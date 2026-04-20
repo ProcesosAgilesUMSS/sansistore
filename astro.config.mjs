@@ -6,7 +6,8 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://ProcesosAgilesUMSS.github.io/sansistore',
+  site: 'https://ProcesosAgilesUMSS.github.io',
+  base: '/sansistore',
 
   integrations: [react()],
 
