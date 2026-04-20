@@ -14,15 +14,24 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v4
+      - name: Checkout your repository
+        uses: actions/checkout@v4
+      - name: Print Node and Bun versions
+        run: |
+          node --version || true
+          bun --version || true
+
+      - name: Install, build, and upload your site
+        uses: withastro/action@v6
         with:
+          # Build from repository root
+          path: .
+          # Use Node 24 as requested
           node-version: '24'
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: "1.3"
-      - run: bun install
-      - run: bun run build
+          # Use Bun as the package manager/runtime
+          package-manager: 'bun@latest'
+          # Explicit build command using bun
+          build-cmd: 'bun run build'
         env:
           PUBLIC_FIREBASE_API_KEY: ${{ secrets.PUBLIC_FIREBASE_API_KEY }}
           PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.PUBLIC_FIREBASE_AUTH_DOMAIN }}
@@ -39,5 +48,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/deploy-pages@v4
+      - name: Deploy to GitHub Pages
         id: deployment
+        uses: actions/deploy-pages@v5
