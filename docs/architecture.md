@@ -1,18 +1,16 @@
-# Arquitectura — Estructura de Carpetas
-
-## Enfoque: Feature-based
-
+# Architecture — Folder Structure
+## Approach: Feature-based
 ```
 src/
-├── components/        # UI genérico compartido (botones, inputs, etc.)
+├── components/        # Shared generic UI (buttons, inputs, etc.)
 ├── layouts/           # Astro layouts
-├── pages/             # Rutas Astro — solo importan su feature
+├── pages/             # Astro routes — only import from their feature
 │   ├── login.astro
 │   ├── dashboard.astro
 │   └── products/
 │       └── index.astro
 │
-├── features/          # Un directorio por módulo
+├── features/          # One directory per module
 │   ├── auth/
 │   │   ├── components/
 │   │   ├── hooks/
@@ -24,12 +22,10 @@ src/
 │       ├── services/
 │       └── types.ts
 │
-├── lib/               # Firebase, helpers, cliente HTTP
+├── lib/               # Firebase, helpers, HTTP client
 └── styles/
 ```
-
-## Reglas
-
-- Cada página importa solo desde su feature correspondiente
-- Los módulos no se importan entre sí — lo compartido va a `components/` o `lib/`
-- Si un componente conoce Firebase o hace fetch, pertenece a un feature, no a `components/`
+## Rules
+- Each page imports only from its corresponding feature
+- Modules do not import from each other — shared code goes in `components/` or `lib/`
+- If a component knows about Firebase or makes fetch calls, it belongs in a feature, not in `components/`

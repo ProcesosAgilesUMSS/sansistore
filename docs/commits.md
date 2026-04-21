@@ -1,37 +1,37 @@
 # Commits
 
-## Formato
+## Format
 
 ```
-<tipo>: <descripción en imperativo, minúsculas>
+<type>: <description in imperative mood, lowercase>
 ```
 
-## Tipos
+## Types
 
-| Tipo | Cuándo usar |
+| Type | When to use |
 |------|-------------|
-| `feat` | Nueva funcionalidad |
-| `fix` | Corrección de bug |
-| `refactor` | Cambio de código sin nuevo comportamiento |
-| `chore` | Tareas técnicas, configs, dependencias |
-| `docs` | Documentación |
-| `style` | Formato, espaciado (sin cambio de lógica) |
-| `test` | Agregar o modificar tests |
+| `feat` | New functionality |
+| `fix` | Bug fix |
+| `refactor` | Code change with no new behavior |
+| `chore` | Technical tasks, configs, dependencies |
+| `docs` | Documentation |
+| `style` | Formatting, spacing (no logic change) |
+| `test` | Add or update tests |
 
-## Ejemplos
+## Examples
 
 ```bash
-git commit -m "feat: agregar formulario de login"
-git commit -m "fix: corregir validación de email en registro"
-git commit -m "refactor: extraer hook useAuth de LoginPage"
-git commit -m "chore: actualizar dependencias de tailwind"
-git commit -m "docs: documentar componente Button"
+git commit -m "feat: add login form"
+git commit -m "fix: correct email validation in registration"
+git commit -m "refactor: extract useAuth hook from LoginPage"
+git commit -m "chore: update tailwind dependencies"
+git commit -m "docs: document Button component"
 ```
 
-## Reglas
+## Rules
 
-- Usar imperativo: `agregar` no `agregué` ni `agregando`
-- Minúsculas siempre
-- Sin punto final
-- Descripción clara y concisa
-- Un commit por cambio lógico — no mezclar funcionalidades
+- Use imperative mood: `add` not `added` or `adding`
+- Always lowercase
+- No trailing period
+- Clear and concise description
+- One commit per logical change — do not mix features
