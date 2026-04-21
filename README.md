@@ -1,15 +1,18 @@
 # Sansistore - CI/CD Workflow
 
-## Workflow
+## Docs
 
-### Global Rules
-- **NEVER push directly to `main` or `develop`**
-- All work requires Pull Request (PR)
-- You need approval to merge
+| Doc | Description |
+|-----|-------------|
+| [Architecture](docs/architecture.md) | Stack, folder structure and environments |
+| [Branches](docs/branches.md) | Branch naming, prefixes and workflow |
+| [Commits](docs/commits.md) | Format, types and examples |
+| [CI/CD](docs/cicd.md) | Pipeline and deploy to production |
+| [Pull Requests](docs/pull-requests.md) | Template, checklist and issue types |
 
 ---
 
-## Daily Development Flow
+## Daily flow
 
 ```mermaid
 flowchart LR
@@ -23,35 +26,14 @@ flowchart LR
     style D fill:#fff3e0
 ```
 
-### Daily Steps
-
-1. **Create your branch from develop**
-   ```bash
-   git checkout develop
-   git pull origin develop
-   git checkout -b feature/your-task
-   ```
-
-2. **Work on your task** and commit
-   ```bash
-   git add .
-   git commit -m "feat: description of changes"
-   ```
-
-3. **Push your branch and create PR to develop**
-   ```bash
-   git push -u origin feature/your-task
-   ```
-
-4. **Wait for review** - Someone must approve your PR
-
-5. **CI/CD runs automatically** on the PR
-
-6. **Merge to develop** after approval + CI passing
+1. Create branch from `develop` → see [Branches](docs/branches.md)
+2. Work and commit → see [Commits](docs/commits.md)
+3. Open PR to `develop` and wait for approval + CI to pass → see [Pull Requests](docs/pull-requests.md)
+4. Merge to `develop`
 
 ---
 
-## Release to Production Flow
+## Release flow
 
 ```mermaid
 flowchart LR
@@ -63,26 +45,17 @@ flowchart LR
     style D fill:#c8e6c9
 ```
 
-### Release Steps
+```bash
+git checkout main && git merge develop && git push origin main
+git tag -a v1.0.0 -m "Release v1.0.0"
+git push origin v1.0.0
+```
 
-1. **Merge develop to main** (release manager only)
-   ```bash
-   git checkout main
-   git merge develop
-   git push origin main
-   ```
-
-2. **Create a version tag**
-   ```bash
-   git tag -a v1.0.0 -m "Release v1.0.0"
-   git push origin v1.0.0
-   ```
-
-3. **GitHub Action detects the tag** and deploys to production
+→ see [CI/CD](docs/cicd.md)
 
 ---
 
-## General Workflow Diagram
+## General workflow
 
 ```mermaid
 flowchart TB
@@ -98,12 +71,14 @@ flowchart TB
     subgraph FEATURES["FEATURE BRANCHES"]
         F1[feature/*]
         F2[fix/*]
-        F3[chore/*]
+        F3[hotfix/*]
+        F4[chore/*]
     end
     
     F1 --> D1
     F2 --> D1
     F3 --> D1
+    F4 --> D1
     D1 -->|APPROVAL + CI OK| DEVELOP
     DEVELOP -.->|merge| MAIN
     
@@ -114,46 +89,7 @@ flowchart TB
 
 ---
 
-## Issue Guidelines
-
-Before creating a PR, create an issue first. Use the appropriate template:
-
-| Issue Type | When to Use |
-|------------|--------------|
-| **User Story** | New feature from user perspective |
-| **Bug Report** | Something not working |
-| **Task** | Subtask or technical work |
-
-Create issue: Go to Issues → New Issue → Select template
-
----
-
-## Pull Request Template
-
-When creating a PR, use the template (auto-filled):
-
-```markdown
-## Description
-<!-- What does this PR do? Why is it needed? -->
-
-## Type of Change
-- [ ] New feature
-- [ ] Bug fix
-- [ ] Refactoring
-- [ ] Documentation
-
-## Related Issues
-<!-- Closes #123 -->
-
-## Checklist
-- [ ] Code works as expected
-- [ ] No new warnings or errors
-- [ ] Self-reviewed
-```
-
----
-
-## Useful Commands
+## Useful commands
 
 | Command | Description |
 |---------|-------------|
@@ -166,39 +102,26 @@ When creating a PR, use the template (auto-filled):
 
 ---
 
-## Frontend Guide
+## Frontend
 
-Tech Stack: Astro + React + Tailwind CSS + Firebase
-
-### Commands
+**Stack:** Astro + React + Tailwind CSS + Firebase
 
 ```bash
 bun install          # Install dependencies
 bun dev              # Start dev server (localhost:4321)
 bun build            # Production build
 bun preview          # Preview build
-bun astro check     # Typecheck
-```
-
-### Structure
-
-```
-src/
-├── components/      # React/Astro components
-├── layouts/         # Astro layouts
-├── pages/           # Routes (file-based routing)
-├── lib/             # Utilities, Firebase, etc.
-└── styles/          # Global CSS
+bun astro check      # Typecheck
 ```
 
 ---
 
-## Team Rules
+## Global rules
 
-1. **NEVER** do `git push -f` to develop or main
-2. **NEVER** push directly to main or develop
-3. Always create issues before starting work
-4. Always use PR template with clear description
-5. Wait for approval before merging
-6. CI must pass before merging
-7. Keep develop stable for others
+- **NEVER** `git push -f` to `develop` or `main`
+- **NEVER** push directly to `main` or `develop`
+- Always create an issue before starting work
+- Always use PR template with clear description
+- Wait for approval before merging
+- CI must pass before merging
+- Keep `develop` stable for the team
