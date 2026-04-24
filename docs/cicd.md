@@ -1,6 +1,6 @@
 # CI/CD
 
-## Pipeline (automatic on every PR to develop)
+## Pipeline (automatic on PRs)
 
 ```
 bun astro check  ──►  bun build  ──►  lint / tests
@@ -9,22 +9,23 @@ bun astro check  ──►  bun build  ──►  lint / tests
 
 Merge only happens with **approval + CI green**.
 
-## Deploy to production
+## Deployments (Vercel)
 
-```bash
-# 1. Merge develop → main (release manager only)
-git checkout main
-git merge develop
-git push origin main
+We deploy from branches:
 
-# 2. Create version tag → triggers automatic deploy
-git tag -a v1.0.0 -m "Release v1.0.0"
-git push origin v1.0.0
-```
+| Branch | Deploy URL |
+|---|---|
+| `main` | https://sansistore-test.vercel.app |
+| `production` | https://sansistore-umss.vercel.app |
+
+Release flow:
+
+1. During the sprint, PRs merge into `main` (QA / pre-release).
+2. At sprint end, open a merge request `main` → `production`.
+3. Merge after QA sign-off.
 
 ## Rules
 
 - CI must pass before merging
-- Only the release manager can merge to `main`
-- Production deploy is triggered **only** by a `vX.X.X` tag
-- Keep `develop` stable for the rest of the team
+- Never push directly to `main` or `production`
+- Never force-push to `main` or `production`

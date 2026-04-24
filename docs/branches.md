@@ -1,37 +1,59 @@
 # Branches
+
 ## Main branches
+
 | Branch | Purpose | Access |
-|--------|---------|--------|
-| `main` | Production | Release manager only |
-| `develop` | Staging / integration | Whole team (via PR) |
+|---|---|---|
+| `main` | Staging / QA (pre-release) | Whole team (via PR) |
+| `production` | Production (live) | Limited (via PR) |
+
+Deploy mapping (Vercel):
+
+| Branch | Deploy URL |
+|---|---|
+| `main` | https://sansistore-test.vercel.app |
+| `production` | https://sansistore-umss.vercel.app |
+
 ## Working branches
+
 | Prefix | When to use | Example |
-|--------|-------------|---------|
+|---|---|---|
 | `feature/` | New functionality | `feature/login-page` |
 | `fix/` | Bug fix | `fix/email-validation` |
-| `hotfix/` | Urgent fix directly to main | `hotfix/payment-crash` |
+| `hotfix/` | Urgent fix for production | `hotfix/payment-crash` |
 | `chore/` | Technical tasks | `chore/update-deps` |
+
 ## Flow
+
 ```
-develop ──► feature/your-task  ──► PR ──► develop ──► main
-main    ──► hotfix/urgent-fix  ──► PR ──► main + merge into develop
+main        ──► feature/your-task  ──► PR ──► main
+main        ──► fix/your-bug       ──► PR ──► main
+main        ──► (end of sprint)    ──► PR ──► production
+production  ──► hotfix/urgent-fix  ──► PR ──► production ──► back-merge ──► main
 ```
+
 ## Commands
+
 ```bash
-# Create branch from develop
-git checkout develop
-git pull origin develop
+# Create branch from main
+git checkout main
+git pull origin main
 git checkout -b feature/task-name
+
 # Push for the first time
 git push -u origin feature/task-name
-# Update branch with changes from develop
-git checkout develop && git pull
+
+# Update your branch with changes from main
+git checkout main && git pull
 git checkout feature/task-name
-git merge develop
+git merge main
 ```
+
 ## Rules
-- Always branch off from `develop`, never from `main`
-- **NEVER** push directly to `main` or `develop`
-- **NEVER** `git push -f` to `main` or `develop`
-- Name in kebab-case: `feature/my-task` not `feature/myTask`
-- One branch per issue/task
+
+- Branch off from `main` for normal work.
+- Hotfixes branch off from `production`.
+- Never push directly to `main` or `production`.
+- Never force-push to `main` or `production`.
+- Name in kebab-case: `feature/my-task` not `feature/myTask`.
+- One branch per issue/task.
