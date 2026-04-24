@@ -41,7 +41,7 @@ Daily work:
 
 End of sprint (release):
 
-1. Open a merge request `main` → `production`.
+1. Open a pull request `main` → `production`.
 2. Merge after QA sign-off.
 
 Hotfixes:
