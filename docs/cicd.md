@@ -21,7 +21,7 @@ We deploy from branches:
 Release flow:
 
 1. During the sprint, PRs merge into `main` (QA / pre-release).
-2. At sprint end, open a merge request `main` → `production`.
+2. At sprint end, open a pull request `main` → `production`.
 3. Merge after QA sign-off.
 
 ## Rules
