@@ -1,0 +1,9 @@
+[book]
+title = "Sansi Store Documentation"
+description = "Internal documentation for Sansi Store project"
+authors = ["Sansi Team"]
+src = "."
+
+[output.html]
+git-repository-url = "https://github.com/ProcesosAgilesUMSS/sansistore"
+edit-url-template = "https://github.com/ProcesosAgilesUMSS/sansistore/edit/main/docs/{path}"
