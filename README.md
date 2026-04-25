@@ -31,6 +31,142 @@ bun astro check
 
 If you need environment variables (Firebase, etc.), ask the team for the current `.env` values or check the Vercel project settings.
 
+## Data model
+
+This is the base Firestore model. The database uses consistent English names for collections and fields.
+
+```mermaid
+classDiagram
+  class users {
+    +string uid
+    +string email
+    +string displayName
+    +string role
+    +string institutionalId
+    +timestamp createdAt
+  }
+
+  class locations {
+    +string locationId
+    +string userId
+    +string label
+    +string type
+    +number lat
+    +number lng
+    +boolean isDefault
+  }
+
+  class categories {
+    +string categoryId
+    +string name
+    +boolean active
+  }
+
+  class products {
+    +string productId
+    +string categoryId
+    +string name
+    +number price
+    +string imageUrl
+    +boolean active
+    +boolean hasOffer
+    +number offerPrice
+  }
+
+  class inventory {
+    +string productId
+    +number stockTotal
+    +number stockAvailable
+    +number stockReserved
+    +number minStock
+    +boolean enabled
+  }
+
+  class inventoryMovements {
+    +string movementId
+    +string productId
+    +string operatorId
+    +string type
+    +number quantity
+    +timestamp createdAt
+  }
+
+  class reviews {
+    +string reviewId
+    +string productId
+    +string userId
+    +number rating
+    +string comment
+    +timestamp createdAt
+  }
+
+  class orders {
+    +string orderId
+    +string buyerId
+    +string sellerId
+    +string status
+    +number total
+    +string locationId
+    +timestamp createdAt
+  }
+
+  class orderItems {
+    +string itemId
+    +string productId
+    +string productName
+    +number unitPrice
+    +number quantity
+    +number subtotal
+  }
+
+  class deliveries {
+    +string deliveryId
+    +string orderId
+    +string courierId
+    +string status
+    +string incidentReason
+    +number amountCollected
+    +timestamp assignedAt
+  }
+
+  class payments {
+    +string paymentId
+    +string orderId
+    +number amount
+    +string method
+    +string status
+    +timestamp registeredAt
+  }
+
+  class courierSessions {
+    +string sessionId
+    +string courierId
+    +number totalCollected
+    +number deliveriesCount
+    +timestamp closedAt
+  }
+
+  users "1" --> "0..*" locations : owns
+  users "1" --> "0..*" orders : places
+  users "1" --> "0..*" reviews : writes
+  categories "1" --> "0..*" products : contains
+  products "1" *-- "1" inventory : subcollection
+  inventory "1" --> "0..*" inventoryMovements : logs
+  products "1" --> "0..*" reviews : has
+  orders "1" *-- "1..*" orderItems : subcollection
+  orders "1" --> "1" deliveries : has
+  orders "1" --> "1" payments : has
+  deliveries "0..*" --> "1" courierSessions : belongs
+```
+
+### Technical notes
+
+The model is a good base for an ecommerce app with delivery, with three implementation details to keep consistent:
+
+- In Firestore, you do not always need to store `productId`, `orderId`, etc. inside the document if the document ID already represents that value. Store it only when exports or search flows need it.
+- `inventoryMovements` should belong under `products` or live as a root collection indexed by `productId`. Nesting it under `inventory` can make global audit queries harder.
+- Define closed values for `role`, `status`, `type`, and `method` from the start to avoid inconsistent states.
+
 ## Branching and releases
 
 Daily work:
