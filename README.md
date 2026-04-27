@@ -125,8 +125,11 @@ classDiagram
     +string courierId
     +string status
     +string incidentReason
+    +string evidenceUrl
     +number amountCollected
     +timestamp assignedAt
+    +timestamp pickedUpAt
+    +timestamp deliveredAt
   }
 
   class payments {
@@ -166,6 +169,8 @@ The model is a good base for an ecommerce app with delivery, with three implemen
 - In Firestore, you do not always need to store `productId`, `orderId`, etc. inside the document if the document ID already represents that value. Store it only when exports or search flows need it.
 - `inventoryMovements` should belong under `products` or live as a root collection indexed by `productId`. Nesting it under `inventory` can make global audit queries harder.
 - Define closed values for `role`, `status`, `type`, and `method` from the start to avoid inconsistent states.
+- Delivery lifecycle timestamps must be stored in `deliveries`: `assignedAt`, `pickedUpAt`, and `deliveredAt`, to support tracking and performance metrics.
+- `evidenceUrl` is optional and stores delivery or incident evidence when required.
 
 ## Branching and releases
 
