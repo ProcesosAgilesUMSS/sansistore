@@ -71,6 +71,7 @@ classDiagram
     +boolean active
     +boolean hasOffer
     +number offerPrice
+    +number soldCount
   }
 
   class inventory {
@@ -146,11 +147,30 @@ classDiagram
     +timestamp closedAt
   }
 
+  class cartItems {
+    +string cartItemId
+    +string userId
+    +string productId
+    +number quantity
+    +timestamp addedAt
+  }
+
+  class favorites {
+    +string favoriteId
+    +string userId
+    +string productId
+    +timestamp createdAt
+  }
+
   users "1" --> "0..*" locations : owns
   users "1" --> "0..*" orders : places
   users "1" --> "0..*" reviews : writes
+  users "1" --> "0..*" cartItems : has
+  users "1" --> "0..*" favorites : saves
   categories "1" --> "0..*" products : contains
   products "1" *-- "1" inventory : subcollection
+  products "1" --> "0..*" cartItems : referenced in
+  products "1" --> "0..*" favorites : saved in
   inventory "1" --> "0..*" inventoryMovements : logs
   products "1" --> "0..*" reviews : has
   orders "1" *-- "1..*" orderItems : subcollection
