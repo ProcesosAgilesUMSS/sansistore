@@ -146,20 +146,31 @@ classDiagram
   }
 
   class payments {
-    +string paymentId
-    +string orderId
-    +number amount
-    +string method
-    +string status
-    +timestamp registeredAt
+  +string paymentId
+  +string orderId
+  +number amount
+  +string method
+  +string status
+  +string registeredBy
+  +string verifiedBy
+  +timestamp registeredAt
+  +timestamp verifiedAt
+  +timestamp updatedAt
   }
 
   class courierSessions {
-    +string sessionId
-    +string courierId
-    +number totalCollected
-    +number deliveriesCount
-    +timestamp closedAt
+  +string sessionId
+  +string courierId
+  +number totalCollected
+  +number deliveriesCount
+  +number expectedAmount
+  +number differenceAmount
+  +string status
+  +timestamp openedAt
+  +timestamp closedAt
+  +string validatedBy
+  +timestamp validatedAt
+  +timestamp updatedAt
   }
 
   users "1" --> "0..*" locations : owns
