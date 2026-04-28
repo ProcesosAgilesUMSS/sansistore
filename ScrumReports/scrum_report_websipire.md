@@ -11,3 +11,9 @@
 - **Yesterday:** Trabajé en la definición de los criterios de aceptación para las historias de usuario del Sprint 1, especificando los resultados esperados, condiciones de validación y aspectos necesarios para comprobar que cada historia cumpla con lo requerido.
 - **Today:** Coordinar con el equipo WebSpire la revisión de los criterios de aceptación y apoyar en la planificación del Sprint 1 para asegurar que las historias de usuario estén claras antes de su implementación.
 - **Blockers:** None.
+  
+## Jose Brandon Pinedo Gonzales
+
+- **Yesterday:** Modifiqué el modelo de datos de Firestore para Entrega y Cobro. Se actualizaron las colecciones `orders`, `deliveries`, `payments` y `courierSessions`, además de crear `notifications` para soportar alertas del sistema.
+- **Today:** Revisaré que los cambios realizados en la base de datos cubran correctamente las historias de usuario asignadas al Sprint 1 y coordinaré con el equipo los siguientes pasos.
+- **Blockers:** None.
