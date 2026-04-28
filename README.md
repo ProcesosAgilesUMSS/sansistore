@@ -101,13 +101,20 @@ classDiagram
   }
 
   class orders {
-    +string orderId
-    +string buyerId
-    +string sellerId
-    +string status
-    +number total
-    +string locationId
-    +timestamp createdAt
+  +string orderId
+  +string buyerId
+  +string sellerId
+  +string status
+  +number total
+  +string locationId
+  +string paymentStatus
+  +string deliveryStatus
+  +string deliveryId
+  +string paymentId
+  +timestamp confirmedAt
+  +timestamp cancelledAt
+  +timestamp createdAt
+  +timestamp updatedAt
   }
 
   class orderItems {
