@@ -173,6 +173,18 @@ classDiagram
   +timestamp updatedAt
   }
 
+  class notifications {
+  +string notificationId
+  +string userId
+  +string orderId
+  +string type
+  +string title
+  +string message
+  +boolean read
+  +timestamp createdAt
+  +timestamp updatedAt
+  }
+
   users "1" --> "0..*" locations : owns
   users "1" --> "0..*" orders : places
   users "1" --> "0..*" reviews : writes
@@ -184,6 +196,8 @@ classDiagram
   orders "1" --> "1" deliveries : has
   orders "1" --> "1" payments : has
   deliveries "0..*" --> "1" courierSessions : belongs
+  users "1" --> "0..*" notifications : receives
+  orders "1" --> "0..*" notifications : triggers
 ```
 
 ### Technical notes
