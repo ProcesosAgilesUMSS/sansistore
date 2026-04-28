@@ -136,6 +136,8 @@ classDiagram
   +string incidentReason
   +string failureReason
   +number amountCollected
+  +boolean customerConfirmed
+  +timestamp customerConfirmedAt
   +timestamp assignedAt
   +timestamp pickedUpAt
   +timestamp deliveredAt
