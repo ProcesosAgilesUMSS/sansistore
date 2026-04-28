@@ -41,8 +41,9 @@ classDiagram
     +string uid
     +string email
     +string displayName
-    +string role
+    +array roles
     +string institutionalId
+    +string phone 
     +timestamp createdAt
   }
 
@@ -105,6 +106,7 @@ classDiagram
     +string buyerId
     +string sellerId
     +string status
+    +string reason
     +number total
     +string locationId
     +timestamp createdAt
@@ -127,6 +129,8 @@ classDiagram
     +string incidentReason
     +number amountCollected
     +timestamp assignedAt
+    +timestamp inTransitAt
+    +timestamp deliveredAt
   }
 
   class payments {
