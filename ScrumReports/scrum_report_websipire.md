@@ -17,3 +17,10 @@
 - **Yesterday:** Modifiqué el modelo de datos de Firestore para Entrega y Cobro. Se actualizaron las colecciones `orders`, `deliveries`, `payments` y `courierSessions`, además de crear `notifications` para soportar alertas del sistema.
 - **Today:** Revisaré que los cambios realizados en la base de datos cubran correctamente las historias de usuario asignadas al Sprint 1 y coordinaré con el equipo los siguientes pasos.
 - **Blockers:** None.
+
+
+## Juan Daniel Vasquez Casana
+
+- **Yesterday:** Analicé la HU *“Como mensajero quiero marcar un pedido como entregado para registrar que la entrega fue completada”*, definiendo sus estados y funcionalidades. También apoyé en la creación y organización de labels en GitHub para una mejor gestión de tareas.
+- **Today:** Coordinar con el equipo la planificación del Sprint 1 y continuaré mejorando los mockups según los acuerdos definidos.
+- **Blockers:** None.
