@@ -43,6 +43,8 @@ classDiagram
     +string displayName
     +array roles
     +string institutionalId
+    +boolean isActive
+    +string createdBy
     +timestamp createdAt
   }
 
@@ -60,8 +62,6 @@ classDiagram
     +string categoryId
     +string name
     +boolean active
-    +string createdBy
-    +timestamp createdAt
   }
 
   class products {
@@ -103,34 +103,14 @@ classDiagram
   }
 
   class orders {
-  +string orderId
-  +string buyerId
-  +string sellerId
-  +string status
-  +number total
-  +string locationId
-  +string paymentStatus
-  +string deliveryStatus
-  +string deliveryId
-  +string paymentId
-  +timestamp confirmedAt
-  +timestamp cancelledAt
-  +timestamp createdAt
-  +timestamp updatedAt
-  +string orderId
-  +string buyerId
-  +string sellerId
-  +string status
-  +number total
-  +string locationId
-  +string paymentStatus
-  +string deliveryStatus
-  +string deliveryId
-  +string paymentId
-  +timestamp confirmedAt
-  +timestamp cancelledAt
-  +timestamp createdAt
-  +timestamp updatedAt
+    +string orderId
+    +string buyerId
+    +string sellerId
+    +string status
+    +string reason
+    +number total
+    +string locationId
+    +timestamp createdAt
   }
 
   class orderItems {
@@ -143,102 +123,32 @@ classDiagram
   }
 
   class deliveries {
-  +string deliveryId
-  +string orderId
-  +string courierId
-  +string status
-  +string deliveryCode
-  +number attemptNumber
-  +string incidentReason
-  +string failureReason
-  +number amountCollected
-  +boolean customerConfirmed
-  +timestamp customerConfirmedAt
-  +timestamp assignedAt
-  +timestamp pickedUpAt
-  +timestamp deliveredAt
-  +timestamp failedAt
-  +timestamp reprogrammedAt
-  +timestamp createdAt
-  +timestamp updatedAt
-  +string deliveryId
-  +string orderId
-  +string courierId
-  +string status
-  +string deliveryCode
-  +number attemptNumber
-  +string incidentReason
-  +string failureReason
-  +number amountCollected
-  +boolean customerConfirmed
-  +timestamp customerConfirmedAt
-  +timestamp assignedAt
-  +timestamp pickedUpAt
-  +timestamp deliveredAt
-  +timestamp failedAt
-  +timestamp reprogrammedAt
-  +timestamp createdAt
-  +timestamp updatedAt
+    +string deliveryId
+    +string orderId
+    +string courierId
+    +string status
+    +string incidentReason
+    +number amountCollected
+    +timestamp assignedAt
+    +timestamp inTransitAt
+    +timestamp deliveredAt
   }
 
   class payments {
-  +string paymentId
-  +string orderId
-  +number amount
-  +string method
-  +string status
-  +string registeredBy
-  +string verifiedBy
-  +timestamp registeredAt
-  +timestamp verifiedAt
-  +timestamp updatedAt
-  +string paymentId
-  +string orderId
-  +number amount
-  +string method
-  +string status
-  +string registeredBy
-  +string verifiedBy
-  +timestamp registeredAt
-  +timestamp verifiedAt
-  +timestamp updatedAt
+    +string paymentId
+    +string orderId
+    +number amount
+    +string method
+    +string status
+    +timestamp registeredAt
   }
 
   class courierSessions {
-  +string sessionId
-  +string courierId
-  +number totalCollected
-  +number deliveriesCount
-  +number expectedAmount
-  +number differenceAmount
-  +string status
-  +timestamp openedAt
-  +timestamp closedAt
-  +string validatedBy
-  +timestamp validatedAt
-  +timestamp updatedAt
-  }
-
-  class notifications {
-  +string notificationId
-  +string userId
-  +string orderId
-  +string type
-  +string title
-  +string message
-  +boolean read
-  +timestamp createdAt
-  +timestamp updatedAt
-  }
-
-  class settings {
-    +string documentId
-    +number reservationTimeLimit
-  }
-
-  class settings {
-    +string documentId
-    +number reservationTimeLimit
+    +string sessionId
+    +string courierId
+    +number totalCollected
+    +number deliveriesCount
+    +timestamp closedAt
   }
 
   users "1" --> "0..*" locations : owns
@@ -252,9 +162,6 @@ classDiagram
   orders "1" --> "1" deliveries : has
   orders "1" --> "1" payments : has
   deliveries "0..*" --> "1" courierSessions : belongs
-  users "1" --> "1" settings : configures
-  users "1" --> "0..*" notifications : receives
-  orders "1" --> "0..*" notifications : triggers
 ```
 
 ### Technical notes
@@ -264,7 +171,6 @@ The model is a good base for an ecommerce app with delivery, with three implemen
 - In Firestore, you do not always need to store `productId`, `orderId`, etc. inside the document if the document ID already represents that value. Store it only when exports or search flows need it.
 - `inventoryMovements` should belong under `products` or live as a root collection indexed by `productId`. Nesting it under `inventory` can make global audit queries harder.
 - Define closed values for `role`, `status`, `type`, and `method` from the start to avoid inconsistent states.
-- (TODO) `roles` is an array accepting: admin | vendedor | mensajero | operador | comprador. Example: ["admin", "comprador"] -> CHECK. Use array-contains for queries.
 
 ## Branching and releases
 
