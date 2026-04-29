@@ -115,6 +115,20 @@ classDiagram
   +timestamp cancelledAt
   +timestamp createdAt
   +timestamp updatedAt
+  +string orderId
+  +string buyerId
+  +string sellerId
+  +string status
+  +number total
+  +string locationId
+  +string paymentStatus
+  +string deliveryStatus
+  +string deliveryId
+  +string paymentId
+  +timestamp confirmedAt
+  +timestamp cancelledAt
+  +timestamp createdAt
+  +timestamp updatedAt
   }
 
   class orderItems {
@@ -145,9 +159,37 @@ classDiagram
   +timestamp reprogrammedAt
   +timestamp createdAt
   +timestamp updatedAt
+  +string deliveryId
+  +string orderId
+  +string courierId
+  +string status
+  +string deliveryCode
+  +number attemptNumber
+  +string incidentReason
+  +string failureReason
+  +number amountCollected
+  +boolean customerConfirmed
+  +timestamp customerConfirmedAt
+  +timestamp assignedAt
+  +timestamp pickedUpAt
+  +timestamp deliveredAt
+  +timestamp failedAt
+  +timestamp reprogrammedAt
+  +timestamp createdAt
+  +timestamp updatedAt
   }
 
   class payments {
+  +string paymentId
+  +string orderId
+  +number amount
+  +string method
+  +string status
+  +string registeredBy
+  +string verifiedBy
+  +timestamp registeredAt
+  +timestamp verifiedAt
+  +timestamp updatedAt
   +string paymentId
   +string orderId
   +number amount
@@ -198,6 +240,8 @@ classDiagram
   orders "1" --> "1" deliveries : has
   orders "1" --> "1" payments : has
   deliveries "0..*" --> "1" courierSessions : belongs
+  users "1" --> "0..*" notifications : receives
+  orders "1" --> "0..*" notifications : triggers
   users "1" --> "0..*" notifications : receives
   orders "1" --> "0..*" notifications : triggers
 ```
