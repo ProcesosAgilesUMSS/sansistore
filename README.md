@@ -106,13 +106,34 @@ classDiagram
   }
 
   class orders {
-    +string orderId
-    +string buyerId
-    +string sellerId
-    +string status
-    +number total
-    +string locationId
-    +timestamp createdAt
+  +string orderId
+  +string buyerId
+  +string sellerId
+  +string status
+  +number total
+  +string locationId
+  +string paymentStatus
+  +string deliveryStatus
+  +string deliveryId
+  +string paymentId
+  +timestamp confirmedAt
+  +timestamp cancelledAt
+  +timestamp createdAt
+  +timestamp updatedAt
+  +string orderId
+  +string buyerId
+  +string sellerId
+  +string status
+  +number total
+  +string locationId
+  +string paymentStatus
+  +string deliveryStatus
+  +string deliveryId
+  +string paymentId
+  +timestamp confirmedAt
+  +timestamp cancelledAt
+  +timestamp createdAt
+  +timestamp updatedAt
   }
 
   class orderItems {
@@ -125,30 +146,97 @@ classDiagram
   }
 
   class deliveries {
-    +string deliveryId
-    +string orderId
-    +string courierId
-    +string status
-    +string incidentReason
-    +number amountCollected
-    +timestamp assignedAt
+  +string deliveryId
+  +string orderId
+  +string courierId
+  +string status
+  +string deliveryCode
+  +number attemptNumber
+  +string incidentReason
+  +string failureReason
+  +number amountCollected
+  +boolean customerConfirmed
+  +timestamp customerConfirmedAt
+  +timestamp assignedAt
+  +timestamp pickedUpAt
+  +timestamp deliveredAt
+  +timestamp failedAt
+  +timestamp reprogrammedAt
+  +timestamp createdAt
+  +timestamp updatedAt
+  +string deliveryId
+  +string orderId
+  +string courierId
+  +string status
+  +string deliveryCode
+  +number attemptNumber
+  +string incidentReason
+  +string failureReason
+  +number amountCollected
+  +boolean customerConfirmed
+  +timestamp customerConfirmedAt
+  +timestamp assignedAt
+  +timestamp pickedUpAt
+  +timestamp deliveredAt
+  +timestamp failedAt
+  +timestamp reprogrammedAt
+  +timestamp createdAt
+  +timestamp updatedAt
   }
 
   class payments {
-    +string paymentId
-    +string orderId
-    +number amount
-    +string method
-    +string status
-    +timestamp registeredAt
+  +string paymentId
+  +string orderId
+  +number amount
+  +string method
+  +string status
+  +string registeredBy
+  +string verifiedBy
+  +timestamp registeredAt
+  +timestamp verifiedAt
+  +timestamp updatedAt
+  +string paymentId
+  +string orderId
+  +number amount
+  +string method
+  +string status
+  +string registeredBy
+  +string verifiedBy
+  +timestamp registeredAt
+  +timestamp verifiedAt
+  +timestamp updatedAt
   }
 
   class courierSessions {
-    +string sessionId
-    +string courierId
-    +number totalCollected
-    +number deliveriesCount
-    +timestamp closedAt
+  +string sessionId
+  +string courierId
+  +number totalCollected
+  +number deliveriesCount
+  +number expectedAmount
+  +number differenceAmount
+  +string status
+  +timestamp openedAt
+  +timestamp closedAt
+  +string validatedBy
+  +timestamp validatedAt
+  +timestamp updatedAt
+  }
+
+  class notifications {
+  +string notificationId
+  +string userId
+  +string orderId
+  +string type
+  +string title
+  +string message
+  +boolean read
+  +timestamp createdAt
+  +timestamp updatedAt
+  }
+
+  class settings {
+    +string documentId
+    +number reservationTimeLimit
   }
 
   class settings {
@@ -168,6 +256,8 @@ classDiagram
   orders "1" --> "1" payments : has
   deliveries "0..*" --> "1" courierSessions : belongs
   users "1" --> "1" settings : configures
+  users "1" --> "0..*" notifications : receives
+  orders "1" --> "0..*" notifications : triggers
 ```
 
 ### Technical notes
