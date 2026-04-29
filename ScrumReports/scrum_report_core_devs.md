@@ -22,3 +22,8 @@
 - **Yesterday:** investigue para el desarrolo del modulo de inventario 
 - **Today:** organizar la estructura inicial del modulo de inventario.
 - **Blockers:** Ninguno
+
+## Eddy Sejas Arze
+- **Yesterday:** Investigar Astro
+- **Today:** Investigar Firebase
+- **Blockers:** Ninguno
