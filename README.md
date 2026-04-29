@@ -41,11 +41,8 @@ classDiagram
     +string uid
     +string email
     +string displayName
-    +string phoneNumber
     +array roles
     +string institutionalId
-    +boolean isActive
-    +string createdBy
     +timestamp createdAt
   }
 
@@ -232,6 +229,11 @@ classDiagram
   +boolean read
   +timestamp createdAt
   +timestamp updatedAt
+  }
+
+  class settings {
+    +string documentId
+    +number reservationTimeLimit
   }
 
   class settings {
