@@ -17,3 +17,8 @@
 - **Yesterday:** Revisar las HU e inicializar el repositorio
 - **Today:** Realizar los mockups de las HU definidas.
 - **Blockers:** Ninguno
+  
+## Vania F. Llanos Villarroel 
+- **Yesterday:** investigue para el desarrolo del modulo de inventario 
+- **Today:** organizar la estructura inicial del modulo de inventario.
+- **Blockers:** Ninguno
