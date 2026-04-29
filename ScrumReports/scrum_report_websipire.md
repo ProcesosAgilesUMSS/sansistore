@@ -24,3 +24,9 @@
 - **Yesterday:** Analicé la HU *“Como mensajero quiero marcar un pedido como entregado para registrar que la entrega fue completada”*, definiendo sus estados y funcionalidades. También apoyé en la creación y organización de labels en GitHub para una mejor gestión de tareas.
 - **Today:** Coordinar con el equipo la planificación del Sprint 1 y continuaré mejorando los mockups según los acuerdos definidos.
 - **Blockers:** None.
+
+## Alejandro Torrico Quispe
+
+- **Yesterday:** Participe en la agregación de  labels para las Historias de Usuario en GitHub, clasificándolas según las distintas áreas funcionales y equipos correspondientes para facilitar su organización y seguimiento.
+- **Today:** * Participé en la coordinación con mi equipo para definir y priorizar las Historias de Usuario que serán trabajadas durante este sprint.
+- **Blockers:** None.
