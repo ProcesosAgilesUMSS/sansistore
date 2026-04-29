@@ -43,6 +43,8 @@ classDiagram
     +string displayName
     +array roles
     +string institutionalId
+    +boolean isActive
+    +string createdBy
     +timestamp createdAt
   }
 
@@ -107,6 +109,7 @@ classDiagram
     +string buyerId
     +string sellerId
     +string status
+    +string incidentReason
     +number total
     +string locationId
     +string paymentStatus
@@ -141,6 +144,7 @@ classDiagram
     +boolean customerConfirmed
     +timestamp customerConfirmedAt
     +timestamp assignedAt
+    +timestamp inTransitAt
     +timestamp pickedUpAt
     +timestamp deliveredAt
     +timestamp failedAt
