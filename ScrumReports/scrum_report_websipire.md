@@ -30,3 +30,11 @@
 - **Yesterday:** Participe en la agregación de  labels para las Historias de Usuario en GitHub, clasificándolas según las distintas áreas funcionales y equipos correspondientes para facilitar su organización y seguimiento.
 - **Today:** * Participé en la coordinación con mi equipo para definir y priorizar las Historias de Usuario que serán trabajadas durante este sprint.
 - **Blockers:** None.
+
+# Daily Reports - Team 3 Webspire 30/04/26
+
+## Dayana Saleth Ortuño Guzman
+
+ * **Yesterday:** Coordiné con el equipo la planificación del Sprint 1. Con base en eso, comenzamos a diseñar los mockups en Figma junto a mi compañera Victoria.
+* **Today:** Finalizar los ajustes pendientes en los mockups. Posteriormente, iniciar la implementación de la historia de usuario: *“Como mensajero, quiero marcar un pedido como entregado para registrar que la entrega fue completada”* .
+* **Blockers:** None
