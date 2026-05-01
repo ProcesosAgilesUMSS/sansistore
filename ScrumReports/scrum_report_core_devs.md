@@ -41,3 +41,8 @@
 - **Yesterday:** Investigar criterios de aceptacion para las HU's que se trabajaran en el primer sprint
 - **Today:** Definir criterios de aceptacion para las HU's que falten
 - **Blockers:** Ninguno
+
+## Rios Quiruchi Edney Jhojan
+- **Yesterday:** Inicializar el repositorio en mi maquina y avanzar con las tareas de la HU1.
+- **Today:** Avanzar con el dise;o de la HU1
+- **Blockers:** Tuve problemas para entender el proyecto en su completitud
