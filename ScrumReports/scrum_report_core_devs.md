@@ -27,3 +27,9 @@
 - **Yesterday:** Investigar Astro
 - **Today:** Investigar Firebase
 - **Blockers:** Ninguno
+  
+  # 04/30/2026
+## Soliz Moya Alejandra
+- **Yesterday:** Refiné los mockups de las HU 
+- **Today:** Investigar Astro
+- **Blockers:** Ninguno
