@@ -41,8 +41,10 @@ classDiagram
     +string uid
     +string email
     +string displayName
-    +string role
+    +array roles
     +string institutionalId
+    +boolean isActive
+    +string createdBy
     +timestamp createdAt
   }
 
@@ -60,6 +62,8 @@ classDiagram
     +string categoryId
     +string name
     +boolean active
+    +string createdBy
+    +timestamp createdAt
   }
 
   class products {
@@ -105,9 +109,17 @@ classDiagram
     +string buyerId
     +string sellerId
     +string status
+    +string incidentReason
     +number total
     +string locationId
+    +string paymentStatus
+    +string deliveryStatus
+    +string deliveryId
+    +string paymentId
+    +timestamp confirmedAt
+    +timestamp cancelledAt
     +timestamp createdAt
+    +timestamp updatedAt
   }
 
   class orderItems {
@@ -124,12 +136,24 @@ classDiagram
     +string orderId
     +string courierId
     +string status
+    +string deliveryCode
+    +number attemptNumber
     +string incidentReason
     +string evidenceUrl
+    +string failureReason
     +number amountCollected
+    +boolean customerConfirmed
+    +timestamp customerConfirmedAt
     +timestamp assignedAt
     +timestamp pickedUpAt
     +timestamp deliveredAt
+    +timestamp inTransitAt
+    +timestamp pickedUpAt
+    +timestamp deliveredAt
+    +timestamp failedAt
+    +timestamp reprogrammedAt
+    +timestamp createdAt
+    +timestamp updatedAt
   }
 
   class payments {
@@ -138,7 +162,11 @@ classDiagram
     +number amount
     +string method
     +string status
+    +string registeredBy
+    +string verifiedBy
     +timestamp registeredAt
+    +timestamp verifiedAt
+    +timestamp updatedAt
   }
 
   class courierSessions {
@@ -146,7 +174,31 @@ classDiagram
     +string courierId
     +number totalCollected
     +number deliveriesCount
+    +number expectedAmount
+    +number differenceAmount
+    +string status
+    +timestamp openedAt
     +timestamp closedAt
+    +string validatedBy
+    +timestamp validatedAt
+    +timestamp updatedAt
+  }
+
+  class notifications {
+    +string notificationId
+    +string userId
+    +string orderId
+    +string type
+    +string title
+    +string message
+    +boolean read
+    +timestamp createdAt
+    +timestamp updatedAt
+  }
+
+  class settings {
+    +string documentId
+    +number reservationTimeLimit
   }
 
   users "1" --> "0..*" locations : owns
@@ -160,6 +212,9 @@ classDiagram
   orders "1" --> "1" deliveries : has
   orders "1" --> "1" payments : has
   deliveries "0..*" --> "1" courierSessions : belongs
+  users "1" --> "1" settings : configures
+  users "1" --> "0..*" notifications : receives
+  orders "1" --> "0..*" notifications : triggers
 ```
 
 ### Technical notes
@@ -171,6 +226,7 @@ The model is a good base for an ecommerce app with delivery, with three implemen
 - Define closed values for `role`, `status`, `type`, and `method` from the start to avoid inconsistent states.
 - Delivery lifecycle timestamps must be stored in `deliveries`: `assignedAt`, `pickedUpAt`, and `deliveredAt`, to support tracking and performance metrics.
 - `evidenceUrl` is optional and stores delivery or incident evidence when required.
+- (TODO) `roles` is an array accepting: admin | vendedor | mensajero | operador | comprador. Example: ["admin", "comprador"] -> CHECK. Use array-contains for queries.
 
 ## Branching and releases
 
