@@ -43,3 +43,8 @@
 * **Yesterday:** Apoyé en la planificación del Sprint 1 junto con el equipo WebSpire y colaboré con el diseño y revisión de los mockups en Figma, tomando en cuenta las historias de usuario priorizadas para este sprint.
 * **Today:** Continuaré apoyando en los ajustes finales de los mockups y en la revisión de que el diseño esté alineado con las historias de usuario del Sprint 1. También coordinaré con el equipo para iniciar la implementación de las funcionalidades correspondientes.
 * **Blockers:** None
+
+* ## Juan Daniel Vasquez Casana 
+* **Yesterday:** Participé en la planificación del Sprint 1 y diseñé el flujo de la HU-02, considerando validaciones como la restricción de pedidos asignados al mensajero y la confirmación previa al cambio de estado.  
+* **Today:** Continuaré con los ajustes del flujo de la HU-02 y posteriormente iniciaré la implementación de la funcionalidad para marcar pedidos como “Entregado”.  
+* **Blockers:** Ninguno  
