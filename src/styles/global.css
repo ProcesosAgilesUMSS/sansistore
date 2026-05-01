@@ -1,1 +1,52 @@
 @import 'tailwindcss';
+
+@layer base {
+    :root {
+        color-scheme: light;
+        --theme-bg: #fffbf4;
+        --theme-text: #1e1e1e;
+        --theme-card-bg: #ffffff;
+        --theme-secondary-bg: #e8e5d8;
+        --theme-border: rgba(136, 176, 75, 0.15);
+    }
+
+    html[data-theme='dark'] {
+        color-scheme: dark;
+        --theme-bg: #0a0b0d;
+        --theme-text: #f5f3ef;
+        --theme-card-bg: #141518;
+        --theme-secondary-bg: #1a1b1e;
+        --theme-border: rgba(255, 255, 255, 0.08);
+    }
+
+    html,
+    body {
+        background-color: var(--theme-bg);
+        color: var(--theme-text);
+    }
+}
+
+@theme {
+        --color-bg-light: var(--theme-bg);
+        --color-bg-dark: #0a0b0d;
+        --color-primary: #88b04b;
+        --color-primary-action: #1e1e1e;
+        --color-text-light: var(--theme-text);
+        --color-text-dark: #f5f3ef;
+        --color-card-bg-light: var(--theme-card-bg);
+        --color-card-bg-dark: #141518;
+        --color-secondary-bg-light: var(--theme-secondary-bg);
+        --color-secondary-bg-dark: #1a1b1e;
+        --color-border-light: var(--theme-border);
+        --color-border-dark: rgba(255, 255, 255, 0.08);
+}
+
+@layer utilities {
+    html[data-theme='dark'] .theme-icon-light {
+        display: none;
+    }
+
+    html[data-theme='light'] .theme-icon-dark {
+        display: none;
+    }
+}

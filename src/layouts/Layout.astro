@@ -9,15 +9,37 @@ const { title = 'Sansistore' } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang="es" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <script is:inline>
+      const storageKey = 'sansistore-theme';
+      const media = window.matchMedia('(prefers-color-scheme: dark)');
+
+      const applyTheme = (theme) => {
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+      };
+
+      try {
+        const storedTheme = window.localStorage.getItem(storageKey);
+        applyTheme(
+          storedTheme === 'light' || storedTheme === 'dark'
+            ? storedTheme
+            : media.matches
+              ? 'dark'
+              : 'light',
+        );
+      } catch {
+        applyTheme(media.matches ? 'dark' : 'light');
+      }
+    </script>
   </head>
-  <body class="antialiased">
+  <body class="antialiased bg-bg-light text-text-light">
     <slot />
   </body>
 </html>
