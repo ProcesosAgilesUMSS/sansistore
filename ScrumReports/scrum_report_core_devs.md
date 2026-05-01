@@ -5,7 +5,7 @@
 
 ## Willian D. Gonza Rojas
 - **Yesterday:** Inicialicé el proyecto en mi repositorio local, y refinar las US; Registro de Ingreso de Productos y Control de Visibilidad.
-- **Today:** nvestigar Astro y realziar mockups segun el diseño elegido. 
+- **Today:** Investigar Astro y realziar mockups segun el diseño elegido. 
 - **Blockers:** Ninguno
 
 ## Rios Quiruchi Edney Jhojan
@@ -28,8 +28,16 @@
 - **Today:** Investigar Firebase
 - **Blockers:** Ninguno
   
-  # 04/30/2026
+# 04/30/2026
+
+# Daily Report - Team 7 - core devs
+
 ## Soliz Moya Alejandra
 - **Yesterday:** Refiné los mockups de las HU 
 - **Today:** Investigar Astro
+- **Blockers:** Ninguno
+
+## Eddy Sejas Arze
+- **Yesterday:** Investigar criterios de aceptacion para las HU's que se trabajaran en el primer sprint
+- **Today:** Definir criterios de aceptacion para las HU's que falten
 - **Blockers:** Ninguno
