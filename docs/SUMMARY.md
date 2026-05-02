@@ -14,5 +14,7 @@
 ## Frontend System
 - [Design System](./frontend/design-system.md)
 
+- [Seeding](./seed.md)
+
 ## Reports
 - [Daily Report](./daily-report.md)

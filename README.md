@@ -20,6 +20,30 @@ bun install
 bun dev
 ```
 
+### Local emulators (Firestore + Auth)
+
+For local development you can run the Firebase emulators for Firestore and Auth. The project includes an `emu` script that starts both emulators using the configuration in `firebase.json`:
+
+```bash
+# starts Firestore and Auth emulators
+bun run emu
+```
+
+When `PUBLIC_APP_ENV` is not `production` the frontend will automatically connect to the emulators (Firestore on localhost:8080, Auth on localhost:9099). See `src/lib/firebase.ts` for details.
+
+Seeding local emulator
+
+The project includes a seeder at `seed/index.mjs` and a `seed/seed-products.mjs` example. Run the seeder with:
+
+```bash
+# run all seeders
+bun run seed
+# run an individual seeder
+node ./seed/index.mjs seed-products
+```
+
+The seeder defaults to the Firestore emulator (it sets `FIRESTORE_EMULATOR_HOST=localhost:8080` if not provided) so it will not write to production by accident.
+
 Scripts:
 
 ```bash
