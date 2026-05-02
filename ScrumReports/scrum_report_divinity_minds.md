@@ -45,3 +45,8 @@
 - **Yesterday:** Trabajé en la definición de la HU de búsqueda y filtros, y comencé su desarrollo.
 - **Today:** Continuar con el desarrollo de la HU de búsqueda y filtros.
 - **Blockers:** n/a. 
+
+## Marcos Velasquez Vela
+- **Yesterday:** Preparé la base de datos de productos con descripciones, imágenes y reviews; además implementé la HU de detalle de producto con navegación desde el catálogo, vista por `slug`, carga directa desde Firestore y manejo de error.
+- **Today:** Realizar pruebas de la HU de detalle de producto y apoyar en la integración de las siguientes tareas del Sprint 1.
+- **Blockers:** n/a.
