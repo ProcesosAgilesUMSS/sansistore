@@ -22,6 +22,7 @@ Notes:
 
 - The app will automatically connect to the local emulators when the environment variable `PUBLIC_APP_ENV` is not set to `production` (see `src/lib/firebase.ts`).
 - Firestore emulator runs on localhost:8080 and Auth emulator on localhost:9099 by default (configured in `firebase.json`).
+ - The Firebase Local Emulator requires Java 21 or newer to run. Verify with `java -version` and install/update Java if needed.
 
 2. Make sure you understand the environments:
 

@@ -44,6 +44,10 @@ node ./seed/index.mjs seed-products
 
 The seeder defaults to the Firestore emulator (it sets `FIRESTORE_EMULATOR_HOST=localhost:8080` if not provided) so it will not write to production by accident.
 
+Java requirement
+
+- The Firebase Local Emulator requires Java 21 or newer. Confirm by running `java -version` and install/update Java if needed before running `bun run emu`.
+
 Scripts:
 
 ```bash
