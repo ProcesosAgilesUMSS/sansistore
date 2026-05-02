@@ -176,39 +176,43 @@ export default function FeaturedProducts() {
                     <ShoppingBag size={15} className="text-text-light opacity-35" />
                   </div>
 
-                  <span className="mt-3 block text-sm font-semibold text-text-light transition-colors group-hover:text-primary">
-                    {product.name}
-                  </span>
-
-                  <div className="mt-1 flex items-center gap-2">
-                    <span className="text-sm font-bold text-text-light">
-                      {formatPrice(product.hasOffer && product.offerPrice ? product.offerPrice : product.price)}
+                  <div className="mt-3 space-y-2">
+                    <span className="line-clamp-2 block text-sm font-semibold leading-5 text-text-light transition-colors group-hover:text-primary">
+                      {product.name}
                     </span>
 
-                    {product.hasOffer && product.offerPrice && (
-                      <span className="text-xs line-through text-text-light opacity-40">
-                        {formatPrice(product.price)}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-sm font-bold text-text-light">
+                        {formatPrice(product.hasOffer && product.offerPrice ? product.offerPrice : product.price)}
                       </span>
-                    )}
+
+                      {product.hasOffer && product.offerPrice && (
+                        <span className="text-xs line-through text-text-light opacity-40">
+                          {formatPrice(product.price)}
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="text-xs text-text-light opacity-65">
+                      {product.stockAvailable && product.stockAvailable > 0
+                        ? `Stock: ${product.stockAvailable} disponibles`
+                        : 'Stock: 0 disponibles'}
+                    </p>
                   </div>
 
-                  <p className="mt-2 text-xs text-text-light opacity-65">
-                    {product.stockAvailable && product.stockAvailable > 0
-                      ? `Stock: ${product.stockAvailable} disponibles`
-                      : 'Stock: 0 disponibles'}
-                  </p>
-
-                  <button
-                    type="button"
-                    disabled={!product.stockAvailable}
-                    className={`mt-auto inline-flex w-full items-center justify-center rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${
-                      product.stockAvailable && product.stockAvailable > 0
-                        ? 'bg-primary text-primary-action hover:opacity-90'
-                        : 'cursor-not-allowed bg-secondary-bg-light text-text-light opacity-45'
-                    }`}
-                  >
-                    Agregar al carrito
-                  </button>
+                  <div className="mt-auto pt-4">
+                    <button
+                      type="button"
+                      disabled={!product.stockAvailable}
+                      className={`inline-flex w-full items-center justify-center rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${
+                        product.stockAvailable && product.stockAvailable > 0
+                          ? 'bg-primary text-primary-action hover:opacity-90'
+                          : 'cursor-not-allowed bg-secondary-bg-light text-text-light opacity-45'
+                      }`}
+                    >
+                      Agregar al carrito
+                    </button>
+                  </div>
                   </div>
 
               </article>
