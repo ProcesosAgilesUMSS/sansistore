@@ -15,6 +15,26 @@ interface Product {
   badge?: string;
 }
 
+function hasValidOffer(product: Product) {
+  return Boolean(
+    product.hasOffer &&
+      typeof product.offerPrice === 'number' &&
+      product.offerPrice < product.price
+  );
+}
+
+function getVisibleBadge(product: Product) {
+  if (!product.badge) return null;
+
+  const normalizedBadge = product.badge.trim().toLowerCase();
+
+  if (!hasValidOffer(product) && (normalizedBadge === 'oferta' || normalizedBadge.includes('descuento'))) {
+    return null;
+  }
+
+  return product.badge;
+}
+
 export default function FeaturedProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -87,6 +107,12 @@ export default function FeaturedProducts() {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
 
             {products.map((product) => (
+              (() => {
+                const showOffer = hasValidOffer(product);
+                const visibleBadge = getVisibleBadge(product);
+                const currentPrice = showOffer ? product.offerPrice : product.price;
+
+                return (
               <a
                 key={product.id}
                 href={`/productos/${product.slug}`}
@@ -107,8 +133,8 @@ export default function FeaturedProducts() {
                   )}
 
                   {/* BADGE */}
-                  {product.badge && (
-                    <span className="absolute top-3 left-3 px-2 py-0.5 rounded-full text-xs font-semibold bg-primary-action text-bg-light">{product.badge}</span>
+                  {visibleBadge && (
+                    <span className="absolute top-3 left-3 px-2 py-0.5 rounded-full text-xs font-semibold bg-primary-action text-bg-light">{visibleBadge}</span>
                   )}
 
                   {/* QUICK ACTION */}
@@ -129,10 +155,10 @@ export default function FeaturedProducts() {
                   <div className="flex items-center gap-2 mt-1">
 
                     <span className="text-sm font-bold text-text-light">$
-                      {product.hasOffer && product.offerPrice ? product.offerPrice : product.price}
+                      {currentPrice}
                     </span>
 
-                    {product.hasOffer && product.offerPrice && (
+                    {showOffer && (
                       <span className="text-xs line-through text-text-light opacity-40">${product.price}</span>
                     )}
 
@@ -140,6 +166,8 @@ export default function FeaturedProducts() {
                 </div>
 
               </a>
+                );
+              })()
             ))}
 
           </div>

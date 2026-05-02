@@ -42,6 +42,27 @@ function formatPrice(amount: number) {
   return `Bs ${amount.toFixed(2)}`;
 }
 
+function hasValidOffer(product: Product | null) {
+  return Boolean(
+    product &&
+      product.hasOffer &&
+      typeof product.offerPrice === 'number' &&
+      product.offerPrice < product.price
+  );
+}
+
+function getVisibleBadge(product: Product | null) {
+  if (!product?.badge) return null;
+
+  const normalizedBadge = product.badge.trim().toLowerCase();
+
+  if (!hasValidOffer(product) && (normalizedBadge === 'oferta' || normalizedBadge.includes('descuento'))) {
+    return null;
+  }
+
+  return product.badge;
+}
+
 function renderStars(rating: number) {
   return Array.from({ length: 5 }, (_, index) => (
     <Star
@@ -140,12 +161,13 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
     };
   }, [productSlug]);
 
-  const currentPrice =
-    product && product.hasOffer && product.offerPrice ? product.offerPrice : product?.price ?? 0;
+  const showOffer = hasValidOffer(product);
+  const currentPrice = showOffer ? product?.offerPrice ?? 0 : product?.price ?? 0;
   const stockAvailable = product?.stockAvailable ?? 0;
   const isAvailable = stockAvailable > 0 && product?.enabled !== false;
   const normalizedDescription = product?.description?.trim();
   const descriptionText = normalizedDescription ? normalizedDescription : 'Sin descripción';
+  const visibleBadge = getVisibleBadge(product);
 
   return (
     <section className="min-h-screen bg-bg-light py-10">
@@ -250,9 +272,9 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
                     </div>
                   )}
 
-                  {product.badge && (
+                  {visibleBadge && (
                     <span className="absolute left-5 top-5 rounded-full bg-primary-action px-3 py-1 text-xs font-semibold text-white">
-                      {product.badge}
+                      {visibleBadge}
                     </span>
                   )}
                 </div>
@@ -268,7 +290,7 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
 
                 <div className="mt-5 flex items-center gap-3">
                   <span className="text-2xl font-black text-text-light">{formatPrice(currentPrice)}</span>
-                  {product.hasOffer && product.offerPrice && (
+                  {showOffer && (
                     <span className="text-sm text-text-light opacity-45 line-through">
                       {formatPrice(product.price)}
                     </span>
