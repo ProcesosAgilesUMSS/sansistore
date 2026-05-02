@@ -51,16 +51,31 @@ function hasValidOffer(product: Product | null) {
   );
 }
 
-function getVisibleBadge(product: Product | null) {
-  if (!product?.badge) return null;
+function getDiscountPercentage(product: Product | null) {
+  if (!hasValidOffer(product)) return null;
 
-  const normalizedBadge = product.badge.trim().toLowerCase();
+  const basePrice = product?.price ?? 0;
+  const offerPrice = product?.offerPrice ?? 0;
 
-  if (!hasValidOffer(product) && (normalizedBadge === 'oferta' || normalizedBadge.includes('descuento'))) {
-    return null;
+  return Math.round(((basePrice - offerPrice) / basePrice) * 100);
+}
+
+function getBadgeData(product: Product | null) {
+  const discountPercentage = getDiscountPercentage(product);
+
+  if (discountPercentage) {
+    return {
+      label: `-${discountPercentage}%`,
+      className: 'bg-red-600 text-white',
+    };
   }
 
-  return product.badge;
+  if (!product?.badge) return null;
+
+  return {
+    label: product.badge,
+    className: 'bg-primary-action text-white',
+  };
 }
 
 function renderStars(rating: number) {
@@ -167,7 +182,7 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
   const isAvailable = stockAvailable > 0 && product?.enabled !== false;
   const normalizedDescription = product?.description?.trim();
   const descriptionText = normalizedDescription ? normalizedDescription : 'Sin descripción';
-  const visibleBadge = getVisibleBadge(product);
+  const badgeData = getBadgeData(product);
 
   return (
     <section className="min-h-screen bg-bg-light py-10">
@@ -272,9 +287,9 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
                     </div>
                   )}
 
-                  {visibleBadge && (
-                    <span className="absolute left-5 top-5 rounded-full bg-primary-action px-3 py-1 text-xs font-semibold text-white">
-                      {visibleBadge}
+                  {badgeData && (
+                    <span className={`absolute left-5 top-5 rounded-full px-3 py-1 text-xs font-semibold ${badgeData.className}`}>
+                      {badgeData.label}
                     </span>
                   )}
                 </div>

@@ -23,16 +23,28 @@ function hasValidOffer(product: Product) {
   );
 }
 
-function getVisibleBadge(product: Product) {
-  if (!product.badge) return null;
+function getDiscountPercentage(product: Product) {
+  if (!hasValidOffer(product)) return null;
 
-  const normalizedBadge = product.badge.trim().toLowerCase();
+  return Math.round(((product.price - product.offerPrice!) / product.price) * 100);
+}
 
-  if (!hasValidOffer(product) && (normalizedBadge === 'oferta' || normalizedBadge.includes('descuento'))) {
-    return null;
+function getBadgeData(product: Product) {
+  const discountPercentage = getDiscountPercentage(product);
+
+  if (discountPercentage) {
+    return {
+      label: `-${discountPercentage}%`,
+      className: 'bg-red-600 text-white',
+    };
   }
 
-  return product.badge;
+  if (!product.badge) return null;
+
+  return {
+    label: product.badge,
+    className: 'bg-primary-action text-bg-light',
+  };
 }
 
 export default function FeaturedProducts() {
@@ -109,7 +121,7 @@ export default function FeaturedProducts() {
             {products.map((product) => (
               (() => {
                 const showOffer = hasValidOffer(product);
-                const visibleBadge = getVisibleBadge(product);
+                const badgeData = getBadgeData(product);
                 const currentPrice = showOffer ? product.offerPrice : product.price;
 
                 return (
@@ -133,8 +145,8 @@ export default function FeaturedProducts() {
                   )}
 
                   {/* BADGE */}
-                  {visibleBadge && (
-                    <span className="absolute top-3 left-3 px-2 py-0.5 rounded-full text-xs font-semibold bg-primary-action text-bg-light">{visibleBadge}</span>
+                  {badgeData && (
+                    <span className={`absolute top-3 left-3 px-2 py-0.5 rounded-full text-xs font-semibold ${badgeData.className}`}>{badgeData.label}</span>
                   )}
 
                   {/* QUICK ACTION */}

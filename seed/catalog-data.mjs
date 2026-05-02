@@ -41,7 +41,7 @@ export const catalogProducts = [
     slug: 'queso-crema-bonle-pil-andina-200-gr',
     category: 'lacteos',
     name: 'Queso Crema Bonle PIL Andina 200 gr',
-    price: 28,
+    price: 32,
     description:
       'Queso crema suave y facil de untar, ideal para desayunos, meriendas y recetas saladas o dulces.',
     imageUrl:
@@ -190,6 +190,9 @@ export const catalogProducts = [
       'Detergente liquido para lavado de ropa, pensado para cargas frecuentes y limpieza completa del hogar.',
     imageUrl:
       'https://hipermaxi.com/tienda-api/marketfile/ImageEcommerce?hashfile=ff61f40_66f6_4b37_a21a_2730f4fc6c1f.webp&co=5&size=900x900',
+    badge: 'Oferta',
+    hasOffer: true,
+    offerPrice: 109,
     sourceUrl:
       'https://www.hipermaxi.com/la-paz/hipermaxi-achumani/producto/554466/detergente-liquido-ola-futuro-limpieza-completa-5-l',
     reviews: [
