@@ -50,3 +50,73 @@
         display: none;
     }
 }
+
+@layer components {
+    .product-detail-badge,
+    .product-detail-status-badge {
+        border-radius: 9999px;
+        border: 1px solid transparent;
+        font-size: 0.75rem;
+        font-weight: 700;
+        line-height: 1rem;
+    }
+
+    .product-detail-badge {
+        padding: 0.25rem 0.75rem;
+        box-shadow: 0 10px 24px rgb(0 0 0 / 0.16);
+    }
+
+    .product-detail-badge--discount {
+        background-color: #b91c1c;
+        color: #ffffff;
+    }
+
+    .product-detail-badge--label {
+        background-color: #1e1e1e;
+        color: #ffffff;
+    }
+
+    .product-detail-status-badge {
+        padding: 0.25rem 0.75rem;
+    }
+
+    .product-detail-status-badge--available {
+        background-color: #e5f3d0;
+        border-color: rgb(63 98 18 / 0.18);
+        color: #365314;
+    }
+
+    .product-detail-status-badge--unavailable {
+        background-color: #e7e5e4;
+        border-color: rgb(87 83 78 / 0.2);
+        color: #292524;
+    }
+
+    html[data-theme='dark'] .product-detail-badge {
+        box-shadow: 0 14px 30px rgb(0 0 0 / 0.36);
+    }
+
+    html[data-theme='dark'] .product-detail-badge--discount {
+        background-color: #fecaca;
+        border-color: rgb(254 202 202 / 0.35);
+        color: #7f1d1d;
+    }
+
+    html[data-theme='dark'] .product-detail-badge--label {
+        background-color: #f5f3ef;
+        border-color: rgb(255 255 255 / 0.18);
+        color: #0a0b0d;
+    }
+
+    html[data-theme='dark'] .product-detail-status-badge--available {
+        background-color: #d9f99d;
+        border-color: rgb(217 249 157 / 0.28);
+        color: #1a2e05;
+    }
+
+    html[data-theme='dark'] .product-detail-status-badge--unavailable {
+        background-color: #e7e5e4;
+        border-color: rgb(231 229 228 / 0.2);
+        color: #1c1917;
+    }
+}
