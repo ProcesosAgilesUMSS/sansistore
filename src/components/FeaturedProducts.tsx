@@ -53,7 +53,7 @@ export default function FeaturedProducts() {
             Destacados
           </h2>
 
-          <a href="#" className="inline-flex items-center gap-1 text-sm font-semibold transition-all duration-300 hover:gap-2 text-primary">
+          <a href="/productos" className="inline-flex items-center gap-1 text-sm font-semibold transition-all duration-300 hover:gap-2 text-primary">
             Ver todos <ArrowRight size={14} />
           </a>
         </div>
