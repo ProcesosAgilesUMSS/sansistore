@@ -1,10 +1,15 @@
 import { initializeApp } from 'firebase/app';
 import {
+  Timestamp,
+  collection,
   deleteDoc,
   doc,
+  getDocs,
   getFirestore,
+  query,
   serverTimestamp,
   setDoc,
+  where,
 } from 'firebase/firestore';
 import { categories, catalogProducts } from '../seed/catalog-data.mjs';
 
@@ -46,10 +51,6 @@ async function main() {
     await deleteDoc(doc(db, 'products', product.legacyId)).catch(() => {});
     await deleteDoc(doc(db, 'inventory', product.legacyId)).catch(() => {});
     console.log('Removed legacy product IDs for', product.legacyId);
-
-    for (let index = 1; index <= product.reviews.length; index += 1) {
-      await deleteDoc(doc(db, 'reviews', `${product.legacyId}-review-${index}`)).catch(() => {});
-    }
   }
 
   for (const product of catalogProducts) {
@@ -81,6 +82,13 @@ async function main() {
     }, { merge: true });
     console.log('Upserted inventory', product.id);
 
+    const existingReviewsSnap = await getDocs(
+      query(collection(db, 'reviews'), where('productId', '==', product.id))
+    );
+
+    await Promise.all(existingReviewsSnap.docs.map((reviewDoc) => deleteDoc(reviewDoc.ref)));
+    console.log('Cleared reviews for', product.id);
+
     for (const review of product.reviews) {
       await setDoc(doc(db, 'reviews', review.id), {
         productId: product.id,
@@ -89,7 +97,9 @@ async function main() {
         comment: review.comment,
         active: true,
         createdBy: 'direct-seed',
-        createdAt: serverTimestamp(),
+        createdAt: review.createdAt
+          ? Timestamp.fromDate(new Date(review.createdAt))
+          : serverTimestamp(),
       }, { merge: true });
       console.log('Upserted review', review.id);
     }
