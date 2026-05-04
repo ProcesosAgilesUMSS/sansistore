@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
-import { ShoppingBag, Package, Search, X } from 'lucide-react';
+import { ShoppingBag, Package, Search, X, History, Trash2 } from 'lucide-react';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
@@ -28,6 +28,39 @@ interface Inventory {
 
 const PRODUCT_PLACEHOLDER = '/product-placeholder.svg';
 const MAX_SEARCH_LENGTH = 100;
+const SEARCH_HISTORY_KEY = 'sansistore-search-history';
+const MAX_HISTORY_ITEMS = 5;
+
+function getSearchHistory(): string[] {
+  try {
+    const stored = localStorage.getItem(SEARCH_HISTORY_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveSearchTerm(term: string) {
+  if (!term.trim()) return;
+  try {
+    const current = getSearchHistory();
+    const filtered = current.filter((t) => t.toLowerCase() !== term.toLowerCase());
+    const updated = [term, ...filtered].slice(0, MAX_HISTORY_ITEMS);
+    localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(updated));
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+function deleteSearchTerm(term: string) {
+  try {
+    const current = getSearchHistory();
+    const updated = current.filter((t) => t.toLowerCase() !== term.toLowerCase());
+    localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(updated));
+  } catch {
+    // Ignore storage errors
+  }
+}
 
 function formatPrice(amount: number) {
   return `Bs ${amount.toFixed(2)}`;
@@ -76,6 +109,8 @@ export default function FeaturedProducts() {
   const [searchTerm, setSearchTerm] = useState('');
   const [appliedSearch, setAppliedSearch] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [inputFocused, setInputFocused] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -136,6 +171,10 @@ export default function FeaturedProducts() {
     fetchProducts();
   }, []);
 
+  useEffect(() => {
+    setSearchHistory(getSearchHistory());
+  }, []);
+
   const removeAccents = (text: string) => {
     return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   };
@@ -151,12 +190,22 @@ export default function FeaturedProducts() {
   }, [products, appliedSearch]);
 
   const searchSuggestions = useMemo(() => {
-    if (!searchTerm || searchTerm.length < 1) return [];
+    if (!searchTerm || searchTerm.length < 1) {
+      if (inputFocused && searchHistory.length > 0) {
+        return searchHistory.map((term) => ({ type: 'history' as const, term }));
+      }
+      return [];
+    }
     const normalizedTerm = removeAccents(searchTerm.toLowerCase());
-    return products
+    const historySuggestions = searchHistory
+      .filter((term) => removeAccents(term.toLowerCase()).includes(normalizedTerm))
+      .map((term) => ({ type: 'history' as const, term }));
+    const productSuggestions = products
       .filter((p) => removeAccents(p.name.toLowerCase()).includes(normalizedTerm))
-      .slice(0, 5);
-  }, [products, searchTerm]);
+      .slice(0, 5)
+      .map((p) => ({ type: 'product' as const, product: p }));
+    return [...historySuggestions, ...productSuggestions];
+  }, [products, searchTerm, searchHistory, inputFocused]);
 
   const highlightText = (text: string, term: string, enabled: boolean = true) => {
     if (!enabled || !term || !text) return text;
@@ -201,7 +250,10 @@ export default function FeaturedProducts() {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
       handleSearchClear();
+      (e.target as HTMLInputElement).blur();
     } else if (e.key === 'Enter') {
+      saveSearchTerm(searchTerm);
+      setSearchHistory(getSearchHistory());
       setAppliedSearch(searchTerm);
       setShowSuggestions(false);
     }
@@ -210,6 +262,8 @@ export default function FeaturedProducts() {
   const handleInputChange = (value: string) => {
     setSearchTerm(value);
     if (value.length >= 1) {
+      setShowSuggestions(true);
+    } else if (inputFocused) {
       setShowSuggestions(true);
     } else {
       setShowSuggestions(false);
@@ -241,7 +295,11 @@ export default function FeaturedProducts() {
             onKeyDown={handleKeyDown}
             maxLength={MAX_SEARCH_LENGTH}
             disabled={loading}
-            onFocus={() => searchTerm.length >= 1 && setShowSuggestions(true)}
+            onFocus={() => {
+              setInputFocused(true);
+              setShowSuggestions(true);
+            }}
+            onBlur={() => setInputFocused(false)}
             className="w-full rounded-full border border-border-light bg-card-bg-light py-2.5 pl-10 pr-10 text-sm text-text-light placeholder:text-text-light/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
           />
           {searchTerm && (
@@ -257,21 +315,73 @@ export default function FeaturedProducts() {
 
           {showSuggestions && searchSuggestions.length > 0 && (
             <ul className="absolute top-full left-0 right-0 z-20 mt-1 max-h-60 overflow-y-auto rounded-lg border border-border-light bg-card-bg-light py-1 shadow-lg">
-              {searchSuggestions.map((product) => (
-                <li key={product.id}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSearchTerm(product.name);
-                      setAppliedSearch(product.name);
-                      setShowSuggestions(false);
-                    }}
-                    className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm text-text-light hover:bg-secondary-bg-light"
-                  >
-                    <span className="line-clamp-1">{highlightText(product.name, searchTerm, true)}</span>
-                  </button>
+              {searchSuggestions.map((suggestion, index) => (
+                <li key={suggestion.type === 'history' ? `history-${suggestion.term}` : suggestion.product.id}>
+                  <div className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-text-light">
+                    <button
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        if (suggestion.type === 'history') {
+                          saveSearchTerm(suggestion.term);
+                          setSearchHistory(getSearchHistory());
+                          setSearchTerm(suggestion.term);
+                          setAppliedSearch(suggestion.term);
+                        } else {
+                          setSearchTerm(suggestion.product.name);
+                          setAppliedSearch(suggestion.product.name);
+                          saveSearchTerm(suggestion.product.name);
+                          setSearchHistory(getSearchHistory());
+                        }
+                        setShowSuggestions(false);
+                      }}
+                      className="flex flex-1 items-center gap-2 hover:bg-secondary-bg-light rounded py-1 -my-1 cursor-pointer"
+                    >
+                      {suggestion.type === 'history' && (
+                        <History size={14} className="text-primary shrink-0" />
+                      )}
+                      <span className="line-clamp-1">
+                        {suggestion.type === 'history'
+                          ? highlightText(suggestion.term, searchTerm, true)
+                          : highlightText(suggestion.product.name, searchTerm, true)}
+                      </span>
+                    </button>
+                    {suggestion.type === 'history' && (
+                      <button
+                        type="button"
+                        onMouseDown={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
+                          deleteSearchTerm(suggestion.term);
+                          setSearchHistory(getSearchHistory());
+                        }}
+                        className="shrink-0 p-1 text-text-light opacity-40 hover:text-red-500 hover:opacity-100 cursor-pointer rounded"
+                        aria-label="Eliminar de historial"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    )}
+                  </div>
                 </li>
               ))}
+            </ul>
+          )}
+          {showSuggestions && searchSuggestions.length === 0 && searchTerm && (
+            <ul className="absolute top-full left-0 right-0 z-20 mt-1 rounded-lg border border-border-light bg-card-bg-light py-1 shadow-lg">
+              <li>
+                <button
+                  type="button"
+                  onClick={() => {
+                    saveSearchTerm(searchTerm);
+                    setSearchHistory(getSearchHistory());
+                    setAppliedSearch(searchTerm);
+                    setShowSuggestions(false);
+                  }}
+                  className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm text-text-light hover:bg-secondary-bg-light"
+                >
+                  Buscar "{searchTerm}"
+                </button>
+              </li>
             </ul>
           )}
         </div>
