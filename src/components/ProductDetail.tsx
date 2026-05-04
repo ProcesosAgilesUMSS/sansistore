@@ -155,7 +155,7 @@ export default function ProductDetail({ productSlug, initialProduct }: ProductDe
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [nameTruncated, setNameTruncated] = useState(false);
   const [expandedReviews, setExpandedReviews] = useState<Set<string>>(new Set());
-  const titleRef = useRef<HTMLHeadingElement>(null);
+  const titleRef = useRef<HTMLElement | null>(null);
   const reviewRefs = useRef<Map<string, HTMLParagraphElement>>(new Map());
   const [truncatedReviews, setTruncatedReviews] = useState<Set<string>>(new Set());
 
@@ -473,19 +473,30 @@ setNameExpanded(false);
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">
                   Detalle del producto
                 </p>
-                <h1
-                  ref={titleRef}
-                  className={`mt-3 text-3xl font-black tracking-tight text-text-light sm:text-4xl ${!nameExpanded ? 'line-clamp-3' : ''} ${nameTruncated ? 'cursor-pointer' : ''}`}
-                  onClick={nameTruncated ? () => setNameExpanded(!nameExpanded) : undefined}
-                  title={product.name}
-                >
-                  {product.name}
+                <h1 className="mt-3 text-3xl font-black tracking-tight text-text-light sm:text-4xl">
+                  {nameTruncated ? (
+                    <button
+                      ref={titleRef as any}
+                      type="button"
+                      onClick={() => setNameExpanded(!nameExpanded)}
+                      aria-expanded={nameExpanded}
+                      title={product.name}
+                      className={`w-full text-left ${!nameExpanded ? 'line-clamp-3' : ''} cursor-pointer`}
+                    >
+                      {product.name}
+                    </button>
+                  ) : (
+                    <span ref={titleRef as any} title={product.name} className={`${!nameExpanded ? 'line-clamp-3' : ''}`}>
+                      {product.name}
+                    </span>
+                  )}
                 </h1>
                 {nameExpanded && (
                   <button
                     type="button"
                     onClick={() => setNameExpanded(!nameExpanded)}
                     className="mt-1 mx-auto flex animate-bounce cursor-pointer text-primary"
+                    aria-label={nameExpanded ? 'Mostrar menos nombre' : 'Mostrar más nombre'}
                   >
                     <ChevronUp size={20} />
                   </button>
