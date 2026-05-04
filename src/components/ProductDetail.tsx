@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { ArrowLeft, ChevronRight, MessageSquare, Package, Star } from 'lucide-react';
+import { useEffect, useState, useRef } from 'react';
+import { ArrowLeft, ChevronRight, ChevronUp, MessageSquare, Package, Star } from 'lucide-react';
 import { Timestamp, collection, getDocs, limit, query, where } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
@@ -153,6 +153,8 @@ export default function ProductDetail({ productSlug, initialProduct }: ProductDe
   const [visibleReviewsCount, setVisibleReviewsCount] = useState(REVIEW_PAGE_SIZE);
   const [nameExpanded, setNameExpanded] = useState(false);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+  const [nameTruncated, setNameTruncated] = useState(false);
+  const titleRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
     let ignore = false;
@@ -274,6 +276,17 @@ export default function ProductDetail({ productSlug, initialProduct }: ProductDe
       ignore = true;
     };
   }, [productSlug, initialProduct]);
+
+  useEffect(() => {
+    const checkTruncation = () => {
+      if (titleRef.current) {
+        setNameTruncated(titleRef.current.scrollHeight > titleRef.current.clientHeight);
+      }
+    };
+    checkTruncation();
+    window.addEventListener('resize', checkTruncation);
+    return () => window.removeEventListener('resize', checkTruncation);
+  }, [product, nameExpanded]);
 
   const showOffer = hasValidOffer(product);
   const currentPrice = showOffer ? product?.offerPrice ?? 0 : product?.price ?? 0;
@@ -430,19 +443,20 @@ export default function ProductDetail({ productSlug, initialProduct }: ProductDe
                   Detalle del producto
                 </p>
                 <h1
-                  className={`mt-3 text-3xl font-black tracking-tight text-text-light sm:text-4xl ${!nameExpanded ? 'line-clamp-3' : ''} cursor-pointer`}
-                  onClick={() => setNameExpanded(!nameExpanded)}
+                  ref={titleRef}
+                  className={`mt-3 text-3xl font-black tracking-tight text-text-light sm:text-4xl ${!nameExpanded ? 'line-clamp-3' : ''} ${nameTruncated ? 'cursor-pointer' : ''}`}
+                  onClick={nameTruncated ? () => setNameExpanded(!nameExpanded) : undefined}
                   title={product.name}
                 >
                   {product.name}
                 </h1>
-                {product.name.split('\n').length > 3 && (
+                {nameExpanded && (
                   <button
                     type="button"
                     onClick={() => setNameExpanded(!nameExpanded)}
-                    className="mt-1 cursor-pointer text-sm font-semibold text-primary hover:underline"
+                    className="mt-1 mx-auto flex animate-bounce cursor-pointer text-primary"
                   >
-                    {nameExpanded ? 'mostrar menos' : 'mostrar más'}
+                    <ChevronUp size={20} />
                   </button>
                 )}
 
