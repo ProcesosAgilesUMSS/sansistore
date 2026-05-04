@@ -154,18 +154,18 @@ export default function ProductDetail({ productSlug, initialProduct }: ProductDe
   const [nameExpanded, setNameExpanded] = useState(false);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [nameTruncated, setNameTruncated] = useState(false);
-  const [expandedReviews, setExpandedReviews] = useState<Set<number>>(new Set());
+  const [expandedReviews, setExpandedReviews] = useState<Set<string>>(new Set());
   const titleRef = useRef<HTMLHeadingElement>(null);
-  const reviewRefs = useRef<Map<number, HTMLParagraphElement>>(new Map());
-  const [truncatedReviews, setTruncatedReviews] = useState<Set<number>>(new Set());
+  const reviewRefs = useRef<Map<string, HTMLParagraphElement>>(new Map());
+  const [truncatedReviews, setTruncatedReviews] = useState<Set<string>>(new Set());
 
-  const toggleReview = (index: number) => {
+  const toggleReview = (reviewId: string) => {
     setExpandedReviews((prev) => {
       const next = new Set(prev);
-      if (next.has(index)) {
-        next.delete(index);
+      if (next.has(reviewId)) {
+        next.delete(reviewId);
       } else {
-        next.add(index);
+        next.add(reviewId);
       }
       return next;
     });
@@ -180,8 +180,9 @@ export default function ProductDetail({ productSlug, initialProduct }: ProductDe
       setImageFailed(false);
       setReviewSort('recent');
       setVisibleReviewsCount(REVIEW_PAGE_SIZE);
-      setNameExpanded(false);
-      setDescriptionExpanded(false);
+setNameExpanded(false);
+        setDescriptionExpanded(false);
+        setExpandedReviews(new Set<string>());
 
       try {
         if (initialProduct) {
@@ -328,10 +329,10 @@ export default function ProductDetail({ productSlug, initialProduct }: ProductDe
 
   useEffect(() => {
     const checkTruncation = () => {
-      const truncated = new Set<number>();
-      reviewRefs.current.forEach((el, index) => {
+      const truncated = new Set<string>();
+      reviewRefs.current.forEach((el, reviewId) => {
         if (el && el.scrollHeight > el.clientHeight) {
-          truncated.add(index);
+          truncated.add(reviewId);
         }
       });
       setTruncatedReviews(truncated);
@@ -585,7 +586,7 @@ export default function ProductDetail({ productSlug, initialProduct }: ProductDe
                 </div>
               ) : (
                 <div className="mt-6 grid gap-4">
-                  {visibleReviews.map((review, index) => (
+                  {visibleReviews.map((review) => (
                     <article
                       key={review.id}
                       className="rounded-2xl border border-border-light bg-secondary-bg-light/50 px-5 py-4"
@@ -610,20 +611,20 @@ export default function ProductDetail({ productSlug, initialProduct }: ProductDe
                       </div>
                       <p
                         ref={(el) => {
-                          if (el) reviewRefs.current.set(index, el);
-                          else reviewRefs.current.delete(index);
+                          if (el) reviewRefs.current.set(review.id, el);
+                          else reviewRefs.current.delete(review.id);
                         }}
-                        className={`mt-3 text-sm leading-6 text-text-light opacity-80 ${!expandedReviews.has(index) ? 'line-clamp-3' : ''}`}
+                        className={`mt-3 text-sm leading-6 text-text-light opacity-80 ${!expandedReviews.has(review.id) ? 'line-clamp-3' : ''}`}
                       >
                         {review.comment}
                       </p>
-                      {(truncatedReviews.has(index) || expandedReviews.has(index)) && (
+                      {(truncatedReviews.has(review.id) || expandedReviews.has(review.id)) && (
                         <button
                           type="button"
-                          onClick={() => toggleReview(index)}
+                          onClick={() => toggleReview(review.id)}
                           className="mt-1 cursor-pointer text-sm font-semibold text-primary hover:underline"
                         >
-                          {expandedReviews.has(index) ? 'mostrar menos' : 'mostrar más'}
+                          {expandedReviews.has(review.id) ? 'mostrar menos' : 'mostrar más'}
                         </button>
                       )}
                     </article>
