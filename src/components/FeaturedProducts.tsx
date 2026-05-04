@@ -186,9 +186,9 @@ export default function FeaturedProducts() {
 
   const getMatchField = (product: Product, term: string) => {
     if (!term) return null;
-    const t = term.toLowerCase();
-    if (product.name.toLowerCase().includes(t)) return 'name';
-    if (product.description?.toLowerCase().includes(t)) return 'description';
+    const t = removeAccents(term.toLowerCase());
+    if (removeAccents(product.name.toLowerCase()).includes(t)) return 'name';
+    if (removeAccents(product.description?.toLowerCase()).includes(t)) return 'description';
     return null;
   };
 
