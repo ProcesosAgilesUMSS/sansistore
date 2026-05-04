@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo, useRef } from 'react';
 import { ShoppingBag, Package, Search, X, History, Trash2 } from 'lucide-react';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import CategoryFilter from './CategoryFilter';
 
 interface Product {
   id: string;
@@ -12,10 +13,12 @@ interface Product {
   active?: boolean;
   hasOffer?: boolean;
   offerPrice?: number;
+  description?: string;
   badge?: string;
   stockAvailable?: number;
   stockTotal?: number;
   enabled?: boolean;
+  categoryId?: string;
 }
 
 interface Inventory {
@@ -115,6 +118,7 @@ export default function FeaturedProducts({ initialSearch = '' }: FeaturedProduct
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [inputFocused, setInputFocused] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const searchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -184,14 +188,18 @@ export default function FeaturedProducts({ initialSearch = '' }: FeaturedProduct
   };
 
   const filteredProducts = useMemo(() => {
-    if (!appliedSearch) return products;
+    let result = products;
+    if (selectedCategory) {
+      result = result.filter((p) => p.categoryId === selectedCategory);
+    }
+    if (!appliedSearch) return result;
     const term = removeAccents(appliedSearch.toLowerCase());
-    const byName = products.filter((p) => removeAccents(p.name.toLowerCase()).includes(term));
-    const byDescription = products.filter(
+    const byName = result.filter((p) => removeAccents(p.name.toLowerCase()).includes(term));
+    const byDescription = result.filter(
       (p) => !removeAccents(p.name.toLowerCase()).includes(term) && p.description && removeAccents(p.description.toLowerCase()).includes(term)
     );
     return [...byName, ...byDescription];
-  }, [products, appliedSearch]);
+  }, [products, appliedSearch, selectedCategory]);
 
   const searchSuggestions = useMemo(() => {
     if (!searchTerm || searchTerm.length < 1) {
@@ -241,7 +249,7 @@ export default function FeaturedProducts({ initialSearch = '' }: FeaturedProduct
     if (!term) return null;
     const t = removeAccents(term.toLowerCase());
     if (removeAccents(product.name.toLowerCase()).includes(t)) return 'name';
-    if (removeAccents(product.description?.toLowerCase()).includes(t)) return 'description';
+    if (product.description && removeAccents(product.description.toLowerCase()).includes(t)) return 'description';
     return null;
   };
 
@@ -298,36 +306,41 @@ export default function FeaturedProducts({ initialSearch = '' }: FeaturedProduct
           </h2>
         </div>
 
-        <div ref={searchRef} className="relative mb-6 max-w-6xl">
-          <Search
-            size={18}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light opacity-40"
+       <div className="mb-6 flex items-center gap-3 max-w-6xl">
+          <CategoryFilter
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
           />
-          <input
-            type="text"
-            placeholder="Buscar productos..."
-            value={searchTerm}
-            onChange={(e) => handleInputChange(e.target.value)}
-            onKeyDown={handleKeyDown}
-            maxLength={MAX_SEARCH_LENGTH}
-            disabled={loading}
-            onFocus={() => {
-              setInputFocused(true);
-              setShowSuggestions(true);
-            }}
-            onBlur={() => setInputFocused(false)}
-            className="w-full rounded-full border border-border-light bg-card-bg-light py-2.5 pl-10 pr-10 text-sm text-text-light placeholder:text-text-light/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
-          />
-          {searchTerm && (
-            <button
-              type="button"
-              onClick={handleSearchClear}
-              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-text-light opacity-40 hover:bg-secondary-bg-light hover:opacity-100"
-              aria-label="Limpiar búsqueda"
-            >
-              <X size={14} />
-            </button>
-          )}
+          <div ref={searchRef} className="relative flex-1">
+            <Search
+              size={18}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light opacity-40"
+            />
+            <input
+              type="text"
+              placeholder="Buscar productos..."
+              value={searchTerm}
+              onChange={(e) => handleInputChange(e.target.value)}
+              onKeyDown={handleKeyDown}
+              maxLength={MAX_SEARCH_LENGTH}
+              disabled={loading}
+              onFocus={() => {
+                setInputFocused(true);
+                setShowSuggestions(true);
+              }}
+              onBlur={() => setInputFocused(false)}
+              className="w-full rounded-full border border-border-light bg-card-bg-light py-2.5 pl-10 pr-10 text-sm text-text-light placeholder:text-text-light/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
+            />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={handleSearchClear}
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-text-light opacity-40 hover:bg-secondary-bg-light hover:opacity-100"
+                aria-label="Limpiar búsqueda"
+              >
+                <X size={14} />
+              </button>
+            )}
 
           {showSuggestions && searchSuggestions.length > 0 && (
             <ul className="absolute top-full left-0 right-0 z-20 mt-1 max-h-60 overflow-y-auto rounded-lg border border-border-light bg-card-bg-light py-1 shadow-lg">
@@ -400,6 +413,7 @@ export default function FeaturedProducts({ initialSearch = '' }: FeaturedProduct
               </li>
             </ul>
           )}
+          </div> 
         </div>
 
         {loading && (
@@ -419,10 +433,14 @@ export default function FeaturedProducts({ initialSearch = '' }: FeaturedProduct
           </div>
         )}
 
-        {!loading && !error && filteredProducts.length === 0 && appliedSearch && (
+        {!loading && !error && filteredProducts.length === 0 && (appliedSearch || selectedCategory) && (
           <div className="py-20 text-center">
             <Package size={40} className="mx-auto mb-3 text-text-light opacity-40" />
-            <p className="text-sm text-text-light opacity-50">No se encontraron productos</p>
+            <p className="text-sm text-text-light opacity-50">
+              {selectedCategory && !appliedSearch
+                ? 'No hay productos disponibles en esta categoría'
+                : 'No se encontraron productos'}
+            </p>
           </div>
         )}
 
@@ -434,8 +452,8 @@ export default function FeaturedProducts({ initialSearch = '' }: FeaturedProduct
         )}
 
         {!loading && !error && products.length > 0 && (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-            {(appliedSearch ? filteredProducts : products).map((product) => {
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+            {filteredProducts.map((product) => {
               const showOffer = hasValidOffer(product);
               const badgeData = getBadgeData(product);
               const currentPrice = showOffer ? product.offerPrice! : product.price;
