@@ -30,6 +30,7 @@ interface Review {
 
 interface ProductDetailProps {
   productSlug: string;
+  initialProduct?: string;
 }
 
 interface InventoryRecord {
@@ -142,10 +143,10 @@ function formatReviewDate(review: Review) {
   }).format(new Date(timestamp));
 }
 
-export default function ProductDetail({ productSlug }: ProductDetailProps) {
+export default function ProductDetail({ productSlug, initialProduct }: ProductDetailProps) {
   const [product, setProduct] = useState<Product | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!initialProduct);
   const [error, setError] = useState<string | null>(null);
   const [imageFailed, setImageFailed] = useState(false);
   const [reviewSort, setReviewSort] = useState<ReviewSortKey>('recent');
@@ -162,57 +163,93 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
       setVisibleReviewsCount(REVIEW_PAGE_SIZE);
 
       try {
-        const productQuery = query(
-          collection(db, 'products'),
-          where('slug', '==', productSlug),
-          limit(1)
-        );
-        const productSnap = await getDocs(productQuery);
+        if (initialProduct) {
+          const parsed = JSON.parse(initialProduct) as Product;
+          setProduct(parsed);
 
-        if (productSnap.empty) {
+          const inventoryQuery = query(
+            collection(db, 'inventory'),
+            where('productId', '==', parsed.id),
+            limit(1)
+          );
+          const reviewsQuery = query(
+            collection(db, 'reviews'),
+            where('productId', '==', parsed.id),
+            where('active', '==', true)
+          );
+          const [inventorySnap, reviewsSnap] = await Promise.all([
+            getDocs(inventoryQuery),
+            getDocs(reviewsQuery),
+          ]);
+          const inventoryData = inventorySnap.empty
+            ? null
+            : (inventorySnap.docs[0].data() as InventoryRecord);
+          const productReviews = reviewsSnap.docs
+            .map((reviewDoc) => ({ id: reviewDoc.id, ...reviewDoc.data() }) as Review)
+            .filter((review) => review.active !== false);
+
           if (!ignore) {
-            setProduct(null);
-            setReviews([]);
-            setError('No se encontró el producto solicitado.');
+            setProduct({
+              ...parsed,
+              enabled: inventoryData?.enabled ?? true,
+              stockAvailable: inventoryData?.stockAvailable ?? 0,
+              stockTotal: inventoryData?.stockTotal ?? inventoryData?.stockAvailable ?? 0,
+            });
+            setReviews(productReviews);
           }
-          return;
-        }
+        } else {
+          const productQuery = query(
+            collection(db, 'products'),
+            where('slug', '==', productSlug),
+            limit(1)
+          );
+          const productSnap = await getDocs(productQuery);
 
-        const productDoc = productSnap.docs[0];
-        const productData = {
-          id: productDoc.id,
-          ...productDoc.data(),
-        } as Product;
-        const inventoryQuery = query(
-          collection(db, 'inventory'),
-          where('productId', '==', productDoc.id),
-          limit(1)
-        );
+          if (productSnap.empty) {
+            if (!ignore) {
+              setProduct(null);
+              setReviews([]);
+              setError('No se encontró el producto solicitado.');
+            }
+            return;
+          }
 
-        const reviewsQuery = query(
-          collection(db, 'reviews'),
-          where('productId', '==', productDoc.id),
-          where('active', '==', true)
-        );
-        const [inventorySnap, reviewsSnap] = await Promise.all([
-          getDocs(inventoryQuery),
-          getDocs(reviewsQuery),
-        ]);
-        const inventoryData = inventorySnap.empty
-          ? null
-          : (inventorySnap.docs[0].data() as InventoryRecord);
-        const productReviews = reviewsSnap.docs
-          .map((reviewDoc) => ({ id: reviewDoc.id, ...reviewDoc.data() }) as Review)
-          .filter((review) => review.active !== false);
+          const productDoc = productSnap.docs[0];
+          const productData = {
+            id: productDoc.id,
+            ...productDoc.data(),
+          } as Product;
+          const inventoryQuery = query(
+            collection(db, 'inventory'),
+            where('productId', '==', productDoc.id),
+            limit(1)
+          );
 
-        if (!ignore) {
-          setProduct({
-            ...productData,
-            enabled: inventoryData?.enabled ?? true,
-            stockAvailable: inventoryData?.stockAvailable ?? 0,
-            stockTotal: inventoryData?.stockTotal ?? inventoryData?.stockAvailable ?? 0,
-          });
-          setReviews(productReviews);
+          const reviewsQuery = query(
+            collection(db, 'reviews'),
+            where('productId', '==', productDoc.id),
+            where('active', '==', true)
+          );
+          const [inventorySnap, reviewsSnap] = await Promise.all([
+            getDocs(inventoryQuery),
+            getDocs(reviewsQuery),
+          ]);
+          const inventoryData = inventorySnap.empty
+            ? null
+            : (inventorySnap.docs[0].data() as InventoryRecord);
+          const productReviews = reviewsSnap.docs
+            .map((reviewDoc) => ({ id: reviewDoc.id, ...reviewDoc.data() }) as Review)
+            .filter((review) => review.active !== false);
+
+          if (!ignore) {
+            setProduct({
+              ...productData,
+              enabled: inventoryData?.enabled ?? true,
+              stockAvailable: inventoryData?.stockAvailable ?? 0,
+              stockTotal: inventoryData?.stockTotal ?? inventoryData?.stockAvailable ?? 0,
+            });
+            setReviews(productReviews);
+          }
         }
       } catch {
         if (!ignore) {
@@ -232,12 +269,12 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
     return () => {
       ignore = true;
     };
-  }, [productSlug]);
+  }, [productSlug, initialProduct]);
 
   const showOffer = hasValidOffer(product);
   const currentPrice = showOffer ? product?.offerPrice ?? 0 : product?.price ?? 0;
   const stockAvailable = product?.stockAvailable ?? 0;
-  const isAvailable = stockAvailable > 0 && product?.enabled !== false && product?.active !== false;
+  const isAvailable = stockAvailable > 0 && product?.enabled !== false && (product?.active ?? true) !== false;
   const normalizedDescription = product?.description?.trim();
   const descriptionText = normalizedDescription ? normalizedDescription : 'Sin descripción';
   const badgeData = getBadgeData(product);
