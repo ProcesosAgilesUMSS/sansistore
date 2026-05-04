@@ -13,7 +13,7 @@ type MapEventsProps = {
 function MapEvents({ setLat, setLng }: MapEventsProps) {
   useMapEvents({
     click(e) {
-      console.log("CLICK:", e.latlng);
+      //console.log("CLICK:", e.latlng);
       setLat(e.latlng.lat);
       setLng(e.latlng.lng);
     },
@@ -46,11 +46,11 @@ export default function MapPicker() {
       isDefault: true,
     };
 
-    console.log("PAYLOAD FINAL:", payload);
+    //console.log("PAYLOAD FINAL:", payload);
 
     try {
       await saveLocation(payload);
-      console.log("GUARDADO OK");
+      //console.log("GUARDADO OK");
     } catch (err) {
       console.error("ERROR:", err);
     }
