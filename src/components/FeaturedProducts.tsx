@@ -136,19 +136,61 @@ export default function FeaturedProducts() {
     fetchProducts();
   }, []);
 
+  const removeAccents = (text: string) => {
+    return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  };
+
   const filteredProducts = useMemo(() => {
     if (!appliedSearch) return products;
-    return products.filter((product) =>
-      product.name.toLowerCase().includes(appliedSearch.toLowerCase())
+    const term = removeAccents(appliedSearch.toLowerCase());
+    const byName = products.filter((p) => removeAccents(p.name.toLowerCase()).includes(term));
+    const byDescription = products.filter(
+      (p) => !removeAccents(p.name.toLowerCase()).includes(term) && p.description && removeAccents(p.description.toLowerCase()).includes(term)
     );
+    return [...byName, ...byDescription];
   }, [products, appliedSearch]);
 
   const searchSuggestions = useMemo(() => {
     if (!searchTerm || searchTerm.length < 1) return [];
+    const normalizedTerm = removeAccents(searchTerm.toLowerCase());
     return products
-      .filter((p) => p.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      .filter((p) => removeAccents(p.name.toLowerCase()).includes(normalizedTerm))
       .slice(0, 5);
   }, [products, searchTerm]);
+
+  const highlightText = (text: string, term: string, enabled: boolean = true) => {
+    if (!enabled || !term || !text) return text;
+    const normalizedText = removeAccents(text);
+    const normalizedTerm = removeAccents(term);
+    const escaped = normalizedTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(escaped, 'gi');
+    const result: React.ReactNode[] = [];
+    let lastIndex = 0;
+    let match;
+    while ((match = regex.exec(normalizedText)) !== null) {
+      if (match.index > lastIndex) {
+        result.push(text.slice(lastIndex, match.index));
+      }
+      result.push(
+        <mark key={match.index} className="bg-primary/30 text-primary font-semibold rounded px-0.5">
+          {text.slice(match.index, match.index + match[0].length)}
+        </mark>
+      );
+      lastIndex = match.index + match[0].length;
+    }
+    if (lastIndex < text.length) {
+      result.push(text.slice(lastIndex));
+    }
+    return result.length > 0 ? result : text;
+  };
+
+  const getMatchField = (product: Product, term: string) => {
+    if (!term) return null;
+    const t = term.toLowerCase();
+    if (product.name.toLowerCase().includes(t)) return 'name';
+    if (product.description?.toLowerCase().includes(t)) return 'description';
+    return null;
+  };
 
   const handleSearchClear = () => {
     setSearchTerm('');
@@ -226,15 +268,7 @@ export default function FeaturedProducts() {
                     }}
                     className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm text-text-light hover:bg-secondary-bg-light"
                   >
-                    <img
-                      src={product.imageUrl || PRODUCT_PLACEHOLDER}
-                      alt={product.name}
-                      className="h-8 w-8 rounded object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src = PRODUCT_PLACEHOLDER;
-                      }}
-                    />
-                    <span className="line-clamp-1">{product.name}</span>
+                    <span className="line-clamp-1">{highlightText(product.name, searchTerm, true)}</span>
                   </button>
                 </li>
               ))}
@@ -326,8 +360,14 @@ export default function FeaturedProducts() {
 
                     <div className="mt-3 space-y-2">
                       <span className="block line-clamp-2 text-sm font-semibold leading-5 text-text-light transition-colors group-hover:text-primary">
-                        {product.name}
+                        {highlightText(product.name, appliedSearch, getMatchField(product, appliedSearch) === 'name')}
                       </span>
+
+                      {product.description && (
+                        <p className="mt-1 line-clamp-2 text-xs text-text-light opacity-65">
+                          {highlightText(product.description, appliedSearch, getMatchField(product, appliedSearch) === 'description')}
+                        </p>
+                      )}
 
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="text-sm font-bold text-text-light">{formatPrice(currentPrice)}</span>
