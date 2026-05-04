@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { ShoppingBag, Package } from 'lucide-react';
+import { useEffect, useState, useMemo, useRef } from 'react';
+import { ShoppingBag, Package, Search, X } from 'lucide-react';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
@@ -27,6 +27,7 @@ interface Inventory {
 }
 
 const PRODUCT_PLACEHOLDER = '/product-placeholder.svg';
+const MAX_SEARCH_LENGTH = 100;
 
 function formatPrice(amount: number) {
   return `Bs ${amount.toFixed(2)}`;
@@ -72,6 +73,32 @@ export default function FeaturedProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [appliedSearch, setAppliedSearch] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -120,6 +147,44 @@ export default function FeaturedProducts() {
     fetchProducts();
   }, []);
 
+  const filteredProducts = useMemo(() => {
+    if (!appliedSearch) return products;
+    return products.filter((product) =>
+      product.name.toLowerCase().includes(appliedSearch.toLowerCase())
+    );
+  }, [products, appliedSearch]);
+
+  const searchSuggestions = useMemo(() => {
+    if (!searchTerm || searchTerm.length < 1) return [];
+    return products
+      .filter((p) => p.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      .slice(0, 5);
+  }, [products, searchTerm]);
+
+  const handleSearchClear = () => {
+    setSearchTerm('');
+    setAppliedSearch('');
+    setShowSuggestions(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      handleSearchClear();
+    } else if (e.key === 'Enter') {
+      setAppliedSearch(searchTerm);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleInputChange = (value: string) => {
+    setSearchTerm(value);
+    if (value.length >= 1) {
+      setShowSuggestions(true);
+    } else {
+      setShowSuggestions(false);
+    }
+  };
+
   return (
     <section id="productos" className="bg-bg-light py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -130,6 +195,62 @@ export default function FeaturedProducts() {
           >
             Productos disponibles
           </h2>
+        </div>
+
+        <div ref={searchRef} className="relative mb-6 max-w-6xl">
+          <Search
+            size={18}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light opacity-40"
+          />
+          <input
+            type="text"
+            placeholder="Buscar productos..."
+            value={searchTerm}
+            onChange={(e) => handleInputChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            maxLength={MAX_SEARCH_LENGTH}
+            disabled={loading}
+            onFocus={() => searchTerm.length >= 1 && setShowSuggestions(true)}
+            className="w-full rounded-full border border-border-light bg-card-bg-light py-2.5 pl-10 pr-10 text-sm text-text-light placeholder:text-text-light/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
+          />
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={handleSearchClear}
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-text-light opacity-40 hover:bg-secondary-bg-light hover:opacity-100"
+              aria-label="Limpiar búsqueda"
+            >
+              <X size={14} />
+            </button>
+          )}
+
+          {showSuggestions && searchSuggestions.length > 0 && (
+            <ul className="absolute top-full left-0 right-0 z-20 mt-1 max-h-60 overflow-y-auto rounded-lg border border-border-light bg-card-bg-light py-1 shadow-lg">
+              {searchSuggestions.map((product) => (
+                <li key={product.id}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchTerm(product.name);
+                      setAppliedSearch(product.name);
+                      setShowSuggestions(false);
+                    }}
+                    className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm text-text-light hover:bg-secondary-bg-light"
+                  >
+                    <img
+                      src={product.imageUrl || PRODUCT_PLACEHOLDER}
+                      alt={product.name}
+                      className="h-8 w-8 rounded object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = PRODUCT_PLACEHOLDER;
+                      }}
+                    />
+                    <span className="line-clamp-1">{product.name}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         {loading && (
@@ -149,10 +270,10 @@ export default function FeaturedProducts() {
           </div>
         )}
 
-        {!loading && !error && products.length === 0 && (
+        {!loading && !error && filteredProducts.length === 0 && appliedSearch && (
           <div className="py-20 text-center">
             <Package size={40} className="mx-auto mb-3 text-text-light opacity-40" />
-            <p className="text-sm text-text-light opacity-50">No hay productos disponibles en este momento.</p>
+            <p className="text-sm text-text-light opacity-50">No se encontraron productos</p>
           </div>
         )}
 
@@ -165,7 +286,7 @@ export default function FeaturedProducts() {
 
         {!loading && !error && products.length > 0 && (
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-            {products.map((product) => {
+            {(appliedSearch ? filteredProducts : products).map((product) => {
               const showOffer = hasValidOffer(product);
               const badgeData = getBadgeData(product);
               const currentPrice = showOffer ? product.offerPrice! : product.price;
@@ -233,20 +354,6 @@ export default function FeaturedProducts() {
                           ? `Stock: ${product.stockAvailable} disponibles`
                           : 'Stock: 0 disponibles'}
                       </p>
-                    </div>
-
-                    <div className="mt-auto pt-4">
-                      <button
-                        type="button"
-                        disabled={!isAvailable}
-                        className={`inline-flex w-full items-center justify-center rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${
-                          isAvailable
-                            ? 'bg-primary text-primary-action hover:opacity-90'
-                            : 'cursor-not-allowed bg-secondary-bg-light text-text-light opacity-45'
-                        }`}
-                      >
-                        Agregar al carrito
-                      </button>
                     </div>
                   </div>
                 </article>
