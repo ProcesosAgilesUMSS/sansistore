@@ -31,23 +31,25 @@ isSupported().then((yes) => yes && getAnalytics(app));
 
 export { app, auth, db, googleProvider };
 
-// Only connect to Firebase emulators when explicitly enabled.
-const useFirebaseEmulators =
-  import.meta.env.DEV && import.meta.env.PUBLIC_USE_FIREBASE_EMULATORS === 'true';
-
-if (useFirebaseEmulators) {
+// Connect to emulators when not in production
+// PUBLIC_APP_ENV is set in .env (development or production)
+if (import.meta.env.PUBLIC_APP_ENV !== 'production') {
   // Firestore emulator
   try {
     connectFirestoreEmulator(db, 'localhost', 8080);
     // Connect auth emulator as well
     try {
       connectAuthEmulator(auth, 'http://localhost:9099');
+      // eslint-disable-next-line no-console
       console.log('Firebase Auth: connected to emulator at http://localhost:9099');
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.warn('Firebase Auth: could not connect to emulator', e);
     }
+    // eslint-disable-next-line no-console
     console.log('Firebase: connected to emulators (firestore at localhost:8080)');
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.warn('Firebase: could not connect to emulators', e);
   }
 }
