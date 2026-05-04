@@ -51,6 +51,11 @@
 - **Today:**        Realizar una vista simple en el proyecto para la US "Control de Visibilidad de Productos", revisando el framework de astro
 - **Blockers:**     Ninguno
 
+  ## Vania F. Llanos Villarroel 
+- **Yesterday:** organizar la estructura inicial del modulo de inventario.
+- **Today:** Investigar astro
+- **Blockers:** Ninguno
+
 
 # Daily Report
 # 05/04/2026
