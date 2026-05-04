@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react';
 import { ArrowLeft, ChevronRight, MessageSquare, Star } from 'lucide-react';
-import { Timestamp, collection, getDocs, limit, query, where } from 'firebase/firestore';
+import {
+  Timestamp,
+  collection,
+  getDocs,
+  limit,
+  query,
+  where,
+} from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { getOfferBadgeData, hasValidOffer } from '../lib/productOffers';
 
@@ -72,7 +79,11 @@ function renderStars(rating: number) {
     <Star
       key={`${rating}-${index}`}
       size={14}
-      className={index < rating ? 'fill-primary text-primary' : 'text-text-light opacity-20'}
+      className={
+        index < rating
+          ? 'fill-primary text-primary'
+          : 'text-text-light opacity-20'
+      }
     />
   ));
 }
@@ -98,9 +109,15 @@ function sortReviews(reviews: Review[], sortKey: ReviewSortKey) {
       case 'oldest':
         return getReviewTimestamp(left) - getReviewTimestamp(right);
       case 'highest':
-        return right.rating - left.rating || getReviewTimestamp(right) - getReviewTimestamp(left);
+        return (
+          right.rating - left.rating ||
+          getReviewTimestamp(right) - getReviewTimestamp(left)
+        );
       case 'lowest':
-        return left.rating - right.rating || getReviewTimestamp(right) - getReviewTimestamp(left);
+        return (
+          left.rating - right.rating ||
+          getReviewTimestamp(right) - getReviewTimestamp(left)
+        );
       case 'recent':
       default:
         return getReviewTimestamp(right) - getReviewTimestamp(left);
@@ -129,7 +146,8 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
   const [error, setError] = useState<string | null>(null);
   const [imageFailed, setImageFailed] = useState(false);
   const [reviewSort, setReviewSort] = useState<ReviewSortKey>('recent');
-  const [visibleReviewsCount, setVisibleReviewsCount] = useState(REVIEW_PAGE_SIZE);
+  const [visibleReviewsCount, setVisibleReviewsCount] =
+    useState(REVIEW_PAGE_SIZE);
 
   useEffect(() => {
     let ignore = false;
@@ -182,7 +200,9 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
           ? null
           : (inventorySnap.docs[0].data() as InventoryRecord);
         const productReviews = reviewsSnap.docs
-          .map((reviewDoc) => ({ id: reviewDoc.id, ...reviewDoc.data() }) as Review)
+          .map(
+            (reviewDoc) => ({ id: reviewDoc.id, ...reviewDoc.data() }) as Review
+          )
           .filter((review) => review.active !== false);
 
         if (!ignore) {
@@ -190,7 +210,8 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
             ...productData,
             enabled: inventoryData?.enabled ?? true,
             stockAvailable: inventoryData?.stockAvailable ?? 0,
-            stockTotal: inventoryData?.stockTotal ?? inventoryData?.stockAvailable ?? 0,
+            stockTotal:
+              inventoryData?.stockTotal ?? inventoryData?.stockAvailable ?? 0,
           });
           setReviews(productReviews);
         }
@@ -215,11 +236,15 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
   }, [productSlug]);
 
   const showOffer = hasValidOffer(product);
-  const currentPrice = showOffer ? product?.offerPrice ?? 0 : product?.price ?? 0;
+  const currentPrice = showOffer
+    ? (product?.offerPrice ?? 0)
+    : (product?.price ?? 0);
   const stockAvailable = product?.stockAvailable ?? 0;
   const isAvailable = stockAvailable > 0 && product?.enabled !== false;
   const normalizedDescription = product?.description?.trim();
-  const descriptionText = normalizedDescription ? normalizedDescription : 'Sin descripción';
+  const descriptionText = normalizedDescription
+    ? normalizedDescription
+    : 'Sin descripción';
   const badgeData = getBadgeData(product);
   const sortedReviews = sortReviews(reviews, reviewSort);
   const visibleReviews = sortedReviews.slice(0, visibleReviewsCount);
@@ -229,7 +254,9 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
     ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviewsCount
     : 0;
   const roundedAverage = reviewsCount ? Math.round(averageRating) : 0;
-  const averageLabel = reviewsCount ? `${averageRating.toFixed(1)}/5` : 'Sin calificaciones';
+  const averageLabel = reviewsCount
+    ? `${averageRating.toFixed(1)}/5`
+    : 'Sin calificaciones';
   const reviewSortOptions: Array<{ value: ReviewSortKey; label: string }> = [
     { value: 'recent', label: 'Más recientes' },
     { value: 'oldest', label: 'Más antiguos' },
@@ -241,12 +268,21 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
     <section className="min-h-screen bg-bg-light pb-10 pt-20 sm:pt-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
-          <nav aria-label="Ruta de navegación" className="flex items-center gap-2 text-sm text-text-light">
-            <a href="/" className="font-semibold opacity-70 transition-opacity hover:opacity-100">
+          <nav
+            aria-label="Ruta de navegación"
+            className="flex items-center gap-2 text-sm text-text-light"
+          >
+            <a
+              href="/"
+              className="font-semibold opacity-70 transition-opacity hover:opacity-100"
+            >
               Inicio
             </a>
             <ChevronRight size={14} className="opacity-35" aria-hidden="true" />
-            <a href="/productos" className="font-semibold opacity-70 transition-opacity hover:opacity-100">
+            <a
+              href="/productos"
+              className="font-semibold opacity-70 transition-opacity hover:opacity-100"
+            >
               Productos
             </a>
             <ChevronRight size={14} className="opacity-35" aria-hidden="true" />
@@ -330,7 +366,9 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
         {!loading && error && (
           <div className="rounded-3xl border border-border-light bg-card-bg-light px-6 py-10 text-center">
             <MessageSquare size={36} className="mx-auto mb-4 text-primary" />
-            <h1 className="text-xl font-black text-text-light">Error al cargar el detalle</h1>
+            <h1 className="text-xl font-black text-text-light">
+              Error al cargar el detalle
+            </h1>
             <p className="mt-2 text-sm text-text-light opacity-70">{error}</p>
           </div>
         )}
@@ -359,7 +397,9 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
                   )}
 
                   {badgeData && (
-                    <span className={`absolute left-5 top-5 rounded-full px-3 py-1 text-xs font-semibold ${badgeData.className}`}>
+                    <span
+                      className={`absolute left-5 top-5 rounded-full px-3 py-1 text-xs font-semibold ${badgeData.className}`}
+                    >
                       {badgeData.label}
                     </span>
                   )}
@@ -375,7 +415,9 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
                 </h1>
 
                 <div className="mt-5 flex items-center gap-3">
-                  <span className="text-2xl font-black text-text-light">{formatPrice(currentPrice)}</span>
+                  <span className="text-2xl font-black text-text-light">
+                    {formatPrice(currentPrice)}
+                  </span>
                   {showOffer && (
                     <span className="text-sm text-text-light opacity-45 line-through">
                       {formatPrice(product.price)}
@@ -407,7 +449,9 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center gap-3">
                   <MessageSquare size={18} className="text-primary" />
-                  <h2 className="text-xl font-black text-text-light">Comentarios del producto</h2>
+                  <h2 className="text-xl font-black text-text-light">
+                    Comentarios del producto
+                  </h2>
                 </div>
 
                 <label className="flex items-center gap-2 text-sm font-medium text-text-light">
@@ -431,16 +475,20 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
 
               <div className="mt-6 grid gap-4 rounded-3xl border border-border-light bg-secondary-bg-light/45 p-5 sm:grid-cols-[auto_1fr] sm:items-center">
                 <div className="flex items-center gap-2">
-                  {reviewsCount ? (
-                    renderStars(roundedAverage)
-                  ) : (
-                    Array.from({ length: 5 }).map((_, index) => (
-                      <Star key={index} size={14} className="text-text-light opacity-20" />
-                    ))
-                  )}
+                  {reviewsCount
+                    ? renderStars(roundedAverage)
+                    : Array.from({ length: 5 }).map((_, index) => (
+                        <Star
+                          key={index}
+                          size={14}
+                          className="text-text-light opacity-20"
+                        />
+                      ))}
                 </div>
                 <div className="space-y-1">
-                  <p className="text-base font-bold text-text-light">{averageLabel}</p>
+                  <p className="text-base font-bold text-text-light">
+                    {averageLabel}
+                  </p>
                   <p className="text-sm text-text-light opacity-65">
                     {reviewsCount
                       ? `${reviewsCount} calificación${reviewsCount === 1 ? '' : 'es'} registradas`
@@ -451,7 +499,9 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
 
               {reviewsCount === 0 ? (
                 <div className="mt-6 rounded-3xl border border-dashed border-border-light px-5 py-8 text-center">
-                  <p className="text-base font-semibold text-text-light">Sin calificaciones</p>
+                  <p className="text-base font-semibold text-text-light">
+                    Sin calificaciones
+                  </p>
                   <p className="mt-2 text-sm text-text-light opacity-60">
                     Este producto aún no tiene comentarios registrados.
                   </p>
@@ -475,7 +525,9 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
                           ) : null}
                         </div>
                         <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-1">{renderStars(review.rating)}</div>
+                          <div className="flex items-center gap-1">
+                            {renderStars(review.rating)}
+                          </div>
                           <span className="text-sm font-semibold text-text-light opacity-70">
                             {review.rating.toFixed(1)}
                           </span>
@@ -490,7 +542,11 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
                   {hasMoreReviews && (
                     <button
                       type="button"
-                      onClick={() => setVisibleReviewsCount((count) => count + REVIEW_PAGE_SIZE)}
+                      onClick={() =>
+                        setVisibleReviewsCount(
+                          (count) => count + REVIEW_PAGE_SIZE
+                        )
+                      }
                       className="mt-2 inline-flex justify-center rounded-full border border-border-light bg-card-bg-light px-5 py-3 text-sm font-semibold text-text-light transition-colors hover:border-primary hover:text-primary"
                     >
                       Cargar más comentarios

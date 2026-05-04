@@ -10,9 +10,9 @@ export function hasValidOffer(product: OfferableProduct | null | undefined) {
 
   return Boolean(
     product.hasOffer &&
-      typeof product.offerPrice === 'number' &&
-      product.offerPrice > 0 &&
-      product.offerPrice < product.price
+    typeof product.offerPrice === 'number' &&
+    product.offerPrice > 0 &&
+    product.offerPrice < product.price
   );
 }
 
@@ -22,8 +22,14 @@ export function calculateDiscountPercentage(price: number, offerPrice: number) {
   return Math.round(((price - offerPrice) / price) * 100);
 }
 
-export function getDiscountPercentage(product: OfferableProduct | null | undefined) {
-  if (!product || !hasValidOffer(product) || typeof product.offerPrice !== 'number') {
+export function getDiscountPercentage(
+  product: OfferableProduct | null | undefined
+) {
+  if (
+    !product ||
+    !hasValidOffer(product) ||
+    typeof product.offerPrice !== 'number'
+  ) {
     return null;
   }
 
@@ -34,7 +40,9 @@ export function isOfferBadge(badge?: string | null) {
   return badge?.trim().toLowerCase() === 'oferta';
 }
 
-export function getOfferBadgeData(product: OfferableProduct | null | undefined) {
+export function getOfferBadgeData(
+  product: OfferableProduct | null | undefined
+) {
   const discountPercentage = getDiscountPercentage(product);
 
   if (discountPercentage) {
