@@ -83,13 +83,13 @@ export default function Navbar() {
 
           {/* LINKS */}
           <div className="hidden md:flex items-center gap-8">
-            {['Novedades', 'Ofertas', 'Colecciones'].map((item) => (
+            {[{ label: 'Productos', href: '/productos' }, { label: 'Novedades', href: '#' }, { label: 'Ofertas', href: '#' }].map((item) => (
               <a
-                key={item}
-                href="#"
+                key={item.label}
+                href={item.href}
                 className="text-[13px] text-text-light opacity-[0.60] font-semibold tracking-[0.02em] transition-all hover:text-primary hover:opacity-100"
               >
-                {item}
+                {item.label}
               </a>
             ))}
           </div>

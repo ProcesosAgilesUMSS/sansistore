@@ -102,12 +102,16 @@ function getBadgeData(product: Product) {
   };
 }
 
-export default function FeaturedProducts() {
+interface FeaturedProductsProps {
+  initialSearch?: string;
+}
+
+export default function FeaturedProducts({ initialSearch = '' }: FeaturedProductsProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [appliedSearch, setAppliedSearch] = useState('');
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
+  const [appliedSearch, setAppliedSearch] = useState(initialSearch);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [inputFocused, setInputFocused] = useState(false);
@@ -245,6 +249,7 @@ export default function FeaturedProducts() {
     setSearchTerm('');
     setAppliedSearch('');
     setShowSuggestions(false);
+    updateUrl('');
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -255,6 +260,7 @@ export default function FeaturedProducts() {
       saveSearchTerm(searchTerm);
       setSearchHistory(getSearchHistory());
       setAppliedSearch(searchTerm);
+      updateUrl(searchTerm);
       setShowSuggestions(false);
     }
   };
@@ -268,6 +274,16 @@ export default function FeaturedProducts() {
     } else {
       setShowSuggestions(false);
     }
+  };
+
+  const updateUrl = (term: string) => {
+    const url = new URL(window.location.href);
+    if (term.trim()) {
+      url.searchParams.set('q', term.trim());
+    } else {
+      url.searchParams.delete('q');
+    }
+    window.history.pushState({}, '', url);
   };
 
   return (
@@ -322,17 +338,17 @@ export default function FeaturedProducts() {
                       type="button"
                       onMouseDown={(e) => {
                         e.preventDefault();
-                        if (suggestion.type === 'history') {
-                          saveSearchTerm(suggestion.term);
-                          setSearchHistory(getSearchHistory());
-                          setSearchTerm(suggestion.term);
-                          setAppliedSearch(suggestion.term);
-                        } else {
-                          setSearchTerm(suggestion.product.name);
-                          setAppliedSearch(suggestion.product.name);
-                          saveSearchTerm(suggestion.product.name);
-                          setSearchHistory(getSearchHistory());
-                        }
+                        const term = suggestion.type === 'history' ? suggestion.term : suggestion.product.name;
+                          if (suggestion.type === 'history') {
+                            saveSearchTerm(term);
+                            setSearchHistory(getSearchHistory());
+                          } else {
+                            saveSearchTerm(term);
+                            setSearchHistory(getSearchHistory());
+                          }
+                          setSearchTerm(term);
+                          setAppliedSearch(term);
+                          updateUrl(term);
                         setShowSuggestions(false);
                       }}
                       className="flex flex-1 items-center gap-2 hover:bg-secondary-bg-light rounded py-1 -my-1 cursor-pointer"

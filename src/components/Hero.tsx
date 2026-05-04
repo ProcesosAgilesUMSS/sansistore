@@ -26,7 +26,7 @@ export default function Hero() {
 
           {/* Primary */}
           <a
-            href="#productos"
+            href="/productos"
             className="px-6 py-3 rounded-full font-semibold text-sm transition-all active:scale-95 hover:brightness-110 bg-primary text-bg-light"
           >
             Ver colección

@@ -267,7 +267,7 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
               Inicio
             </a>
             <ChevronRight size={14} className="opacity-35" aria-hidden="true" />
-            <a href="/#productos" className="font-semibold opacity-70 transition-opacity hover:opacity-100">
+            <a href="/productos" className="font-semibold opacity-70 transition-opacity hover:opacity-100">
               Productos
             </a>
             <ChevronRight size={14} className="opacity-35" aria-hidden="true" />
@@ -277,7 +277,7 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
           </nav>
 
           <a
-            href="/#productos"
+            href="/productos"
             className="inline-flex w-fit items-center gap-2 rounded-full border border-border-light bg-card-bg-light px-4 py-2 text-sm font-semibold text-text-light transition-colors hover:border-primary hover:text-primary"
           >
             <ArrowLeft size={16} />
