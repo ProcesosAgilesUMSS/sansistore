@@ -26,3 +26,7 @@ pnpm-debug.log*
 /SKILL.md
 /.agents
 /skills-lock.json
+
+#cositas
+src/features/inventory/x
+src/features/x
