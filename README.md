@@ -29,7 +29,7 @@ For local development you can run the Firebase emulators for Firestore and Auth.
 bun run emu
 ```
 
-When `PUBLIC_USE_FIREBASE_EMULATORS=true` and the app is running in development, the frontend will connect to the emulators (Firestore on localhost:8080, Auth on localhost:9099). See `src/lib/firebase.ts` for details.
+When `PUBLIC_APP_ENV` is not `production` the frontend will automatically connect to the emulators (Firestore on localhost:8080, Auth on localhost:9099). See `src/lib/firebase.ts` for details.
 
 Seeding local emulator
 
