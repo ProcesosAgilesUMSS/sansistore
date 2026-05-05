@@ -66,12 +66,12 @@
 - **Today:** Implementación y documentación del Frontend Design System del proyecto, definiendo el sistema de diseño global (tokens de color, tipografía, espaciado, componentes, theming y arquitectura UI) para garantizar consistencia visual, escalabilidad y mantenibilidad del frontend. Participación en la defensa del Sprint 1.
 - **Blockers:** None.
 
-
 ---
 
 ## 05-05-2026
 
 ### José Daniel Virreira Rufino
+
 - **Yesterday:** Inicié el desarrollo de la base fundamental para todas las historias de usuario de este primer sprint, tras charla con mis compañeros hemos definido quienes se encargarán de las historias de usuarios.
 - **Today:** Preparar la historia de usuario para la presentación parcial que probablemente se hará en la reunión que tenemos hoy a las 8 de la noche.
 - **Blockers:** Dudas sobre el merge de las ramas de desarrollo.
@@ -83,16 +83,25 @@
 - **Today:** Inicio de la implementación técnica de las historias de usuario:
   - Panel de entregas para el mensajero.
   - Cambio de estado de pedido a “EN CAMINO” para el seguimiento.
-  Enfocado en la estructuración del módulo `delivery/prog_api` y la definición de endpoints necesarios para soportar la lógica de negocio.
+    Enfocado en la estructuración del módulo `delivery/prog_api` y la definición de endpoints necesarios para soportar la lógica de negocio.
 
 - **Blockers:** None.
 
 - ### Bruno Salcedo Cadiz
+
 - **Yesterday:** Inicie con el desarrollo de la historia de usuario asignada y cree seeds para la base de datos en el apartado que estoy trabajando
 - **Today:** Continuar desarrollando la historia de usuario
-- **Blockers:** Dudas de estandares seguido sobre las ramas 
+- **Blockers:** Dudas de estandares seguido sobre las ramas
 
 - ### Adrian Said Andrade Medina
+
 - **Yesterday:** Comence con el desarrollo de la historia de usuario que me toco
 - **Today:** Continuar con la construccion historia de usuario
 - **Blockers:** Dudas de conceptuales de astro
+
+- ### Efrain Peralta Felipe
+
+- **Yesterday:** Analice la historia de usuario que tengo asignado (118), sus criterios de aceptación y dependencias con otras historias de usuario.
+- **Today:** Desarrollo de la historia de usario asignada.
+- **Blockers:** Duda sobre que campo de la colección orders se usara para que el vendedor marque el pedido como "listo para entrega", para que pueda ser asignado a un mensajero
+
