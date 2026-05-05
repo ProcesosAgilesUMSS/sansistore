@@ -1,5 +1,12 @@
-import { useEffect, useState } from 'react';
-import { ArrowLeft, ChevronRight, MessageSquare, Star } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import {
+  ArrowLeft,
+  ChevronRight,
+  ChevronUp,
+  MessageSquare,
+  Package,
+  Star,
+} from 'lucide-react';
 import {
   Timestamp,
   collection,
@@ -38,6 +45,7 @@ interface Review {
 
 interface ProductDetailProps {
   productSlug: string;
+  initialProduct?: string;
 }
 
 interface InventoryRecord {
@@ -49,7 +57,6 @@ interface InventoryRecord {
 
 type ReviewSortKey = 'recent' | 'oldest' | 'highest' | 'lowest';
 
-const PRODUCT_PLACEHOLDER = '/product-placeholder.svg';
 const REVIEW_PAGE_SIZE = 10;
 
 function formatPrice(amount: number) {
@@ -139,15 +146,43 @@ function formatReviewDate(review: Review) {
   }).format(new Date(timestamp));
 }
 
-export default function ProductDetail({ productSlug }: ProductDetailProps) {
+export default function ProductDetail({
+  productSlug,
+  initialProduct,
+}: ProductDetailProps) {
   const [product, setProduct] = useState<Product | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!initialProduct);
   const [error, setError] = useState<string | null>(null);
   const [imageFailed, setImageFailed] = useState(false);
   const [reviewSort, setReviewSort] = useState<ReviewSortKey>('recent');
   const [visibleReviewsCount, setVisibleReviewsCount] =
     useState(REVIEW_PAGE_SIZE);
+  const [nameExpanded, setNameExpanded] = useState(false);
+  const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+  const [nameTruncated, setNameTruncated] = useState(false);
+  const [expandedReviews, setExpandedReviews] = useState<Set<string>>(
+    new Set()
+  );
+  const [truncatedReviews, setTruncatedReviews] = useState<Set<string>>(
+    new Set()
+  );
+  const titleRef = useRef<HTMLElement | null>(null);
+  const reviewRefs = useRef<Map<string, HTMLParagraphElement>>(new Map());
+
+  const toggleReview = (reviewId: string) => {
+    setExpandedReviews((previous) => {
+      const next = new Set(previous);
+
+      if (next.has(reviewId)) {
+        next.delete(reviewId);
+      } else {
+        next.add(reviewId);
+      }
+
+      return next;
+    });
+  };
 
   useEffect(() => {
     let ignore = false;
@@ -158,8 +193,54 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
       setImageFailed(false);
       setReviewSort('recent');
       setVisibleReviewsCount(REVIEW_PAGE_SIZE);
+      setNameExpanded(false);
+      setDescriptionExpanded(false);
+      setExpandedReviews(new Set<string>());
+      setTruncatedReviews(new Set<string>());
 
       try {
+        if (initialProduct) {
+          const parsed = JSON.parse(initialProduct) as Product;
+
+          setProduct(parsed);
+
+          const inventoryQuery = query(
+            collection(db, 'inventory'),
+            where('productId', '==', parsed.id),
+            limit(1)
+          );
+          const reviewsQuery = query(
+            collection(db, 'reviews'),
+            where('productId', '==', parsed.id),
+            where('active', '==', true)
+          );
+          const [inventorySnap, reviewsSnap] = await Promise.all([
+            getDocs(inventoryQuery),
+            getDocs(reviewsQuery),
+          ]);
+          const inventoryData = inventorySnap.empty
+            ? null
+            : (inventorySnap.docs[0].data() as InventoryRecord);
+          const productReviews = reviewsSnap.docs
+            .map(
+              (reviewDoc) => ({ id: reviewDoc.id, ...reviewDoc.data() }) as Review
+            )
+            .filter((review) => review.active !== false);
+
+          if (!ignore) {
+            setProduct({
+              ...parsed,
+              enabled: inventoryData?.enabled ?? true,
+              stockAvailable: inventoryData?.stockAvailable ?? 0,
+              stockTotal:
+                inventoryData?.stockTotal ?? inventoryData?.stockAvailable ?? 0,
+            });
+            setReviews(productReviews);
+          }
+
+          return;
+        }
+
         const productQuery = query(
           collection(db, 'products'),
           where('slug', '==', productSlug),
@@ -186,7 +267,6 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
           where('productId', '==', productDoc.id),
           limit(1)
         );
-
         const reviewsQuery = query(
           collection(db, 'reviews'),
           where('productId', '==', productDoc.id),
@@ -233,21 +313,59 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
     return () => {
       ignore = true;
     };
-  }, [productSlug]);
+  }, [productSlug, initialProduct]);
+
+  useEffect(() => {
+    const checkTitleTruncation = () => {
+      if (titleRef.current) {
+        setNameTruncated(
+          titleRef.current.scrollHeight > titleRef.current.clientHeight
+        );
+      }
+    };
+
+    checkTitleTruncation();
+    window.addEventListener('resize', checkTitleTruncation);
+
+    return () => window.removeEventListener('resize', checkTitleTruncation);
+  }, [product, nameExpanded]);
+
+  const sortedReviews = sortReviews(reviews, reviewSort);
+  const visibleReviews = sortedReviews.slice(0, visibleReviewsCount);
+
+  useEffect(() => {
+    const checkReviewTruncation = () => {
+      const truncated = new Set<string>();
+
+      reviewRefs.current.forEach((element, reviewId) => {
+        if (element && element.scrollHeight > element.clientHeight) {
+          truncated.add(reviewId);
+        }
+      });
+
+      setTruncatedReviews(truncated);
+    };
+
+    checkReviewTruncation();
+    window.addEventListener('resize', checkReviewTruncation);
+
+    return () => window.removeEventListener('resize', checkReviewTruncation);
+  }, [visibleReviews]);
 
   const showOffer = hasValidOffer(product);
   const currentPrice = showOffer
     ? (product?.offerPrice ?? 0)
     : (product?.price ?? 0);
   const stockAvailable = product?.stockAvailable ?? 0;
-  const isAvailable = stockAvailable > 0 && product?.enabled !== false;
+  const isAvailable =
+    stockAvailable > 0 &&
+    product?.enabled !== false &&
+    (product?.active ?? true) !== false;
   const normalizedDescription = product?.description?.trim();
   const descriptionText = normalizedDescription
     ? normalizedDescription
     : 'Sin descripción';
   const badgeData = getBadgeData(product);
-  const sortedReviews = sortReviews(reviews, reviewSort);
-  const visibleReviews = sortedReviews.slice(0, visibleReviewsCount);
   const hasMoreReviews = sortedReviews.length > visibleReviews.length;
   const reviewsCount = reviews.length;
   const averageRating = reviewsCount
@@ -255,7 +373,7 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
     : 0;
   const roundedAverage = reviewsCount ? Math.round(averageRating) : 0;
   const averageLabel = reviewsCount
-    ? `${averageRating.toFixed(1)}/5`
+    ? `${roundedAverage.toFixed(1)}/5`
     : 'Sin calificaciones';
   const reviewSortOptions: Array<{ value: ReviewSortKey; label: string }> = [
     { value: 'recent', label: 'Más recientes' },
@@ -383,17 +501,17 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
                       src={product.imageUrl}
                       alt={product.name}
                       className="h-full w-full object-cover"
-                      onError={(event) => {
-                        event.currentTarget.onerror = null;
-                        event.currentTarget.src = PRODUCT_PLACEHOLDER;
-                      }}
+                      onError={() => setImageFailed(true)}
                     />
                   ) : (
-                    <img
-                      src={PRODUCT_PLACEHOLDER}
-                      alt={`Imagen predeterminada de ${product.name}`}
-                      className="h-full w-full object-cover"
-                    />
+                    <div className="flex h-full items-center justify-center">
+                      <div className="flex flex-col items-center gap-3 text-text-light opacity-50">
+                        <Package size={56} className="opacity-70" />
+                        <span className="text-sm font-medium">
+                          Imagen no disponible
+                        </span>
+                      </div>
+                    </div>
                   )}
 
                   {badgeData && (
@@ -411,8 +529,39 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
                   Detalle del producto
                 </p>
                 <h1 className="mt-3 text-3xl font-black tracking-tight text-text-light sm:text-4xl">
-                  {product.name}
+                  {nameTruncated ? (
+                    <button
+                      ref={titleRef as React.RefObject<HTMLButtonElement>}
+                      type="button"
+                      onClick={() => setNameExpanded(!nameExpanded)}
+                      aria-expanded={nameExpanded}
+                      title={product.name}
+                      className={`w-full cursor-pointer text-left ${!nameExpanded ? 'line-clamp-3' : ''}`}
+                    >
+                      {product.name}
+                    </button>
+                  ) : (
+                    <span
+                      ref={titleRef as React.RefObject<HTMLSpanElement>}
+                      title={product.name}
+                      className={`${!nameExpanded ? 'line-clamp-3' : ''}`}
+                    >
+                      {product.name}
+                    </span>
+                  )}
                 </h1>
+                {nameExpanded && (
+                  <button
+                    type="button"
+                    onClick={() => setNameExpanded(!nameExpanded)}
+                    className="mx-auto mt-1 flex animate-bounce cursor-pointer text-primary"
+                    aria-label={
+                      nameExpanded ? 'Mostrar menos nombre' : 'Mostrar más nombre'
+                    }
+                  >
+                    <ChevronUp size={20} />
+                  </button>
+                )}
 
                 <div className="mt-5 flex items-center gap-3">
                   <span className="text-2xl font-black text-text-light">
@@ -434,14 +583,27 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
                   >
                     {isAvailable ? 'Disponible' : 'Producto agotado'}
                   </span>
-                  <span className="text-sm text-text-light opacity-70">
-                    Stock: {stockAvailable} disponibles
-                  </span>
+                  {isAvailable && (
+                    <span className="text-sm text-text-light opacity-70">
+                      Stock: {stockAvailable} disponibles
+                    </span>
+                  )}
                 </div>
 
-                <p className="mt-6 text-sm leading-7 text-text-light opacity-80">
-                  {descriptionText}
-                </p>
+                <div className="mt-6">
+                  <p
+                    className={`text-sm leading-7 text-text-light opacity-80 ${!descriptionExpanded ? 'line-clamp-7' : ''}`}
+                  >
+                    {descriptionText}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setDescriptionExpanded(!descriptionExpanded)}
+                    className="mt-1 text-sm font-semibold text-primary hover:underline"
+                  >
+                    {descriptionExpanded ? 'mostrar menos' : 'mostrar más'}
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -533,9 +695,27 @@ export default function ProductDetail({ productSlug }: ProductDetailProps) {
                           </span>
                         </div>
                       </div>
-                      <p className="mt-3 text-sm leading-6 text-text-light opacity-80">
+                      <p
+                        ref={(element) => {
+                          if (element) reviewRefs.current.set(review.id, element);
+                          else reviewRefs.current.delete(review.id);
+                        }}
+                        className={`mt-3 text-sm leading-6 text-text-light opacity-80 ${!expandedReviews.has(review.id) ? 'line-clamp-3' : ''}`}
+                      >
                         {review.comment}
                       </p>
+                      {(truncatedReviews.has(review.id) ||
+                        expandedReviews.has(review.id)) && (
+                        <button
+                          type="button"
+                          onClick={() => toggleReview(review.id)}
+                          className="mt-1 cursor-pointer text-sm font-semibold text-primary hover:underline"
+                        >
+                          {expandedReviews.has(review.id)
+                            ? 'mostrar menos'
+                            : 'mostrar más'}
+                        </button>
+                      )}
                     </article>
                   ))}
 

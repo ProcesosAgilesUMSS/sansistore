@@ -1,0 +1,8 @@
+---
+import Layout from '../layouts/Layout.astro';
+import MapPicker from '../features/location/components/MapPicker.tsx';
+---
+
+<Layout title="Mapa">
+  <MapPicker client:only="react" />
+</Layout>
