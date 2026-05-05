@@ -71,3 +71,30 @@
     para su implementación.
 - **Blockers:** None.
 ------------------------------------------------------------------------------------------------------------------------------
+# 05/05/2026
+## Daily Reports - Team 6 SoftwareOne
+
+### Llanos Vega Juan Carlos
+- **Yesterday:** Descarga y actualización del sistema software desde el main principal en mi entorno personal para preparar el inicio del desarrollo software e instalación de herramientas concursantes al funcionamiento del software. 
+- **Today:** Evalúe las tareas de la historia de usuario en cuanto al frontend y backend,y la representación en mockups sobre las funcionalidades representativas. 
+- **Blockers:** None
+
+### Rodriguez Torrico Arnold Guery
+- **Yesterday:** Analicé la HU enfocándome en los criterios de aceptación, especialmente en cómo se debe mostrar la información del pedido al vendedor.
+- **Today:** Trabajé en la propuesta de la vista del detalle de pedido (UI), definiendo qué información se mostrará como nombre del producto, cantidad y características, además del flujo de navegación entre lista de pedidos y detalle.
+- **Blockers:** Aún tengo dudas sobre algunos datos que vendrán desde backend.
+
+### Pereira Fiorilo Oliver Do Santos
+- **Yesterday:** Analicé los requerimientos y criterios de aceptación de la HU-074, definiendo la estructura de datos necesaria (ID, productos, fecha, estado) y las restricciones de rol para la vista del vendedor.
+- **Today:** Comencé a trabajar en la propuesta de la interfaz gráfica (mockups UI draft) para la lista de pedidos pendientes, estructurando el diseño del componente de la lista y contemplando la vista del estado vacío cuando no existen pedidos.
+- **Blockers:** Ninguno por el momento.
+
+### Paqui Rojas Aaron David
+- **Yesterday:**
+- **Today:**
+- **Blockers:**
+
+### Gutiérrez Fuentes Alexander Raul
+- **Yesterday:** (02/05 - 03/05) Finalicé la configuración del entorno de desarrollo resolviendo conflictos de Firebase, establecí la arquitectura base de la HU-076 en src/features/orders y realicé una refactorización integral del componente SentOrdersList para mejorar su semántica, accesibilidad y alineación con el Design System oficial.
+- **Today:** Desarrollé el sistema de filtros interactivos mediante estados reactivos y componentes SVG personalizados, implementé la lógica de colapso con feedback visual y sincronicé la rama de trabajo siguiendo los estándares de commits y flujos de trabajo documentados en el proyecto.
+- **Blockers:** None
