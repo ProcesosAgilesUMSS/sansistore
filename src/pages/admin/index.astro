@@ -1,0 +1,12 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AdminLayout from '../../components/admin/AdminLayout';
+---
+
+<Layout title="Admin · Sansistore">
+  <AdminLayout client:load pageTitle="Dashboard" pageSubtitle="Panel de administración">
+    <div style="display:flex; align-items:center; justify-content:center; height:300px; color:#88b04b; font-size:14px;">
+      Panel Dashboard
+    </div>
+  </AdminLayout>
+</Layout>
