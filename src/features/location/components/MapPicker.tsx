@@ -90,8 +90,7 @@ export default function MapPicker() {
       const zone = getCurrentZone(lat, lng);
       alert(`Ubicación guardada correctamente en ${zone}`);
     } catch (err) {
-      console.error("ERROR:", err);
-      setErrorMessage("❌ Error al guardar la ubicación");
+      setErrorMessage("Error al guardar la ubicación");
       setShowError(true);
     }
   };
