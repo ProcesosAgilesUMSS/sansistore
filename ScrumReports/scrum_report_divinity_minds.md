@@ -84,3 +84,9 @@
 - **Yesterday:** Finalicé la historia de usuario "Búsqueda de productos por nombre". Implementé la barra de búsqueda en el catálogo, asegurando que sea case-insensitive, gestione correctamente la limpieza de filtros (botón X / ESC), los mensajes de estado vacío y el límite de 100 caracteres.
 - **Today:** Trabajaré en la resolución de bugs detectados en diferentes HUs.
 - **Blockers:** Tuve un bloqueo temporal por dependencias entre HUs, pero fue solucionado.
+
+## Marcos Velasquez Vela
+
+- **Yesterday:** Implementé las HUs de ver productos disponibles y ver detalles de producto, incluyendo el seed del catálogo, la conexión al emulador de Firebase por entorno, el catálogo completo en FeaturedProducts, la navegación por slug, la vista ProductDetail, skeletons, badges de oferta válidos, reseñas mejoradas y una página 404 personalizada.
+- **Today:** Realizar integración final y correcciones visuales y funcionales en catálogo y detalle de producto, validando ofertas, navegación, estados de error y reseñas antes del merge.
+- **Blockers:** n/a.
