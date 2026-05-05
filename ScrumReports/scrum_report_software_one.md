@@ -85,9 +85,9 @@
 - **Blockers:** Aún tengo dudas sobre algunos datos que vendrán desde backend.
 
 ### Pereira Fiorilo Oliver Do Santos
-- **Yesterday:** 
-- **Today:** 
-- **Blockers:** 
+- **Yesterday:** Analicé los requerimientos y criterios de aceptación de la HU-074, definiendo la estructura de datos necesaria (ID, productos, fecha, estado) y las restricciones de rol para la vista del vendedor.
+- **Today:** Comencé a trabajar en la propuesta de la interfaz gráfica (mockups UI draft) para la lista de pedidos pendientes, estructurando el diseño del componente de la lista y contemplando la vista del estado vacío cuando no existen pedidos.
+- **Blockers:** Ninguno por el momento.
 
 ### Paqui Rojas Aaron David
 - **Yesterday:**
