@@ -1,0 +1,27 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar';
+---
+
+<Layout title="Delivery Actions">
+  <Navbar client:load />
+  <main class="min-h-screen bg-bg-light pt-14 text-text-light">
+    <section class="flex gap-4 p-4">
+      <aside class="w-56 rounded-xl border border-border-light bg-card-bg-light p-3">
+        <p class="mb-3 px-2 text-xs font-semibold uppercase text-primary">
+          Delivery
+        </p>
+
+        <button class="w-full rounded-xl border border-primary bg-secondary-bg-light p-2 text-left text-sm font-medium text-primary">
+          Pedidos asignados
+        </button>
+      </aside>
+
+      <section class="flex-1 rounded-xl border border-border-light bg-card-bg-light p-4">
+        <h1 class="text-lg font-semibold">
+          Pedidos asignados
+        </h1>
+      </section>
+    </section>
+  </main>
+</Layout>
