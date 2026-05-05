@@ -58,3 +58,17 @@
 * **Yesterday:** Apoyé en el análisis de la historia de usuario “Como mensajero, quiero ver el monto exacto a cobrar para evitar errores”, revisando junto con Brandon los datos necesarios para que el mensajero pueda visualizar correctamente el monto de cobro asociado al pedido.
 * **Today:** Continuaré colaborando en la definición de la interfaz y la lógica necesaria para mostrar el monto exacto del pedido, tomando en cuenta el estado de pago, la información de entrega y la validación del pedido asignado al mensajero.
 * **Blockers:** None
+
+# Daily Reports - Team 3 Webspire 05/05/26
+
+## Dayana Saleth Ortuño Guzman
+
+ * **Yesterday:** En la carpeta feature cree otro archivo llamado cobro, donde implemente una parte del frontend de la HU *“Como comprador quiero pagar contra entrega”* y tambien ayude en hacer un diagrama de flujo, para que entendamos cual es el flujo de la parte de cobro.
+* **Today:** Terminar de hacer la parte del frontend.
+* **Blockers:** None
+
+## Maria Victoria Grageda Vallejos
+
+ * **Yesterday:** 
+* **Today:** 
+* **Blockers:** None
