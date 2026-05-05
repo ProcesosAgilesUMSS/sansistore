@@ -5,6 +5,7 @@ import { db } from '../lib/firebase';
 
 interface Product {
   id: string;
+  slug: string;
   name: string;
   price: number;
   imageUrl?: string;
@@ -12,6 +13,42 @@ interface Product {
   hasOffer?: boolean;
   offerPrice?: number;
   badge?: string;
+}
+
+function hasValidOffer(product: Product) {
+  return Boolean(
+    product.hasOffer &&
+      typeof product.offerPrice === 'number' &&
+      product.offerPrice < product.price
+  );
+}
+
+function getDiscountPercentage(product: Product) {
+  if (!hasValidOffer(product)) return null;
+
+  return Math.round(((product.price - product.offerPrice!) / product.price) * 100);
+}
+
+function isOfferBadge(badge?: string) {
+  return badge?.trim().toLowerCase() === 'oferta';
+}
+
+function getBadgeData(product: Product) {
+  const discountPercentage = getDiscountPercentage(product);
+
+  if (discountPercentage) {
+    return {
+      label: `-${discountPercentage}%`,
+      className: 'bg-red-600 text-white',
+    };
+  }
+
+  if (!product.badge || isOfferBadge(product.badge)) return null;
+
+  return {
+    label: product.badge,
+    className: 'bg-primary-action text-bg-light',
+  };
 }
 
 export default function FeaturedProducts() {
@@ -86,7 +123,18 @@ export default function FeaturedProducts() {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
 
             {products.map((product) => (
-              <div key={product.id} className="group cursor-pointer rounded-2xl overflow-hidden border transition-all duration-300 hover:-translate-y-1 bg-card-bg-light border-border-light">
+              (() => {
+                const showOffer = hasValidOffer(product);
+                const badgeData = getBadgeData(product);
+                const currentPrice = showOffer ? product.offerPrice : product.price;
+
+                return (
+              <a
+                key={product.id}
+                href={`/productos/${product.slug}`}
+                aria-label={`Ver detalle de ${product.name}`}
+                className="group block rounded-2xl overflow-hidden border transition-all duration-300 hover:-translate-y-1 bg-card-bg-light border-border-light"
+              >
 
                 {/* IMAGE */}
                 <div className="relative aspect-square flex items-center justify-center overflow-hidden bg-secondary-bg-light">
@@ -101,34 +149,41 @@ export default function FeaturedProducts() {
                   )}
 
                   {/* BADGE */}
-                  {product.badge && (
-                    <span className="absolute top-3 left-3 px-2 py-0.5 rounded-full text-xs font-semibold bg-primary-action text-bg-light">{product.badge}</span>
+                  {badgeData && (
+                    <span className={`absolute top-3 left-3 px-2 py-0.5 rounded-full text-xs font-semibold ${badgeData.className}`}>{badgeData.label}</span>
                   )}
 
                   {/* QUICK ACTION */}
-                  <button className="absolute bottom-3 right-3 w-9 h-9 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 bg-bg-light text-text-light">
+                  <span
+                    aria-hidden="true"
+                    className="absolute bottom-3 right-3 w-9 h-9 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 bg-bg-light text-text-light"
+                  >
                     <ShoppingBag size={14} />
-                  </button>
+                  </span>
                 </div>
 
                 {/* INFO */}
                 <div className="p-4">
-                  <h3 className="text-sm font-semibold group-hover:text-primary transition-colors text-text-light">{product.name}</h3>
+                  <span className="text-sm font-semibold group-hover:text-primary transition-colors text-text-light">
+                    {product.name}
+                  </span>
 
                   <div className="flex items-center gap-2 mt-1">
 
                     <span className="text-sm font-bold text-text-light">$
-                      {product.hasOffer && product.offerPrice ? product.offerPrice : product.price}
+                      {currentPrice}
                     </span>
 
-                    {product.hasOffer && product.offerPrice && (
+                    {showOffer && (
                       <span className="text-xs line-through text-text-light opacity-40">${product.price}</span>
                     )}
 
                   </div>
                 </div>
 
-              </div>
+              </a>
+                );
+              })()
             ))}
 
           </div>
