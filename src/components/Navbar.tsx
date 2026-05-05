@@ -92,6 +92,12 @@ export default function Navbar() {
                 {item}
               </a>
             ))}
+            <a
+              href="/admin"
+              className="text-[13px] text-primary font-semibold tracking-[0.02em] transition-all hover:opacity-70"
+            >
+              Admin
+            </a>
           </div>
 
           {/* ACTIONS */}
@@ -204,6 +210,12 @@ export default function Navbar() {
                 {item}
               </a>
             ))}
+            <a
+              href="/admin"
+              className="text-[13px] text-primary font-semibold tracking-[0.02em] transition-all hover:opacity-70"
+            >
+              Admin
+            </a>
           </div>
         )}
       </div>
