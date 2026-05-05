@@ -1,0 +1,57 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+---
+
+<Layout title="Página no encontrada | SansiStore">
+  <Navbar client:load />
+
+  <main class="min-h-screen overflow-hidden bg-bg-light text-text-light">
+    <section class="relative mx-auto grid min-h-screen max-w-6xl items-center gap-12 px-4 pb-20 pt-28 sm:px-6 lg:grid-cols-[0.85fr_1.15fr]">
+      <div class="relative z-10">
+        <p class="text-sm font-black tracking-normal">
+          Sansi<span class="text-primary">Store</span>
+        </p>
+        <p class="mt-8 text-xs font-semibold uppercase tracking-[0.22em] text-primary">
+          Error 404
+        </p>
+        <h1 class="mt-4 max-w-xl text-4xl font-black leading-tight tracking-normal sm:text-5xl">
+          No pudimos encontrar esta página
+        </h1>
+        <p class="mt-5 max-w-lg text-sm leading-7 opacity-75 sm:text-base">
+          La ruta no existe o el enlace ya no está disponible. Puedes volver al inicio o revisar el
+          catálogo para continuar navegando.
+        </p>
+
+        <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+          <a
+            href="/"
+            class="inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-6 text-sm font-semibold text-bg-dark transition-opacity hover:opacity-90"
+          >
+            Ir al inicio
+          </a>
+          <a
+            href="/#productos"
+            class="inline-flex min-h-12 items-center justify-center rounded-full border border-border-light px-6 text-sm font-semibold text-text-light transition-colors hover:border-primary hover:text-primary"
+          >
+            Ver productos
+          </a>
+        </div>
+      </div>
+
+      <div class="relative min-h-[300px] sm:min-h-[380px] lg:min-h-[520px]" aria-hidden="true">
+        <div class="absolute inset-x-0 bottom-0 mx-auto h-44 max-w-[520px] rounded-[100%] bg-secondary-bg-light opacity-80 blur-2xl"></div>
+        <div class="absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full border border-border-light bg-card-bg-light sm:h-80 sm:w-80"></div>
+        <div class="absolute left-1/2 top-1/2 flex h-48 w-48 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-primary text-7xl font-black text-bg-dark shadow-2xl shadow-primary/20 sm:h-60 sm:w-60 sm:text-8xl">
+          404
+        </div>
+        <div class="absolute right-2 top-8 h-20 w-20 rounded-3xl border border-border-light bg-card-bg-light sm:right-12 sm:top-16"></div>
+        <div class="absolute bottom-12 left-0 h-16 w-16 rounded-full border border-border-light bg-card-bg-light sm:left-12"></div>
+        <div class="absolute bottom-4 right-10 h-24 w-24 rounded-[2rem] bg-secondary-bg-light sm:right-24"></div>
+      </div>
+    </section>
+  </main>
+
+  <Footer client:load />
+</Layout>
