@@ -65,3 +65,13 @@
 - **Yesterday:** Finalización del despliegue del prototipo funcional (mockup en código) en Vercel tras decisión grupal de omitir Figma para acelerar la validación de lógica de rutas UMSS.
 - **Today:** Implementación y documentación del Frontend Design System del proyecto, definiendo el sistema de diseño global (tokens de color, tipografía, espaciado, componentes, theming y arquitectura UI) para garantizar consistencia visual, escalabilidad y mantenibilidad del frontend. Participación en la defensa del Sprint 1.
 - **Blockers:** None.
+
+
+---
+
+## 05-05-2026
+
+## José Daniel Virreira Rufino
+- **Yesterday:** Inicié el desarrollo de la base fundamental para todas las historias de usuario de este primer sprint, tras charla con mis compañeros hemos definido quienes se encargarán de las historias de usuarios.
+- **Today:** Preparar la historia de usuario para la presentación parcial que probablemente se hará en la reunión que tenemos hoy a las 8 de la noche.
+- **Blockers:** Dudas sobre el merge de las ramas de desarrollo.
