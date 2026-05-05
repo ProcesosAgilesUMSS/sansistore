@@ -66,3 +66,12 @@
 - **Yesterday:** Alinee la HU de ofertas con criterios de aceptacion y prepare el diseño del indicador de descuento y el filtro en el catalogo; revise la data esperada desde backend.
 - **Today:** Definir el flujo de UI para precios con descuento y estado vacio, y dejar listo el esqueleto del filtro para integrar cuando este disponible la carga de productos.
 - **Blockers:** Dependencia de la HU de productos disponibles para integrar el filtro y render.
+
+# 05/04/2026
+
+# Daily Report - Team 1
+
+## Merino Vidal Mateo Alejandro
+- **Yesterday:** Implementé el filtro de productos por categoría (HU), incluyendo el componente `CategoryFilter` con dropdown de búsqueda, botón para quitar filtro, manejo de errores y mensajes de estado vacío, integrado en `FeaturedProducts` junto al buscador existente.
+- **Today:** Integración y corrección de detalles del filtro por categoría, asegurando que cumple todos los criterios de aceptación de la HU.
+- **Blockers:** n/a.

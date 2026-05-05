@@ -105,6 +105,8 @@ export const catalogProducts = [
     imageUrl:
       'https://hipermaxi.com/tienda-api/marketfile/ImageEcommerce?hashfile=fb2d89f_c5dd_4212_905e_e69b8d28427e.webp&co=5&size=900x900',
     badge: 'Bolivia',
+    stockTotal: 36,
+    stockAvailable: 24,
     sourceUrl:
       'https://www.hipermaxi.com/la-paz/hipermaxi-el-poeta/producto/786024/leche-pil-natural-900-ml',
     reviews: [
@@ -138,6 +140,8 @@ export const catalogProducts = [
     badge: 'Oferta',
     hasOffer: true,
     offerPrice: 28,
+    stockTotal: 18,
+    stockAvailable: 0,
     sourceUrl:
       'https://www.hipermaxi.com/la-paz/hipermaxi-el-poeta/producto/783359/queso-crema-bonle-pil-andina-200-gr',
     reviews: [
@@ -169,6 +173,8 @@ export const catalogProducts = [
     imageUrl:
       'https://hipermaxi.com/tienda-api/marketfile/ImageEcommerce?hashfile=294b7aa_1b79_4bbc_aabe_4a15c769d068.webp&co=5&size=900x900',
     badge: 'Popular',
+    stockTotal: 42,
+    stockAvailable: 17,
     sourceUrl:
       'https://www.hipermaxi.com/cochabamba/hipermaxi-blanco-galindo/producto/058424/aceite-fino-vegetal-900-ml',
     reviews: [],
@@ -183,6 +189,8 @@ export const catalogProducts = [
     description: '   ',
     imageUrl:
       'https://hipermaxi.com/tienda-api/marketfile/ImageEcommerce?hashfile=a7aad26_2e85_4057_b8b4_dd06128d71f2.webp&co=5&size=900x900',
+    stockTotal: 55,
+    stockAvailable: 8,
     sourceUrl:
       'https://www.hipermaxi.com/santa-cruz/hipermaxi-blacutt/producto/540900/arroz-grano-de-oro-caisy-1-kg',
     reviews: [
@@ -213,6 +221,8 @@ export const catalogProducts = [
       'Pasta seca tipo spaguetto para comidas rapidas y rendidoras, util para salsa roja o blanca.',
     imageUrl:
       'https://hipermaxi.com/tienda-api/marketfile/ImageEcommerce?hashfile=9366ed1_1927_4112_9833_407bf0b2f34f.webp&co=5&size=900x900',
+    stockTotal: 27,
+    stockAvailable: 0,
     sourceUrl:
       'https://www.hipermaxi.com/santa-cruz/hipermaxi-canoto/producto/008210/fideo-lazzaroni-spaguetto-52-400-gr',
     reviews: [
@@ -242,8 +252,10 @@ export const catalogProducts = [
     description:
       'Mocochinchi deshidratado listo para preparar una bebida tradicional boliviana de sabor dulce.',
     imageUrl:
-      'https://hipermaxi.com/tienda-api/marketfile/ImageEcommerce?hashfile=7801756_7695_4242_940c_b3d75ab834e9.webp&co=5&size=900x900',
+      'https://hipermaxi.com/tienda-api/marketfile/ImageEcommerce?hashfile=demo-image-missing.webp&co=5&size=900x900',
     badge: 'Tradicional',
+    stockTotal: 30,
+    stockAvailable: 12,
     sourceUrl:
       'https://www.hipermaxi.com/la-paz/hipermaxi-calacoto/producto/658208/mocochinchi-soproma-100-gr',
     reviews: mocochinchiReviews,
@@ -262,6 +274,8 @@ export const catalogProducts = [
     badge: 'Oferta',
     hasOffer: true,
     offerPrice: 109,
+    stockTotal: 15,
+    stockAvailable: 3,
     sourceUrl:
       'https://www.hipermaxi.com/la-paz/hipermaxi-achumani/producto/554466/detergente-liquido-ola-futuro-limpieza-completa-5-l',
     reviews: [

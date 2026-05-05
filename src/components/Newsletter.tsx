@@ -3,14 +3,8 @@ export default function Newsletter() {
     <section className="py-24 relative overflow-hidden bg-bg-dark">
       {/* Glow background */}
       <div className="absolute inset-0">
-        <div
-          className="absolute top-0 left-1/4 w-96 h-96 rounded-full blur-3xl"
-          className="absolute top-0 left-1/4 w-96 h-96 rounded-full blur-3xl bg-primary/12"
-        />
-        <div
-          className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl"
-          className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl bg-bg-light/5"
-        />
+        <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full blur-3xl bg-primary/12" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl bg-bg-light/5" />
       </div>
 
       <div className="relative max-w-2xl mx-auto px-4 text-center">

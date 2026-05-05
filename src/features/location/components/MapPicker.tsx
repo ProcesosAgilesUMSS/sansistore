@@ -1,9 +1,10 @@
-import React from "react";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
-import { useLocation } from "../hooks/useLocation";
-import { saveLocation } from "../services/locationService";
-import type { LocationType } from "../types";
-import "leaflet/dist/leaflet.css";
+import React from 'react';
+import type { LeafletMouseEvent } from 'leaflet';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { useLocation } from '../hooks/useLocation';
+import { saveLocation } from '../services/locationService';
+import type { LocationType } from '../types';
+import 'leaflet/dist/leaflet.css';
 
 type MapEventsProps = {
   setLat: React.Dispatch<React.SetStateAction<number>>;
@@ -12,8 +13,7 @@ type MapEventsProps = {
 
 function MapEvents({ setLat, setLng }: MapEventsProps) {
   useMapEvents({
-    click(e) {
-      //console.log("CLICK:", e.latlng);
+    click(e: LeafletMouseEvent) {
       setLat(e.latlng.lat);
       setLng(e.latlng.lng);
     },
@@ -38,7 +38,7 @@ export default function MapPicker() {
 
   const handleSave = async () => {
     const payload = {
-      userId: "TEMP_USER",
+      userId: 'TEMP_USER',
       lat,
       lng,
       label,
@@ -46,39 +46,34 @@ export default function MapPicker() {
       isDefault: true,
     };
 
-    //console.log("PAYLOAD FINAL:", payload);
-
     try {
       await saveLocation(payload);
-      //console.log("GUARDADO OK");
     } catch (err) {
-      console.error("ERROR:", err);
+      console.error('ERROR:', err);
     }
   };
 
   return (
     <div
-      style={{
-        background: "var(--theme-card-bg)",
-        color: "var(--theme-text)",
-        padding: "16px",
-        borderRadius: "1.25rem",
-        border: "1px solid var(--theme-border)",
-        display: "flex",
-        flexDirection: "column",
-        gap: "14px",
-      }}
-    >
-      <h1 style={{ fontWeight: 800 }}>
-        Seleccionar ubicacion
-      </h1>
+        style={{
+          background: 'var(--theme-card-bg)',
+          color: 'var(--theme-text)',
+          padding: '16px',
+          borderRadius: '1.25rem',
+          border: '1px solid var(--theme-border)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '14px',
+        }}
+      >
+      <h1 style={{ fontWeight: 800 }}>Seleccionar ubicacion</h1>
 
       <MapContainer
         center={center}
         zoom={16}
         style={{
-          height: "320px",
-          borderRadius: "1.25rem",
+          height: '320px',
+          borderRadius: '1.25rem',
         }}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -86,48 +81,48 @@ export default function MapPicker() {
         <MapEvents setLat={setLat} setLng={setLng} />
       </MapContainer>
 
-    <div>
-      <h4 style={{ fontWeight: 700 }}>Ubicacion</h4>
+      <div>
+        <h4 style={{ fontWeight: 700 }}>Ubicacion</h4>
 
-      <div
-        style={{
-          display: "flex",
-          gap: "10px",
-        }}
-      >
-        <div style={{ flex: 1 }}>
-          <label style={{ fontSize: "12px", opacity: 0.7 }}>Latitud</label>
-          <input
-            value={lat.toFixed(6)}
-            readOnly
-            style={{
-              width: "100%",
-              padding: "10px",
-              borderRadius: "12px",
-              border: "1px solid var(--theme-border)",
-              background: "var(--theme-secondary-bg)",
-              color: "var(--theme-text)",
-            }}
-          />
-        </div>
+        <div
+          style={{
+            display: 'flex',
+            gap: '10px',
+          }}
+        >
+          <div style={{ flex: 1 }}>
+            <label style={{ fontSize: '12px', opacity: 0.7 }}>Latitud</label>
+            <input
+              value={lat.toFixed(6)}
+              readOnly
+              style={{
+                width: '100%',
+                padding: '10px',
+                borderRadius: '12px',
+                border: '1px solid var(--theme-border)',
+                background: 'var(--theme-secondary-bg)',
+                color: 'var(--theme-text)',
+              }}
+            />
+          </div>
 
-        <div style={{ flex: 1 }}>
-          <label style={{ fontSize: "12px", opacity: 0.7 }}>Longitud</label>
-          <input
-            value={lng.toFixed(6)}
-            readOnly
-            style={{
-              width: "100%",
-              padding: "10px",
-              borderRadius: "12px",
-              border: "1px solid var(--theme-border)",
-              background: "var(--theme-secondary-bg)",
-              color: "var(--theme-text)",
-            }}
-          />
+          <div style={{ flex: 1 }}>
+            <label style={{ fontSize: '12px', opacity: 0.7 }}>Longitud</label>
+            <input
+              value={lng.toFixed(6)}
+              readOnly
+              style={{
+                width: '100%',
+                padding: '10px',
+                borderRadius: '12px',
+                border: '1px solid var(--theme-border)',
+                background: 'var(--theme-secondary-bg)',
+                color: 'var(--theme-text)',
+              }}
+            />
+          </div>
         </div>
       </div>
-    </div>
 
       <div>
         <h4 style={{ fontWeight: 700 }}>Tipo de lugar</h4>
@@ -135,12 +130,12 @@ export default function MapPicker() {
           value={type}
           onChange={(e) => setType(e.target.value as LocationType)}
           style={{
-            width: "100%",
-            padding: "10px",
-            borderRadius: "12px",
-            border: "1px solid var(--theme-border)",
-            background: "var(--theme-bg)",
-            color: "var(--theme-text)",
+            width: '100%',
+            padding: '10px',
+            borderRadius: '12px',
+            border: '1px solid var(--theme-border)',
+            background: 'var(--theme-bg)',
+            color: 'var(--theme-text)',
           }}
         >
           <option value="AULA">Aula</option>
@@ -161,12 +156,12 @@ export default function MapPicker() {
           onChange={(e) => setLabel(e.target.value)}
           placeholder="Ej: Aula 962 - Facultad de Tecnología"
           style={{
-            width: "100%",
-            padding: "10px",
-            borderRadius: "12px",
-            border: "1px solid var(--theme-border)",
-            background: "var(--theme-bg)",
-            color: "var(--theme-text)",
+            width: '100%',
+            padding: '10px',
+            borderRadius: '12px',
+            border: '1px solid var(--theme-border)',
+            background: 'var(--theme-bg)',
+            color: 'var(--theme-text)',
           }}
         />
       </div>
@@ -174,12 +169,12 @@ export default function MapPicker() {
       <button
         onClick={handleSave}
         style={{
-          background: "var(--color-primary)", 
-          color: "white",
-          padding: "12px",
-          borderRadius: "9999px",
+          background: 'var(--color-primary)',
+          color: 'white',
+          padding: '12px',
+          borderRadius: '9999px',
           fontWeight: 700,
-          marginTop: "6px",
+          marginTop: '6px',
         }}
       >
         Guardar

@@ -1,14 +1,18 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar';
-import Hero from '../components/Hero';
-import FeaturedProducts from '../components/FeaturedProducts';
 import Footer from '../components/Footer';
 ---
 
 <Layout title="Sansistore">
   <Navbar client:load />
-  <Hero client:load />
-  <FeaturedProducts client:load />
+  <div class="min-h-[80vh] flex items-center justify-center bg-bg-light">
+    <div class="text-center">
+      <h1 class="text-4xl font-bold text-text-light mb-4">Bienvenido a Sansistore</h1>
+      <a href="/productos" class="inline-block px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+        Ver Productos
+      </a>
+    </div>
+  </div>
   <Footer client:load />
 </Layout>

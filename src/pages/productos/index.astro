@@ -1,0 +1,14 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar';
+import FeaturedProducts from '../../components/FeaturedProducts';
+import Footer from '../../components/Footer';
+
+const initialSearch = Astro.url.searchParams.get('q') || '';
+---
+
+<Layout title="Productos | Sansistore">
+  <Navbar client:load />
+  <FeaturedProducts client:load initialSearch={initialSearch} />
+  <Footer client:load />
+</Layout>
