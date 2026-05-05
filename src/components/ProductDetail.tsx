@@ -319,7 +319,8 @@ setNameExpanded(false);
     ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviewsCount
     : 0;
   const roundedAverage = reviewsCount ? Math.round(averageRating) : 0;
-  const averageLabel = reviewsCount ? `${averageRating.toFixed(1)}/5` : 'Sin calificaciones';
+  // Keep numeric label consistent with the star visualization (which uses roundedAverage)
+  const averageLabel = reviewsCount ? `${roundedAverage.toFixed(1)}/5` : 'Sin calificaciones';
   const reviewSortOptions: Array<{ value: ReviewSortKey; label: string }> = [
     { value: 'recent', label: 'Más recientes' },
     { value: 'oldest', label: 'Más antiguos' },
