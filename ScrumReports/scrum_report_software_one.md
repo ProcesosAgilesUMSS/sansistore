@@ -80,9 +80,9 @@
 - **Blockers:** None
 
 ### Rodriguez Torrico Arnold Guery
-- **Yesterday:** 
-- **Today:** 
-- **Blockers:** 
+- **Yesterday:** Analicé la HU enfocándome en los criterios de aceptación, especialmente en cómo se debe mostrar la información del pedido al vendedor.
+- **Today:** Trabajé en la propuesta de la vista del detalle de pedido (UI), definiendo qué información se mostrará como nombre del producto, cantidad y características, además del flujo de navegación entre lista de pedidos y detalle.
+- **Blockers:** Aún tengo dudas sobre algunos datos que vendrán desde backend.
 
 ### Pereira Fiorilo Oliver Do Santos
 - **Yesterday:** 
