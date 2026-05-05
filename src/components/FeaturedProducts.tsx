@@ -1,13 +1,5 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
-import {
-  ShoppingBag,
-  Package,
-  Search,
-  X,
-  History,
-  Trash2,
-  Percent,
-} from 'lucide-react';
+import { ShoppingBag, Package, Search, X, History, Trash2 } from 'lucide-react';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { getOfferBadgeData, hasValidOffer } from '../lib/productOffers';
@@ -354,22 +346,13 @@ export default function FeaturedProducts({
             type="button"
             onClick={() => setShowOffersOnly((current) => !current)}
             aria-pressed={showOffersOnly}
-            aria-label={
-              showOffersOnly
-                ? 'Quitar filtro Solo ofertas'
-                : 'Activar filtro Solo ofertas'
-            }
             className={`inline-flex items-center rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200 ${
               showOffersOnly
                 ? 'border-primary bg-primary text-bg-light hover:brightness-110'
                 : 'border-border-light text-text-light hover:border-primary hover:text-primary'
             }`}
           >
-            <Percent size={14} className="mr-2" aria-hidden="true" />
             Solo ofertas
-            {showOffersOnly && (
-              <X size={14} className="ml-2" aria-hidden="true" />
-            )}
           </button>
           <div ref={searchRef} className="relative flex-1">
             <Search
