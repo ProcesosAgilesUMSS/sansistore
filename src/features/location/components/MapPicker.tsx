@@ -1,21 +1,25 @@
-import React, { useState } from "react";
+// components/MapPicker.tsx
+import React from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents, Polygon } from "react-leaflet";
 import { useLocation } from "../hooks/useLocation";
+import { useZoneValidation } from "../hooks/useZoneValidation";
 import { saveLocation } from "../services/locationService";
 import type { LocationType } from "../types";
-import { isLocationValid, getCurrentZone, ALLOWED_ZONES } from "../utils/zoneLimits";
 import "leaflet/dist/leaflet.css";
 
 type MapEventsProps = {
   setLat: React.Dispatch<React.SetStateAction<number>>;
   setLng: React.Dispatch<React.SetStateAction<number>>;
+  onLocationChange: (lat: number, lng: number) => void;
 };
 
-function MapEvents({ setLat, setLng }: MapEventsProps) {
+function MapEvents({ setLat, setLng, onLocationChange }: MapEventsProps) {
   useMapEvents({
     click(e) {
-      setLat(e.latlng.lat);
-      setLng(e.latlng.lng);
+      const { lat, lng } = e.latlng;
+      onLocationChange(lat, lng);
+      setLat(lat);
+      setLng(lng);
     },
   });
 
@@ -34,45 +38,25 @@ export default function MapPicker() {
     setType,
   } = useLocation();
 
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [showError, setShowError] = useState<boolean>(false);
+  const {
+    errorMessage,
+    showError,
+    validateLocation,
+    validateBeforeSave,
+    getSuccessMessage,
+    allowedZones,
+  } = useZoneValidation();
 
-  // Calcular el centro del mapa basado en el primer punto de la primera zona
-  const mapCenter: [number, number] = ALLOWED_ZONES.length > 0 && ALLOWED_ZONES[0].points.length > 0
-    ? ALLOWED_ZONES[0].points[0]
+  const mapCenter: [number, number] = allowedZones.length > 0 && allowedZones[0].points.length > 0
+    ? allowedZones[0].points[0]
     : [lat, lng];
 
-  // Función para validar y actualizar ubicación
   const handleLocationChange = (newLat: number, newLng: number) => {
-    if (isLocationValid(newLat, newLng)) {
-      setLat(newLat);
-      setLng(newLng);
-      setErrorMessage("");
-      setShowError(false);
-    } else {
-      setErrorMessage(
-        `Ubicación fuera de zonas permitidas.\n\nLas zonas permitidas son:\n` +
-        ALLOWED_ZONES.map(z => `• ${z.name}`).join('\n') +
-        `\n\nSolo puedes seleccionar ubicaciones dentro de estas áreas.`
-      );
-      setShowError(true);
-      
-      // Ocultar mensaje después de 4 segundos
-      setTimeout(() => {
-        setShowError(false);
-      }, 2000);
-    }
+    validateLocation(newLat, newLng);
   };
 
   const handleSave = async () => {
-    // Validar antes de guardar
-    if (!isLocationValid(lat, lng)) {
-      setErrorMessage("No se puede guardar: La ubicación está fuera de las zonas permitidas");
-      setShowError(true);
-      
-      setTimeout(() => {
-        setShowError(false);
-      }, 3000);
+    if (!validateBeforeSave(lat, lng)) {
       return;
     }
 
@@ -87,23 +71,12 @@ export default function MapPicker() {
 
     try {
       await saveLocation(payload);
-      const zone = getCurrentZone(lat, lng);
-      alert(`Ubicación guardada correctamente en ${zone}`);
+      alert(getSuccessMessage(lat, lng));
     } catch (err) {
-      setErrorMessage("Error al guardar la ubicación");
-      setShowError(true);
+      console.error("ERROR:", err);
+      alert("Error al guardar la ubicación");
     }
   };
-
-  // Componente MapEvents con validación
-  function MapEventsWithValidation({ setLat, setLng }: MapEventsProps) {
-    useMapEvents({
-      click(e) {
-        handleLocationChange(e.latlng.lat, e.latlng.lng);
-      },
-    });
-    return null;
-  }
 
   return (
     <div
@@ -122,7 +95,6 @@ export default function MapPicker() {
         Seleccionar ubicacion
       </h1>
 
-      {/* Mostrar mensaje de error */}
       {showError && errorMessage && (
         <div
           style={{
@@ -140,7 +112,6 @@ export default function MapPicker() {
         </div>
       )}
 
-      {/* Mostrar zonas permitidas */}
       <div
         style={{
           background: "var(--theme-secondary-bg)",
@@ -152,7 +123,7 @@ export default function MapPicker() {
       >
         <strong>Zonas permitidas:</strong>
         <ul style={{ margin: "4px 0 0 20px", padding: 0 }}>
-          {ALLOWED_ZONES.map((zone, idx) => (
+          {allowedZones.map((zone, idx) => (
             <li key={idx}>
               <strong>{zone.name}</strong>
               <br />
@@ -174,8 +145,7 @@ export default function MapPicker() {
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         
-        {/* Mostrar zonas en el mapa como polígonos */}
-        {ALLOWED_ZONES.map((zone, idx) => (
+        {allowedZones.map((zone, idx) => (
           <Polygon
             key={idx}
             positions={zone.points}
@@ -189,18 +159,16 @@ export default function MapPicker() {
         ))}
         
         <Marker position={[lat, lng]} />
-        <MapEventsWithValidation setLat={setLat} setLng={setLng} />
+        <MapEvents 
+          setLat={setLat} 
+          setLng={setLng} 
+          onLocationChange={handleLocationChange}
+        />
       </MapContainer>
 
       <div>
         <h4 style={{ fontWeight: 700 }}>Ubicacion</h4>
-
-        <div
-          style={{
-            display: "flex",
-            gap: "10px",
-          }}
-        >
+        <div style={{ display: "flex", gap: "10px" }}>
           <div style={{ flex: 1 }}>
             <label style={{ fontSize: "12px", opacity: 0.7 }}>Latitud</label>
             <input
@@ -216,7 +184,6 @@ export default function MapPicker() {
               }}
             />
           </div>
-
           <div style={{ flex: 1 }}>
             <label style={{ fontSize: "12px", opacity: 0.7 }}>Longitud</label>
             <input

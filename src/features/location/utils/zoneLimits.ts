@@ -1,10 +1,10 @@
-// Definir las zonas permitidas (polígonos)
+
 export interface Zone {
   name: string;
-  points: [number, number][]; // Array de [lat, lng] que forman el polígono
+  points: [number, number][]; 
 }
 
-// Configura tus zonas aquí - DEFINE LOS PUNTOS DE TU POLÍGONO
+
 export const ALLOWED_ZONES: Zone[] = [
   {
     name: "Zona 1 - Campus Central",
@@ -17,7 +17,6 @@ export const ALLOWED_ZONES: Zone[] = [
       [-17.395598, -66.148028],
       [-17.394984, -66.148200],
       [-17.395148, -66.149133]
-      // Cierra el polígono (el último punto se conecta con el primero)
     ],
   },
   {
@@ -37,7 +36,6 @@ export const ALLOWED_ZONES: Zone[] = [
   },
 ];
 
-// Función para verificar si un punto está dentro de un polígono (Ray Casting Algorithm)
 export function isPointInPolygon(
   point: [number, number],
   polygon: [number, number][]
@@ -58,7 +56,6 @@ export function isPointInPolygon(
   return inside;
 }
 
-// Función para verificar si una ubicación está en alguna zona permitida
 export function isLocationValid(lat: number, lng: number): boolean {
   for (const zone of ALLOWED_ZONES) {
     if (isPointInPolygon([lat, lng], zone.points)) {
@@ -68,7 +65,6 @@ export function isLocationValid(lat: number, lng: number): boolean {
   return false;
 }
 
-// Función para obtener en qué zona está
 export function getCurrentZone(lat: number, lng: number): string | null {
   for (const zone of ALLOWED_ZONES) {
     if (isPointInPolygon([lat, lng], zone.points)) {
