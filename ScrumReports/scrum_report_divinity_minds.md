@@ -78,3 +78,9 @@
 - **Yesterday:** Reestructure y actualice la HU #205, implemente el filtro "Solo ofertas" con reglas de oferta valida, unifique logica compartida en catalogo/detalle y ajuste estados de error/vacio; ademas resolvi conflictos de merge en `ProductDetail` y valide la rama para PR.
 - **Today:** Preparar y abrir PR de `ver-productos-disponibles` hacia `main`, adjuntando validaciones y cierre de pendientes del merge.
 - **Blockers:** n/a.
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Finalicé la historia de usuario "Búsqueda de productos por nombre". Implementé la barra de búsqueda en el catálogo, asegurando que sea case-insensitive, gestione correctamente la limpieza de filtros (botón X / ESC), los mensajes de estado vacío y el límite de 100 caracteres.
+- **Today:** Trabajaré en la resolución de bugs detectados en diferentes HUs.
+- **Blockers:** Tuve un bloqueo temporal por dependencias entre HUs, pero fue solucionado.
