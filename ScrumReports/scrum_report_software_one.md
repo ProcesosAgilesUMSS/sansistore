@@ -71,3 +71,30 @@
     para su implementación.
 - **Blockers:** None.
 ------------------------------------------------------------------------------------------------------------------------------
+# 05/05/2026
+## Daily Reports - Team 6 SoftwareOne
+
+### Llanos Vega Juan Carlos
+- **Yesterday:** Descarga y actualización del sistema software desde el main principal en mi entorno personal para preparar el inicio del desarrollo software e instalación de herramientas concursantes al funcionamiento del software. 
+- **Today:** Evalúe las tareas de la historia de usuario en cuanto al frontend y backend,y la representación en mockups sobre las funcionalidades representativas. 
+- **Blockers:** None
+
+### Rodriguez Torrico Arnold Guery
+- **Yesterday:** 
+- **Today:** 
+- **Blockers:** 
+
+### Pereira Fiorilo Oliver Do Santos
+- **Yesterday:** 
+- **Today:** 
+- **Blockers:** 
+
+### Paqui Rojas Aaron David
+- **Yesterday:**
+- **Today:**
+- **Blockers:**
+
+### Gutiérrez Fuentes Alexander Raul
+- **Yesterday:** (02/05 - 03/05) Finalicé la configuración del entorno de desarrollo resolviendo conflictos de Firebase, establecí la arquitectura base de la HU-076 en src/features/orders y realicé una refactorización integral del componente SentOrdersList para mejorar su semántica, accesibilidad y alineación con el Design System oficial.
+- **Today:** Desarrollé el sistema de filtros interactivos mediante estados reactivos y componentes SVG personalizados, implementé la lógica de colapso con feedback visual y sincronicé la rama de trabajo siguiendo los estándares de commits y flujos de trabajo documentados en el proyecto.
+- **Blockers:** None
