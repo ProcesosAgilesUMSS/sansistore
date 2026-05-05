@@ -90,9 +90,9 @@
 - **Blockers:** Ninguno por el momento.
 
 ### Paqui Rojas Aaron David
-- **Yesterday:**
-- **Today:**
-- **Blockers:**
+- **Yesterday:** Me enfoqué en desglosar la HU-074 y sus criterios de aceptación. Con esto, dejé definida la estructura de información requerida y las restricciones de acceso para el rol de vendedor.
+- **Today:** Arranqué con el diseño preliminar de la UI para los pedidos pendientes. Estoy maquetando el componente principal de la lista y diseñando la vista de "sin resultados" o estado vacío.
+- **Blockers:** Todo en orden, ningún bloqueo por ahora.
 
 ### Gutiérrez Fuentes Alexander Raul
 - **Yesterday:** (02/05 - 03/05) Finalicé la configuración del entorno de desarrollo resolviendo conflictos de Firebase, establecí la arquitectura base de la HU-076 en src/features/orders y realicé una refactorización integral del componente SentOrdersList para mejorar su semántica, accesibilidad y alineación con el Design System oficial.
