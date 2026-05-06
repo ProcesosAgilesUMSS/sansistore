@@ -1,0 +1,10 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar';
+import MessengerOrdersPanel from '../../features/delivery/components/MessengerOrdersPanel';
+---
+
+<Layout title="Pedidos asignados | Sansistore">
+  <Navbar client:load />
+  <MessengerOrdersPanel client:load messengerId="juan.mensajero" />
+</Layout>
