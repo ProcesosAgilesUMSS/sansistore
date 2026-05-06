@@ -1,14 +1,14 @@
 import type { Order } from '../types';
 import { formatCurrency } from '../../utils/currency';
 
-interface ConfirmModalProps {
+interface Props {
     order: Order;
     onConfirm: () => void;
     onCancel: () => void;
     isLoading: boolean;
 }
 
-export const ConfirmModal = ({ order, onConfirm, onCancel, isLoading }: ConfirmModalProps) => {
+export const ConfirmModal = ({ order, onConfirm, onCancel, isLoading }: Props) => {
 
     return (
         <div
@@ -23,9 +23,10 @@ export const ConfirmModal = ({ order, onConfirm, onCancel, isLoading }: ConfirmM
             />
 
             <div className="relative z-10 w-full max-w-sm rounded-[1.25rem] bg-[var(--theme-card-bg)] border border-[var(--theme-border)] p-6 shadow-2xl">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: 'var(--theme-secondary-bg)' }}>
                     <svg
-                        className="h-6 w-6 text-amber-600 dark:text-amber-400"
+                        className="h-6 w-6"
+                        style={{ color: 'var(--color-primary)' }}
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -52,7 +53,7 @@ export const ConfirmModal = ({ order, onConfirm, onCancel, isLoading }: ConfirmM
                 </p>
                 <p className="mb-5 text-sm text-[var(--theme-text)] opacity-60">
                     Total:{' '}
-                    <span className="font-700 text-[#88B04B]">{formatCurrency(order.total)}</span>
+                    <span className="font-700" style={{ color: 'var(--color-primary)' }}>{formatCurrency(order.total)}</span>
                 </p>
 
                 <p className="mb-6 text-sm text-[var(--theme-text)] opacity-70 leading-relaxed">

@@ -45,17 +45,14 @@ export const seedUsers = [
     createdBy: 'seeder',
   },
 ];
-
-// ── UBICACIONES ───────────────────────────────────────────────────────────────
-// Ubicaciones dentro del campus UMSS registradas por los compradores
 export const seedLocations = [
   {
     locationId: 'loc-001',
     userId: 'user-comprador-001',
     label: 'Aula 3B - Facultad de Ciencias',
     type: 'aula',
-    lat: -17.39318,
-    lng: -66.15282,
+    lat: -17.393193877396495,
+    lng: -66.14935531570967,
     isDefault: true,
   },
   {
@@ -63,8 +60,8 @@ export const seedLocations = [
     userId: 'user-comprador-001',
     label: 'Laboratorio de Computación - Piso 2',
     type: 'laboratorio',
-    lat: -17.39290,
-    lng: -66.15260,
+    lat: -17.393136932794956,
+    lng: -66.14862432030439,
     isDefault: false,
   },
   {
@@ -72,26 +69,19 @@ export const seedLocations = [
     userId: 'user-comprador-002',
     label: 'Oficina Docentes - Bloque A',
     type: 'oficina',
-    lat: -17.39350,
-    lng: -66.15310,
+    lat: -17.3937747113195,
+    lng: -66.14875709293923,
     isDefault: true,
   },
 ];
 
-// ── ÓRDENES ───────────────────────────────────────────────────────────────────
-// Estados del flujo:
-//   CREADO → RESERVADO → LISTO → ASIGNADO → EN CAMINO → ENTREGADO → PAGADO
-//
-// Para la HU "marcar como LISTO" se necesitan pedidos en RESERVADO
-// Se incluyen también otros estados para tener contexto realista en la lista
 export const seedOrders = [
-  // ── Pedido principal: RESERVADO → el vendedor lo marcará LISTO ────────────
   {
     orderId: 'order-001',
     buyerId: 'user-comprador-001',
     sellerId: 'user-vendedor-001',
-    status: 'RESERVADO',           // ← estado que el vendedor cambiará a LISTO
-    total: 23.2,                   // 9.7 (leche) + 13.5 (arroz)
+    status: 'RESERVADO',
+    total: 23.2,
     locationId: 'loc-001',
     paymentStatus: 'PENDIENTE',
     deliveryStatus: null,
@@ -102,11 +92,10 @@ export const seedOrders = [
     cancelledAt: null,
     createdAt: '2026-04-25T08:50:00.000Z',
     updatedAt: '2026-04-25T09:00:00.000Z',
-    // orderItems (subcollección)
     items: [
       {
         itemId: 'item-001-a',
-        productId: '5f1c7b56-1dc5-4d48-a3a6-7f0d9c7d1011', // Leche PIL Natural 900 ml
+        productId: '5f1c7b56-1dc5-4d48-a3a6-7f0d9c7d1011',
         productName: 'Leche PIL Natural 900 ml',
         unitPrice: 9.7,
         quantity: 1,
@@ -114,7 +103,7 @@ export const seedOrders = [
       },
       {
         itemId: 'item-001-b',
-        productId: '9950d7ec-1222-4268-a95b-d1818e6c4044', // Arroz Grano de Oro 1 kg
+        productId: '9950d7ec-1222-4268-a95b-d1818e6c4044',
         productName: 'Arroz Grano de Oro Caisy 1 kg',
         unitPrice: 13.5,
         quantity: 1,
@@ -123,13 +112,12 @@ export const seedOrders = [
     ],
   },
 
-  // ── Segundo pedido RESERVADO (para tener lista con múltiples items) ────────
   {
     orderId: 'order-002',
     buyerId: 'user-comprador-002',
     sellerId: 'user-vendedor-001',
     status: 'RESERVADO',
-    total: 128,                    // 123 (detergente) + 5 extra por cantidad
+    total: 128,
     locationId: 'loc-003',
     paymentStatus: 'PENDIENTE',
     deliveryStatus: null,
@@ -143,15 +131,15 @@ export const seedOrders = [
     items: [
       {
         itemId: 'item-002-a',
-        productId: 'c3e77f4c-2cb5-4ce2-9134-a15466777077', // Detergente Ola 5 L
+        productId: 'c3e77f4c-2cb5-4ce2-9134-a15466777077',
         productName: 'Detergente Liquido Ola Futuro 5 L',
-        unitPrice: 109,            // precio con oferta activa
+        unitPrice: 109,
         quantity: 1,
         subtotal: 109,
       },
       {
         itemId: 'item-002-b',
-        productId: 'b62fd8d5-1d66-4f39-a26f-6b7e9fda9088', // Galletas Victoria
+        productId: 'b62fd8d5-1d66-4f39-a26f-6b7e9fda9088',
         productName: 'Galletas Agua Victoria 120 gr',
         unitPrice: 8,
         quantity: 2,
@@ -160,12 +148,11 @@ export const seedOrders = [
     ],
   },
 
-  // ── Pedido ya en LISTO (ya fue procesado, sirve para ver el estado destino) ─
   {
     orderId: 'order-003',
     buyerId: 'user-comprador-001',
     sellerId: 'user-vendedor-001',
-    status: 'LISTO_PARA_ENTREGA',               // ← estado resultado después de la HU
+    status: 'LISTO_PARA_ENTREGA',
     total: 10,
     locationId: 'loc-002',
     paymentStatus: 'PENDIENTE',
@@ -180,7 +167,7 @@ export const seedOrders = [
     items: [
       {
         itemId: 'item-003-a',
-        productId: 'aa2941bf-5f4f-4c8d-bb17-61977dcd6066', // Mocochinchi 100 gr
+        productId: 'aa2941bf-5f4f-4c8d-bb17-61977dcd6066',
         productName: 'Mocochinchi Soproma 100 gr',
         unitPrice: 10,
         quantity: 1,
@@ -189,7 +176,6 @@ export const seedOrders = [
     ],
   },
 
-  // ── Pedido ASIGNADO (ya tiene mensajero, pasó por LISTO) ─────────────────
   {
     orderId: 'order-004',
     buyerId: 'user-comprador-002',
@@ -209,7 +195,7 @@ export const seedOrders = [
     items: [
       {
         itemId: 'item-004-a',
-        productId: 'fb4fef79-3a32-4720-9f27-1ac9d4b3b033', // Aceite Fino 900 ml
+        productId: 'fb4fef79-3a32-4720-9f27-1ac9d4b3b033',
         productName: 'Aceite Fino Vegetal 900 ml',
         unitPrice: 18,
         quantity: 1,
@@ -218,7 +204,6 @@ export const seedOrders = [
     ],
   },
 
-  // ── Pedido CANCELADO (para contexto en la lista del vendedor) ─────────────
   {
     orderId: 'order-005',
     buyerId: 'user-comprador-001',
@@ -238,7 +223,7 @@ export const seedOrders = [
     items: [
       {
         itemId: 'item-005-a',
-        productId: '4ec27ef8-64d3-46cf-b48a-c8e76f0f5055', // Fideo Lazzaroni
+        productId: '4ec27ef8-64d3-46cf-b48a-c8e76f0f5055',
         productName: 'Fideo Lazzaroni Spaguetto 52 400 gr',
         unitPrice: 6.5,
         quantity: 1,
@@ -248,15 +233,11 @@ export const seedOrders = [
   },
 ];
 
-// ── DELIVERIES ────────────────────────────────────────────────────────────────
-// Solo se crean deliveries para pedidos que ya pasaron por LISTO o ASIGNADO
-// Los pedidos RESERVADO aún no tienen delivery — se crea al marcar LISTO
 export const seedDeliveries = [
-  // Delivery del order-003 (LISTO — recién marcado por el vendedor)
   {
     deliveryId: 'delivery-003',
     orderId: 'order-003',
-    courierId: null,               // aún sin mensajero asignado
+    courierId: null,
     status: 'CREADO',
     deliveryCode: 'DEL-2024-003',
     attemptNumber: 1,
@@ -276,7 +257,6 @@ export const seedDeliveries = [
     updatedAt: '2026-04-24T14:30:00.000Z',
   },
 
-  // Delivery del order-004 (ASIGNADO — ya tiene mensajero)
   {
     deliveryId: 'delivery-004',
     orderId: 'order-004',

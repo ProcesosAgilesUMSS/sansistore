@@ -1,11 +1,15 @@
-export const StatusPill = ({ status }: { status: string }) => {
+interface Props {
+    status: string;
+}
+
+export const StatusPill = ({ status }: Props) => {
     const styles: Record<string, string> = {
         RESERVADO:
-            'bg-amber-100 text-amber-800 border border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-700/40',
+            'border border-[var(--theme-border)] bg-[var(--theme-secondary-bg)] text-[var(--theme-text)]',
         LISTO:
-            'bg-emerald-100 text-emerald-800 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-700/40',
+            'border border-[var(--theme-border)] bg-[var(--color-primary)] text-white',
         ASIGNADO:
-            'bg-blue-100 text-blue-800 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700/40',
+            'border border-[var(--theme-border)] bg-[var(--theme-secondary-bg)] text-[var(--theme-text)]',
     };
     return (
         <span
@@ -13,10 +17,10 @@ export const StatusPill = ({ status }: { status: string }) => {
         >
             <span
                 className={`h-1.5 w-1.5 rounded-full ${status === 'RESERVADO'
-                    ? 'bg-amber-500'
+                    ? 'bg-[var(--color-primary)]'
                     : status === 'LISTO'
-                        ? 'bg-emerald-500'
-                        : 'bg-blue-500'
+                        ? 'bg-white'
+                        : 'bg-[var(--color-primary)]'
                     }`}
             />
             {status}

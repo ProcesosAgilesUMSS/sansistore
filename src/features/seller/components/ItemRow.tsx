@@ -1,7 +1,11 @@
 import type { OrderItem } from '../types';
 import { formatCurrency } from '../../utils/currency';
 
-export const ItemRow = ({ item }: { item: OrderItem }) => {
+interface Props {
+    item: OrderItem;
+}
+
+export const ItemRow = ({ item }: Props) => {
 
     return (
         <tr className="text-sm border-t border-[var(--theme-border)]">

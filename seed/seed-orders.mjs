@@ -1,26 +1,9 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// seed-orders.mjs
-// Seeder para la HU: "Como Vendedor, quiero marcar pedidos como listos para entrega"
-//
-// Crea las colecciones:
-//   users → locations → orders (+ orderItems subcollección) → deliveries
-//
-// Prerequisito: seed-products.mjs debe haberse ejecutado primero
-//   ya que orderItems referencian productIds existentes.
-//
-// Uso:
-//   node seed/index.mjs seed-orders          ← solo este seeder
-//   node seed/index.mjs                      ← todos los seeders en orden
-// ─────────────────────────────────────────────────────────────────────────────
-
 import admin from 'firebase-admin';
 import { seedUsers, seedLocations, seedOrders, seedDeliveries } from './seed-orders-data.mjs';
 
 export async function run({ adminApp, db }) {
   const firestore = db;
 
-  // ── 1. USUARIOS ────────────────────────────────────────────────────────────
-  console.log('\nSeeding users...');
   for (const u of seedUsers) {
     const docRef = firestore.collection('users').doc(u.uid);
     await docRef.set({
@@ -35,7 +18,6 @@ export async function run({ adminApp, db }) {
     console.log(`  Upserted user [${u.roles.join(',')}]`, u.uid, '-', u.displayName);
   }
 
-  // ── 2. UBICACIONES ─────────────────────────────────────────────────────────
   console.log('\nSeeding locations...');
   for (const l of seedLocations) {
     const docRef = firestore.collection('locations').doc(l.locationId);
@@ -50,7 +32,6 @@ export async function run({ adminApp, db }) {
     console.log(`  Upserted location "${l.label}" for user`, l.userId);
   }
 
-  // ── 3. ÓRDENES + orderItems (subcollección) ────────────────────────────────
   console.log('\nSeeding orders & orderItems...');
   for (const o of seedOrders) {
     const { items, ...orderData } = o;
@@ -78,7 +59,6 @@ export async function run({ adminApp, db }) {
     });
     console.log(`  Upserted order [${orderData.status}]`, o.orderId);
 
-    // orderItems como subcollección de orders
     for (const item of items) {
       const itemRef = orderRef.collection('orderItems').doc(item.itemId);
       await itemRef.set({
@@ -92,10 +72,6 @@ export async function run({ adminApp, db }) {
     }
   }
 
-  // ── 4. DELIVERIES ──────────────────────────────────────────────────────────
-  // Solo para pedidos que ya pasaron por LISTO o ASIGNADO.
-  // Los pedidos en RESERVADO NO tienen delivery aún:
-  //   se crea en el momento en que el vendedor ejecuta "marcar como LISTO".
   console.log('\nSeeding deliveries...');
   for (const d of seedDeliveries) {
     const docRef = firestore.collection('deliveries').doc(d.deliveryId);

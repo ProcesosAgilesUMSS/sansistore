@@ -4,8 +4,6 @@ import { db } from '../../../lib/firebase';
 import { subscribeSellerOrders, fetchOrderItems, markOrderAsReady } from '../services/sellerServices'
 import type { Order, OrderItem } from '../types';
 
-// ID del vendedor hardcodeado temporalmente hasta que se implemente
-// protección de rutas con Firebase Auth. Reemplazar con auth.currentUser.uid
 const TEMP_SELLER_ID = 'user-vendedor-001';
 
 interface UseSellerOrdersReturn {

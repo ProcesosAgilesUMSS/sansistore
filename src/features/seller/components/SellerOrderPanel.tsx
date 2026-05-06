@@ -35,7 +35,7 @@ export default function SellerOrdersPanel() {
   const handleCancel = () => setPendingOrder(null);
 
   return (
-    <div className="min-h-screen bg-[var(--theme-bg)] px-4 py-8 md:px-8">
+    <div className="min-h-screen bg-[var(--theme-bg)] px-4 pb-8 pt-12 md:px-8 md:pt-12">
       {pendingOrder && (
         <ConfirmModal
           order={pendingOrder}
@@ -45,19 +45,20 @@ export default function SellerOrdersPanel() {
         />
       )}
 
-      <header className="mb-8">
+      <header className="mb-6 rounded-[1.25rem] border border-[var(--theme-border)] bg-[var(--theme-card-bg)] px-5 py-5 shadow-sm sm:px-6">
         <p
-          className="text-xs font-700 uppercase tracking-[0.2em] text-[#88B04B] mb-1"
+          className="text-xs font-700 uppercase tracking-[0.2em] mb-2"
+          style={{ color: 'var(--color-primary)' }}
         >
           Panel del Vendedor
         </p>
         <h1
-          className="text-3xl font-900 text-[var(--theme-text)] leading-tight"
+          className="text-2xl font-900 text-[var(--theme-text)] leading-tight sm:text-3xl"
           style={{ fontFamily: 'Outfit, sans-serif' }}
         >
           Pedidos para entrega
         </h1>
-        <p className="mt-1 text-sm text-[var(--theme-text)] opacity-50">
+        <p className="mt-2 max-w-2xl text-sm text-[var(--theme-text)] opacity-70 sm:text-[0.95rem]">
           Revisa y prepara los pedidos confirmados por los compradores.
         </p>
       </header>
@@ -87,14 +88,14 @@ export default function SellerOrdersPanel() {
         <div className="grid gap-8 lg:grid-cols-2">
           <section>
             <div className="mb-4 flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-amber-400" />
+              <span className="h-2 w-2 rounded-full bg-[var(--color-primary)]" />
               <h2
                 className="text-sm font-800 uppercase tracking-widest text-[var(--theme-text)] opacity-60"
                 style={{ fontFamily: 'Outfit, sans-serif' }}
               >
                 Reservados
               </h2>
-              <span className="ml-auto rounded-full bg-amber-100 px-2 py-0.5 text-xs font-700 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+              <span className="ml-auto rounded-full border border-[var(--theme-border)] bg-[var(--theme-secondary-bg)] px-2 py-0.5 text-xs font-700 text-[var(--theme-text)]">
                 {reserved.length}
               </span>
             </div>
@@ -126,14 +127,14 @@ export default function SellerOrdersPanel() {
 
           <section>
             <div className="mb-4 flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-emerald-400" />
+              <span className="h-2 w-2 rounded-full bg-[var(--color-primary)]" />
               <h2
                 className="text-sm font-800 uppercase tracking-widest text-[var(--theme-text)] opacity-60"
                 style={{ fontFamily: 'Outfit, sans-serif' }}
               >
                 Listos para entrega
               </h2>
-              <span className="ml-auto rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-700 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+              <span className="ml-auto rounded-full border border-[var(--theme-border)] bg-[var(--theme-secondary-bg)] px-2 py-0.5 text-xs font-700 text-[var(--theme-text)]">
                 {ready.length}
               </span>
             </div>

@@ -33,9 +33,7 @@ export const OrderCard = ({
                 : 'border-[var(--theme-border)]'
                 }`}
         >
-            {/* Cabecera de la tarjeta */}
             <div className="flex flex-wrap items-center gap-3 p-4">
-                {/* ID del pedido */}
                 <div className="flex-1 min-w-0">
                     <p
                         className="font-800 text-base text-[var(--theme-text)] tracking-tight"
@@ -48,15 +46,12 @@ export const OrderCard = ({
                     </p>
                 </div>
 
-                {/* Estado */}
                 <StatusPill status={order.status} />
 
-                {/* Total */}
-                <p className="font-700 text-[#88B04B] text-base">
+                <p className="font-700 text-[var(--color-primary)] text-base">
                     {formatCurrency(order.total)}
                 </p>
 
-                {/* Botón expandir */}
                 <button
                     onClick={() => onToggle(order.orderId)}
                     className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--theme-border)] text-[var(--theme-text)] opacity-60 transition hover:opacity-100 hover:bg-[var(--theme-secondary-bg)]"
@@ -74,7 +69,6 @@ export const OrderCard = ({
                 </button>
             </div>
 
-            {/* Panel de detalle (expandible) */}
             {isExpanded && (
                 <div className="border-t border-[var(--theme-border)] px-1 pb-4">
                     <table className="w-full text-sm mt-1">
@@ -118,11 +112,10 @@ export const OrderCard = ({
                 </div>
             )}
 
-            {/* Acción: solo para pedidos RESERVADO */}
             {onMarkReady && (
                 <div className="flex justify-end border-t border-[var(--theme-border)] px-4 py-3">
                     {isSuccess ? (
-                        <span className="flex items-center gap-1.5 text-sm font-600 text-emerald-600 dark:text-emerald-400">
+                        <span className="flex items-center gap-1.5 text-sm font-600 text-[var(--color-primary)]">
                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                             </svg>
@@ -132,7 +125,7 @@ export const OrderCard = ({
                         <button
                             onClick={() => onMarkReady(order)}
                             disabled={isMarking}
-                            className="flex items-center gap-2 rounded-full bg-[#88B04B] px-5 py-2 text-sm font-700 text-white transition hover:bg-[#7a9e43] active:scale-95 disabled:opacity-60"
+                            className="flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-5 py-2 text-sm font-700 text-white transition hover:opacity-90 active:scale-95 disabled:opacity-60"
                         >
                             {isMarking ? (
                                 <>
