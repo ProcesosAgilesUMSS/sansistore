@@ -1,0 +1,10 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar';
+import CourierOrdersPanel from '../../features/courier/components/CourierOrdersPanel';
+---
+
+<Layout title="Pedidos asignados | SansiStore">
+  <Navbar client:load />
+  <CourierOrdersPanel client:load />
+</Layout>
