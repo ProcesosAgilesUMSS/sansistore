@@ -64,3 +64,8 @@
 - **Yesterday:**    Realizar una vista simple en el proyecto
 - **Today:**        Realizar la estructura del proyecto para el area 7, inventario, y realizar la UserStorie "Ingreso de Lotes, solo formulario"
 - **Blockers:**     Un pequeño error de dependecias o funcionamiento de astro.
+
+- ## Soliz Moya Alejandra
+- **Yesterday:**    Ayude en el diseño del sidebar.
+- **Today:**        Revise documentacion de react para las dudas que tenia.
+- **Blockers:**     Ninguno.
