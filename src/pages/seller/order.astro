@@ -1,0 +1,12 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SellerOrdersPanel from '../../features/seller/components/SellerOrderPanel';
+import Navbar from '../../components/Navbar';
+import Footer from '../../components/Footer';
+---
+
+<Layout title="Pedidos">
+  <Navbar client:load />
+  <SellerOrdersPanel client:load />
+  <Footer client:load />
+</Layout>
