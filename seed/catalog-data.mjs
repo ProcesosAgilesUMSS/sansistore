@@ -309,6 +309,8 @@ export const catalogProducts = [
     badge: 'Oferta',
     hasOffer: true,
     offerPrice: 8,
+    stockTotal: 40,
+    stockAvailable: 25,
     sourceUrl:
       'https://www.hipermaxi.com/la-paz/hipermaxi-el-poeta/producto/779005/galletas-agua-victoria-120-gr',
     reviews: [

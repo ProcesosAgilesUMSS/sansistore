@@ -1,6 +1,8 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import SentOrdersList from '../../features/orders/components/SentOrdersList';
+import Navbar from '../../components/Navbar';
+import Footer from '../../components/Footer';
 ---
 
 <Layout title="Pedidos Enviados">
@@ -14,7 +16,9 @@ import SentOrdersList from '../../features/orders/components/SentOrdersList';
     }
   </style>
 
-  <div>
+  <Navbar client:load />
+  <div class="pt-18">
     <SentOrdersList client:load />
   </div>
+  <Footer client:load />
 </Layout>
