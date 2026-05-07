@@ -1,11 +1,15 @@
 export const SkeletonRow = () => {
   return (
-    <tr className="animate-pulse">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <td key={i} className="px-4 py-3">
-          <div className="h-4 rounded bg-(--theme-secondary-bg) w-3/4" />
-        </td>
-      ))}
-    </tr>
+    <div className="animate-pulse rounded-xl border border-(--theme-border) p-3">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1">
+          <div className="h-4 w-32 rounded bg-(--theme-secondary-bg)" />
+
+          <div className="mt-2 h-3 w-20 rounded bg-(--theme-secondary-bg)" />
+        </div>
+
+        <div className="h-4 w-16 rounded bg-(--theme-secondary-bg)" />
+      </div>
+    </div>
   );
-}
+};

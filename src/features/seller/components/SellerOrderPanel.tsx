@@ -38,7 +38,6 @@ export default function SellerOrdersPanel() {
     <div className="min-h-screen bg-(--theme-bg) px-4 pb-8 pt-12 md:px-8 md:pt-12">
       {pendingOrder && (
         <ConfirmModal
-          order={pendingOrder}
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           isLoading={!!markingOrderId}
@@ -96,7 +95,7 @@ export default function SellerOrdersPanel() {
               >
                 Reservados
               </h2>
-              <span className="ml-auto rounded-full border border-(--theme-border) bg-(--theme-secondary-bg) px-2 py-0.5 text-xs font-700 text-(--theme-text)">
+              <span className="ml-auto rounded-full border border-(--theme-border) bg-(--theme-secondary-bg) px-4 py-1 text-xs font-700 text-(--theme-text)">
                 {reserved.length}
               </span>
             </div>
@@ -135,7 +134,7 @@ export default function SellerOrdersPanel() {
               >
                 Listos para entrega
               </h2>
-              <span className="ml-auto rounded-full border border-(--theme-border) bg-(--theme-secondary-bg) px-2 py-0.5 text-xs font-700 text-(--theme-text)">
+              <span className="ml-auto rounded-full border border-(--theme-border) bg-(--theme-secondary-bg) px-4 py-1 text-xs font-700 text-(--theme-text)">
                 {ready.length}
               </span>
             </div>
