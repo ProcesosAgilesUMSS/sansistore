@@ -14,7 +14,7 @@ import {
   X,
   ChevronRight,
 } from 'lucide-react';
-import UserManagement from '../../users/components/UserManagement.tsx';
+import UserManagement from '../users/components/UserManagement.tsx';
 import CategoryList from '../categories/components/CategoryList.tsx';
 
 type Section = 'dashboard' | 'usuarios' | 'categorias' | null;
