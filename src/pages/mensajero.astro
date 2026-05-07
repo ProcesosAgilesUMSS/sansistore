@@ -1,8 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import MessengerDashboard from '../features/mensajero/components/MessengerDashboard';
+import Navbar from '../components/Navbar';
+import CourierDashboard from '../features/mensajero/components/CourierDashboard.tsx';
 ---
 
-<Layout title="Panel del Mensajero">
-  <MessengerDashboard client:load />
+<Layout title="Panel del Mensajero | Sansistore">
+  <Navbar client:load />
+  <CourierDashboard client:load />
 </Layout>
