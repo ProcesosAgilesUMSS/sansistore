@@ -27,12 +27,11 @@ export const OrderCard = ({
 }: Props) => {
   return (
     <div
-      className={`overflow-hidden rounded-[1.25rem] border bg-(--theme-card-bg) transition-all duration-200 hover:-translate-y-[1px] hover:shadow-lg ${isSuccess
-          ? 'border-emerald-400 shadow-[0_0_0_3px_rgba(136,176,75,0.25)]'
-          : 'border-(--theme-border)'
+      className={`overflow-hidden rounded-[1.25rem] border bg-(--theme-card-bg) transition-all duration-200 hover:-translate-y-px hover:shadow-lg ${isSuccess
+        ? 'border-emerald-400 shadow-[0_0_0_3px_rgba(136,176,75,0.25)]'
+        : 'border-(--theme-border)'
         }`}
     >
-      {/* HEADER */}
       <div className="p-4">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
@@ -78,7 +77,6 @@ export const OrderCard = ({
           </div>
         </div>
 
-        {/* ACCORDION BUTTON */}
         <button
           onClick={() => onToggle(order.orderId)}
           className="mt-4 flex w-full items-center justify-between rounded-xl border border-(--theme-border) px-4 py-3 text-sm font-600 text-(--theme-text) transition hover:bg-(--theme-secondary-bg)"
@@ -105,7 +103,6 @@ export const OrderCard = ({
         </button>
       </div>
 
-      {/* EXPANDED CONTENT */}
       {isExpanded && (
         <div className="border-t border-(--theme-border) pb-4">
           <div className="space-y-3 px-4 pt-4">
@@ -144,23 +141,9 @@ export const OrderCard = ({
               ))
             )}
           </div>
-
-          {/* TOTAL SUMMARY */}
-          {!itemsLoading && expandedItems.length > 0 && (
-            <div className="mx-4 mt-4 flex items-center justify-between rounded-xl border border-(--theme-border) px-4 py-3">
-              <span className="text-xs font-700 uppercase tracking-widest text-(--theme-text) opacity-50">
-                Total
-              </span>
-
-              <span className="font-800 text-lg text-primary">
-                {formatCurrency(order.total)}
-              </span>
-            </div>
-          )}
         </div>
       )}
 
-      {/* FOOTER ACTION */}
       {onMarkReady && (
         <div className="flex justify-end border-t border-(--theme-border) px-4 py-4">
           {isSuccess ? (
