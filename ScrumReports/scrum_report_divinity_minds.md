@@ -38,17 +38,17 @@
 
 # Daily Report - Team 1
 
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Alinee la HU de ofertas con criterios de aceptacion y prepare el diseño del indicador de descuento y el filtro en el catalogo; revise la data esperada desde backend.
+- **Today:** Definir el flujo de UI para precios con descuento y estado vacio, y dejar listo el esqueleto del filtro para integrar cuando este disponible la carga de productos.
+- **Blockers:** Dependencia de la HU de productos disponibles para integrar el filtro y render.
+
 ## Gutierrez Hinojosa Jhon Deymar
 
 - **Yesterday:** Configuré Firebase local para todos los equipos junto con seeders de productos para nuestro equipo, cerré PRs de referencia del día anterior, y participé en la definición de la HU #32 junto con el refinamiento de otras historias de usuarios.
 - **Today:** Desarrollo de la HU #32.
 - **Blockers:** Definir correctamente las historias de usuario.
-
-## Merudia Calderon Dayeza
-
-- **Yesterday:** Trabajé en la definición de la HU de búsqueda y filtros, y comencé su desarrollo.
-- **Today:** Continuar con el desarrollo de la HU de búsqueda y filtros.
-- **Blockers:** n/a.
 
 ## Merino Vidal Mateo Alejandro
 
@@ -56,13 +56,48 @@
 - **Today:** Actualicé la historia de usuario en la planificación de GitHub para mantener coherencia con el Sprint.
 - **Blockers:** n/a.
 
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Trabajé en la definición de la HU de búsqueda y filtros, y comencé su desarrollo.
+- **Today:** Continuar con el desarrollo de la HU de búsqueda y filtros.
+- **Blockers:** n/a.
+
 ## Marcos Velasquez Vela
 - **Yesterday:** Preparé la base de datos de productos con descripciones, imágenes y reviews; además implementé la HU de detalle de producto con navegación desde el catálogo, vista por `slug`, carga directa desde Firestore y manejo de error.
 - **Today:** Realizar pruebas de la HU de detalle de producto y apoyar en la integración de las siguientes tareas del Sprint 1.
 - **Blockers:** n/a.
 
+---
+
+# 05/05/2026
+
+# Daily Report - Team 1
+
 ## Castro Tejada Steven Lisandro
 
-- **Yesterday:** Alinee la HU de ofertas con criterios de aceptacion y prepare el diseño del indicador de descuento y el filtro en el catalogo; revise la data esperada desde backend.
-- **Today:** Definir el flujo de UI para precios con descuento y estado vacio, y dejar listo el esqueleto del filtro para integrar cuando este disponible la carga de productos.
-- **Blockers:** Dependencia de la HU de productos disponibles para integrar el filtro y render.
+- **Yesterday:** Reestructure y actualice la HU #205, implemente el filtro "Solo ofertas" con reglas de oferta valida, unifique logica compartida en catalogo/detalle y ajuste estados de error/vacio; ademas resolvi conflictos de merge en `ProductDetail` y valide la rama para PR.
+- **Today:** Preparar y abrir PR de `ver-productos-disponibles` hacia `main`, adjuntando validaciones y cierre de pendientes del merge.
+- **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+- **Yesterday:** Implementé el filtro de productos por categoría (HU), incluyendo el componente `CategoryFilter` con dropdown de búsqueda, botón para quitar filtro, manejo de errores y mensajes de estado vacío, integrado en `FeaturedProducts` junto al buscador existente.
+- **Today:** Integración y corrección de detalles del filtro por categoría, asegurando que cumple todos los criterios de aceptación de la HU.
+- **Blockers:** n/a.
+
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Reporté bugs en las HUs de mis compañeros y realicé correcciones y mejoras en la búsqueda y en los detalles de producto.
+- **Today:** Automatizaré las pruebas con Playwright y realizaré una revisión en busca de bugs.
+- **Blockers:** Marcos inició la HU de productos disponibles desde la rama de detalles, lo que provocó conflictos al mergear main con el trabajo de Steven. Falta una definición más clara de HUs independientes, lo que retrasó el avance del equipo.
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Finalicé la historia de usuario "Búsqueda de productos por nombre". Implementé la barra de búsqueda en el catálogo, asegurando que sea case-insensitive, gestione correctamente la limpieza de filtros (botón X / ESC), los mensajes de estado vacío y el límite de 100 caracteres.
+- **Today:** Trabajaré en la resolución de bugs detectados en diferentes HUs.
+- **Blockers:** Tuve un bloqueo temporal por dependencias entre HUs, pero fue solucionado.
+
+## Marcos Velasquez Vela
+
+- **Yesterday:** Implementé las HUs de ver productos disponibles y ver detalles de producto, incluyendo el seed del catálogo, la conexión al emulador de Firebase por entorno, el catálogo completo en FeaturedProducts, la navegación por slug, la vista ProductDetail, skeletons, badges de oferta válidos, reseñas mejoradas y una página 404 personalizada.
+- **Today:** Realizar integración final y correcciones visuales y funcionales en catálogo y detalle de producto, validando ofertas, navegación, estados de error y reseñas antes del merge.
+- **Blockers:** n/a.

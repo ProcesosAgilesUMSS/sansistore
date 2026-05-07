@@ -1,4 +1,4 @@
-# 04/28/2026
+# 28704/2026
 
 # Daily Report - Team 5 - Nova 2.0
 
@@ -29,7 +29,7 @@
 - **Today:** Finalizar la planificación del Sprint 1 con el resto del equipo, revisando que no falte nada necesario en la propuesta de base de datos para nuestro equipo.
 - **Blockers:** None.
 
-# 04/30/2026
+# 30/04/2026
 
 # Daily Report - Team 5 - Nova 2.0
 
@@ -58,4 +58,33 @@
 ##  Camila Wara Fernandez Sandoval
 - **Yesterday:**  Prepare e instale mi entorno de desarrollo 
 - **Today:**  participación en el diseño de mock ups 
+- **Blockers:** None
+
+# 05/05/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+- **Yesterday:** organice y revise de como van las hus de mis grupo.
+- **Today:** hice la integracion de las hus que nos toco para este primer sprint parte fronted.
+- **Blockers:** None.
+
+## Dylan Coca Beltran
+- **Yesterday:** Revise mis mockups y requisitos para mi hu 
+- **Today:** Realice un avance en el frontend del panel de administracion y mi hu 
+- **Blockers:** None
+
+## Jherlan Marcelo Calero Sardan
+- **Yesterday:** Revise el mockup y criterios de aceptacion de mi hu correspondiente.
+- **Today:** comencé primero con el desarollo del frontend de mi hu .
+- **Blockers:** None.
+
+## Camila Wara Fernandez Sandoval
+- **Yesterday:** Hice las ultimas revisiones y correcciones de los mockups de mi historia de usuario
+- **Today:** Trabaje en el desarrollo del frontend de mi historia de usuario    
+- **Blockers:** None
+
+## Fabricio Javier Cordova Caceres 
+- **Yesterday:** Hice las ultimas revisiones y correcciones de los mockups de mi historia de usuario y los criterios de aceptación 
+- **Today:** Trabaje en el desarrollo del frontend de mi historia de usuario  y se empezó con el desarrollo del backend 
 - **Blockers:** None

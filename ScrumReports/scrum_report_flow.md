@@ -1,3 +1,36 @@
+
+# 05/05/2026
+
+# Daily Report - Team 4
+
+## Anahi Sanabria Ugarte
+- **Yesterday**: login, validación de logeo solo con cuentas institucionales y modal de mensaje de error genérico
+- **Today**: Revision de conexión con backend y pruebas 
+- **Blockers**: ninguno
+
+## José Ignacio Jaldin Janko
+- **Yesterday:**  Registro de localizaciones.
+- **Today:** Revisión de conexión backend. 
+- **Blockers:** Ninguno.
+
+
+## Leonel Zeballos Aldunate
+- **Yesterday**: login, registro de inicio de sesión en la colección user dentro de firebase
+- **Today**: Revision de conexión con backend y pruebas 
+- **Blockers**: ninguno
+
+## Sergio Maldonado Sejas
+- **Yesterday**:mapa y registro de ubicaciones globales
+- **Today**: validaciones de ubicacion dentro de los campus de la universidad
+- **Blockers**: ninguno
+
+## Valery Dariana Ortuño Panozo
+- **Yesterday**: implementacion del mapa interactivo para selección de ubicacion, captura de coordenadas, selección de tipo y guardado en Firebase  
+- **Today**: ajustes de UI segun el design system y limpieza del codigo.
+- **Blockers*: ninguno
+
+
+
 # 04/30/2026
 
 # Daily Report - Team 4
@@ -26,3 +59,43 @@
 - **Yesterday:** Establecimiento de los criterios de aceptación de mis historias de usuario para asegurar que cumplan con los requerimientos del modelo.
 - **Today:** Iniciando el desarrollo activo y la integración de mis tareas dentro del flujo de trabajo del sprint.
 - **Blockers:** Ninguno.
+
+
+
+
+
+
+# 04/28/2026
+
+# Daily Report - Team 4
+
+## Anahi Sanabria Ugarte
+- **Yesterday:** Revise el diagrama de la base de datos y apoye a completar lo necesario
+- **Today**: terminaré la revision de la base de datos y refinando las historias de usuario viendo los criterios de aceptación 
+- **Blockers:** ninguno
+
+
+## José Ignacio Jaldin Janko
+- **Yesterday:** Revise el diagrama de la base de datos y apoye a completar lo necesario
+- **Today:** Subir report scrum y base de datos. 
+- **Blockers:** ninguno
+
+
+## Leonel Zeballos Aldunate
+- **Yesterday:** Revise el diagrama de la base de datos y apoye a completar lo necesario
+- **Today**: terminaré la revision de la base de datos y refinando las historias de usuario viendo los criterios de aceptación 
+- **Blockers:** ninguno
+
+
+## Sergio Maldonado Sejas
+- **Yesterday:** Revise el diagrama de la base de datos y apoye a completar lo necesario
+- **Today:** terminaré la revision de la base de datos y refinando las historias de usuario viendo los criterios de aceptación 
+- **Blockers:** ninguno
+
+
+
+## Valery Dariana Ortuño Panozo
+- **Yesterday**: Revisé y ajusté el modelo de base de datos del proyecto Sansistore, refinando entidades principales (users, locations, orders, deliveries) y definiendo la separación de estados entre pedidos, entregas y pagos. 
+- **Today**: Apoyar en la revisión del Sprint 1, verificando coherencia entre el modelo de datos y las historias de usuario del equipo (usuarios, ubicaciones y delivery), y validar reglas básicas del flujo de pedidos.
+- **Blockers**: None.
+
