@@ -86,3 +86,11 @@
 * **Yesterday:** Avancé en la implementación de la HU “Visualizar monto exacto a cobrar”, desarrollando la vista del Panel del Mensajero y el detalle de cobro del pedido. Integré la lectura de pedidos desde Firestore, la visualización del monto total, subtotal y cargos adicionales, además del estado de pago “Pendiente de cobro” y el método de pago “Pago contra entrega”.
 * **Today:** Continuar con pruebas del flujo en el emulador, validar casos donde el monto no sea válido y ajustar la asignación de pedidos al mensajero para que el panel muestre únicamente los pedidos correspondientes.
 * **Blockers:** None
+
+# Daily Reports - Team 3 Webspire 07/05/26
+
+## Dayana Saleth Ortuño Guzman
+
+ * **Yesterday:** Arreglar algunos detalles de la parte de frontend
+* **Today:** Crear productos mockeados, miestrastanto, para que se pueda entender la vista de la HU *“Como comprador quiero pagar contra entrega”*, ya que depende de otra HU que aun no a sido implementada en este Sprint. "Agregar producto a carrito"
+* **Blockers:** Entender las dependencias con la HU que estoy trabajando
