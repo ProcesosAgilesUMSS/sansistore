@@ -87,9 +87,11 @@ test.describe('Product Detail Page', () => {
 
   test('product image loads', async ({ page }) => {
     await page.goto('/productos/leche-test-instock');
-
     const productImage = page.locator('img').first();
+
     await expect(productImage).toBeVisible();
+    await expect(productImage).toHaveJSProperty('complete', true);
+    await expect(productImage).not.toHaveJSProperty('naturalWidth', 0);
   });
 
   test('returns 404 for non-existent product', async ({ page }) => {
@@ -97,7 +99,7 @@ test.describe('Product Detail Page', () => {
 
     // Should redirect to 404 page
     expect(response?.status()).toBe(404);
-    await expect(page.getByText(/404|not found|no encontrado/i)).toBeVisible();
+    await expect(page.getByText(/No pudimos encontrar esta página/)).toBeVisible();
   });
 
   test('displays category information', async ({ page }) => {
