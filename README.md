@@ -20,6 +20,36 @@ bun install
 bun dev
 ```
 
+### Local emulators (Firestore + Auth)
+
+For local development you can run the Firebase emulators for Firestore and Auth. The project includes an `emu` script that starts both emulators using the configuration in `firebase.json`:
+
+```bash
+# starts Firestore and Auth emulators
+bun run emu
+```
+
+When `PUBLIC_APP_ENV` is not `production` the frontend will automatically connect to the emulators (Firestore on localhost:8080, Auth on localhost:9099). See `src/lib/firebase.ts` for details.
+
+Seeding local emulator
+
+The project includes a seeder at `seed/index.mjs` and a `seed/seed-products.mjs` example. Run the seeder with:
+
+```bash
+# run all seeders
+bun run seed
+# run an individual seeder
+node ./seed/index.mjs seed-products
+```
+
+The seeder defaults to the Firestore emulator (it sets `FIRESTORE_EMULATOR_HOST=localhost:8080` if not provided) so it will not write to production by accident.
+
+For the current catalog seed, you can also sync products directly to Firestore with `node --env-file=.env scripts/push-products-to-firestore.mjs`.
+
+Java requirement
+
+- The Firebase Local Emulator requires Java 21 or newer. Confirm by running `java -version` and install/update Java if needed before running `bun run emu`.
+
 Scripts:
 
 ```bash
@@ -41,8 +71,10 @@ classDiagram
     +string uid
     +string email
     +string displayName
-    +string role
+    +array roles
     +string institutionalId
+    +boolean isActive
+    +string createdBy
     +timestamp createdAt
   }
 
@@ -60,18 +92,24 @@ classDiagram
     +string categoryId
     +string name
     +boolean active
+    +string createdBy
+    +timestamp createdAt
   }
 
   class products {
     +string productId
     +string categoryId
     +string name
+    +string slug
+    +string description
     +number price
     +string imageUrl
     +boolean active
     +boolean hasOffer
     +number offerPrice
     +number soldCount
+    +string badge
+    +string sourceUrl
   }
 
   class inventory {
@@ -95,9 +133,10 @@ classDiagram
   class reviews {
     +string reviewId
     +string productId
-    +string userId
+    +string authorName
     +number rating
     +string comment
+    +boolean active
     +timestamp createdAt
   }
 
@@ -106,9 +145,17 @@ classDiagram
     +string buyerId
     +string sellerId
     +string status
+    +string incidentReason
     +number total
     +string locationId
+    +string paymentStatus
+    +string deliveryStatus
+    +string deliveryId
+    +string paymentId
+    +timestamp confirmedAt
+    +timestamp cancelledAt
     +timestamp createdAt
+    +timestamp updatedAt
   }
 
   class orderItems {
@@ -125,9 +172,24 @@ classDiagram
     +string orderId
     +string courierId
     +string status
+    +string deliveryCode
+    +number attemptNumber
     +string incidentReason
+    +string evidenceUrl
+    +string failureReason
     +number amountCollected
+    +boolean customerConfirmed
+    +timestamp customerConfirmedAt
     +timestamp assignedAt
+    +timestamp pickedUpAt
+    +timestamp deliveredAt
+    +timestamp inTransitAt
+    +timestamp pickedUpAt
+    +timestamp deliveredAt
+    +timestamp failedAt
+    +timestamp reprogrammedAt
+    +timestamp createdAt
+    +timestamp updatedAt
   }
 
   class payments {
@@ -136,7 +198,11 @@ classDiagram
     +number amount
     +string method
     +string status
+    +string registeredBy
+    +string verifiedBy
     +timestamp registeredAt
+    +timestamp verifiedAt
+    +timestamp updatedAt
   }
 
   class courierSessions {
@@ -144,7 +210,31 @@ classDiagram
     +string courierId
     +number totalCollected
     +number deliveriesCount
+    +number expectedAmount
+    +number differenceAmount
+    +string status
+    +timestamp openedAt
     +timestamp closedAt
+    +string validatedBy
+    +timestamp validatedAt
+    +timestamp updatedAt
+  }
+
+  class notifications {
+    +string notificationId
+    +string userId
+    +string orderId
+    +string type
+    +string title
+    +string message
+    +boolean read
+    +timestamp createdAt
+    +timestamp updatedAt
+  }
+
+  class settings {
+    +string documentId
+    +number reservationTimeLimit
   }
 
   class cartItems {
@@ -177,15 +267,24 @@ classDiagram
   orders "1" --> "1" deliveries : has
   orders "1" --> "1" payments : has
   deliveries "0..*" --> "1" courierSessions : belongs
+  users "1" --> "1" settings : configures
+  users "1" --> "0..*" notifications : receives
+  orders "1" --> "0..*" notifications : triggers
 ```
 
 ### Technical notes
 
-The model is a good base for an ecommerce app with delivery, with three implementation details to keep consistent:
+The model is a good base for an ecommerce app with delivery. Keep these implementation details consistent:
 
 - In Firestore, you do not always need to store `productId`, `orderId`, etc. inside the document if the document ID already represents that value. Store it only when exports or search flows need it.
+- In the current catalog seed, `products` and `reviews` use UUIDs as Firestore document IDs. In practice, the `productId` and `reviewId` shown in this diagram can map to the document ID itself.
 - `inventoryMovements` should belong under `products` or live as a root collection indexed by `productId`. Nesting it under `inventory` can make global audit queries harder.
+- `products` should include a human-readable `description` for the catalog detail flow. Optional presentation fields such as `badge` and `sourceUrl` can be stored when the frontend needs merchandising labels or traceability of seeded data.
+- `reviews` can be seeded with `authorName` when there is no authenticated `userId` yet. Once buyer reviews are enabled, define whether both fields will coexist or whether `authorName` becomes derived display data.
 - Define closed values for `role`, `status`, `type`, and `method` from the start to avoid inconsistent states.
+- Delivery lifecycle timestamps must be stored in `deliveries`: `assignedAt`, `pickedUpAt`, and `deliveredAt`, to support tracking and performance metrics.
+- `evidenceUrl` is optional and stores delivery or incident evidence when required.
+- (TODO) `roles` is an array accepting: admin | vendedor | mensajero | operador | comprador. Example: ["admin", "comprador"] -> CHECK. Use array-contains for queries.
 
 ## Branching and releases
 

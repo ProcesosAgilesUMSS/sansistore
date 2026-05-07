@@ -1,0 +1,24 @@
+---
+
+import Layout from '../../layouts/Layout.astro';
+import { StockTable } from '../../features/inventory/components/StockTable.tsx';
+
+---
+
+<Layout title="Sansistore | Panel de Operador de Inventario">
+  <main class="p-6 md:p-10 bg-gray-50 min-h-screen">
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Panel de Control de Inventario</h1>
+        
+        <!-- Botón de Acción -->
+        <a href="/inventory/entry" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition shadow-sm">
+            + Ingresar Nuevo Lote
+        </a>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+        <StockTable client:load />
+    </div>
+    
+  </main>
+</Layout>

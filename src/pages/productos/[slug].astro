@@ -1,0 +1,26 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar';
+import Footer from '../../components/Footer';
+import ProductDetail from '../../components/ProductDetail';
+import { db } from '../../lib/firebase';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+
+const { slug } = Astro.params;
+
+const productQuery = query(collection(db, 'products'), where('slug', '==', slug), where('active', '==', true));
+const productSnap = await getDocs(productQuery);
+
+if (productSnap.empty) {
+  return Astro.redirect('/404');
+}
+
+const product = productSnap.docs[0].data();
+const productJson = JSON.stringify({ id: productSnap.docs[0].id, ...product });
+---
+
+<Layout title="Detalle de producto | Sansistore">
+  <Navbar client:load />
+  <ProductDetail client:load productSlug={slug!} initialProduct={productJson} />
+  <Footer client:load />
+</Layout>
