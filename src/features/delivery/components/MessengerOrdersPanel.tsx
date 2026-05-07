@@ -44,6 +44,36 @@ const statusCopy: Record<OrderStatus, { label: string; tone: string }> = {
   },
 };
 
+function formatEventTime(date: Date | null | undefined) {
+  if (!date) {
+    return 'Pendiente';
+  }
+
+  return new Intl.DateTimeFormat('es-BO', {
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date);
+}
+
+function SummaryPill({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number;
+}) {
+  return (
+    <div className="min-w-[140px] rounded-[20px] border border-border-light bg-card-bg-light px-4 py-3 shadow-[0_12px_30px_rgba(0,0,0,0.05)]">
+      <p className="text-[10px] font-black uppercase tracking-[0.24em] text-text-light/45">
+        {label}
+      </p>
+      <p className="mt-2 text-2xl font-black tracking-tight text-text-light">
+        {value}
+      </p>
+    </div>
+  );
+}
+
 type OrderCardProps = {
   order: DeliveryOrder;
   isProcessing: boolean;
@@ -73,9 +103,21 @@ function OrderCard({
         : order.status === 'PENDING_REASSIGNMENT'
           ? 'Este pedido fue rechazado y queda pendiente de reasignacion.'
           : 'Este pedido ya no se puede operar desde esta vista.';
+  const eventTime =
+    order.status === 'ACCEPTED'
+      ? formatEventTime(order.acceptedAt)
+      : order.status === 'PENDING_REASSIGNMENT'
+        ? formatEventTime(order.rejectedAt)
+        : formatEventTime(order.assignedAt);
+  const eventLabel =
+    order.status === 'ACCEPTED'
+      ? 'Aceptado'
+      : order.status === 'PENDING_REASSIGNMENT'
+        ? 'Rechazado'
+        : 'Asignado';
 
   return (
-    <article className="flex flex-col gap-5 rounded-[24px] border border-border-light bg-card-bg-light p-5 shadow-[0_18px_50px_rgba(0,0,0,0.06)] transition-transform duration-300 hover:-translate-y-1">
+    <article className="flex flex-col gap-5 rounded-[28px] border border-border-light bg-card-bg-light p-5 shadow-[0_18px_50px_rgba(0,0,0,0.06)] transition-transform duration-300 hover:-translate-y-1">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
           <p className="text-[11px] font-black uppercase tracking-[0.24em] text-primary/70">
@@ -90,6 +132,15 @@ function OrderCard({
           className={`rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-[0.16em] ${status.tone}`}
         >
           {status.label}
+        </span>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <span className="rounded-full bg-secondary-bg-light px-3 py-1 text-[11px] font-bold text-text-light/70">
+          {eventLabel}: {eventTime}
+        </span>
+        <span className="rounded-full bg-secondary-bg-light px-3 py-1 text-[11px] font-bold text-text-light/70">
+          Mensajero: {order.assignedMessengerName ?? 'Sin asignar'}
         </span>
       </div>
 
@@ -229,16 +280,47 @@ export default function MessengerOrdersPanel({
     refreshOrders,
   } =
     useMessengerOrders(messengerId);
+  const assignedCount = orders.filter((order) => order.status === 'ASSIGNED').length;
+  const acceptedCount = orders.filter((order) => order.status === 'ACCEPTED').length;
+  const pendingReassignCount = orders.filter(
+    (order) => order.status === 'PENDING_REASSIGNMENT',
+  ).length;
+  const activeMessengerLabel =
+    messengerOptions.find((option) => option.id === messengerId)?.label ?? messengerId;
 
   return (
     <section className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-24 sm:px-6">
-      <div className="space-y-2">
-        <p className="text-xs font-black uppercase tracking-[0.32em] text-primary/70">
-          Team 2 Logistics
-        </p>
-        <h1 className="text-3xl font-black tracking-tight text-text-light sm:text-4xl">
-          Pedidos asignados
-        </h1>
+      <div className="overflow-hidden rounded-[32px] border border-border-light bg-[linear-gradient(135deg,rgba(136,176,75,0.14),rgba(136,176,75,0.03))] p-6 shadow-[0_28px_90px_rgba(0,0,0,0.08)] sm:p-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="space-y-3">
+            <p className="text-xs font-black uppercase tracking-[0.32em] text-primary/70">
+              Team 2 Logistics
+            </p>
+            <h1 className="text-3xl font-black tracking-tight text-text-light sm:text-4xl">
+              Gestion de pedidos asignados
+            </h1>
+            <p className="max-w-2xl text-sm text-text-light/68 sm:text-base">
+              Vista operativa para que el mensajero revise su carga actual,
+              identifique pedidos pendientes y responda cada asignacion sin
+              salir del panel.
+            </p>
+          </div>
+
+          <div className="rounded-[24px] border border-border-light bg-card-bg-light/80 px-4 py-3 backdrop-blur">
+            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-text-light/45">
+              Mensajero activo
+            </p>
+            <p className="mt-2 text-xl font-black tracking-tight text-text-light">
+              {activeMessengerLabel}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 flex flex-wrap gap-3">
+          <SummaryPill label="Asignados" value={assignedCount} />
+          <SummaryPill label="Aceptados" value={acceptedCount} />
+          <SummaryPill label="Reasignar" value={pendingReassignCount} />
+        </div>
       </div>
 
       <div className="rounded-[28px] border border-border-light bg-card-bg-light p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)]">
