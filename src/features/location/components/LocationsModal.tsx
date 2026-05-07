@@ -5,7 +5,7 @@ import LocationCard from "./LocationCard";
 
 import type { Location } from "../types";
 import { useAuthUser } from '../../../hooks/useAuthUser';
-import { useUserLocation } from '../services/useUserLocation';
+import { useUserLocation } from '../hooks/useUserLocation';
 
 export default function LocationsModal() {
     const [isOpen, setIsOpen] = useState(true);
