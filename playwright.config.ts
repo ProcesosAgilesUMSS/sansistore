@@ -88,6 +88,7 @@ export default defineConfig({
     timeout: 120000,
     env: {
       FIRESTORE_EMULATOR_HOST: 'localhost:8080',
+      PUBLIC_APP_ENV: 'development',
     },
   },
 });
