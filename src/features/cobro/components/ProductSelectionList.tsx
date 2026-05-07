@@ -1,27 +1,23 @@
-import { Minus, Package, Plus } from 'lucide-react';
+import { Package } from 'lucide-react';
 import type { CashOnDeliveryOrderItem, CobroProduct } from '../types';
 import { formatMoney, getProductPrice } from '../utils/money';
 
 interface ProductSelectionListProps {
   loading: boolean;
   products: CobroProduct[];
-  quantities: Record<string, number>;
   selectedItems: CashOnDeliveryOrderItem[];
-  onQuantityChange: (productId: string, nextQuantity: number) => void;
 }
 
 export function ProductSelectionList({
   loading,
   products,
-  quantities,
   selectedItems,
-  onQuantityChange,
 }: ProductSelectionListProps) {
   return (
     <div className="rounded-lg border border-border-light bg-card-bg-light p-4">
       <div className="mb-4 flex items-center justify-between gap-3">
         <h3 className="text-lg font-bold text-text-light">
-          Productos para el pedido
+          Productos seleccionados
         </h3>
         <span className="text-sm font-semibold text-text-light opacity-60">
           {selectedItems.length} seleccionados
@@ -51,7 +47,7 @@ export function ProductSelectionList({
       {!loading && products.length > 0 && (
         <div className="grid gap-3 sm:grid-cols-2">
           {products.map((product) => {
-            const quantity = quantities[product.id] ?? 0;
+            const quantity = product.quantity ?? 1;
 
             return (
               <article
@@ -78,26 +74,8 @@ export function ProductSelectionList({
                     {formatMoney(getProductPrice(product))}
                   </p>
 
-                  <div className="mt-3 flex h-9 w-32 items-center justify-between rounded-full border border-border-light">
-                    <button
-                      type="button"
-                      aria-label={`Disminuir ${product.name}`}
-                      onClick={() => onQuantityChange(product.id, quantity - 1)}
-                      className="flex h-9 w-9 items-center justify-center rounded-full text-text-light transition hover:text-primary"
-                    >
-                      <Minus size={15} />
-                    </button>
-                    <span className="w-8 text-center text-sm font-bold text-text-light">
-                      {quantity}
-                    </span>
-                    <button
-                      type="button"
-                      aria-label={`Aumentar ${product.name}`}
-                      onClick={() => onQuantityChange(product.id, quantity + 1)}
-                      className="flex h-9 w-9 items-center justify-center rounded-full text-text-light transition hover:text-primary"
-                    >
-                      <Plus size={15} />
-                    </button>
+                  <div className="mt-3 inline-flex h-8 items-center rounded-full border border-primary/40 bg-primary/10 px-3 text-xs font-bold text-primary">
+                    Cantidad: {quantity}
                   </div>
                 </div>
               </article>

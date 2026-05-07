@@ -6,11 +6,12 @@ export const getCheckoutProducts = async (): Promise<CobroProduct[]> => {
   const productsQuery = query(
     collection(db, 'products'),
     orderBy('createdAt', 'desc'),
-    limit(4)
+    limit(3)
   );
   const snap = await getDocs(productsQuery);
 
   return snap.docs
     .map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }) as CobroProduct)
-    .filter((product) => product.active !== false);
+    .filter((product) => product.active !== false)
+    .filter((product) => Number(product.quantity ?? 0) > 0);
 };

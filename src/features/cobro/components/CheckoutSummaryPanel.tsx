@@ -1,8 +1,7 @@
-import { AlertCircle, CheckCircle2, CreditCard, ShoppingBag } from 'lucide-react';
+import { AlertCircle, CreditCard, ShoppingBag } from 'lucide-react';
 import type {
   CashOnDeliveryOrderItem,
   CashPaymentMethod,
-  ConfirmedCashOrder,
 } from '../types';
 import { formatMoney } from '../utils/money';
 
@@ -14,8 +13,6 @@ interface CheckoutSummaryPanelProps {
   paymentMethod: CashPaymentMethod;
   saving: boolean;
   errorMessage: string;
-  successMessage: string;
-  confirmedOrder: ConfirmedCashOrder | null;
   onPaymentMethodChange: (method: CashPaymentMethod) => void;
   onConfirmOrder: () => void;
 }
@@ -28,8 +25,6 @@ export function CheckoutSummaryPanel({
   paymentMethod,
   saving,
   errorMessage,
-  successMessage,
-  confirmedOrder,
   onPaymentMethodChange,
   onConfirmOrder,
 }: CheckoutSummaryPanelProps) {
@@ -123,31 +118,11 @@ export function CheckoutSummaryPanel({
         </div>
       )}
 
-      {successMessage && (
-        <div
-          id="seguimiento-pedido"
-          className="my-3 rounded-lg border border-primary/30 bg-primary/10 p-3 text-sm text-text-light"
-        >
-          <div className="mb-2 flex gap-2 font-bold">
-            <CheckCircle2 size={17} className="mt-0.5 shrink-0 text-primary" />
-            <span>{successMessage}</span>
-          </div>
-          {confirmedOrder && (
-            <div className="space-y-1 text-xs font-semibold opacity-80">
-              <p>Pedido: {confirmedOrder.orderId}</p>
-              <p>Pago asociado: {confirmedOrder.paymentId}</p>
-              <p>Total pendiente: {formatMoney(confirmedOrder.total)}</p>
-              <p>Estado: Pendiente de cobro</p>
-            </div>
-          )}
-        </div>
-      )}
-
       <button
         type="button"
         onClick={onConfirmOrder}
         disabled={!hasSelectedProducts || saving}
-        className="mt-4 flex h-11 w-full items-center justify-center rounded-full bg-primary-action px-4 text-sm font-bold text-bg-light transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-45"
+        className="mt-4 flex h-11 w-full items-center justify-center rounded-full bg-primary px-4 text-sm font-bold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:bg-secondary-bg-light disabled:text-text-light disabled:opacity-45"
       >
         {saving ? 'Registrando pedido...' : 'Confirmar pedido'}
       </button>
