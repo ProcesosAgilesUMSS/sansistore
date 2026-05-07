@@ -615,48 +615,25 @@ export default function ProductDetail({
                     Comentarios del producto
                   </h2>
                 </div>
-
-                <label className="flex items-center gap-2 text-sm font-medium text-text-light">
-                  <span className="opacity-70">Ordenar por</span>
-                  <select
-                    value={reviewSort}
-                    onChange={(event) => {
-                      setReviewSort(event.target.value as ReviewSortKey);
-                      setVisibleReviewsCount(REVIEW_PAGE_SIZE);
-                    }}
-                    className="rounded-full border border-border-light bg-secondary-bg-light px-4 py-2 text-sm text-text-light outline-none transition-colors hover:border-primary focus:border-primary"
-                  >
-                    {reviewSortOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-
-              <div className="mt-6 grid gap-4 rounded-3xl border border-border-light bg-secondary-bg-light/45 p-5 sm:grid-cols-[auto_1fr] sm:items-center">
-                <div className="flex items-center gap-2">
-                  {reviewsCount
-                    ? renderStars(roundedAverage)
-                    : Array.from({ length: 5 }).map((_, index) => (
-                        <Star
-                          key={index}
-                          size={14}
-                          className="text-text-light opacity-20"
-                        />
+                {reviewsCount > 0 && (
+                  <label className="flex items-center gap-2 text-sm font-medium text-text-light">
+                    <span className="opacity-70">Ordenar por</span>
+                    <select
+                      value={reviewSort}
+                      onChange={(event) => {
+                        setReviewSort(event.target.value as ReviewSortKey);
+                        setVisibleReviewsCount(REVIEW_PAGE_SIZE);
+                      }}
+                      className="rounded-full border border-border-light bg-secondary-bg-light px-4 py-2 text-sm text-text-light outline-none transition-colors hover:border-primary focus:border-primary"
+                    >
+                      {reviewSortOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
                       ))}
-                </div>
-                <div className="space-y-1">
-                  <p className="text-base font-bold text-text-light">
-                    {averageLabel}
-                  </p>
-                  <p className="text-sm text-text-light opacity-65">
-                    {reviewsCount
-                      ? `${reviewsCount} calificación${reviewsCount === 1 ? '' : 'es'} registradas`
-                      : 'Este producto aún no tiene reviews registradas.'}
-                  </p>
-                </div>
+                    </select>
+                  </label>
+                )}
               </div>
 
               {reviewsCount === 0 ? (
@@ -669,70 +646,86 @@ export default function ProductDetail({
                   </p>
                 </div>
               ) : (
-                <div className="mt-6 grid gap-4">
-                  {visibleReviews.map((review) => (
-                    <article
-                      key={review.id}
-                      className="rounded-2xl border border-border-light bg-secondary-bg-light/50 px-5 py-4"
-                    >
-                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                        <div>
-                          <p className="text-sm font-bold text-text-light">
-                            {review.authorName?.trim() || 'Comprador anónimo'}
-                          </p>
-                          {formatReviewDate(review) ? (
-                            <p className="mt-1 text-xs uppercase tracking-[0.16em] text-text-light opacity-45">
-                              {formatReviewDate(review)}
-                            </p>
-                          ) : null}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-1">
-                            {renderStars(review.rating)}
-                          </div>
-                          <span className="text-sm font-semibold text-text-light opacity-70">
-                            {review.rating.toFixed(1)}
-                          </span>
-                        </div>
-                      </div>
-                      <p
-                        ref={(element) => {
-                          if (element) reviewRefs.current.set(review.id, element);
-                          else reviewRefs.current.delete(review.id);
-                        }}
-                        className={`mt-3 text-sm leading-6 text-text-light opacity-80 ${!expandedReviews.has(review.id) ? 'line-clamp-3' : ''}`}
-                      >
-                        {review.comment}
+                <>
+                  <div className="mt-6 grid gap-4 rounded-3xl border border-border-light bg-secondary-bg-light/45 p-5 sm:grid-cols-[auto_1fr] sm:items-center">
+                    <div className="flex items-center gap-2">
+                      {renderStars(roundedAverage)}
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-base font-bold text-text-light">
+                        {averageLabel}
                       </p>
-                      {(truncatedReviews.has(review.id) ||
-                        expandedReviews.has(review.id)) && (
-                        <button
-                          type="button"
-                          onClick={() => toggleReview(review.id)}
-                          className="mt-1 cursor-pointer text-sm font-semibold text-primary hover:underline"
-                        >
-                          {expandedReviews.has(review.id)
-                            ? 'mostrar menos'
-                            : 'mostrar más'}
-                        </button>
-                      )}
-                    </article>
-                  ))}
+                      <p className="text-sm text-text-light opacity-65">
+                        {`${reviewsCount} calificación${reviewsCount === 1 ? '' : 'es'} registradas`}
+                      </p>
+                    </div>
+                  </div>
 
-                  {hasMoreReviews && (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setVisibleReviewsCount(
-                          (count) => count + REVIEW_PAGE_SIZE
-                        )
-                      }
-                      className="mt-2 inline-flex justify-center rounded-full border border-border-light bg-card-bg-light px-5 py-3 text-sm font-semibold text-text-light transition-colors hover:border-primary hover:text-primary"
-                    >
-                      Cargar más comentarios
-                    </button>
-                  )}
-                </div>
+                  <div className="mt-6 grid gap-4">
+                    {visibleReviews.map((review) => (
+                      <article
+                        key={review.id}
+                        className="rounded-2xl border border-border-light bg-secondary-bg-light/50 px-5 py-4"
+                      >
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                          <div>
+                            <p className="text-sm font-bold text-text-light">
+                              {review.authorName?.trim() || 'Comprador anónimo'}
+                            </p>
+                            {formatReviewDate(review) ? (
+                              <p className="mt-1 text-xs uppercase tracking-[0.16em] text-text-light opacity-45">
+                                {formatReviewDate(review)}
+                              </p>
+                            ) : null}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
+                              {renderStars(review.rating)}
+                            </div>
+                            <span className="text-sm font-semibold text-text-light opacity-70">
+                              {review.rating.toFixed(1)}
+                            </span>
+                          </div>
+                        </div>
+                        <p
+                          ref={(element) => {
+                            if (element) reviewRefs.current.set(review.id, element);
+                            else reviewRefs.current.delete(review.id);
+                          }}
+                          className={`mt-3 text-sm leading-6 text-text-light opacity-80 ${!expandedReviews.has(review.id) ? 'line-clamp-3' : ''}`}
+                        >
+                          {review.comment}
+                        </p>
+                        {(truncatedReviews.has(review.id) ||
+                          expandedReviews.has(review.id)) && (
+                          <button
+                            type="button"
+                            onClick={() => toggleReview(review.id)}
+                            className="mt-1 cursor-pointer text-sm font-semibold text-primary hover:underline"
+                          >
+                            {expandedReviews.has(review.id)
+                              ? 'mostrar menos'
+                              : 'mostrar más'}
+                          </button>
+                        )}
+                      </article>
+                    ))}
+
+                    {hasMoreReviews && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setVisibleReviewsCount(
+                            (count) => count + REVIEW_PAGE_SIZE
+                          )
+                        }
+                        className="mt-2 inline-flex justify-center rounded-full border border-border-light bg-card-bg-light px-5 py-3 text-sm font-semibold text-text-light transition-colors hover:border-primary hover:text-primary"
+                      >
+                        Cargar más comentarios
+                      </button>
+                    )}
+                  </div>
+                </>
               )}
             </section>
           </div>
