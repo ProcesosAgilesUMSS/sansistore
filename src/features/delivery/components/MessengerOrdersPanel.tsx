@@ -55,25 +55,6 @@ function formatEventTime(date: Date | null | undefined) {
   }).format(date);
 }
 
-function SummaryPill({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | number;
-}) {
-  return (
-    <div className="min-w-[140px] rounded-[20px] border border-border-light bg-card-bg-light px-4 py-3 shadow-[0_12px_30px_rgba(0,0,0,0.05)]">
-      <p className="text-[10px] font-black uppercase tracking-[0.24em] text-text-light/45">
-        {label}
-      </p>
-      <p className="mt-2 text-2xl font-black tracking-tight text-text-light">
-        {value}
-      </p>
-    </div>
-  );
-}
-
 type OrderCardProps = {
   order: DeliveryOrder;
   isProcessing: boolean;
@@ -277,14 +258,8 @@ export default function MessengerOrdersPanel({
     activeOrderId,
     acceptOrder,
     rejectOrder,
-    refreshOrders,
   } =
     useMessengerOrders(messengerId);
-  const assignedCount = orders.filter((order) => order.status === 'ASSIGNED').length;
-  const acceptedCount = orders.filter((order) => order.status === 'ACCEPTED').length;
-  const pendingReassignCount = orders.filter(
-    (order) => order.status === 'PENDING_REASSIGNMENT',
-  ).length;
   const activeMessengerLabel =
     messengerOptions.find((option) => option.id === messengerId)?.label ?? messengerId;
 
@@ -314,12 +289,6 @@ export default function MessengerOrdersPanel({
               {activeMessengerLabel}
             </p>
           </div>
-        </div>
-
-        <div className="mt-6 flex flex-wrap gap-3">
-          <SummaryPill label="Asignados" value={assignedCount} />
-          <SummaryPill label="Aceptados" value={acceptedCount} />
-          <SummaryPill label="Reasignar" value={pendingReassignCount} />
         </div>
       </div>
 
@@ -389,25 +358,6 @@ export default function MessengerOrdersPanel({
               <p className="text-sm text-text-light/60">
                 Datos temporales compatibles con el flujo real de la HU.
               </p>
-            </div>
-
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-secondary-bg-light px-4 py-3">
-              <p className="text-sm text-text-light/65">
-                Si cambias de mensajero o una accion tarda en responder, la
-                vista refresca el estado mas reciente del panel.
-              </p>
-              <button
-                type="button"
-                onClick={() => void refreshOrders()}
-                disabled={loading || activeOrderId !== null}
-                className={`rounded-full px-4 py-2 text-xs font-black uppercase tracking-[0.18em] ${
-                  loading || activeOrderId !== null
-                    ? 'bg-primary/30 text-bg-dark/70'
-                    : 'bg-primary text-bg-dark'
-                }`}
-              >
-                Refrescar
-              </button>
             </div>
 
             {orders.length === 0 ? (
