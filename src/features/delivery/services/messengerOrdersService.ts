@@ -87,3 +87,38 @@ export async function acceptMessengerOrder(
 
   return updatedOrder;
 }
+
+export async function rejectMessengerOrder(
+  orderId: string,
+  messengerId: string,
+): Promise<DeliveryOrder> {
+  await wait(450);
+
+  const orderIndex = mockOrders.findIndex((order) => order.id === orderId);
+
+  if (orderIndex === -1) {
+    throw new Error('No se encontro el pedido seleccionado.');
+  }
+
+  const order = mockOrders[orderIndex];
+
+  if (order.assignedMessengerId !== messengerId) {
+    throw new Error('El pedido no pertenece al mensajero activo.');
+  }
+
+  if (order.status !== 'ASSIGNED') {
+    throw new Error('Solo se pueden rechazar pedidos en estado ASSIGNED.');
+  }
+
+  const updatedOrder: DeliveryOrder = {
+    ...order,
+    status: 'PENDING_REASSIGNMENT',
+    rejectedAt: new Date(),
+  };
+
+  mockOrders = mockOrders.map((currentOrder) =>
+    currentOrder.id === orderId ? updatedOrder : currentOrder,
+  );
+
+  return updatedOrder;
+}

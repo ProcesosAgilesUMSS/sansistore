@@ -48,11 +48,18 @@ type OrderCardProps = {
   order: DeliveryOrder;
   isProcessing: boolean;
   onAccept: (orderId: string) => void;
+  onReject: (orderId: string) => void;
 };
 
-function OrderCard({ order, isProcessing, onAccept }: OrderCardProps) {
+function OrderCard({
+  order,
+  isProcessing,
+  onAccept,
+  onReject,
+}: OrderCardProps) {
   const status = statusCopy[order.status];
   const canAccept = order.status === 'ASSIGNED' && !isProcessing;
+  const canReject = order.status === 'ASSIGNED' && !isProcessing;
 
   return (
     <article className="flex flex-col gap-5 rounded-[24px] border border-border-light bg-card-bg-light p-5 shadow-[0_18px_50px_rgba(0,0,0,0.06)] transition-transform duration-300 hover:-translate-y-1">
@@ -115,10 +122,15 @@ function OrderCard({ order, isProcessing, onAccept }: OrderCardProps) {
         </button>
         <button
           type="button"
-          disabled
-          className="min-w-[140px] rounded-full border border-rose-500/30 px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-rose-500 opacity-50"
+          onClick={() => onReject(order.id)}
+          disabled={!canReject}
+          className={`min-w-[140px] rounded-full border px-5 py-3 text-xs font-black uppercase tracking-[0.18em] transition-opacity ${
+            canReject
+              ? 'border-rose-500/50 text-rose-500'
+              : 'border-rose-500/30 text-rose-500 opacity-50'
+          }`}
         >
-          Rechazar
+          {isProcessing ? 'Procesando...' : 'Rechazar'}
         </button>
       </div>
     </article>
@@ -192,7 +204,14 @@ export default function MessengerOrdersPanel({
   initialMessengerId,
 }: MessengerOrdersPanelProps) {
   const [messengerId, setMessengerId] = useState(initialMessengerId);
-  const { orders, loading, error, activeOrderId, acceptOrder } =
+  const {
+    orders,
+    loading,
+    error,
+    activeOrderId,
+    acceptOrder,
+    rejectOrder,
+  } =
     useMessengerOrders(messengerId);
 
   return (
@@ -284,6 +303,7 @@ export default function MessengerOrdersPanel({
                     order={order}
                     isProcessing={activeOrderId === order.id}
                     onAccept={acceptOrder}
+                    onReject={rejectOrder}
                   />
                 ))}
               </div>
