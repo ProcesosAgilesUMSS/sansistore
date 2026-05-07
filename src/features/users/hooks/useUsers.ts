@@ -59,6 +59,21 @@ export function useUsers() {
     return true;
   };
 
+  const editUser = (uid: string, updated: Partial<User>): boolean => {
+    // Validar que el email no esté en uso por otro usuario
+    const emailExists = users.some(
+      (u) => u.email.toLowerCase() === updated.email?.toLowerCase() && u.uid !== uid
+    );
+    if (emailExists) return false;
+
+    // TODO: Reemplazar con actualización real en Firestore
+    setUsers((prev) =>
+      prev.map((u) => (u.uid === uid ? { ...u, ...updated } : u))
+    );
+    showSuccess(`Usuario actualizado exitosamente.`);
+    return true;
+  };
+
   return {
     users: filteredUsers,
     searchQuery,
@@ -68,6 +83,7 @@ export function useUsers() {
     isModalOpen,
     setIsModalOpen,
     registerUser,
+    editUser,
     successMessage,
     errorMessage,
   };

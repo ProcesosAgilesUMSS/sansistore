@@ -5,6 +5,8 @@ import { ROLE_LABELS } from '../types';
 import type { UserRole } from '../types';
 import UserTable from './UserTable';
 import RegisterUserModal from './RegisterUserModal';
+import UserEditModal from './UserEditModal.tsx';
+import type { User } from '../types';
 
 const FILTER_ROLES: { value: UserRole | 'all'; label: string }[] = [
   { value: 'all', label: 'Todos los roles' },
@@ -24,9 +26,18 @@ export default function UserManagement() {
     isModalOpen,
     setIsModalOpen,
     registerUser,
+    editUser,
     successMessage,
     errorMessage,
   } = useUsers();
+
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
+  const handleEdit = (user: User) => {
+    setSelectedUser(user);
+    setEditModalOpen(true);
+  };
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -163,13 +174,20 @@ export default function UserManagement() {
       </div>
 
       {/* Table */}
-      <UserTable users={users} />
+      <UserTable users={users} onEdit={handleEdit} />
 
       {/* Modal */}
       <RegisterUserModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onRegister={registerUser}
+      />
+
+      <UserEditModal
+        isOpen={editModalOpen}
+        user={selectedUser}
+        onClose={() => setEditModalOpen(false)}
+        onSave={editUser}
       />
     </div>
   );

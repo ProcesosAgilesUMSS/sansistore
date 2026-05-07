@@ -4,9 +4,10 @@ import { ROLE_LABELS, ROLE_COLORS } from '../types';
 
 interface UserTableProps {
   users: User[];
+  onEdit: (user: User) => void;
 }
 
-export default function UserTable({ users }: UserTableProps) {
+export default function UserTable({ users, onEdit }: UserTableProps) {
   if (users.length === 0) {
     return (
       <div className="flex items-center justify-center py-16 text-[var(--theme-text)]/40 text-sm">
@@ -89,6 +90,7 @@ export default function UserTable({ users }: UserTableProps) {
                   </td>
                   <td className="px-5 py-4 text-center">
                     <button
+                      onClick={() => onEdit(user)}
                       className="p-2 rounded-lg text-[var(--theme-text)]/30 hover:text-[#88b04b] hover:bg-[#88b04b]/10 transition-colors duration-150"
                       title="Editar usuario"
                     >
@@ -125,6 +127,7 @@ export default function UserTable({ users }: UserTableProps) {
                   </p>
                 </div>
                 <button
+                  onClick={() => onEdit(user)}
                   className="p-2 rounded-lg text-[var(--theme-text)]/30 hover:text-[#88b04b] hover:bg-[#88b04b]/10 transition-colors duration-150 flex-shrink-0 ml-2"
                   title="Editar usuario"
                 >
