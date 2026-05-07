@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { adminAuth, adminDb } from '../../lib/firebase-admin';
 
-const ALLOWED_ROLES = ['admin', 'vendedor', 'mensajero', 'operador_inv'] as const;
+const ALLOWED_ROLES = ['admin', 'vendedor', 'mensajero', 'operador_inv', 'comprador'] as const;
 type AllowedRole = (typeof ALLOWED_ROLES)[number];
 const devAdminBypassEnabled =
   import.meta.env.ENABLE_DEV_ADMIN_BYPASS === 'true' &&
@@ -15,6 +15,15 @@ interface CreateUserRequest {
   phoneNumber?: string;
   role?: string;
   roles?: string[];
+}
+
+interface UpdateUserRequest {
+  uid?: string;
+  displayName?: string;
+  email?: string;
+  phoneNumber?: string;
+  roles?: string[];
+  isActive?: boolean;
 }
 
 type AdminGuardResult =
@@ -107,6 +116,35 @@ function validateCreateUserPayload(payload: CreateUserRequest) {
   };
 }
 
+function validateUpdateUserPayload(payload: UpdateUserRequest) {
+  const uid = payload.uid?.trim();
+  if (!uid) return { error: 'El uid es obligatorio.' };
+
+  const email = payload.email?.trim().toLowerCase();
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { error: 'Ingrese un correo electronico valido.' };
+  }
+
+  const roles = payload.roles?.map((r) => r.trim());
+  if (roles !== undefined) {
+    if (roles.length === 0) return { error: 'El usuario debe tener al menos un rol.' };
+    if (roles.some((role) => !ALLOWED_ROLES.includes(role as AllowedRole))) {
+      return { error: 'Uno o mas roles seleccionados no son validos.' };
+    }
+  }
+
+  return {
+    data: {
+      uid,
+      ...(payload.displayName?.trim() && { displayName: payload.displayName.trim() }),
+      ...(email && { email }),
+      ...(payload.phoneNumber?.trim() && { phoneNumber: payload.phoneNumber.trim() }),
+      ...(roles && { roles: roles as AllowedRole[] }),
+      ...(typeof payload.isActive === 'boolean' && { isActive: payload.isActive }),
+    },
+  };
+}
+
 function generateTemporaryPassword() {
   const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
   const lower = 'abcdefghijkmnopqrstuvwxyz';
@@ -146,7 +184,7 @@ function serializeUser(uid: string, data: FirebaseFirestore.DocumentData) {
   };
 }
 
-async function emailExistsInFirestore(email: string) {
+async function emailExistsInFirestore(email: string, excludeUid?: string) {
   let snapshot;
 
   try {
@@ -161,7 +199,10 @@ async function emailExistsInFirestore(email: string) {
     );
   }
 
-  return !snapshot.empty;
+  if (snapshot.empty) return false;
+  // Si el único resultado es el mismo usuario que estamos editando, no hay conflicto
+  if (excludeUid && snapshot.docs[0].id === excludeUid) return false;
+  return true;
 }
 
 async function emailExistsInAuth(email: string) {
@@ -284,4 +325,75 @@ export const POST: APIRoute = async ({ request }) => {
       500,
     );
   }
+};
+
+export const PATCH: APIRoute = async ({ request }) => {
+  try {
+    const admin = await requireAdmin(request);
+    if (admin.error) return admin.error;
+
+    let payload: UpdateUserRequest;
+    try {
+      payload = await request.json();
+    } catch {
+      return jsonResponse({ message: 'El cuerpo de la solicitud no es valido.' }, 400);
+    }
+
+    const validation = validateUpdateUserPayload(payload);
+    if ('error' in validation) {
+      return jsonResponse({ message: validation.error }, 400);
+    }
+
+    const { uid, email, roles, isActive, ...rest } = validation.data;
+
+    // Verificar que el usuario existe
+    const userDoc = await adminDb.collection('users').doc(uid).get();
+    if (!userDoc.exists) {
+      return jsonResponse({ message: 'Usuario no encontrado.' }, 404);
+    }
+
+    // Validar email solo si cambió respecto al actual
+    const currentData = userDoc.data();
+    if (email && email !== currentData?.email) {
+      if (await emailExistsInFirestore(email, uid)) {
+        return jsonResponse({ message: 'El correo ya esta en uso por otro usuario.' }, 409);
+      }
+    }
+
+    // Actualizar en Firebase Auth
+    await adminAuth.updateUser(uid, {
+      ...(rest.displayName && { displayName: rest.displayName }),
+      ...(email && { email }),
+      ...(typeof isActive === 'boolean' && { disabled: !isActive }),
+    });
+
+    // Actualizar custom claims si cambiaron roles
+    if (roles) {
+      await adminAuth.setCustomUserClaims(uid, { roles });
+    }
+
+    // Actualizar en Firestore
+    await adminDb.collection('users').doc(uid).update({
+      ...rest,
+      ...(email && { email }),
+      ...(roles && { roles }),
+      ...(typeof isActive === 'boolean' && { isActive }),
+    });
+
+    const updated = await adminDb.collection('users').doc(uid).get();
+    return jsonResponse({
+      message: 'Usuario actualizado correctamente.',
+      user: serializeUser(uid, updated.data()!),
+    });
+
+  } catch (error) {
+      if (error instanceof ExternalServiceError) {
+        return jsonResponse({ message: error.message }, error.status);
+      }
+      console.error('PATCH /api/users error:', error);
+      return jsonResponse(
+        { message: error instanceof Error ? error.message : 'Error desconocido' },
+        500,
+      );
+    }
 };

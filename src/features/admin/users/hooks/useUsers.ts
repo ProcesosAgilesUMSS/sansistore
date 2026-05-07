@@ -1,7 +1,6 @@
-//src/features/admin/users/hooks/useUsers.ts
 import { useEffect, useMemo, useState } from 'react';
-import type { User, UserRole, CreateUserPayload } from '../types';
-import { createUser, getUsers } from '../services/userService';
+import type { User, UserRole, CreateUserPayload, UpdateUserPayload } from '../types';
+import { createUser, getUsers, updateUser } from '../services/userService';
 
 interface ToastState {
   message: string;
@@ -13,6 +12,8 @@ export function useUsers() {
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<UserRole | 'all'>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [toast, setToast] = useState<ToastState | null>(null);
 
   useEffect(() => {
@@ -61,10 +62,45 @@ export function useUsers() {
   };
 
   const registerUser = async (payload: CreateUserPayload): Promise<boolean> => {
-    const { user } = await createUser(payload);
-    setUsers((prev) => [...prev, user]);
-    showToast(`Usuario "${payload.displayName}" registrado exitosamente.`, 'success');
-    return true;
+    try {
+      const { user } = await createUser(payload);
+      setUsers((prev) => [...prev, user]);
+      showToast(`Usuario "${payload.displayName}" registrado exitosamente.`, 'success');
+      return true;
+    } catch (error) {
+      showToast(
+        error instanceof Error ? error.message : 'No se pudo registrar el usuario.',
+        'error',
+      );
+      return false;
+    }
+  };
+
+  const editUser = async (uid: string, payload: UpdateUserPayload): Promise<boolean> => {
+    try {
+      const updatedUser = await updateUser(uid, payload);
+      setUsers((prev) =>
+        prev.map((u) => (u.uid === uid ? updatedUser : u))
+      );
+      showToast('Usuario actualizado exitosamente.', 'success');
+      return true;
+    } catch (error) {
+      showToast(
+        error instanceof Error ? error.message : 'No se pudo actualizar el usuario.',
+        'error',
+      );
+      return false;
+    }
+  };
+
+  const openEditModal = (user: User) => {
+    setSelectedUser(user);
+    setIsEditModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setSelectedUser(null);
+    setIsEditModalOpen(false);
   };
 
   return {
@@ -75,7 +111,12 @@ export function useUsers() {
     setRoleFilter,
     isModalOpen,
     setIsModalOpen,
+    isEditModalOpen,
+    selectedUser,
+    openEditModal,
+    closeEditModal,
     registerUser,
+    editUser,
     toast,
     dismissToast,
   };

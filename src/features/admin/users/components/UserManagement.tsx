@@ -5,6 +5,7 @@ import { useUsers } from '../hooks/useUsers';
 import type { UserRole } from '../types';
 import UserTable from './UserTable';
 import RegisterUserModal from './RegisterUserModal';
+import UserEditModal from './UserEditModal';
 import Toast from './Toast';
 
 const FILTER_ROLES: { value: UserRole | 'all'; label: string }[] = [
@@ -12,7 +13,7 @@ const FILTER_ROLES: { value: UserRole | 'all'; label: string }[] = [
   { value: 'admin', label: 'Administrador' },
   { value: 'vendedor', label: 'Vendedor' },
   { value: 'mensajero', label: 'Mensajero' },
-  { value: 'operador', label: 'Operador inv.' },
+  { value: 'operador_inv', label: 'Operador inv.' },
 ];
 
 export default function UserManagement() {
@@ -24,7 +25,12 @@ export default function UserManagement() {
     setRoleFilter,
     isModalOpen,
     setIsModalOpen,
+    isEditModalOpen,
+    selectedUser,
+    openEditModal,
+    closeEditModal,
     registerUser,
+    editUser,
     toast,
     dismissToast,
   } = useUsers();
@@ -32,7 +38,6 @@ export default function UserManagement() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -48,8 +53,10 @@ export default function UserManagement() {
 
   return (
     <div className="flex flex-col gap-5">
+
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+
         {/* Search */}
         <div className="relative flex-1">
           <Search
@@ -74,6 +81,7 @@ export default function UserManagement() {
         </div>
 
         <div className="flex items-center gap-3">
+
           {/* Role filter dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button
@@ -148,16 +156,24 @@ export default function UserManagement() {
       </div>
 
       {/* Table */}
-      <UserTable users={users} />
+      <UserTable users={users} onEdit={openEditModal} />
 
-      {/* Modal */}
+      {/* Register modal */}
       <RegisterUserModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onRegister={registerUser}
       />
 
-      {/* Toast notification */}
+      {/* Edit modal */}
+      <UserEditModal
+        isOpen={isEditModalOpen}
+        user={selectedUser}
+        onClose={closeEditModal}
+        onSave={editUser}
+      />
+
+      {/* Toast */}
       {toast && (
         <Toast
           message={toast.message}
@@ -165,7 +181,7 @@ export default function UserManagement() {
           onClose={dismissToast}
         />
       )}
+
     </div>
   );
 }
-

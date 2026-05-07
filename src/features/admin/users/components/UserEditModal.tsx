@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import type { User, UserRole } from "../types";
+import type { User, UserRole, UpdateUserPayload } from '../types';
 
 const ROLES: { value: UserRole; label: string }[] = [
   { value: "mensajero", label: "Mensajero" },
   { value: "vendedor", label: "Vendedor" },
-  { value: "operador", label: "Operador inv." },
+  { value: "operador_inv", label: "Operador inv." },
   { value: "admin", label: "Administrador" },
   { value: "comprador", label: "Comprador" },
 ];
@@ -13,7 +13,7 @@ interface UserEditModalProps {
   isOpen: boolean;
   user: User | null;
   onClose: () => void;
-  onSave: (uid: string, updated: Partial<User>) => boolean;
+  onSave: (uid: string, updated: UpdateUserPayload) => Promise<boolean>;
 }
 
 export default function UserEditModal({
@@ -52,7 +52,7 @@ export default function UserEditModal({
     setError("");
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!name || !email) {
       setError("Todos los campos obligatorios deben completarse.");
       return;
@@ -62,13 +62,14 @@ export default function UserEditModal({
       return;
     }
 
-    const result = onSave(user.uid, {
-      displayName: name.trim(),
-      email: email.trim(),
-      phoneNumber: phone.trim(),
-      roles,
-      isActive,
-    });
+  const result = await onSave(user.uid, {
+    displayName: name.trim(),
+    // Solo manda email si cambió
+    ...(email.trim() !== user.email && { email: email.trim() }),
+    phoneNumber: phone.trim(),
+    roles,
+    isActive,
+  });
 
     if (result) {
       setSuccess("Usuario actualizado correctamente.");

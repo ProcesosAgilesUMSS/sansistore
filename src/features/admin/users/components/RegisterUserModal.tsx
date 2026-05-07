@@ -4,7 +4,7 @@ import { X, Check, AlertCircle, Loader2 } from 'lucide-react';
 import type { UserRole, CreateUserPayload } from '../types';
 import { ROLE_LABELS, ROLE_COLORS } from '../types';
 
-const SELECTABLE_ROLES: UserRole[] = ['mensajero', 'vendedor', 'operador', 'admin'];
+const SELECTABLE_ROLES: UserRole[] = ['mensajero', 'vendedor', 'operador_inv', 'admin', 'comprador'];
 
 interface RegisterUserModalProps {
   isOpen: boolean;

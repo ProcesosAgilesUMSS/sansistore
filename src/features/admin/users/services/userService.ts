@@ -1,6 +1,6 @@
 import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth';
 import { auth } from '../../../../lib/firebase';
-import type { CreateUserPayload, User, UserRole } from '../types';
+import type { CreateUserPayload, UpdateUserPayload, User, UserRole } from '../types';
 
 interface UsersResponse {
   users: User[];
@@ -11,12 +11,16 @@ interface CreateUserResponse {
   temporaryPassword?: string;
 }
 
+interface UpdateUserResponse {
+  user: User;
+}
+
 function toBackendRole(role: UserRole) {
-  return role === 'operador' ? 'operador_inv' : role;
+  return role;
 }
 
 function toFrontendRole(role: string): UserRole {
-  return (role === 'operador_inv' ? 'operador' : role) as UserRole;
+  return role as UserRole;
 }
 
 async function getAuthorizationHeader(): Promise<Record<string, string>> {
@@ -85,4 +89,32 @@ export async function createUser(
     ...data,
     user: normalizeUser(data.user),
   };
+}
+
+export async function updateUser(
+  uid: string,
+  payload: UpdateUserPayload,
+): Promise<User> {
+  const response = await fetch('/api/users', {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(await getAuthorizationHeader()),
+    },
+    body: JSON.stringify({
+      uid,
+      ...(payload.displayName && { displayName: payload.displayName }),
+      ...(payload.email && { email: payload.email }),
+      ...(payload.phoneNumber && { phoneNumber: payload.phoneNumber }),
+      ...(payload.roles && { roles: payload.roles.map((role) => toBackendRole(role)) }),
+      ...(typeof payload.isActive === 'boolean' && { isActive: payload.isActive }),
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(await parseApiError(response));
+  }
+
+  const data = (await response.json()) as UpdateUserResponse;
+  return normalizeUser(data.user);
 }
