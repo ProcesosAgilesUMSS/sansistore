@@ -113,3 +113,8 @@
 - **Yesterday:** Realicé la página base para la nueva pantalla de las acciones de delivery en la que todo el grupo colocará sus funciones. Trabajé en la funcionalidad de la HU que me corresponde
 - **Today:** Participaré en la reunión de la demo y terminaré de pulir las funcionalidades pendientes hasta la hora límite del *code freeze*
 - **Blockers:** None
+
+### Efrain Peralta Felipe
+- **Yesterday:** Realice la página para el vendedor donde reciben las órdenes que están en estado RESERVADO
+- **Today:** Participaré en la reunión de la demo y termine la historia que se me fue asignado.
+- **Blockers:** None
