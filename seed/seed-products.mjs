@@ -5,10 +5,6 @@ import { categories, catalogProducts } from './catalog-data.mjs';
 export async function run({ adminApp, db }) {
   const firestore = db;
 
-  function rand(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
   console.log('Seeding categories...');
   const categoryMap = {};  // Store mapping of category ID to Firestore document ID
   for (const c of categories) {
@@ -25,7 +21,6 @@ export async function run({ adminApp, db }) {
 
   console.log('Seeding products, inventory & reviews...');
   for (const p of catalogProducts) {
-    const stockTotal = rand(20, 500);
     const docRef = firestore.collection('products').doc(p.id);
     await docRef.set({
       categoryId: categoryMap[p.category],  // Reference the Firestore-assigned category document ID
@@ -48,11 +43,11 @@ export async function run({ adminApp, db }) {
     const invRef = firestore.collection('inventory').doc(productId);
     await invRef.set({
       productId,  // Reference the Firestore-assigned product document ID
-      stockTotal,
-      stockAvailable: stockTotal,
+      stockTotal: p.stockTotal,
+      stockAvailable: p.stockAvailable,
       stockReserved: 0,
       minStock: 5,
-      enabled: true,
+      enabled: p.stockAvailable > 0,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
     console.log('Upserted inventory for', productId, 'with ID', invRef.id);

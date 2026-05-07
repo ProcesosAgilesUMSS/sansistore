@@ -14,12 +14,14 @@ import {
   X,
   ChevronRight,
 } from 'lucide-react';
+import UserManagement from '../../features/users/components/UserManagement';
+
+type Section = 'dashboard' | 'usuarios' | 'categorias' | null;
 
 interface NavItem {
   label: string;
   icon: React.ReactNode;
-  href: string;
-  active?: boolean;
+  section: Section;
   badge?: number;
   disabled?: boolean;
 }
@@ -29,89 +31,67 @@ interface NavSection {
   items: NavItem[];
 }
 
-const navSections: NavSection[] = [
-  {
-    title: 'Principal',
-    items: [
-      {
-        label: 'Dashboard',
-        icon: <LayoutDashboard size={15} />,
-        href: '/admin',
-        active: true,
-      },
-      {
-        label: 'Pedidos',
-        icon: <ShoppingBag size={15} />,
-        href: '/admin/pedidos',
-        badge: 0,
-        disabled: true,
-      },
-    ],
-  },
-  {
-    title: 'Configuración',
-    items: [
-      {
-        label: 'Usuarios',
-        icon: <Users size={15} />,
-        href: '/admin/usuarios',
-      },
-      {
-        label: 'Categorías',
-        icon: <Tag size={15} />,
-        href: '/admin/categorias',
-      },
-      {
-        label: 'Parámetros',
-        icon: <Settings size={15} />,
-        href: '/admin/parametros',
-        disabled: true,
-      },
-    ],
-  },
-  {
-    title: 'Analítica',
-    items: [
-      {
-        label: 'Ventas',
-        icon: <BarChart2 size={15} />,
-        href: '/admin/ventas',
-        disabled: true,
-      },
-      {
-        label: 'Inventario',
-        icon: <Package size={15} />,
-        href: '/admin/inventario',
-        disabled: true,
-      },
-      {
-        label: 'Mensajeros',
-        icon: <Bike size={15} />,
-        href: '/admin/mensajeros',
-        disabled: true,
-      },
-      {
-        label: 'Reportes',
-        icon: <FileText size={15} />,
-        href: '/admin/reportes',
-        disabled: true,
-      },
-    ],
-  },
-];
-
-interface AdminLayoutProps {
-  children: React.ReactNode;
-  pageTitle?: string;
-  pageSubtitle?: string;
-}
-
-export default function AdminLayout({
-  children,
-  pageTitle = 'Dashboard',
-  pageSubtitle,
-}: AdminLayoutProps) {
+export default function AdminLayout() {
+  const [activeSection, setActiveSection] = useState<Section>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const navSections: NavSection[] = [
+    {
+      title: 'Principal',
+      items: [
+        {
+          label: 'Dashboard',
+          icon: <LayoutDashboard size={15} />,
+          section: 'dashboard',
+        },
+        {
+          label: 'Pedidos',
+          icon: <ShoppingBag size={15} />,
+          section: null,
+          badge: 8,
+          disabled: true,
+        },
+      ],
+    },
+    {
+      title: 'Configuración',
+      items: [
+        {
+          label: 'Usuarios',
+          icon: <Users size={15} />,
+          section: 'usuarios',
+        },
+        {
+          label: 'Categorías',
+          icon: <Tag size={15} />,
+          section: 'categorias',
+        },
+        {
+          label: 'Parámetros',
+          icon: <Settings size={15} />,
+          section: null,
+          disabled: true,
+        },
+      ],
+    },
+    {
+      title: 'Analítica',
+      items: [
+        { label: 'Ventas', icon: <BarChart2 size={15} />, section: null, disabled: true },
+        { label: 'Inventario', icon: <Package size={15} />, section: null, disabled: true },
+        { label: 'Mensajeros', icon: <Bike size={15} />, section: null, disabled: true },
+        { label: 'Reportes', icon: <FileText size={15} />, section: null, disabled: true },
+      ],
+    },
+  ];
+
+  const pageTitles: Record<string, { title: string; subtitle: string }> = {
+    dashboard: { title: 'Dashboard', subtitle: 'Panel de administración' },
+    usuarios: { title: 'Gestión de usuarios', subtitle: 'Registra y administra usuarios' },
+    categorias: { title: 'Categorías', subtitle: 'Gestiona las categorías de productos' },
+  };
+
+  const currentPage = pageTitles[activeSection ?? 'dashboard'];
 
   const today = new Date().toLocaleDateString('es-BO', {
     weekday: 'long',
@@ -146,12 +126,8 @@ export default function AdminLayout({
             S
           </div>
           <div className="flex flex-col leading-tight">
-            <span className="text-[13px] font-semibold text-white/90">
-              SansiStore
-            </span>
-            <span className="text-[10px] text-[#88b04b]/70 tracking-wide uppercase">
-              Admin
-            </span>
+            <span className="text-[13px] font-semibold text-white/90">SansiStore</span>
+            <span className="text-[10px] text-[#88b04b]/70 tracking-wide uppercase">Admin · Área 7</span>
           </div>
         </div>
 
@@ -162,33 +138,39 @@ export default function AdminLayout({
               <p className="text-[10px] uppercase tracking-widest text-white/25 px-3 mb-1">
                 {section.title}
               </p>
-              {section.items.map((item) => (
-                <a
-                  key={item.label}
-                  href={item.disabled ? undefined : item.href}
-                  className={`
-                    flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] mb-0.5
-                    transition-colors duration-150
-                    ${item.active
-                      ? 'bg-[#88b04b]/15 text-[#88b04b]'
-                      : item.disabled
-                      ? 'text-white/20 cursor-not-allowed'
-                      : 'text-white/50 hover:text-white/80 hover:bg-white/5 cursor-pointer'
-                    }
-                  `}
-                >
-                  <span className="flex-shrink-0">{item.icon}</span>
-                  <span className="flex-1">{item.label}</span>
-                  {item.badge && (
-                    <span className="text-[10px] bg-[#88b04b] text-white px-1.5 py-0.5 rounded-full font-medium">
-                      {item.badge}
-                    </span>
-                  )}
-                  {item.active && (
-                    <ChevronRight size={12} className="opacity-50" />
-                  )}
-                </a>
-              ))}
+              {section.items.map((item) => {
+                const isActive = activeSection === item.section;
+                return (
+                  <button
+                    key={item.label}
+                    onClick={() => {
+                      if (!item.disabled && item.section) {
+                        setActiveSection(item.section);
+                        setSidebarOpen(false);
+                      }
+                    }}
+                    className={`
+                      w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] mb-0.5
+                      transition-colors duration-150 text-left
+                      ${isActive
+                        ? 'bg-[#88b04b]/15 text-[#88b04b]'
+                        : item.disabled
+                        ? 'text-white/20 cursor-not-allowed'
+                        : 'text-white/50 hover:text-white/80 hover:bg-white/5 cursor-pointer'
+                      }
+                    `}
+                  >
+                    <span className="flex-shrink-0">{item.icon}</span>
+                    <span className="flex-1">{item.label}</span>
+                    {item.badge && (
+                      <span className="text-[10px] bg-[#88b04b] text-white px-1.5 py-0.5 rounded-full font-medium">
+                        {item.badge}
+                      </span>
+                    )}
+                    {isActive && <ChevronRight size={12} className="opacity-50" />}
+                  </button>
+                );
+              })}
             </div>
           ))}
         </nav>
@@ -200,17 +182,10 @@ export default function AdminLayout({
               AD
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[12px] text-white/80 font-medium truncate">
-                Admin Demo
-              </p>
-              <p className="text-[10px] text-white/30 truncate">
-                Administrador
-              </p>
+              <p className="text-[12px] text-white/80 font-medium truncate">Admin Demo</p>
+              <p className="text-[10px] text-white/30 truncate">Administrador</p>
             </div>
-            <LogOut
-              size={13}
-              className="text-white/20 group-hover:text-white/50 transition-colors flex-shrink-0"
-            />
+            <LogOut size={13} className="text-white/20 group-hover:text-white/50 transition-colors flex-shrink-0" />
           </div>
         </div>
       </aside>
@@ -229,13 +204,11 @@ export default function AdminLayout({
             </button>
             <div>
               <h1 className="text-[15px] font-semibold text-[var(--theme-text)]">
-                {pageTitle}
+                {currentPage.title}
               </h1>
-              {pageSubtitle && (
-                <p className="text-[11px] text-[var(--theme-text)]/40">
-                  {pageSubtitle}
-                </p>
-              )}
+              <p className="text-[11px] text-[var(--theme-text)]/40">
+                {currentPage.subtitle}
+              </p>
             </div>
           </div>
           <span className="text-[11px] text-[var(--theme-text)]/35 hidden sm:block capitalize">
@@ -245,7 +218,19 @@ export default function AdminLayout({
 
         {/* Content */}
         <main className="flex-1 overflow-y-auto p-5">
-          {children}
+          {activeSection === 'dashboard' && (
+            <div className="flex items-center justify-center h-full text-[var(--theme-text)]/30 text-sm">
+              Dashboard — próximamente
+            </div>
+          )}
+          {activeSection === 'usuarios' && (
+            <UserManagement />
+          )}
+          {activeSection === 'categorias' && (
+            <div className="flex items-center justify-center h-full text-[var(--theme-text)]/30 text-sm">
+              Categorías — próximamente
+            </div>
+          )}
         </main>
 
       </div>

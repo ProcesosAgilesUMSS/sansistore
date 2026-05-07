@@ -73,11 +73,11 @@ async function main() {
 
     await setDoc(doc(db, 'inventory', product.id), {
       productId: product.id,
-      stockTotal: 100,
-      stockAvailable: 100,
+      stockTotal: product.stockTotal,
+      stockAvailable: product.stockAvailable,
       stockReserved: 0,
       minStock: 5,
-      enabled: true,
+      enabled: product.stockAvailable > 0,
       updatedAt: serverTimestamp(),
     }, { merge: true });
     console.log('Upserted inventory', product.id);

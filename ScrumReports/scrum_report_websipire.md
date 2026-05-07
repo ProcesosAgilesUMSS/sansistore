@@ -58,3 +58,31 @@
 * **Yesterday:** Apoyé en el análisis de la historia de usuario “Como mensajero, quiero ver el monto exacto a cobrar para evitar errores”, revisando junto con Brandon los datos necesarios para que el mensajero pueda visualizar correctamente el monto de cobro asociado al pedido.
 * **Today:** Continuaré colaborando en la definición de la interfaz y la lógica necesaria para mostrar el monto exacto del pedido, tomando en cuenta el estado de pago, la información de entrega y la validación del pedido asignado al mensajero.
 * **Blockers:** None
+
+# Daily Reports - Team 3 Webspire 05/05/26
+
+## Dayana Saleth Ortuño Guzman
+
+ * **Yesterday:** En la carpeta feature cree otro archivo llamado cobro, donde implemente una parte del frontend de la HU *“Como comprador quiero pagar contra entrega”* y tambien ayude en hacer un diagrama de flujo, para que entendamos cual es el flujo de la parte de cobro.
+* **Today:** Terminar de hacer la parte del frontend.
+* **Blockers:** None
+
+## Maria Victoria Grageda Vallejos
+* **Yesterday:** Avancé en la implementación de la HU “Como comprador quiero pagar contra entrega”, dejando conectada la selección de productos, el resumen del pedido, el cálculo del total y el registro del pedido con su pago pendiente.
+* **Today:** Revisar el funcionamiento del flujo integrado en la página principal y apoyar en ajustes visuales o validaciones que sean necesarios.
+* **Blockers:** None
+
+## Juan Daniel Vasquez Casana
+* **Yesterday:** Avancé en el desarrollo del frontend de la HU “Marcar pedido como entregado”, implementando la visualización de pedidos asignados y la opción de “Marcar como entregado”, considerando los criterios de aceptación.
+* **Today:** Integrar la lógica para el cambio de estado del pedido y la confirmación previa.
+* **Blockers:** None
+
+## Alejandro Torrico Quispe
+* **Yesterday:** Implementé la base del panel de pedidos asignados para el rol mensajero, creando la vista donde se muestran los pedidos relacionados al usuario autenticado. También avancé en la visualización del monto exacto a cobrar, el método de pago y el estado de la entrega, considerando los criterios de aceptación de la HU.
+* **Today:** Continuar con la integración del panel de mensajero, revisar la conexión con los datos de pedidos y ajustar la funcionalidad para que pueda consumir información real cuando esté disponible el flujo completo de asignación de pediSe depende de la integración con las funcionalidades de creación de pedidos, pago contra entrega y asignación de pedidos al mensajero para trabajar con datos reales del flujo completo.
+* **Blockers:** Se depende de la integración con las funcionalidades de creación de pedidos y asignación de pedidos al mensajero para trabajar con datos reales del flujo completo.
+
+## Jose Brandon Pinedo Gonzales
+* **Yesterday:** Avancé en la implementación de la HU “Visualizar monto exacto a cobrar”, desarrollando la vista del Panel del Mensajero y el detalle de cobro del pedido. Integré la lectura de pedidos desde Firestore, la visualización del monto total, subtotal y cargos adicionales, además del estado de pago “Pendiente de cobro” y el método de pago “Pago contra entrega”.
+* **Today:** Continuar con pruebas del flujo en el emulador, validar casos donde el monto no sea válido y ajustar la asignación de pedidos al mensajero para que el panel muestre únicamente los pedidos correspondientes.
+* **Blockers:** None

@@ -1,0 +1,16 @@
+---
+export const prerender = false;
+
+import Layout from '../../../../layouts/Layout.astro';
+import CategoryEditForm from '../../../../features/admin/categories/components/CategoryEditForm';
+
+const { id } = Astro.params;
+
+if (!id) {
+  return Astro.redirect('/admin/categories');
+}
+---
+
+<Layout title="Editar categoría · SansiStore Admin">
+  <CategoryEditForm client:load categoryId={id} />
+</Layout>
