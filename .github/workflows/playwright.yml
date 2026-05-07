@@ -14,10 +14,23 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
+        cache: 'npm'
     - uses: actions/setup-java@v4
       with:
         java-version: '21'
         distribution: 'temurin'
+    - name: Cache Playwright browsers
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: playwright-
+    - name: Cache Firestore emulator
+      uses: actions/cache@v4
+      with:
+        path: ~/.config/firebase/emulators
+        key: firestore-emulator-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: firestore-emulator-
     - name: Install dependencies
       run: npm ci
     - name: Install Playwright Browsers
