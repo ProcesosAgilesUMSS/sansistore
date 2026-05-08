@@ -1,4 +1,5 @@
 import admin from 'firebase-admin';
+import { seedUsers, seedLocations, seedOrders, seedDeliveries } from './seed-orders-data.mjs';
 
 export async function run({ adminApp, db }) {
   const firestore = db;
@@ -162,5 +163,19 @@ export async function run({ adminApp, db }) {
     });
   }
 
-  console.log('Seeding finished successfully with 30 orders.');
+  // Also seed users from main's data to ensure consistency
+  for (const u of seedUsers) {
+    const docRef = firestore.collection('users').doc(u.uid);
+    await docRef.set({
+      email: u.email,
+      displayName: u.displayName,
+      roles: u.roles,
+      institutionalId: u.institutionalId,
+      isActive: u.isActive,
+      createdBy: u.createdBy,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  }
+
+  console.log('Seeding finished successfully with 30 orders and main users.');
 }
