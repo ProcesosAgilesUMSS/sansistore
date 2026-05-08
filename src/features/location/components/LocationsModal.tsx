@@ -41,11 +41,11 @@ export default function LocationsModal({
             onClick={onClose}
         >
             <div
-                className="w-full max-w-sm overflow-hidden rounded-[2.5rem] border border-[#88B04B]/20 bg-[--theme-card-bg] shadow-2xl transition-colors duration-300"
+                className="w-full max-w-sm overflow-hidden rounded-[2.5rem] border border-[#88B04B]/20 bg-(--theme-card-bg) shadow-2xl transition-colors duration-300"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="flex items-center justify-between border-b border-[#88B04B]/10 px-7 py-5">
-                    <h2 className="font-outfit text-lg font-black tracking-tight text-[--theme-text] transition-colors duration-300">
+                    <h2 className="font-outfit text-lg font-black tracking-tight text-(--theme-text) transition-colors duration-300">
                         Mis Ubicaciones
                     </h2>
                     <button
@@ -53,7 +53,7 @@ export default function LocationsModal({
                         aria-label="Cerrar modal"
                         className="
                             flex h-9 w-9 items-center justify-center rounded-full
-                            bg-[--theme-secondary-bg] text-[--theme-text]
+                            bg-(--theme-secondary-bg) text-(--theme-text)
                             hover:bg-[#88B04B] hover:text-white transition-all duration-200
                         "
                     >
@@ -63,12 +63,12 @@ export default function LocationsModal({
 
                 <div className="flex max-h-[22rem] flex-col gap-3 overflow-y-auto p-5 custom-scrollbar">
                     {loading ? (
-                        <div className="flex flex-col items-center gap-3 py-12 text-[--theme-text]/40">
+                        <div className="flex flex-col items-center gap-3 py-12 text-(--theme-text)/40">
                             <Loader2 size={28} className="animate-spin text-[#88B04B]/60" />
                             <p className="font-outfit text-sm font-bold">Cargando ubicaciones...</p>
                         </div>
                     ) : locations.length === 0 ? (
-                        <div className="flex flex-col items-center gap-3 py-12 text-[--theme-text]/40">
+                        <div className="flex flex-col items-center gap-3 py-12 text-(--theme-text)/40">
                             <MapPin size={32} className="text-[#88B04B]/40" />
                             <p className="font-outfit text-sm font-bold">No hay destinos guardados</p>
                         </div>
