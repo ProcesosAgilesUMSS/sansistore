@@ -8,9 +8,12 @@ import {
   connectAuthEmulator,
 } from 'firebase/auth';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
-  apiKey: import.meta.env.PUBLIC_FIREBASE_API_KEY,
+  apiKey: import.meta.env.PUBLIC_APP_ENV === 'production' 
+    ? import.meta.env.PUBLIC_FIREBASE_API_KEY 
+    : 'dummy-api-key-for-emulator',
   authDomain: import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN,
   projectId: import.meta.env.PUBLIC_FIREBASE_PROJECT_ID,
   storageBucket: import.meta.env.PUBLIC_FIREBASE_STORAGE_BUCKET,
@@ -23,13 +26,14 @@ const app =
   getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 const googleProvider = new GoogleAuthProvider();
 
 setPersistence(auth, browserLocalPersistence).catch(() => {});
 
 isSupported().then((yes) => yes && getAnalytics(app));
 
-export { app, auth, db, googleProvider };
+export { app, auth, db, storage, googleProvider };
 
 // Connect to emulators when not in production
 // PUBLIC_APP_ENV is set in .env (development or production)

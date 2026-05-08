@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import {
   ChevronDown,
-  LogOut,
-  Menu,
-  Moon,
-  Search,
   ShoppingBag,
-  Sun,
+  Search,
+  Menu,
   X,
+  LogOut,
+  Moon,
+  Sun,
+  MapPin,
 } from 'lucide-react';
 import { FirebaseError } from 'firebase/app';
 import {
@@ -56,7 +57,8 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    const currentTheme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+    const currentTheme =
+      document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
     setTheme(currentTheme);
     setThemeReady(true);
   }, []);
@@ -64,14 +66,19 @@ export default function Navbar() {
   const handleLogin = async () => {
     try {
       googleProvider.setCustomParameters({
-        hd: INSTITUTIONAL_DOMAIN.replace('@', '')
+        hd: INSTITUTIONAL_DOMAIN.replace('@', ''),
       });
       await setPersistence(auth, browserLocalPersistence);
       const result = await signInWithPopup(auth, googleProvider);
 
-      if (result.user.email && !result.user.email.endsWith(INSTITUTIONAL_DOMAIN)) {
+      if (
+        result.user.email &&
+        !result.user.email.endsWith(INSTITUTIONAL_DOMAIN)
+      ) {
         await signOut(auth);
-        setAuthError('Solo se permiten cuentas institucionales para acceder a SansiStore.');
+        setAuthError(
+          'Solo se permiten cuentas institucionales para acceder a SansiStore.'
+        );
         return;
       }
 
@@ -88,10 +95,9 @@ export default function Navbar() {
           institutionalId: institutionalId,
           isActive: true,
           createdBy: 'system',
-          createdAt: serverTimestamp()
+          createdAt: serverTimestamp(),
         });
       }
-
     } catch (e: unknown) {
       const ignored = [
         'auth/popup-closed-by-user',
@@ -120,15 +126,22 @@ export default function Navbar() {
       <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-bg-light/85 border-b border-border-light font-sans">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-14">
-
             {/* LOGO */}
-            <a href="/" className="font-black tracking-tight text-[16px] text-text-light">
+            <a
+              href="/"
+              className="font-black tracking-tight text-[16px] text-text-light"
+            >
               sansi<span className="text-primary">store</span>
             </a>
 
             {/* LINKS */}
             <div className="hidden md:flex items-center gap-8">
-              {[{ label: 'Productos', href: '/productos' }, { label: 'Novedades', href: '#' }, { label: 'Ofertas', href: '#' }].map((item) => (
+              {[
+                { label: 'Productos', href: '/productos' },
+                { label: 'Novedades', href: '#' },
+                { label: 'Ofertas', href: '#' },
+                { label: 'Inventario', href: '/inventory' },
+              ].map((item) => (
                 <a
                   key={item.label}
                   href={item.href}
@@ -137,11 +150,17 @@ export default function Navbar() {
                   {item.label}
                 </a>
               ))}
-            </div>
 
-            {/* ACTIONS */}
-            <div className="flex items-center gap-3">
+            <a
+              href="/admin"
+              className="text-[13px] text-primary font-semibold tracking-[0.02em] transition-all hover:opacity-70"
+            >
+              Admin
+            </a>
+          </div>
 
+      {/* ACTIONS */}
+      <div className="flex items-center gap-3">   
               {/* SEARCH */}
               <button className="transition-all text-text-light opacity-[0.60] hover:text-primary hover:opacity-100">
                 <Search size={18} />
@@ -151,14 +170,25 @@ export default function Navbar() {
               <button className="relative transition-all text-text-light opacity-[0.60] hover:text-primary hover:opacity-100">
                 <ShoppingBag size={18} />
                 <span
-                  className={`absolute -top-1 -right-1 text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold border border-primary ${theme === 'dark'
-                    ? 'bg-primary text-bg-dark'
-                    : 'bg-primary text-bg-dark'
-                    }`}
+                  className={`absolute -top-1 -right-1 text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold border border-primary ${
+                    theme === 'dark'
+                      ? 'bg-primary text-bg-dark'
+                      : 'bg-primary text-bg-dark'
+                  }`}
                 >
                   0
                 </span>
               </button>
+
+              {authReady && user && (
+                <a
+                  href="/location"
+                  className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-primary/40 px-3 py-1.5 text-[12px] font-semibold text-primary transition-all hover:bg-primary hover:text-white hover:border-primary"
+                >
+                  <MapPin size={13} />
+                  Mis direcciones
+                </a>
+              )}
 
               {/* THEME */}
               <button
@@ -201,8 +231,9 @@ export default function Navbar() {
 
                       <ChevronDown
                         size={14}
-                        className={`text-text-light opacity-50 transition-transform ${profileMenuOpen ? 'rotate-180' : ''
-                          }`}
+                        className={`text-text-light opacity-50 transition-transform ${
+                          profileMenuOpen ? 'rotate-180' : ''
+                        }`}
                       />
                     </button>
 
@@ -216,8 +247,9 @@ export default function Navbar() {
                           href="/courier"
                           className="block px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
                         >
-                          Acciones delivery
+                          Courier
                         </a>
+
                         <button
                           type="button"
                           role="menuitem"
@@ -229,7 +261,7 @@ export default function Navbar() {
                         </button>
                       </div>
                     )}
-                  </div>
+                </div>
                 ) : (
                   <button
                     onClick={handleLogin}
@@ -262,7 +294,10 @@ export default function Navbar() {
                 ))}
 
               {/* MOBILE */}
-              <button className="md:hidden text-text-light opacity-60 hover:text-primary" onClick={() => setMenuOpen(!menuOpen)}>
+              <button
+                className="md:hidden text-text-light opacity-60 hover:text-primary"
+                onClick={() => setMenuOpen(!menuOpen)}
+              >
                 {menuOpen ? <X size={18} /> : <Menu size={18} />}
               </button>
 
@@ -272,19 +307,43 @@ export default function Navbar() {
           {/* MOBILE MENU */}
           {menuOpen && (
             <div className="md:hidden py-3 flex flex-col gap-3 border-t border-border-light">
-              {['Novedades', 'Ofertas', 'Colecciones'].map((item) => (
+              {[
+                { label: 'Novedades', href: '#' },
+                { label: 'Ofertas', href: '#' },
+                { label: 'Colecciones', href: '#' },
+                { label: 'Inventario', href: '/inventory' },
+              ].map((item) => (
                 <a
-                  key={item}
-                  href="#"
+                  key={item.label}
+                  href={item.href}
                   className="text-[13px] text-text-light opacity-[0.55] font-semibold tracking-[0.02em] transition-all hover:text-primary hover:opacity-100"
                 >
-                  {item}
+                  {item.label}
                 </a>
               ))}
+
+              {user && (
+                <>
+                  <a
+                    href="/location"
+                    className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
+                  >
+                    Mis direcciones
+                  </a>
+
+                  <a
+                    href="/courier"
+                    className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
+                  >
+                    Courier
+                  </a>
+                </>
+              )}
             </div>
           )}
         </div>
       </nav>
+
       {authError && (
         <ErrorCard
           isOpen={authError !== null}

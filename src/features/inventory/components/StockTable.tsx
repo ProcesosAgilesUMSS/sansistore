@@ -1,77 +1,129 @@
+import React, { useState, useEffect } from 'react';
+import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { db } from '../../../lib/firebase';
+import { Package, XCircle } from 'lucide-react';
+import { ProductDetailModal } from './ProductDetailModal';
+import { type InventoryProduct } from '../models/product.model';
 
-
-import React, { useState } from 'react';
-// import { getInventoryFromFirebase } from '../inventoryService'; /
-
-// 1. Definimos una Interface
-interface InventoryProduct {
-  id: string;
-  name: string;
-  category: string;
-  stockTotal: number;
-  stockAvailable: number;
-  stockReserved: number;
-  enabled: boolean;
-}
-
-// 2. DATOS SIMULADO
-const mockData: InventoryProduct[] = [
-  { id: 'prod1', name: 'Galletas de Avena Sansi', category: 'Snacks', stockTotal: 120, stockAvailable: 110, stockReserved: 10, enabled: true },
-  { id: 'prod2', name: 'Refresco Cola 500ml', category: 'Bebidas', stockTotal: 50, stockAvailable: 50, stockReserved: 0, enabled: true },
-  { id: 'prod3', name: 'Sándwich Jamón/Queso', category: 'Alimentos Prep.', stockTotal: 15, stockAvailable: 5, stockReserved: 10, enabled: false }, // Agotado/Deshabilitado
-  { id: 'prod4', name: 'Agua Vital 1L', category: 'Bebidas', stockTotal: 200, stockAvailable: 200, stockReserved: 0, enabled: true },
-];
+type LoadingState = 'loading' | 'error' | 'success';
 
 export const StockTable: React.FC = () => {
-  // mockData.
-  const [products] = useState<InventoryProduct[]>(mockData);
+  const [products, setProducts] = useState<InventoryProduct[]>([]);
+  const [status, setStatus] = useState<LoadingState>('loading');
+  const [selectedProduct, setSelectedProduct] =
+    useState<InventoryProduct | null>(null);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, 'products'));
+        const data = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as InventoryProduct[];
+        setProducts(data);
+        setStatus('success');
+      } catch (err) {
+        console.error('Error fetching products:', err);
+        setStatus('error');
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const handleToggleActive = async () => {
+    if (!selectedProduct) return;
+    try {
+      await updateDoc(doc(db, 'products', selectedProduct.id), {
+        active: !selectedProduct.active,
+      });
+      const updated = { ...selectedProduct, active: !selectedProduct.active };
+      setProducts((prev) =>
+        prev.map((p) => (p.id === selectedProduct.id ? updated : p))
+      );
+      setSelectedProduct(updated);
+    } catch (err) {
+      console.error('Error actualizando producto:', err);
+      alert('No se pudo actualizar el estado del producto.');
+    }
+  };
+
+  if (status === 'loading') {
+    return (
+      <div className="flex items-center justify-center py-20 text-(--theme-text) opacity-40 gap-3">
+        <Package className="animate-pulse w-6 h-6" />
+        <span>Cargando productos...</span>
+      </div>
+    );
+  }
+
+  if (status === 'error') {
+    return (
+      <div className="text-center py-20 text-red-400">
+        <XCircle className="w-10 h-10 mx-auto mb-3 opacity-60" />
+        <p className="font-bold mb-1">No se pudo cargar el inventario</p>
+        <p className="text-sm opacity-70">
+          Verifica tu conexión o los permisos de Firestore
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full table-auto text-sm text-left">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-100">
-          <tr>
-            <th scope="col" className="px-6 py-3 rounded-l-lg">Producto</th>
-            <th scope="col" className="px-6 py-3">Categoría</th>
-            <th scope="col" className="px-6 py-3 text-center">Stock Físico</th>
-            <th scope="col" className="px-6 py-3 text-center">Disponible</th>
-            <th scope="col" className="px-6 py-3 text-center">Reservado</th>
-            <th scope="col" className="px-6 py-3 text-center">Estado</th>
-            <th scope="col" className="px-6 py-3 rounded-r-lg">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.map((product) => (
-            <tr key={product.id} className="bg-white border-b hover:bg-gray-50">
-              <td className="px-6 py-4 font-medium text-gray-900">{product.name}</td>
-              <td className="px-6 py-4 text-gray-600">{product.category}</td>
-              <td className="px-6 py-4 text-center font-semibold">{product.stockTotal}</td>
-              <td className="px-6 py-4 text-center">
-                <span className={`font-bold ${product.stockAvailable < 10 ? 'text-red-600' : 'text-green-700'}`}>
-                    {product.stockAvailable}
-                </span>
-              </td>
-              <td className="px-6 py-4 text-center text-gray-500">{product.stockReserved}</td>
-              <td className="px-6 py-4 text-center">
-                {product.enabled ? (
-                  <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Activo</span>
-                ) : (
-                  <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Inactivo/Agotado</span>
-                )}
-              </td>
-              <td className="px-6 py-4 space-x-2">
-                <button className="text-blue-600 hover:underline">Ajustar</button>
-                <button className={`${product.enabled ? 'text-red-600' : 'text-green-600'} hover:underline`}>
-                    {product.enabled ? 'Deshabilitar' : 'Habilitar'}
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      
-      {products.length === 0 && (
-          <div className="text-center py-10 text-gray-500">No hay productos registrados en el inventario.</div>
+    <div className="space-y-6">
+      {/* Grid de productos */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {products.map((product) => (
+          <button
+            key={product.id}
+            onClick={() => setSelectedProduct(product)}
+            className={`relative flex flex-col items-center p-4 bg-(--theme-secondary-bg) border border-(--theme-border) rounded-2xl transition-all hover:scale-105 hover:border-primary active:scale-95 ${
+              !product.active && 'opacity-60 grayscale'
+            }`}
+          >
+            {/* Badge */}
+            {product.badge && (
+              <span className="absolute top-2 left-2 bg-primary text-white text-[0.55rem] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full">
+                {product.badge}
+              </span>
+            )}
+
+            <div className="w-24 h-24 mb-3 rounded-xl overflow-hidden bg-white flex items-center justify-center">
+              {product.imageUrl ? (
+                <img
+                  src={product.imageUrl}
+                  alt={product.name}
+                  className="object-cover w-full h-full"
+                />
+              ) : (
+                <Package className="w-10 h-10 opacity-20 text-gray-400" />
+              )}
+            </div>
+            <span className="font-['Outfit'] font-bold text-sm text-(--theme-text) text-center line-clamp-2">
+              {product.name}
+            </span>
+            <span className="text-[0.65rem] uppercase tracking-widest text-(--theme-text) opacity-40 mt-1">
+              {product.categoryId}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Panel de detalle */}
+      {selectedProduct && (
+        <ProductDetailModal
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+          onToggleActive={handleToggleActive}
+        />
+      )}
+
+      {status === 'success' && products.length === 0 && (
+        <div className="text-center py-20 text-(--theme-text) opacity-30 flex flex-col items-center gap-3">
+          <Package className="w-12 h-12" />
+          <span>No hay productos registrados.</span>
+        </div>
       )}
     </div>
   );

@@ -64,3 +64,31 @@
 - **Yesterday:**    Realizar una vista simple en el proyecto
 - **Today:**        Realizar la estructura del proyecto para el area 7, inventario, y realizar la UserStorie "Ingreso de Lotes, solo formulario"
 - **Blockers:**     Un pequeño error de dependecias o funcionamiento de astro.
+
+## Soliz Moya Alejandra
+- **Yesterday:**    Ayude en el diseño del sidebar.
+- **Today:**        Revise documentacion de react para las dudas que tenia.
+- **Blockers:**     Ninguno.
+
+## Rios Quiruchi Edney Jhojan
+- **Yesterday:**    Agregar redireccion al inventario en la pagina.
+- **Today:**        Agregar el sidebar y layout dentro la pagina de inventarios.
+- **Blockers:**     Problemas al hacer push a la rama main.
+
+# Daily Report
+# 05/06/2026
+
+## Soliz Moya Alejandra
+- **Yesterday:**    Mejore los detalles de las US.
+- **Today:**        Ayude en el diseño del formulario de productos.
+- **Blockers:**     Ninguno.
+
+## Rios Quiruchi Edney Jhojan
+- **Yesterday:**    Refactorizar la modal de productos.
+- **Today:**        Refactorizar el Sidebar.
+- **Blockers:**     ninguno.
+
+## Willian D. Gonza Rojas
+- **Yesterday:**    Realizar la estructura del proyecto
+- **Today:**        Terminar la creacion de productos
+- **Blockers:**     conlflictos menores
