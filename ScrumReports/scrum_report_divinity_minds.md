@@ -106,6 +106,12 @@
 
 # Daily Report - Team 1
 
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Trabajé en la corrección de algunas HUs para los siguientes sprints, que por ahora no están asignadas a ningún sprint.
+- **Today:** Se realizará la definición correcta de todos los criterios de aceptación y tareas relacionadas, según las HUs, siguiendo tareas, estados y mensajes.
+- **Blockers:** n/a
+
 ## Gutierrez Hinojosa Jhon Deymar
 
 - **Yesterday:** Trabajé en las pruebas automatizadas de detalles de producto y en la automatización del workflow de GitHub para la ejecución y generación de reportes de pruebas.
