@@ -1,11 +1,14 @@
-import { useState } from 'react';
 import { LayoutDashboard, PackagePlus, ArrowLeftRight } from 'lucide-react';
 import { NavItem } from './NavItem';
 import type { NavItemProps } from './NavItem';
 
 interface NavSection {
   label: string;
-  items: Omit<NavItemProps, 'disabled'>[];
+  items: Omit<NavItemProps, 'disabled' | 'isActive'>[];
+}
+
+interface SideBarInventoryProps {
+  pathname: string;
 }
 
 const NAV_SECTIONS: NavSection[] = [
@@ -35,25 +38,24 @@ const NAV_SECTIONS: NavSection[] = [
 ];
 
 const BACKLOG_HREFS = new Set([
-  '/inventario/alertas',
-  '/inventario/historial',
-  '/inventario/reservado',
-  '/inventario/sin-stock',
+  '/inventory/alerts',
+  '/inventory/history',
+  '/inventory/reserved',
+  '/inventory/out-of-stock',
 ]);
 
-export default function SideBarInventory() {
-  const [pathname] = useState(() =>
-    typeof window !== 'undefined' ? window.location.pathname : ''
-  );
-
+export default function SideBarInventory({ pathname }: SideBarInventoryProps) {
   return (
     <aside
       className="
-      hidden md:flex
-      w-58 shrink-0 flex-col
-      bg-(--theme-card-bg) border-r border-(--theme-border)
-      px-3 pt-4 pb-4 sticky top-0 h-screen overflow-y-auto overflow-x-hidden
-    "
+        hidden md:flex
+        w-58 shrink-0 flex-col
+        bg-(--theme-card-bg)
+        border-r border-(--theme-border)
+        px-3 pt-4 pb-4
+        sticky top-0 h-screen
+        overflow-y-auto overflow-x-hidden
+      "
     >
       <div className="flex items-center gap-2.5 px-2 pb-5 mb-5 border-b border-(--theme-border)">
         <span className="font-['Outfit'] font-black text-[1.05rem] text-(--theme-text) tracking-tight leading-none">
@@ -65,9 +67,11 @@ export default function SideBarInventory() {
         <div key={si} className="mb-6">
           <span
             className="
-            block text-[0.58rem] font-bold tracking-[0.14em] uppercase
-            text-(--theme-text) opacity-35 px-2.5 mb-1.5
-          "
+              block text-[0.58rem]
+              font-bold tracking-[0.14em]
+              uppercase text-(--theme-text)
+              opacity-35 px-2.5 mb-1.5
+            "
           >
             {section.label}
           </span>
