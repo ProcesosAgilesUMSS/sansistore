@@ -100,3 +100,21 @@
 * **Yesterday:** Realicé correcciones de bugs y ajustes en la parte de frontend relacionados con la HU: *“Como comprador quiero pagar contra entrega”*, trabajando junto con Dayana para mejorar el funcionamiento de la vista.
 * **Today:** Apoyaré en la creación de productos mockeados para que se pueda entender correctamente la vista de la HU *“Como comprador quiero pagar contra entrega”*, ya que depende de otra HU que aún no ha sido implementada en este Sprint: *“Agregar producto a carrito”*.
 * **Blockers:** Entender las dependencias con la HU que estoy trabajando.
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Arreglé algunos detalles de la parte de frontend e implementé parte de la funcionalidad de la HU: “Como mensajero quiero marcar un pedido como entregado 
+* **Today:** Crear pedidos mockeados, mientras tanto, para que se pueda entender correctamente la vista y el flujo de la HU, ya que algunas funcionalidades relacionadas con la gestión completa de pedidos aún no han sido implementadas.*.
+* **Blockers:** Comprender las dependencias y funcionalidades relacionadas.
+
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Realicé ajustes en la interfaz y avancé con la implementación de la HU-03: “Como mensajero quiero ver el monto exacto a cobrar”, trabajando en la visualización correcta del total del pedido dentro del flujo de entrega. 
+* **Today:** Continuaré con las validaciones de la HU-03 y realizaré pruebas para verificar que el monto mostrado coincida correctamente con la información registrada del pedido.*.
+* **Blockers:** Comprender las dependencias y funcionalidades relacionadas con la HU en la que estoy trabajando.
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Trabajé en algunos ajustes de frontend y en la integración de la funcionalidad de la HU-03: “Como mensajero quiero ver el monto exacto a cobrar”, enfocándome en la presentación del monto total antes de confirmar la entrega. 
+* **Today:** Crear pedidos mockeados para visualizar correctamente el flujo de la HU-03 mientras se completan otras funcionalidades relacionadas con la gestión de pedidos en este Sprint.*.
+* **Blockers:** Dependencia de funcionalidades relacionadas con el cálculo y registro de pedidos para completar las validaciones de la HU.
