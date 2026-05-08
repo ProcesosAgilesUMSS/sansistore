@@ -21,6 +21,8 @@ export async function run({ adminApp, db }) {
 
   console.log('Seeding products, inventory & reviews...');
   for (const p of catalogProducts) {
+    const stockTotal = p.stockTotal ?? 0;
+    const stockAvailable = p.stockAvailable ?? 0;
     const docRef = firestore.collection('products').doc(p.id);
     await docRef.set({
       categoryId: categoryMap[p.category],  // Reference the Firestore-assigned category document ID
@@ -43,11 +45,11 @@ export async function run({ adminApp, db }) {
     const invRef = firestore.collection('inventory').doc(productId);
     await invRef.set({
       productId,  // Reference the Firestore-assigned product document ID
-      stockTotal: p.stockTotal,
-      stockAvailable: p.stockAvailable,
+      stockTotal,
+      stockAvailable,
       stockReserved: 0,
       minStock: 5,
-      enabled: p.stockAvailable > 0,
+      enabled: stockAvailable > 0,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
     console.log('Upserted inventory for', productId, 'with ID', invRef.id);

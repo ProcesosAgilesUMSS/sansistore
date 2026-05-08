@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
+  ChevronDown,
   ShoppingBag,
   Search,
   Menu,
@@ -44,6 +45,8 @@ export default function Navbar() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [authReady, setAuthReady] = useState(false);
   const [theme, setTheme] = useState<ThemeMode>('light');
+  const [themeReady, setThemeReady] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
@@ -57,6 +60,7 @@ export default function Navbar() {
     const currentTheme =
       document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
     setTheme(currentTheme);
+    setThemeReady(true);
   }, []);
 
   const handleLogin = async () => {
@@ -106,7 +110,10 @@ export default function Navbar() {
     }
   };
 
-  const handleLogout = () => signOut(auth).catch(console.error);
+  const handleLogout = () => {
+    setProfileMenuOpen(false);
+    signOut(auth).catch(console.error);
+  };
 
   const toggleTheme = () => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark';
@@ -143,16 +150,17 @@ export default function Navbar() {
                   {item.label}
                 </a>
               ))}
-              <a
-                href="/admin"
-                className="text-[13px] text-primary font-semibold tracking-[0.02em] transition-all hover:opacity-70"
-              >
-                Admin
-              </a>
-            </div>
 
-            {/* ACTIONS */}
-            <div className="flex items-center gap-3">
+            <a
+              href="/admin"
+              className="text-[13px] text-primary font-semibold tracking-[0.02em] transition-all hover:opacity-70"
+            >
+              Admin
+            </a>
+          </div>
+
+      {/* ACTIONS */}
+      <div className="flex items-center gap-3">   
               {/* SEARCH */}
               <button className="transition-all text-text-light opacity-[0.60] hover:text-primary hover:opacity-100">
                 <Search size={18} />
@@ -190,7 +198,7 @@ export default function Navbar() {
                 className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-primary/40 text-primary transition-all hover:border-primary hover:opacity-100"
               >
                 <span className="relative flex h-[18px] w-[18px] items-center justify-center">
-                  {theme === 'dark' ? (
+                  {themeReady && theme === 'dark' ? (
                     <Moon className="h-[18px] w-[18px]" />
                   ) : (
                     <Sun className="h-[18px] w-[18px]" />
@@ -201,25 +209,59 @@ export default function Navbar() {
               {/* AUTH */}
               {authReady &&
                 (user ? (
-                  <div className="flex items-center gap-2">
-                    {user.photoURL && (
-                      <img
-                        src={user.photoURL}
-                        className="w-7 h-7 rounded-full object-cover"
-                      />
-                    )}
-
-                    <span className="hidden sm:inline text-[13px] text-text-light opacity-70">
-                      {user.displayName}
-                    </span>
-
+                  <div className="relative">
                     <button
-                      onClick={handleLogout}
-                      className="opacity-50 transition-all hover:text-primary"
+                      type="button"
+                      aria-expanded={profileMenuOpen}
+                      aria-haspopup="menu"
+                      onClick={() => setProfileMenuOpen((open) => !open)}
+                      className="flex items-center gap-2 rounded-full px-2 py-1 transition-all hover:bg-border-light/40"
                     >
-                      <LogOut size={16} />
+                      {user.photoURL && (
+                        <img
+                          src={user.photoURL}
+                          alt=""
+                          className="w-7 h-7 rounded-full object-cover"
+                        />
+                      )}
+
+                      <span className="hidden sm:inline text-[13px] text-text-light opacity-70">
+                        {user.displayName}
+                      </span>
+
+                      <ChevronDown
+                        size={14}
+                        className={`text-text-light opacity-50 transition-transform ${
+                          profileMenuOpen ? 'rotate-180' : ''
+                        }`}
+                      />
                     </button>
-                  </div>
+
+                    {profileMenuOpen && (
+                      <div
+                        role="menu"
+                        className="absolute right-0 top-11 w-48 overflow-hidden rounded-lg border border-border-light bg-bg-light shadow-lg"
+                      >
+                        <a
+                          role="menuitem"
+                          href="/courier"
+                          className="block px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
+                        >
+                          Courier
+                        </a>
+
+                        <button
+                          type="button"
+                          role="menuitem"
+                          onClick={handleLogout}
+                          className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-[13px] font-semibold text-text-light opacity-70 transition-colors hover:bg-border-light/40 hover:text-primary hover:opacity-100"
+                        >
+                          <LogOut size={14} />
+                          Cerrar sesión
+                        </button>
+                      </div>
+                    )}
+                </div>
                 ) : (
                   <button
                     onClick={handleLogin}
@@ -258,6 +300,7 @@ export default function Navbar() {
               >
                 {menuOpen ? <X size={18} /> : <Menu size={18} />}
               </button>
+
             </div>
           </div>
 
@@ -278,13 +321,23 @@ export default function Navbar() {
                   {item.label}
                 </a>
               ))}
+
               {user && (
-                <a
-                  href="/location"
-                  className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
-                >
-                  Mis direcciones
-                </a>
+                <>
+                  <a
+                    href="/location"
+                    className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
+                  >
+                    Mis direcciones
+                  </a>
+
+                  <a
+                    href="/courier"
+                    className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
+                  >
+                    Courier
+                  </a>
+                </>
               )}
             </div>
           )}
