@@ -88,3 +88,32 @@
 - **Yesterday:** Hice las ultimas revisiones y correcciones de los mockups de mi historia de usuario y los criterios de aceptación 
 - **Today:** Trabaje en el desarrollo del frontend de mi historia de usuario  y se empezó con el desarrollo del backend 
 - **Blockers:** None
+
+# 07/05/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+- **Yesterday:** arregle algunas partes del diseño de mi hu que me corresponde
+- **Today:** cordine e hice pruebas de la integracion de las hus de este primer sprint
+- **Blockers:** Habria que tener una cuenta de administrador con su token ya listo para ver el panel de administracion
+
+## Dylan Coca Beltran
+* **Yesterday:** Estaba completando la parte del frontend de mi historia de usuario e integrando apartados
+* **Today:** Termine mi frontend con sus validaciones y tambien la parte del backend
+* **Blockers:** Hay necesidad de tener un usuario administrador con su token para poder ver el apartado del panel de administracion
+
+## Jherlan Marcelo Calero Sardan
+- **Yesterday:** Hice la conexion del backend con fronted de mi hu correspondiente.
+- **Today:** Reorganize mis carpetas y archivos de mi hu para tenerlos en un sola ruta.
+- **Blockers:** Hay necesidad de tener un usuario administrador con su token para poder ver el apartado del panel de administracion.
+
+## Camila Wara Fernandez Sandoval 
+- **Yesterday:** Trabaje en el desarrollo del frontend de mi historia 
+- **Today:**  Finalice y arregle algunas correcciones que tenia en la parte del front de mi historia, participe en la reunión con mi equipo 
+- **Blockers:** Hay necesidad de tener un usuario administrador con su token para poder ver el apartado del panel de administración
+
+## Fabricio Javier Cordova Caceres 
+- **Yesterday:** Trabaje en el desarrollo del backend de mi historia de usuario 
+- **Today:** Finalización del desarrollo del backend y revision del flujo del proyecto y participe en la reunioncon mis compañeros
+- **Blockers:** Hay necesidad de tener un usuario administrador con su token para poder ver el apartado del panel de administracion
