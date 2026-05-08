@@ -11,7 +11,7 @@ export interface OrderItem {
   itemId: string;
   productId: string;
   productName: string;
-  unitPrice: number;
+  price: number;
   quantity: number;
   subtotal: number;
   description?: string;

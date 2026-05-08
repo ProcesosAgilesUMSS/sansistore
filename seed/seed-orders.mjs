@@ -3,6 +3,28 @@ import admin from 'firebase-admin';
 export async function run({ adminApp, db }) {
   const firestore = db;
 
+  // Helper function to delete a collection recursively
+  async function deleteCollection(collectionRef) {
+    const snapshot = await collectionRef.get();
+    const batch = firestore.batch();
+    for (const doc of snapshot.docs) {
+      // If it's the orders collection, also delete the subcollection
+      if (collectionRef.path === 'orders') {
+        const subSnapshot = await doc.ref.collection('orderItems').get();
+        for (const subDoc of subSnapshot.docs) {
+          batch.delete(subDoc.ref);
+        }
+      }
+      batch.delete(doc.ref);
+    }
+    await batch.commit();
+  }
+
+  // Clean up existing data
+  await deleteCollection(firestore.collection('orders'));
+  await deleteCollection(firestore.collection('deliveries'));
+  await deleteCollection(firestore.collection('locations'));
+
   const locationsData = [
     { locationId: "loc-001", userId: "user-buyer-1", label: "Facultad de Ciencias y Tecnología", type: "Edificio Nuevo", lat: -17.3938, lng: -66.1465, isDefault: true },
     { locationId: "loc-002", userId: "user-buyer-2", label: "Biblioteca Central UMSS", type: "Planta Baja", lat: -17.3940, lng: -66.1460, isDefault: true },
@@ -66,10 +88,38 @@ export async function run({ adminApp, db }) {
     });
   }
 
+  const productCatalog = [
+    { productId: "prod-001", productName: "Coca Cola 2L", price: 15.0 },
+    { productId: "prod-002", productName: "Pan Marraqueta", price: 0.5 },
+    { productId: "prod-003", productName: "Leche Pil 1L", price: 8.0 },
+    { productId: "prod-004", productName: "Arroz Grano de Oro 1kg", price: 10.0 },
+    { productId: "prod-005", productName: "Aceite Fino 1L", price: 14.0 }
+  ];
+
   for (const o of ordersData) {
     const paymentStatus = o.deliveryStatus === 'delivered' ? 'Pagado' : 'Pendiente';
+    
+    // Generate 1-4 random items for this order
+    const numItems = Math.floor(Math.random() * 4) + 1;
+    const items = [];
+    let calculatedTotal = 0;
+
+    for (let i = 0; i < numItems; i++) {
+      const product = productCatalog[Math.floor(Math.random() * productCatalog.length)];
+      const quantity = Math.floor(Math.random() * 3) + 1;
+      const subtotal = product.price * quantity;
+      
+      items.push({
+        ...product,
+        quantity,
+        subtotal
+      });
+      calculatedTotal += subtotal;
+    }
+
     await firestore.collection('orders').doc(o.orderId).set({
       ...o,
+      total: calculatedTotal,
       sellerId: "seller-demo-1",
       incidentReason: "",
       paymentStatus,
@@ -80,15 +130,13 @@ export async function run({ adminApp, db }) {
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
     });
 
-    const itemRef = firestore.collection('orders').doc(o.orderId).collection('orderItems').doc(`ITEM-${o.orderId.split('-')[1]}`);
-    await itemRef.set({
-      itemId: `ITEM-${o.orderId.split('-')[1]}`,
-      productId: "prod-demo",
-      productName: "Producto de Prueba",
-      unitPrice: o.total,
-      quantity: 1,
-      subtotal: o.total
-    });
+    for (const item of items) {
+      const itemId = `ITEM-${Math.random().toString(36).substr(2, 9)}`;
+      await firestore.collection('orders').doc(o.orderId).collection('orderItems').doc(itemId).set({
+        itemId,
+        ...item
+      });
+    }
 
     await firestore.collection('deliveries').doc(o.deliveryId).set({
       deliveryId: o.deliveryId,

@@ -77,10 +77,10 @@ export default function SentOrdersList() {
             <OrderHeader />
             <ul className="col-span-full grid grid-cols-subgrid">
               {filteredOrders.map((order) => (
-                <OrderItem 
-                  key={order.id} 
-                  order={order} 
-                  onViewDetail={() => setSelectedOrder(order)} 
+                <OrderItem
+                  key={order.id}
+                  order={order}
+                  onViewDetail={() => setSelectedOrder(order)}
                 />
               ))}
             </ul>

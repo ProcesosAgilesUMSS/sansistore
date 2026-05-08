@@ -8,7 +8,10 @@ interface OrderItemProps {
 
 export default function OrderItem({ order, onViewDetail }: OrderItemProps) {
   return (
-    <li className="grid grid-cols-subgrid col-span-full border-b items-center py-[10px] min-[760px]:py-0">
+    <li 
+      onClick={onViewDetail}
+      className="grid grid-cols-subgrid col-span-full border-b items-center py-[10px] min-[760px]:py-0 cursor-pointer hover:bg-[#1e1e1e05] transition-colors"
+    >
       <div className="col-span-full min-[760px]:col-start-1 min-[760px]:col-end-3 text-sm flex items-center gap-[8px] text-xs">
         <div className="size-1.5 bg-[#1e1e1e]" />
         {order.id}
@@ -26,15 +29,6 @@ export default function OrderItem({ order, onViewDetail }: OrderItemProps) {
             className={`size-2 rounded-full ${order.status === "delivered" ? "bg-green-700/80" : "bg-blue-700/80"}`}
           />
         </div>
-      </div>
-      <div className="col-start-18 col-end-25 flex justify-end">
-        <button
-          type="button"
-          onClick={onViewDetail}
-          className="text-sm border border-[#1e1e1e44] rounded-full px-4 py-2 hover:bg-[#1e1e1e] hover:text-white transition-colors"
-        >
-          Ver detalle
-        </button>
       </div>
     </li>
   );
