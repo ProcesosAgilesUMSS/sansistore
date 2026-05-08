@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
+import { onAuthStateChanged } from 'firebase/auth';
 import {
   CheckCircle2,
   Clock3,
@@ -9,76 +10,20 @@ import {
   Phone,
   Send,
 } from 'lucide-react';
+import { auth } from '../../../lib/firebase';
+import {
+  getMessengerOrders,
+  setMessengerOrderStatus,
+} from '../services/messengerOrdersService';
 import type { MessengerOrder } from '../types';
 
-const initialOrders: MessengerOrder[] = [
-  {
-    id: 'ORD-2026-001',
-    customerName: 'María Fernández',
-    phone: '70712345',
-    address: 'Av. América #1234, Edificio Los Pinos, Piso 3',
-    city: 'Cochabamba',
-    reference: 'Casa con portón negro, llamar al llegar',
-    cashToCollect: 260,
-    paymentMethod: 'cash',
-    deliveryStatus: 'pending',
-    items: [
-      {
-        id: 'polera-verde',
-        name: 'Polera casual verde',
-        quantity: 1,
-        price: 90,
-      },
-      {
-        id: 'jeans-slim',
-        name: 'Jeans slim fit',
-        quantity: 1,
-        price: 160,
-      },
-    ],
-  },
-  {
-    id: 'ORD-2026-002',
-    customerName: 'Carlos Rojas',
-    phone: '76459821',
-    address: 'Calle Bolívar #456, entre España y 25 de Mayo',
-    city: 'Cochabamba',
-    cashToCollect: 60,
-    paymentMethod: 'cash',
-    deliveryStatus: 'pending',
-    items: [
-      {
-        id: 'sudadera-deportiva',
-        name: 'Sudadera deportiva',
-        quantity: 1,
-        price: 60,
-      },
-    ],
-  },
-  {
-    id: 'ORD-2026-003',
-    customerName: 'Ana Vargas',
-    phone: '70333444',
-    address: 'Zona Cala Cala, Cochabamba',
-    city: 'Cochabamba',
-    cashToCollect: 180,
-    paymentMethod: 'cash',
-    deliveryStatus: 'delivered',
-    items: [
-      {
-        id: 'zapatillas-urbanas',
-        name: 'Zapatillas urbanas',
-        quantity: 1,
-        price: 180,
-      },
-    ],
-  },
-];
+const DEV_COURIER_ID = 'user-mensajero-001';
+
 
 const formatBolivianos = (amount: number) => `Bs ${amount}`;
 
 const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']) => {
-  if (status === 'pending') return 'Asignado';
+  if (status === 'assigned') return 'Asignado';
   if (status === 'in_transit') return 'En camino';
   return 'Entregado';
 };
@@ -209,7 +154,7 @@ function PendingOrderCard({
           Abrir en Maps
         </a>
 
-        {order.deliveryStatus === 'pending' && (
+        {order.deliveryStatus === 'assigned' && (
           <button
             className="messenger-transit-button inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 text-sm font-bold text-white transition hover:bg-blue-700"
             onClick={() => onInTransit(order.id)}
@@ -260,13 +205,63 @@ function DeliveredOrderRow({ order }: { order: MessengerOrder }) {
 
 interface MessengerDashboardProps {
   embedded?: boolean;
+  clientSection?: 'assigned' | 'delivered';
 }
 
-export default function MessengerDashboard({ embedded = false }: MessengerDashboardProps) {
-  const [orders, setOrders] = useState(initialOrders);
+export default function MessengerDashboard({
+  embedded = false,
+  clientSection = 'assigned',
+}: MessengerDashboardProps) {
+  const [orders, setOrders] = useState<MessengerOrder[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    const loadOrders = async (courierId: string) => {
+      setLoading(true);
+      setMessage('');
+
+      try {
+        let data = await getMessengerOrders(courierId);
+
+        if (
+          data.length === 0 &&
+          import.meta.env.PUBLIC_APP_ENV !== 'production' &&
+          courierId !== DEV_COURIER_ID
+        ) {
+          data = await getMessengerOrders(DEV_COURIER_ID);
+        }
+
+        setOrders(data);
+      } catch (error) {
+        console.error(error);
+        setOrders([]);
+        setMessage('No se pudieron cargar las entregas del emulador.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      const devCourierId =
+        import.meta.env.PUBLIC_APP_ENV !== 'production' ? DEV_COURIER_ID : null;
+      const courierId = user?.uid || devCourierId;
+
+      if (!courierId) {
+        setOrders([]);
+        setLoading(false);
+        setMessage('Inicia sesion para ver tus entregas asignadas.');
+        return;
+      }
+
+      void loadOrders(courierId);
+    });
+
+    return unsubscribe;
+  }, []);
 
   const pendingOrders = useMemo(
-    () => orders.filter((order) => order.deliveryStatus === 'pending' || order.deliveryStatus === 'in_transit'),
+    () => orders.filter((order) => order.deliveryStatus === 'assigned' || order.deliveryStatus === 'in_transit'),
     [orders]
   );
   const deliveredOrders = useMemo(
@@ -279,26 +274,44 @@ export default function MessengerDashboard({ embedded = false }: MessengerDashbo
     [pendingOrders]
   );
 
-  const markAsDelivered = (orderId: string) => {
+  const updateOrderStatus = async (
+    orderId: string,
+    status: MessengerOrder['deliveryStatus'],
+  ) => {
+    const targetOrder = orders.find((order) => order.id === orderId);
+    if (!targetOrder) return;
+
     setOrders((currentOrders) =>
       currentOrders.map((order) =>
         order.id === orderId
           ? {
             ...order,
-            deliveryStatus: 'delivered',
+            deliveryStatus: status,
           }
           : order
       )
     );
+
+    try {
+      await setMessengerOrderStatus(targetOrder, status);
+      setMessage('Estado actualizado correctamente.');
+    } catch (error) {
+      console.error(error);
+      setMessage('No se pudo actualizar el estado en Firestore.');
+      setOrders((currentOrders) =>
+        currentOrders.map((order) =>
+          order.id === orderId ? targetOrder : order
+        )
+      );
+    }
   };
+
+  const markAsDelivered = (orderId: string) => {
+    void updateOrderStatus(orderId, 'delivered');
+  };
+
   const markAsInTransit = (orderId: string) => {
-    setOrders((currentOrders) =>
-      currentOrders.map((order) =>
-        order.id === orderId
-          ? { ...order, deliveryStatus: 'in_transit' }
-          : order
-      )
-    );
+    void updateOrderStatus(orderId, 'in_transit');
   };
 
   return (
@@ -515,67 +528,105 @@ export default function MessengerDashboard({ embedded = false }: MessengerDashbo
       <div className="messenger-container">
         <section>
           <h1 className="text-4xl font-black tracking-normal">
-            Pedidos asignados
+            {clientSection === 'assigned' ? 'Pedidos asignados' : 'Entregados hoy'}
           </h1>
           <p className="messenger-copy mt-2 text-base">
-            Organiza tus entregas, revisa direcciones y cambia el estado de cada pedido.
+            {clientSection === 'assigned'
+              ? 'Organiza tus entregas, revisa direcciones y cambia el estado de cada pedido.'
+              : 'Revisa las entregas completadas y el monto cobrado durante la jornada.'}
           </p>
         </section>
 
-        <section className="messenger-summary-grid mt-9 grid gap-6">
-          <SummaryCard
-            icon={<Clock3 size={20} />}
-            label="Pendientes"
-            value={pendingOrders.length}
-          />
-          <SummaryCard
-            icon={<CheckCircle2 size={20} />}
-            label="Entregados Hoy"
-            value={deliveredOrders.length}
-          />
-          <SummaryCard
-            featured
-            icon={<DollarSign size={20} />}
-            label="Total a Cobrar"
-            value={formatBolivianos(cashToCollect)}
-          />
-        </section>
+        {message && (
+          <div className="messenger-order-card mt-6 rounded-lg border p-4 text-sm font-semibold">
+            {message}
+          </div>
+        )}
 
-        <section className="mt-11">
-          <h2 className="mb-6 text-2xl font-black tracking-normal">
-            Pedidos Pendientes
-          </h2>
+        {loading && (
+          <div className="messenger-order-card mt-6 rounded-lg border p-8 text-sm font-semibold">
+            Cargando entregas...
+          </div>
+        )}
 
-          <div className="space-y-6">
-            {pendingOrders.length > 0 ? (
-              pendingOrders.map((order) => (
-                <PendingOrderCard
-                  key={order.id}
-                  order={order}
-                  onDelivered={markAsDelivered}
-                  onInTransit={markAsInTransit}
-                />
-              ))
-            ) : (
-              <div className="messenger-order-card rounded-lg border p-8 text-sm font-semibold">
-                No hay pedidos pendientes.
+        {!loading && clientSection === 'assigned' ? (
+          <>
+            <section className="messenger-summary-grid mt-9 grid gap-6">
+              <SummaryCard
+                icon={<Clock3 size={20} />}
+                label="Pendientes"
+                value={pendingOrders.length}
+              />
+              <SummaryCard
+                featured
+                icon={<DollarSign size={20} />}
+                label="Total a Cobrar"
+                value={formatBolivianos(cashToCollect)}
+              />
+            </section>
+
+            <section className="mt-11">
+              <h2 className="mb-6 text-2xl font-black tracking-normal">
+                Pedidos pendientes
+              </h2>
+
+              <div className="space-y-6">
+                {pendingOrders.length > 0 ? (
+                  pendingOrders.map((order) => (
+                    <PendingOrderCard
+                      key={order.id}
+                      order={order}
+                      onDelivered={markAsDelivered}
+                      onInTransit={markAsInTransit}
+                    />
+                  ))
+                ) : (
+                  <div className="messenger-order-card rounded-lg border p-8 text-sm font-semibold">
+                    No hay pedidos pendientes.
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </section>
+            </section>
+          </>
+        ) : !loading ? (
+          <>
+            <section className="messenger-summary-grid mt-9 grid gap-6">
+              <SummaryCard
+                icon={<CheckCircle2 size={20} />}
+                label="Entregados Hoy"
+                value={deliveredOrders.length}
+              />
+              <SummaryCard
+                featured
+                icon={<DollarSign size={20} />}
+                label="Total cobrado"
+                value={formatBolivianos(
+                  deliveredOrders.reduce((total, order) => total + order.cashToCollect, 0),
+                )}
+              />
+            </section>
 
-        <section className="mt-11">
-          <h2 className="mb-6 text-2xl font-black tracking-normal">
-            Entregados Hoy
-          </h2>
+            <section className="mt-11">
+              <h2 className="mb-6 text-2xl font-black tracking-normal">
+                Entregados hoy
+              </h2>
 
-          <div className="space-y-4">
-            {deliveredOrders.map((order) => (
-              <DeliveredOrderRow key={order.id} order={order} />
-            ))}
-          </div>
-        </section>
+              <div className="space-y-4">
+                {deliveredOrders.length > 0 ? (
+                  deliveredOrders.map((order) => (
+                    <DeliveredOrderRow key={order.id} order={order} />
+                  ))
+                ) : (
+                  <div className="messenger-order-card rounded-lg border p-8 text-sm font-semibold">
+                    No hay entregas completadas hoy.
+                  </div>
+                )}
+              </div>
+            </section>
+          </>
+        ) : null}
       </div>
     </main>
   );
 }
+

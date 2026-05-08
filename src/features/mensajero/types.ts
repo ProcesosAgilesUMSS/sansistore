@@ -7,6 +7,7 @@ export interface MessengerOrderItem {
 
 export interface MessengerOrder {
   id: string;
+  deliveryId: string;
   customerName: string;
   phone: string;
   address: string;
@@ -14,6 +15,6 @@ export interface MessengerOrder {
   reference?: string;
   items: MessengerOrderItem[];
   cashToCollect: number;
-  paymentMethod: 'cash';
-  deliveryStatus: 'pending' | 'in_transit' | 'delivered';
+  paymentMethod: 'cash' | 'cash_on_delivery';
+  deliveryStatus: 'assigned' | 'in_transit' | 'delivered';
 }
