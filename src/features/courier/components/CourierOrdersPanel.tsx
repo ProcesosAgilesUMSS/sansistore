@@ -53,7 +53,11 @@ function getStatusTone(status: DeliveryStatus) {
   return 'bg-amber-500/12 text-amber-600';
 }
 
-export default function CourierOrdersPanel() {
+interface CourierOrdersPanelProps {
+  embedded?: boolean;
+}
+
+export default function CourierOrdersPanel({ embedded = false }: CourierOrdersPanelProps) {
   const [orders, setOrders] = useState<CourierOrder[]>([]);
   const [authCourierId, setAuthCourierId] = useState<string | null>(null);
   const [devCourierId, setDevCourierId] = useState(devCourierOptions[0].id);
@@ -61,6 +65,7 @@ export default function CourierOrdersPanel() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [activeDeliveryId, setActiveDeliveryId] = useState<string | null>(null);
+  const [effectiveCourierId, setEffectiveCourierId] = useState(devCourierOptions[0].id);
 
   const courierId = authCourierId ?? devCourierId;
   const usingDevMode = authCourierId === null;
@@ -70,7 +75,19 @@ export default function CourierOrdersPanel() {
     setMessage('');
 
     try {
-      const data = await getCourierOrders(uid);
+      let data = await getCourierOrders(uid);
+      let resolvedCourierId = uid;
+
+      if (
+        data.length === 0 &&
+        import.meta.env.PUBLIC_APP_ENV !== 'production' &&
+        uid !== devCourierOptions[0].id
+      ) {
+        resolvedCourierId = devCourierOptions[0].id;
+        data = await getCourierOrders(resolvedCourierId);
+      }
+
+      setEffectiveCourierId(resolvedCourierId);
       setOrders(data);
     } catch (error) {
       console.error(error);
@@ -102,14 +119,14 @@ export default function CourierOrdersPanel() {
     deliveryId: string,
     status: DeliveryStatus,
   ) => {
-    if (!courierId || activeDeliveryId) return;
+    if (!effectiveCourierId || activeDeliveryId) return;
 
     setActiveDeliveryId(deliveryId);
     setMessage('');
 
     try {
-      await updateDeliveryStatus(deliveryId, status, courierId);
-      await loadOrders(courierId);
+      await updateDeliveryStatus(deliveryId, status, effectiveCourierId);
+      await loadOrders(effectiveCourierId);
       setSelectedOrder(null);
       setMessage('Estado actualizado correctamente.');
     } catch (error) {
@@ -137,7 +154,7 @@ export default function CourierOrdersPanel() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-bg-light px-6 pt-28 text-text-light">
+      <main className={`${embedded ? 'bg-transparent' : 'min-h-screen bg-bg-light px-6 pt-28'} text-text-light`}>
         <section className="mx-auto max-w-5xl">
           <p className="font-semibold">Cargando pedidos asignados...</p>
         </section>
@@ -146,9 +163,9 @@ export default function CourierOrdersPanel() {
   }
 
   return (
-    <main className="min-h-screen bg-bg-light px-6 pt-28 pb-12 text-text-light">
-      <section className="mx-auto max-w-5xl">
-        <div className="overflow-hidden rounded-[32px] border border-border-light bg-[linear-gradient(135deg,rgba(136,176,75,0.14),rgba(136,176,75,0.03))] p-6 shadow-[0_28px_90px_rgba(0,0,0,0.08)] sm:p-8">
+    <main className={`${embedded ? 'bg-transparent' : 'min-h-screen bg-bg-light px-6 pt-28 pb-12'} text-text-light`}>
+      <section className={embedded ? 'w-full' : 'mx-auto max-w-5xl'}>
+        <div className="overflow-hidden rounded-2xl border border-border-light bg-[linear-gradient(135deg,rgba(136,176,75,0.14),rgba(136,176,75,0.03))] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.08)] sm:p-6">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="space-y-3">
               <p className="text-xs font-black uppercase tracking-[0.32em] text-primary/70">
@@ -162,7 +179,7 @@ export default function CourierOrdersPanel() {
               </p>
             </div>
 
-            <div className="rounded-[24px] border border-border-light bg-card-bg-light/80 px-4 py-3 backdrop-blur">
+            <div className="rounded-2xl border border-border-light bg-card-bg-light/80 px-4 py-3 backdrop-blur">
               <p className="text-[10px] font-black uppercase tracking-[0.24em] text-text-light/45">
                 Mensajero activo
               </p>
@@ -173,7 +190,7 @@ export default function CourierOrdersPanel() {
           </div>
         </div>
 
-        <div className="mt-6 rounded-3xl border border-border-light bg-card-bg-light p-6">
+        <div className="mt-4 rounded-2xl border border-border-light bg-card-bg-light p-5 sm:p-6">
           <div className="space-y-4 border-b border-border-light pb-5">
             {usingDevMode && (
               <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
@@ -207,10 +224,10 @@ export default function CourierOrdersPanel() {
 
             <div>
               <p className="text-sm font-semibold text-text-light/70">
-                Mensajero activo: <span className="text-text-light">{courierId}</span>
+                Mensajero activo: <span className="text-text-light">{effectiveCourierId}</span>
               </p>
               <p className="mt-2 text-sm text-text-light/60">
-                La lista muestra solo tus pedidos asignados. Desde aquÃ­ puedes aceptar o rechazar antes de continuar con el flujo de entrega.
+                La lista muestra solo tus pedidos asignados. Desde aquí puedes aceptar o rechazar antes de continuar con el flujo de entrega.
               </p>
             </div>
           </div>
@@ -254,7 +271,7 @@ export default function CourierOrdersPanel() {
                 return (
                   <article
                     key={order.deliveryId}
-                    className="rounded-[28px] border border-border-light bg-card-bg-light p-6 shadow-[0_18px_50px_rgba(0,0,0,0.06)]"
+                    className="rounded-2xl border border-border-light bg-card-bg-light p-5 shadow-[0_12px_34px_rgba(0,0,0,0.05)] sm:p-6"
                   >
                     <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
                       <div className="space-y-4">
