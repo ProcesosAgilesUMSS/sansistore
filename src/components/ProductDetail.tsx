@@ -62,6 +62,8 @@ type ReviewSortKey = 'recent' | 'oldest' | 'highest' | 'lowest';
 const REVIEW_PAGE_SIZE = 10;
 const PRODUCT_NAME_MAX_LINES = 3;
 const PRODUCT_DESCRIPTION_MAX_LINES = 7;
+const PRODUCT_NAME_EXPAND_LENGTH = 45;
+const PRODUCT_DESCRIPTION_EXPAND_LENGTH = 320;
 
 function formatPrice(amount: number) {
   return `Bs ${amount.toFixed(2)}`;
@@ -462,10 +464,9 @@ export default function ProductDetail({
       if (nameExpandedRef.current) return;
 
       if (titleRef.current) {
-        const nextNameTruncated = hasHiddenText(
-          titleRef.current,
-          PRODUCT_NAME_MAX_LINES
-        );
+        const nextNameTruncated =
+          (product?.name.trim().length ?? 0) > PRODUCT_NAME_EXPAND_LENGTH ||
+          hasHiddenText(titleRef.current, PRODUCT_NAME_MAX_LINES);
         setNameTruncated((previous) =>
           previous === nextNameTruncated ? previous : nextNameTruncated
         );
@@ -542,10 +543,9 @@ export default function ProductDetail({
       if (descriptionRef.current) {
         const measurementElement =
           fullDescriptionRef.current ?? descriptionRef.current;
-        const nextDescriptionTruncated = hasHiddenText(
-          measurementElement,
-          PRODUCT_DESCRIPTION_MAX_LINES
-        );
+        const nextDescriptionTruncated =
+          descriptionText.length > PRODUCT_DESCRIPTION_EXPAND_LENGTH ||
+          hasHiddenText(measurementElement, PRODUCT_DESCRIPTION_MAX_LINES);
         setDescriptionTruncated((previous) =>
           previous === nextDescriptionTruncated
             ? previous
