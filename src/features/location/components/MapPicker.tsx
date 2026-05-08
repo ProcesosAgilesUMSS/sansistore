@@ -4,6 +4,19 @@ import { MapContainer, TileLayer, Marker, useMapEvents, Polygon } from "react-le
 import { useMapPicker } from "../hooks/useMapPicker";
 import type { LocationType } from "../types";
 import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+
+
+const defaultIcon = L.icon({
+  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+L.Marker.prototype.options.icon = defaultIcon;
 
 type MapEventsProps = {
     onLocationChange: (lat: number, lng: number) => void;
