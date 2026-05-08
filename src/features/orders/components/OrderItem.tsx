@@ -8,9 +8,9 @@ interface OrderItemProps {
 
 export default function OrderItem({ order, onViewDetail }: OrderItemProps) {
   return (
-    <li 
+    <li
       onClick={onViewDetail}
-      className="grid grid-cols-subgrid col-span-full border-b items-center py-[10px] min-[760px]:py-0 cursor-pointer hover:bg-[#1e1e1e05] transition-colors"
+      className="grid grid-cols-subgrid col-span-full border-b items-center py-[10px] min-[760px]:py-0 cursor-pointer hover:bg-[#dfdbd1]"
     >
       <div className="col-span-full min-[760px]:col-start-1 min-[760px]:col-end-3 text-sm flex items-center gap-[8px] text-xs">
         <div className="size-1.5 bg-[#1e1e1e]" />

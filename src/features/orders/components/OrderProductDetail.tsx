@@ -45,7 +45,7 @@ export default function OrderProductDetail({
         <button
           type="button"
           onClick={onBack}
-          className="uppercase text-xs border border-[#1e1e1e44] p-[2px_5px_2.5px] border-dotted rounded"
+          className="uppercase text-xs border border-[#1e1e1e44] p-[2px_5px_2.5px] border-dotted rounded cursor-pointer"
         >
           Volver
         </button>
