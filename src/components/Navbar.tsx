@@ -83,7 +83,7 @@ export default function Navbar() {
         await setDoc(userRef, {
           uid: result.user.uid,
           email: result.user.email,
-          displayName: result.user.displayName || 'Usuario UMSS', // por el momento esto
+          displayName: result.user.displayName || 'Usuario UMSS',
           roles: ['comprador'],
           institutionalId: institutionalId,
           isActive: true,
@@ -114,8 +114,6 @@ export default function Navbar() {
     applyTheme(nextTheme);
     setTheme(nextTheme);
   };
-
-  // Use Tailwind classes for colors and hover states (colors defined in tailwind.config.cjs)
 
   return (
     <>
@@ -219,6 +217,13 @@ export default function Navbar() {
                           className="block px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
                         >
                           Acciones delivery
+                        </a>
+                        <a
+                          role="menuitem"
+                          href="/mensajero"
+                          className="block px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
+                        >
+                          Panel de mensajero
                         </a>
                         <button
                           type="button"
