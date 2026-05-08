@@ -48,6 +48,10 @@ export async function run({ adminApp, db }) {
       deliveryId: orderData.deliveryId,
       paymentId: orderData.paymentId,
       incidentReason: orderData.incidentReason,
+      customerName: orderData.customerName ?? null,
+      customerPhone: orderData.customerPhone ?? null,
+      address: orderData.address ?? null,
+      paymentMethod: orderData.paymentMethod ?? 'cash_on_delivery',
       confirmedAt: orderData.confirmedAt
         ? admin.firestore.Timestamp.fromDate(new Date(orderData.confirmedAt))
         : null,
@@ -91,6 +95,12 @@ export async function run({ adminApp, db }) {
         : null,
       assignedAt: d.assignedAt
         ? admin.firestore.Timestamp.fromDate(new Date(d.assignedAt))
+        : null,
+      acceptedAt: d.acceptedAt
+        ? admin.firestore.Timestamp.fromDate(new Date(d.acceptedAt))
+        : null,
+      rejectedAt: d.rejectedAt
+        ? admin.firestore.Timestamp.fromDate(new Date(d.rejectedAt))
         : null,
       pickedUpAt: d.pickedUpAt
         ? admin.firestore.Timestamp.fromDate(new Date(d.pickedUpAt))
