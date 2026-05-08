@@ -1,7 +1,7 @@
 ---
 import InventoryLayout from '../../layouts/InventoryLayout.astro';
 import { StockTable } from '../../features/inventory/components/StockTable.tsx';
-import { LotEntryModal } from '../../features/inventory/components/LotEntryModal.tsx';
+import { ProductModal } from '../../features/inventory/components/ProductModal.tsx';
 ---
 
 <InventoryLayout title="Sansistore | Mis Productos">
@@ -13,7 +13,7 @@ import { LotEntryModal } from '../../features/inventory/components/LotEntryModal
     </h1>
 
     {/* Inyectamos el componente con client:load para activar React */}
-    <LotEntryModal client:load />
+    <ProductModal client:load />
   </div>
 
   <div
