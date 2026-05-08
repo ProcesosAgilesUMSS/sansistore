@@ -1,0 +1,11 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import AdminLayout from '../../../features/admin/components/AdminLayout.tsx';
+import UserManagement from '../../../features/admin/users/components/UserManagement';
+---
+
+<Layout title="Usuarios · Sansistore">
+  <AdminLayout client:load>
+    <UserManagement client:load />
+  </AdminLayout>
+</Layout>
