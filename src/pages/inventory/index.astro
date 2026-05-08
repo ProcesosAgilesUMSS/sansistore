@@ -1,5 +1,8 @@
 ---
+// src/pages/inventory/index.astro
 import InventoryLayout from '../../layouts/InventoryLayout.astro';
+import { StockTable } from '../../features/inventory/components/StockTable.tsx';
+import { LotEntryModal } from '../../features/inventory/components/LotEntryModal.tsx';
 ---
 
 <InventoryLayout title="Sansistore | Inventario">
@@ -9,5 +12,14 @@ import InventoryLayout from '../../layouts/InventoryLayout.astro';
     >
       Panel de <span class="text-primary">Inventario</span>
     </h1>
+
+    {/* 1. Insertamos el componente del modal aquí */}
+    {/* Importante usar client:load para que React pueda manejar el estado del modal */}
+    <LotEntryModal client:load />
+  </div>
+
+  {/* 2. También inyectamos la tabla para que no se vea vacío */}
+  <div class="mt-4">
+    <StockTable client:load />
   </div>
 </InventoryLayout>

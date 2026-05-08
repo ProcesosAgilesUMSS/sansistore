@@ -20,8 +20,8 @@ const NAV_SECTIONS: NavSection[] = [
       },
       {
         icon: PackagePlus,
-        label: 'Registrar Nuevos Productos',
-        href: '/inventory/register',
+        label: 'Mis Productos',
+        href: '/inventory/products',
         sprint: true,
       },
       {

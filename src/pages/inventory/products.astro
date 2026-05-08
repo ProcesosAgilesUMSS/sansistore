@@ -1,21 +1,19 @@
 ---
 import InventoryLayout from '../../layouts/InventoryLayout.astro';
 import { StockTable } from '../../features/inventory/components/StockTable.tsx';
+import { LotEntryModal } from '../../features/inventory/components/LotEntryModal.tsx';
 ---
 
-<InventoryLayout title="Sansistore | Registrar Producto">
+<InventoryLayout title="Sansistore | Mis Productos">
   <div class="flex items-center justify-between mb-8">
     <h1
       class="font-['Outfit'] font-black text-2xl tracking-tight text-(--theme-text)"
     >
-      Registrar <span class="text-primary">Producto</span>
+      Mis <span class="text-primary">Productos</span>
     </h1>
-    <a
-      href="/inventory/register"
-      class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-(--theme-bg) font-['Outfit'] font-bold text-sm tracking-wide transition-all duration-200 hover:brightness-110 active:scale-95"
-    >
-      + Nuevo producto
-    </a>
+
+    {/* Inyectamos el componente con client:load para activar React */}
+    <LotEntryModal client:load />
   </div>
 
   <div
@@ -23,4 +21,4 @@ import { StockTable } from '../../features/inventory/components/StockTable.tsx';
   >
     <StockTable client:load />
   </div>
-</InventoryLayout>;
+</InventoryLayout>

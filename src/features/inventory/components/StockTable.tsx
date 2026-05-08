@@ -1,9 +1,5 @@
-
-
 import React, { useState } from 'react';
-// import { getInventoryFromFirebase } from '../inventoryService'; /
 
-// 1. Definimos una Interface
 interface InventoryProduct {
   id: string;
   name: string;
@@ -12,66 +8,84 @@ interface InventoryProduct {
   stockAvailable: number;
   stockReserved: number;
   enabled: boolean;
+  image?: string; // campo de imagen
 }
 
-// 2. DATOS SIMULADO
 const mockData: InventoryProduct[] = [
-  { id: 'prod1', name: 'Galletas de Avena Sansi', category: 'Snacks', stockTotal: 120, stockAvailable: 110, stockReserved: 10, enabled: true },
-  { id: 'prod2', name: 'Refresco Cola 500ml', category: 'Bebidas', stockTotal: 50, stockAvailable: 50, stockReserved: 0, enabled: true },
-  { id: 'prod3', name: 'Sándwich Jamón/Queso', category: 'Alimentos Prep.', stockTotal: 15, stockAvailable: 5, stockReserved: 10, enabled: false }, // Agotado/Deshabilitado
-  { id: 'prod4', name: 'Agua Vital 1L', category: 'Bebidas', stockTotal: 200, stockAvailable: 200, stockReserved: 0, enabled: true },
+  { id: 'prod1', name: 'Galletas de Avena Sansi', category: 'Snacks', stockTotal: 120, stockAvailable: 110, stockReserved: 10, enabled: true, image: 'https://via.placeholder.com/150' },
+  { id: 'prod2', name: 'Refresco Cola 500ml', category: 'Bebidas', stockTotal: 50, stockAvailable: 50, stockReserved: 0, enabled: true, image: 'https://via.placeholder.com/150' },
+  { id: 'prod3', name: 'Sándwich Jamón/Queso', category: 'Alimentos Prep.', stockTotal: 15, stockAvailable: 5, stockReserved: 10, enabled: false, image: 'https://via.placeholder.com/150' },
+  { id: 'prod4', name: 'Agua Vital 1L', category: 'Bebidas', stockTotal: 200, stockAvailable: 200, stockReserved: 0, enabled: true, image: 'https://via.placeholder.com/150' },
 ];
 
 export const StockTable: React.FC = () => {
-  // mockData.
   const [products] = useState<InventoryProduct[]>(mockData);
+  const [selectedProduct, setSelectedProduct] = useState<InventoryProduct | null>(null);
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full table-auto text-sm text-left">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-100">
-          <tr>
-            <th scope="col" className="px-6 py-3 rounded-l-lg">Producto</th>
-            <th scope="col" className="px-6 py-3">Categoría</th>
-            <th scope="col" className="px-6 py-3 text-center">Stock Físico</th>
-            <th scope="col" className="px-6 py-3 text-center">Disponible</th>
-            <th scope="col" className="px-6 py-3 text-center">Reservado</th>
-            <th scope="col" className="px-6 py-3 text-center">Estado</th>
-            <th scope="col" className="px-6 py-3 rounded-r-lg">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.map((product) => (
-            <tr key={product.id} className="bg-white border-b hover:bg-gray-50">
-              <td className="px-6 py-4 font-medium text-gray-900">{product.name}</td>
-              <td className="px-6 py-4 text-gray-600">{product.category}</td>
-              <td className="px-6 py-4 text-center font-semibold">{product.stockTotal}</td>
-              <td className="px-6 py-4 text-center">
-                <span className={`font-bold ${product.stockAvailable < 10 ? 'text-red-600' : 'text-green-700'}`}>
-                    {product.stockAvailable}
+    <div className="space-y-6">
+      {/* Grid de "Burbujitas" Rectangulares */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {products.map((product) => (
+          <button
+            key={product.id}
+            onClick={() => setSelectedProduct(product)}
+            className={`flex flex-col items-center p-4 bg-(--theme-secondary-bg) border border-(--theme-border) rounded-2xl transition-all hover:scale-105 hover:border-primary active:scale-95 ${!product.enabled && 'opacity-60 grayscale'}`}
+          >
+            {/* Imagen del producto */}
+            <div className="w-24 h-24 mb-3 rounded-xl overflow-hidden bg-white flex items-center justify-center">
+               <img src={product.image} alt={product.name} className="object-cover w-full h-full" />
+            </div>
+            
+            {/* Nombre y Categoría */}
+            <span className="font-['Outfit'] font-bold text-sm text-(--theme-text) text-center line-clamp-2">
+              {product.name}
+            </span>
+            <span className="text-[0.65rem] uppercase tracking-widest text-(--theme-text) opacity-40 mt-1">
+              {product.category}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* "Modal" o Panel de Detalle (Se activa al pulsar una burbuja) */}
+      {selectedProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="bg-(--theme-card-bg) border border-(--theme-border) rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-in fade-in zoom-in duration-200">
+            <div className="flex justify-between items-start mb-4">
+               <h3 className="font-['Outfit'] font-bold text-xl text-(--theme-text)">Detalles del Stock</h3>
+               <button onClick={() => setSelectedProduct(null)} className="text-2xl text-(--theme-text) opacity-50">&times;</button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex justify-between border-b border-(--theme-border) pb-2">
+                <span className="text-sm opacity-60">Stock Físico:</span>
+                <span className="font-bold">{selectedProduct.stockTotal}</span>
+              </div>
+              <div className="flex justify-between border-b border-(--theme-border) pb-2">
+                <span className="text-sm opacity-60">Disponible:</span>
+                <span className={`font-bold ${selectedProduct.stockAvailable < 10 ? 'text-red-500' : 'text-green-500'}`}>
+                  {selectedProduct.stockAvailable}
                 </span>
-              </td>
-              <td className="px-6 py-4 text-center text-gray-500">{product.stockReserved}</td>
-              <td className="px-6 py-4 text-center">
-                {product.enabled ? (
-                  <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Activo</span>
-                ) : (
-                  <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Inactivo/Agotado</span>
-                )}
-              </td>
-              <td className="px-6 py-4 space-x-2">
-                <button className="text-blue-600 hover:underline">Ajustar</button>
-                <button className={`${product.enabled ? 'text-red-600' : 'text-green-600'} hover:underline`}>
-                    {product.enabled ? 'Deshabilitar' : 'Habilitar'}
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      
+              </div>
+              <div className="flex justify-between border-b border-(--theme-border) pb-2">
+                <span className="text-sm opacity-60">Reservado:</span>
+                <span className="font-bold">{selectedProduct.stockReserved}</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 mt-6">
+               <button className="py-2.5 bg-primary text-white rounded-full font-bold text-xs uppercase tracking-wider">Ajustar</button>
+               <button className="py-2.5 border border-(--theme-border) text-(--theme-text) rounded-full font-bold text-xs uppercase tracking-wider">
+                 {selectedProduct.enabled ? 'Deshabilitar' : 'Habilitar'}
+               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {products.length === 0 && (
-          <div className="text-center py-10 text-gray-500">No hay productos registrados en el inventario.</div>
+        <div className="text-center py-20 text-(--theme-text) opacity-30">No hay productos.</div>
       )}
     </div>
   );
