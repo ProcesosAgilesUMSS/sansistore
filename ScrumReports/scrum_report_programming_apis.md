@@ -118,3 +118,8 @@
 - **Yesterday:** Realice la página para el vendedor donde reciben las órdenes que están en estado RESERVADO
 - **Today:** Participaré en la reunión de la demo y termine la historia que se me fue asignado.
 - **Blockers:** None
+
+### Bruno Salcedo Cadiz
+- **Yesterday:** Termine mi historia de usuario 104 para que el repartido pueda aceptar o rechazar un pedido
+- **Today:** Preparar la integracion de mi rama y la presentaicon de la dema
+- **Blockers:** None
