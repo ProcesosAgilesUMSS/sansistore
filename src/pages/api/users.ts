@@ -49,12 +49,15 @@ function getBearerToken(request: Request) {
   return authorization.slice('Bearer '.length).trim();
 }
 
+function getDevAdminBypass(): AdminGuardResult | null {
+  return devAdminBypassEnabled ? { uid: devAdminUid } : null;
+}
+
 async function requireAdmin(request: Request): Promise<AdminGuardResult> {
   const token = getBearerToken(request);
   if (!token) {
-    if (devAdminBypassEnabled) {
-      return { uid: devAdminUid };
-    }
+    const devBypass = getDevAdminBypass();
+    if (devBypass) return devBypass;
 
     return { error: jsonResponse({ message: 'No autenticado.' }, 401) };
   }
@@ -79,8 +82,14 @@ async function requireAdmin(request: Request): Promise<AdminGuardResult> {
       return { uid: decodedToken.uid };
     }
 
+    const devBypass = getDevAdminBypass();
+    if (devBypass) return devBypass;
+
     return { error: jsonResponse({ message: 'No tiene permisos de administrador.' }, 403) };
   } catch {
+    const devBypass = getDevAdminBypass();
+    if (devBypass) return devBypass;
+
     return { error: jsonResponse({ message: 'Token de autenticacion invalido.' }, 401) };
   }
 }
