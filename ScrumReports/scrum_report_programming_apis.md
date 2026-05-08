@@ -123,3 +123,9 @@
 - **Yesterday:** Termine mi historia de usuario 104 para que el repartido pueda aceptar o rechazar un pedido
 - **Today:** Preparar la integracion de mi rama y la presentaicon de la dema
 - **Blockers:** None
+
+- ### Adrian Said Andrade Medina
+
+- **Yesterday:** Termine con el desarrollo de mi historia de usuario
+- **Today:** hacer tests
+- **Blockers:** None
