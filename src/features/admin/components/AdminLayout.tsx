@@ -14,7 +14,8 @@ import {
   X,
   ChevronRight,
 } from 'lucide-react';
-import UserManagement from '../../features/users/components/UserManagement';
+import UserManagement from '../users/components/UserManagement.tsx';
+import CategoryList from '../categories/components/CategoryList.tsx';
 
 type Section = 'dashboard' | 'usuarios' | 'categorias' | null;
 
@@ -227,9 +228,7 @@ export default function AdminLayout() {
             <UserManagement />
           )}
           {activeSection === 'categorias' && (
-            <div className="flex items-center justify-center h-full text-[var(--theme-text)]/30 text-sm">
-              Categorías — próximamente
-            </div>
+            <CategoryList />
           )}
         </main>
 

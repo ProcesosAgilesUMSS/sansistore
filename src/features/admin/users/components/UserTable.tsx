@@ -4,12 +4,13 @@ import { ROLE_LABELS, ROLE_COLORS } from '../types';
 
 interface UserTableProps {
   users: User[];
+  onEdit: (user: User) => void;
 }
 
-export default function UserTable({ users }: UserTableProps) {
+export default function UserTable({ users, onEdit }: UserTableProps) {
   if (users.length === 0) {
     return (
-      <div className="flex items-center justify-center py-16 text-[var(--theme-text)]/40 text-sm">
+      <div className="flex items-center justify-center py-16 text-(--theme-text)/40 text-sm">
         No se encontraron usuarios.
       </div>
     );
@@ -17,24 +18,23 @@ export default function UserTable({ users }: UserTableProps) {
 
   return (
     <>
-      {/* Desktop table */}
-      <div className="hidden md:block overflow-x-auto rounded-xl border border-[var(--theme-border)]">
+      <div className="hidden md:block overflow-x-auto rounded-xl border border-(--theme-border)">
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="bg-[#88b04b]/10">
-              <th className="px-5 py-3.5 font-semibold text-[13px] text-[var(--theme-text)]">
+            <tr className="bg-primary/10">
+              <th className="px-5 py-3.5 font-semibold text-[13px] text-(--theme-text)">
                 Nombre
               </th>
-              <th className="px-5 py-3.5 font-semibold text-[13px] text-[var(--theme-text)]">
+              <th className="px-5 py-3.5 font-semibold text-[13px] text-(--theme-text)">
                 Correo
               </th>
-              <th className="px-5 py-3.5 font-semibold text-[13px] text-[var(--theme-text)]">
+              <th className="px-5 py-3.5 font-semibold text-[13px] text-(--theme-text)">
                 Rol
               </th>
-              <th className="px-5 py-3.5 font-semibold text-[13px] text-[var(--theme-text)]">
+              <th className="px-5 py-3.5 font-semibold text-[13px] text-(--theme-text)">
                 Estado
               </th>
-              <th className="px-5 py-3.5 font-semibold text-[13px] text-[var(--theme-text)] text-center">
+              <th className="px-5 py-3.5 font-semibold text-[13px] text-(--theme-text) text-center">
                 Acciones
               </th>
             </tr>
@@ -46,20 +46,21 @@ export default function UserTable({ users }: UserTableProps) {
                 bg: 'rgba(150,150,150,0.15)',
                 text: '#666',
               };
+
               return (
                 <tr
                   key={user.uid}
                   className={`
-                    border-t border-[var(--theme-border)]
+                    border-t border-(--theme-border)
                     transition-colors duration-150
-                    hover:bg-[#88b04b]/[0.03]
-                    ${idx % 2 === 0 ? 'bg-[var(--theme-card-bg)]' : 'bg-[var(--theme-bg)]'}
+                    hover:bg-primary/[0.03]
+                    ${idx % 2 === 0 ? 'bg-(--theme-card-bg)' : 'bg-(--theme-bg)'}
                   `}
                 >
-                  <td className="px-5 py-4 text-[13px] font-medium text-[var(--theme-text)]">
+                  <td className="px-5 py-4 text-[13px] font-medium text-(--theme-text)">
                     {user.displayName}
                   </td>
-                  <td className="px-5 py-4 text-[13px] text-[var(--theme-text)]/60">
+                  <td className="px-5 py-4 text-[13px] text-(--theme-text)/60">
                     {user.email}
                   </td>
                   <td className="px-5 py-4">
@@ -89,7 +90,8 @@ export default function UserTable({ users }: UserTableProps) {
                   </td>
                   <td className="px-5 py-4 text-center">
                     <button
-                      className="p-2 rounded-lg text-[var(--theme-text)]/30 hover:text-[#88b04b] hover:bg-[#88b04b]/10 transition-colors duration-150"
+                      onClick={() => onEdit(user)}
+                      className="p-2 rounded-lg text-(--theme-text)/30 hover:text-primary hover:bg-primary/10 transition-colors duration-150"
                       title="Editar usuario"
                     >
                       <Pencil size={15} />
@@ -102,7 +104,6 @@ export default function UserTable({ users }: UserTableProps) {
         </table>
       </div>
 
-      {/* Mobile cards */}
       <div className="md:hidden flex flex-col gap-3">
         {users.map((user) => {
           const role = user.roles[0];
@@ -110,22 +111,24 @@ export default function UserTable({ users }: UserTableProps) {
             bg: 'rgba(150,150,150,0.15)',
             text: '#666',
           };
+
           return (
             <div
               key={user.uid}
-              className="bg-[var(--theme-card-bg)] border border-[var(--theme-border)] rounded-xl p-4"
+              className="bg-(--theme-card-bg) border border-(--theme-border) rounded-xl p-4"
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="min-w-0 flex-1">
-                  <p className="text-[14px] font-semibold text-[var(--theme-text)] truncate">
+                  <p className="text-[14px] font-semibold text-(--theme-text) truncate">
                     {user.displayName}
                   </p>
-                  <p className="text-[12px] text-[var(--theme-text)]/50 truncate mt-0.5">
+                  <p className="text-[12px] text-(--theme-text)/50 truncate mt-0.5">
                     {user.email}
                   </p>
                 </div>
                 <button
-                  className="p-2 rounded-lg text-[var(--theme-text)]/30 hover:text-[#88b04b] hover:bg-[#88b04b]/10 transition-colors duration-150 flex-shrink-0 ml-2"
+                  onClick={() => onEdit(user)}
+                  className="p-2 rounded-lg text-(--theme-text)/30 hover:text-primary hover:bg-primary/10 transition-colors duration-150 flex-shrink-0 ml-2"
                   title="Editar usuario"
                 >
                   <Pencil size={15} />
