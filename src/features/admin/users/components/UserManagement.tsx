@@ -14,6 +14,7 @@ const FILTER_ROLES: { value: UserRole | 'all'; label: string }[] = [
   { value: 'vendedor', label: 'Vendedor' },
   { value: 'mensajero', label: 'Mensajero' },
   { value: 'operador_inv', label: 'Operador inv.' },
+  { value: 'comprador', label: 'Comprador' },
 ];
 
 export default function UserManagement() {
