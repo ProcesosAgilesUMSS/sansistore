@@ -105,27 +105,8 @@
 - **Today:** Desarrollo de la historia de usario asignada.
 - **Blockers:** Duda sobre que campo de la colección orders se usara para que el vendedor marque el pedido como "listo para entrega", para que pueda ser asignado a un mensajero
 
-***
+### Jhoel Gustavo Aiza Arce
 
-## 07-05-2026
-
-### José Daniel Virreira Rufino
-- **Yesterday:** Realicé la página base para la nueva pantalla de las acciones de delivery en la que todo el grupo colocará sus funciones. Trabajé en la funcionalidad de la HU que me corresponde
-- **Today:** Participaré en la reunión de la demo y terminaré de pulir las funcionalidades pendientes hasta la hora límite del *code freeze*
-- **Blockers:** None
-
-### Efrain Peralta Felipe
-- **Yesterday:** Realice la página para el vendedor donde reciben las órdenes que están en estado RESERVADO
-- **Today:** Participaré en la reunión de la demo y termine la historia que se me fue asignado.
-- **Blockers:** None
-
-### Bruno Salcedo Cadiz
-- **Yesterday:** Termine mi historia de usuario 104 para que el repartido pueda aceptar o rechazar un pedido
-- **Today:** Preparar la integracion de mi rama y la presentaicon de la dema
-- **Blockers:** None
-
-- ### Adrian Said Andrade Medina
-
-- **Yesterday:** Termine con el desarrollo de mi historia de usuario
-- **Today:** hacer tests
-- **Blockers:** None
+- **Yesterday:** Sincronización de la rama de trabajo con los últimos cambios de `main`, integrando los nuevos servicios de seller y componentes de UI (Navbar, filtros de categorías y lógica de cobro) desarrollados por otros equipos.
+- **Today:** Implementación del **panel de entregas para el mensajero** y desarrollo de la lógica para **marcar pedidos como "EN CAMINO"** para permitir el seguimiento en tiempo real. Además, se integró el acceso directo al dashboard de mensajería en el Navbar principal y se validó la persistencia de datos en Firebase.
+- **Blockers:** None.
