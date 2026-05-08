@@ -95,15 +95,13 @@ function SummaryCard({
 }) {
   return (
     <article
-      className={`messenger-summary-card rounded-lg border p-6 ${
-        featured ? 'messenger-summary-card--featured' : ''
-      }`}
+      className={`messenger-summary-card rounded-lg border p-6 ${featured ? 'messenger-summary-card--featured' : ''
+        }`}
     >
       <div className="flex items-center gap-4">
         <span
-          className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
-            featured ? 'messenger-icon--featured' : 'messenger-icon'
-          }`}
+          className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${featured ? 'messenger-icon--featured' : 'messenger-icon'
+            }`}
         >
           {icon}
         </span>
@@ -117,9 +115,11 @@ function SummaryCard({
 function PendingOrderCard({
   order,
   onDelivered,
+  onInTransit,
 }: {
   order: MessengerOrder;
   onDelivered: (orderId: string) => void;
+  onInTransit: (orderId: string) => void;
 }) {
   return (
     <article className="messenger-order-card rounded-lg border p-6">
@@ -199,14 +199,27 @@ function PendingOrderCard({
           <Send size={17} />
           Abrir en Maps
         </a>
-        <button
-          className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-lg px-6 text-sm font-bold transition"
-          onClick={() => onDelivered(order.id)}
-          type="button"
-        >
-          <CheckCircle2 size={17} />
-          Marcar como Entregado
-        </button>
+
+        {order.deliveryStatus === 'pending' && (
+          <button
+            className="messenger-transit-button inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 text-sm font-bold text-white transition hover:bg-blue-700"
+            onClick={() => onInTransit(order.id)}
+            type="button"
+          >
+            En camino
+          </button>
+        )}
+
+        {order.deliveryStatus === 'in_transit' && (
+          <button
+            className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-lg px-6 text-sm font-bold transition"
+            onClick={() => onDelivered(order.id)}
+            type="button"
+          >
+            <CheckCircle2 size={17} />
+            Marcar como Entregado
+          </button>
+        )}
       </div>
     </article>
   );
@@ -240,7 +253,7 @@ export default function MessengerDashboard() {
   const [orders, setOrders] = useState(initialOrders);
 
   const pendingOrders = useMemo(
-    () => orders.filter((order) => order.deliveryStatus === 'pending'),
+    () => orders.filter((order) => order.deliveryStatus === 'pending' || order.deliveryStatus === 'in_transit'),
     [orders]
   );
   const deliveredOrders = useMemo(
@@ -258,9 +271,18 @@ export default function MessengerDashboard() {
       currentOrders.map((order) =>
         order.id === orderId
           ? {
-              ...order,
-              deliveryStatus: 'delivered',
-            }
+            ...order,
+            deliveryStatus: 'delivered',
+          }
+          : order
+      )
+    );
+  };
+  const markAsInTransit = (orderId: string) => {
+    setOrders((currentOrders) =>
+      currentOrders.map((order) =>
+        order.id === orderId
+          ? { ...order, deliveryStatus: 'in_transit' }
           : order
       )
     );
@@ -463,8 +485,9 @@ export default function MessengerDashboard() {
               pendingOrders.map((order) => (
                 <PendingOrderCard
                   key={order.id}
-                  onDelivered={markAsDelivered}
                   order={order}
+                  onDelivered={markAsDelivered}
+                  onInTransit={markAsInTransit}
                 />
               ))
             ) : (
