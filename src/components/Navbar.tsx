@@ -218,13 +218,6 @@ export default function Navbar() {
                         >
                           Acciones delivery
                         </a>
-                        <a
-                          role="menuitem"
-                          href="/mensajero"
-                          className="block px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
-                        >
-                          Panel de mensajero
-                        </a>
                         <button
                           type="button"
                           role="menuitem"
