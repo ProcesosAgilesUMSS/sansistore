@@ -36,7 +36,8 @@ export default function LocationsModal({
 
     return (
         <div
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-[--theme-bg]/60 px-4 backdrop-blur-md"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4 backdrop-blur-xl"
+
             onClick={onClose}
         >
             <div

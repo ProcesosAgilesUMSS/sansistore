@@ -1,4 +1,3 @@
-// components/MapPicker.tsx
 import React from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents, Polygon } from "react-leaflet";
 import { useMapPicker } from "../hooks/useMapPicker";
@@ -6,14 +5,13 @@ import type { LocationType } from "../types";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-
 const defaultIcon = L.icon({
-  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
+    iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
 });
 
 L.Marker.prototype.options.icon = defaultIcon;
@@ -33,7 +31,11 @@ function MapEvents({ onLocationChange }: MapEventsProps) {
     return null;
 }
 
-export default function MapPicker() {
+interface MapPickerProps {
+    onSave?: () => void;
+}
+
+export default function MapPicker({ onSave }: MapPickerProps) {
     const {
         lat,
         lng,
@@ -48,6 +50,11 @@ export default function MapPicker() {
         allowedZones,
         handleSave,
     } = useMapPicker();
+
+    const handleSaveAndClose = async () => {
+        await handleSave();
+        onSave?.();
+    };
 
     return (
         <div className="bg-(--theme-card-bg) text-(--theme-text) p-4 rounded-2xl border border-(--theme-border) flex flex-col gap-3.5">
@@ -77,7 +84,6 @@ export default function MapPicker() {
                 </ul>
             </div>
 
-            {/* Leaflet requiere height como inline style */}
             <MapContainer
                 center={mapCenter}
                 zoom={16}
@@ -159,7 +165,7 @@ export default function MapPicker() {
             </div>
 
             <button
-                onClick={handleSave}
+                onClick={handleSaveAndClose}
                 className="bg-(--color-primary) text-white py-3 rounded-full font-bold mt-1.5 cursor-pointer"
             >
                 Guardar

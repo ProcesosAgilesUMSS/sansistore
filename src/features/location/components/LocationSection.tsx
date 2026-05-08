@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { MapPin, X } from 'lucide-react';
+import { MapPin, X, CheckCircle } from 'lucide-react';
 import LocationsModal from './LocationsModal';
 import MapPicker from './MapPicker';
 import type { Location } from '../types';
@@ -14,17 +14,31 @@ export default function LocationSection() {
 
     const [modalView, setModalView] = useState<ModalView>('none');
     const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
+    const [toast, setToast] = useState(false);
 
     useEffect(() => {
-        if (!loading && selectedLocation === null) {
+        if (loading) return;
+
+        if (locations.length === 0) {
+            setSelectedLocation(null);
+            return;
+        }
+
+        if (selectedLocation === null) {
             const def = locations.find(l => l.isDefault);
             if (def) setSelectedLocation(def);
         }
     }, [loading, locations]);
 
+    const showToast = () => {
+        setToast(true);
+        setTimeout(() => setToast(false), 3000);
+    };
+
     return (
         <div className="flex min-h-screen items-center justify-center bg-[--theme-bg] transition-colors duration-300">
             <div className="flex items-center gap-3">
+
                 {selectedLocation ? (
                     <div className="flex items-center gap-2.5 rounded-full border border-[#88B04B]/30 bg-[#88B04B]/5 px-4 py-2.5 transition-colors duration-300">
                         <MapPin size={14} className="shrink-0 text-[#88B04B]" />
@@ -98,9 +112,21 @@ export default function LocationSection() {
                             </button>
                         </div>
                         <div className="p-5">
-                            <MapPicker />
+                            <MapPicker onSave={() => {
+                                setModalView('list');
+                                showToast();
+                            }} />
                         </div>
                     </div>
+                </div>
+            )}
+
+            {toast && (
+                <div className="fixed bottom-6 left-1/2 z-[200] flex -translate-x-1/2 items-center gap-2 rounded-full bg-[#88B04B] px-5 py-2.5 shadow-lg">
+                    <CheckCircle size={15} className="text-white" />
+                    <span className="font-outfit text-sm font-bold text-white">
+                        Ubicación guardada correctamente
+                    </span>
                 </div>
             )}
         </div>
