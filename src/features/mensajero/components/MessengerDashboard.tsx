@@ -24,6 +24,8 @@ const formatBolivianos = (amount: number) => `Bs ${amount}`;
 
 const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']) => {
   if (status === 'assigned') return 'Asignado';
+  if (status === 'accepted') return 'Aceptado';
+  if (status === 'pending_reassignment') return 'Pendiente de reasignacion';
   if (status === 'in_transit') return 'En camino';
   return 'Entregado';
 };
@@ -154,7 +156,7 @@ function PendingOrderCard({
           Abrir en Maps
         </a>
 
-        {order.deliveryStatus === 'assigned' && (
+        {order.deliveryStatus === 'accepted' && (
           <button
             className="messenger-transit-button inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 text-sm font-bold text-white transition hover:bg-blue-700"
             onClick={() => onInTransit(order.id)}
@@ -261,7 +263,7 @@ export default function MessengerDashboard({
   }, []);
 
   const pendingOrders = useMemo(
-    () => orders.filter((order) => order.deliveryStatus === 'assigned' || order.deliveryStatus === 'in_transit'),
+    () => orders.filter((order) => order.deliveryStatus === 'accepted' || order.deliveryStatus === 'in_transit'),
     [orders]
   );
   const deliveredOrders = useMemo(

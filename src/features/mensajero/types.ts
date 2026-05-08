@@ -50,5 +50,5 @@ export interface MessengerOrder {
   items: MessengerOrderItem[];
   cashToCollect: number;
   paymentMethod: 'cash' | 'cash_on_delivery';
-  deliveryStatus: 'assigned' | 'in_transit' | 'delivered';
+  deliveryStatus: 'assigned' | 'accepted' | 'pending_reassignment' | 'in_transit' | 'delivered';
 }
