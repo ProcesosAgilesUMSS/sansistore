@@ -17,6 +17,8 @@ const DELIVERY_FEE = 0;
 
 export default function CashOnDeliveryCheckout() {
   const [products, setProducts] = useState<CobroProduct[]>([]);
+  // Tracks selected quantity per product id
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [paymentMethod, setPaymentMethod] =
     useState<CashPaymentMethod>('cash_on_delivery');
   const [loading, setLoading] = useState(true);
@@ -28,7 +30,14 @@ export default function CashOnDeliveryCheckout() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        setProducts(await getCheckoutProducts());
+        const fetched = await getCheckoutProducts();
+        setProducts(fetched);
+        // Initialize each product with quantity >= 1 (use stock quantity as default, min 1)
+        const initial: Record<string, number> = {};
+        fetched.forEach((p) => {
+          initial[p.id] = Math.max(1, p.quantity ?? 1);
+        });
+        setQuantities(initial);
       } catch {
         setProducts([]);
       } finally {
@@ -39,11 +48,16 @@ export default function CashOnDeliveryCheckout() {
     fetchProducts();
   }, []);
 
+  // Update quantity for a single product
+  const handleQuantityChange = (productId: string, newQuantity: number) => {
+    setQuantities((prev) => ({ ...prev, [productId]: newQuantity }));
+  };
+
   const orderItems = useMemo<CashOnDeliveryOrderItem[]>(
     () =>
       products
         .map((product) => {
-          const quantity = product.quantity ?? 1;
+          const quantity = quantities[product.id] ?? 0;
           const unitPrice = getProductPrice(product);
 
           return {
@@ -55,7 +69,7 @@ export default function CashOnDeliveryCheckout() {
           };
         })
         .filter((item) => item.quantity > 0),
-    [products]
+    [products, quantities]
   );
 
   const productsTotal = useMemo(
@@ -147,6 +161,7 @@ export default function CashOnDeliveryCheckout() {
             loading={loading}
             products={products}
             selectedItems={orderItems}
+            onQuantityChange={handleQuantityChange}
           />
 
           <CheckoutSummaryPanel

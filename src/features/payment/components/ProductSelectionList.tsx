@@ -1,4 +1,4 @@
-import { Package } from 'lucide-react';
+import { Minus, Package, Plus } from 'lucide-react';
 import type { CashOnDeliveryOrderItem, CobroProduct } from '../types';
 import { formatMoney, getProductPrice } from '../utils/money';
 
@@ -6,13 +6,18 @@ interface ProductSelectionListProps {
   loading: boolean;
   products: CobroProduct[];
   selectedItems: CashOnDeliveryOrderItem[];
+  onQuantityChange: (productId: string, newQuantity: number) => void;
 }
 
 export function ProductSelectionList({
   loading,
   products,
   selectedItems,
+  onQuantityChange,
 }: ProductSelectionListProps) {
+  const getSelectedQuantity = (productId: string) =>
+    selectedItems.find((i) => i.productId === productId)?.quantity ?? 0;
+
   return (
     <div className="rounded-lg border border-border-light bg-card-bg-light p-4">
       <div className="mb-4 flex items-center justify-between gap-3">
@@ -47,7 +52,7 @@ export function ProductSelectionList({
       {!loading && products.length > 0 && (
         <div className="grid gap-3 sm:grid-cols-2">
           {products.map((product) => {
-            const quantity = product.quantity ?? 1;
+            const selectedQty = getSelectedQuantity(product.id);
 
             return (
               <article
@@ -74,8 +79,32 @@ export function ProductSelectionList({
                     {formatMoney(getProductPrice(product))}
                   </p>
 
-                  <div className="mt-3 inline-flex h-8 items-center rounded-full border border-primary/40 bg-primary/10 px-3 text-xs font-bold text-primary">
-                    Cantidad: {quantity}
+                  {/* Quantity stepper */}
+                  <div className="mt-3 inline-flex h-8 items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-1">
+                    <button
+                      type="button"
+                      aria-label="Reducir cantidad"
+                      onClick={() =>
+                        onQuantityChange(product.id, Math.max(1, selectedQty - 1))
+                      }
+                      disabled={selectedQty <= 1}
+                      className="flex h-6 w-6 items-center justify-center rounded-full text-primary transition hover:bg-primary/20 disabled:cursor-not-allowed disabled:opacity-30"
+                    >
+                      <Minus size={12} />
+                    </button>
+
+                    <span className="min-w-[20px] text-center text-xs font-bold text-primary">
+                      {selectedQty}
+                    </span>
+
+                    <button
+                      type="button"
+                      aria-label="Aumentar cantidad"
+                      onClick={() => onQuantityChange(product.id, selectedQty + 1)}
+                      className="flex h-6 w-6 items-center justify-center rounded-full text-primary transition hover:bg-primary/20"
+                    >
+                      <Plus size={12} />
+                    </button>
                   </div>
                 </div>
               </article>

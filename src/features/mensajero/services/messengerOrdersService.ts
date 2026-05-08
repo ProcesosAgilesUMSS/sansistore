@@ -14,8 +14,22 @@ import type { MessengerOrder, MessengerOrderItem } from '../types';
 type DeliveryStatus = MessengerOrder['deliveryStatus'];
 
 const normalizeDeliveryStatus = (status: unknown): DeliveryStatus => {
+  if (status === 'accepted' || status === 'ACCEPTED') return 'accepted';
+  if (status === 'pending_reassignment' || status === 'PENDING_REASSIGNMENT') {
+    return 'pending_reassignment';
+  }
   if (status === 'in_transit' || status === 'delivered') return status;
+  if (status === 'IN_TRANSIT') return 'in_transit';
+  if (status === 'DELIVERED') return 'delivered';
   return 'assigned';
+};
+
+const normalizeOrderDeliveryStatus = (status: DeliveryStatus) => {
+  if (status === 'accepted') return 'ACCEPTED';
+  if (status === 'pending_reassignment') return 'PENDING_REASSIGNMENT';
+  if (status === 'in_transit') return 'IN_TRANSIT';
+  if (status === 'delivered') return 'DELIVERED';
+  return 'ASSIGNED';
 };
 
 const readOrderItems = async (orderId: string): Promise<MessengerOrderItem[]> => {
@@ -90,7 +104,7 @@ export async function setMessengerOrderStatus(
 
   if (order.id) {
     await updateDoc(doc(db, 'orders', order.id), {
-      deliveryStatus: status,
+      deliveryStatus: normalizeOrderDeliveryStatus(status),
       updatedAt: serverTimestamp(),
     });
   }
