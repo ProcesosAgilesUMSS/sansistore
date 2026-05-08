@@ -82,3 +82,8 @@
 - **Yesterday:**    Mejore los detalles de las US.
 - **Today:**        Ayude en el diseño del formulario de productos.
 - **Blockers:**     Ninguno.
+
+## Rios Quiruchi Edney Jhojan
+- **Yesterday:**    Refactorizar la modal de productos.
+- **Today:**        Refactorizar el Sidebar.
+- **Blockers:**     ninguno.
