@@ -10,7 +10,9 @@ import {
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: import.meta.env.PUBLIC_FIREBASE_API_KEY,
+  apiKey: import.meta.env.PUBLIC_APP_ENV === 'production' 
+    ? import.meta.env.PUBLIC_FIREBASE_API_KEY 
+    : 'dummy-api-key-for-emulator',
   authDomain: import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN,
   projectId: import.meta.env.PUBLIC_FIREBASE_PROJECT_ID,
   storageBucket: import.meta.env.PUBLIC_FIREBASE_STORAGE_BUCKET,
