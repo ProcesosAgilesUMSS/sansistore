@@ -22,7 +22,6 @@ export function useSaveLocation() {
             };
  
             await saveLocation(payload);
-            alert(getSuccessMessage(lat, lng));
         },
         [user, validateBeforeSave, getSuccessMessage]
     );

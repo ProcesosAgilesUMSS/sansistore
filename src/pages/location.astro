@@ -1,0 +1,10 @@
+---
+import Layout from '../layouts/Layout.astro';
+import LocationSection from '../features/location/components/LocationSection.tsx';
+import Navbar from '../components/Navbar';
+---
+
+<Layout title="Ubicación">
+    <Navbar client:load />
+    <LocationSection client:only="react" />
+</Layout>
