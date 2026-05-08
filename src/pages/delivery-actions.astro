@@ -1,26 +1,12 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar';
-import MessengerDashboard from '../features/mensajero/components/MessengerDashboard';
+import DeliveryActionsPanel from '../features/mensajero/components/DeliveryActionsPanel';
 ---
 
 <Layout title="Delivery Actions">
   <Navbar client:load />
   <main class="min-h-screen bg-bg-light pt-14 text-text-light">
-    <section class="flex flex-col gap-4 p-4 lg:flex-row">
-      <aside class="w-full rounded-xl border border-border-light bg-card-bg-light p-3 lg:w-56 lg:shrink-0">
-        <p class="mb-3 px-2 text-xs font-semibold uppercase text-primary">
-          Delivery
-        </p>
-
-        <button class="w-full rounded-xl border border-primary bg-secondary-bg-light p-2 text-left text-sm font-medium text-primary">
-          Pedidos asignados
-        </button>
-      </aside>
-
-      <section class="min-w-0 flex-1 rounded-xl border border-border-light bg-card-bg-light p-4">
-        <MessengerDashboard client:load embedded />
-      </section>
-    </section>
+    <DeliveryActionsPanel client:load />
   </main>
 </Layout>
