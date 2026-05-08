@@ -22,7 +22,7 @@ test.describe('Product Detail Page', () => {
     await expect(page.getByRole('heading', { name: /Leche Test In Stock/ })).toBeVisible();
 
     // Check description
-    await expect(page.locator('p.leading-7').filter({ hasText: 'Test product with inventory available' })).toBeVisible();
+    await expect(page.locator('p.leading-7').filter({ hasText: 'Test product with inventory available' }).first()).toBeVisible();
 
     // Check price (Bs 9.99)
     await expect(page.getByText(/Bs\s9\.99/)).toBeVisible();
@@ -42,7 +42,7 @@ test.describe('Product Detail Page', () => {
     await expect(page.getByRole('heading', { name: /Queso Test Out of Stock/ })).toBeVisible();
 
     // Check description
-    await expect(page.locator('p.leading-7').filter({ hasText: 'Test product without inventory' })).toBeVisible();
+    await expect(page.locator('p.leading-7').filter({ hasText: 'Test product without inventory' }).first()).toBeVisible();
 
     // Check price
     await expect(page.getByText(/Bs\s32\.50/)).toBeVisible();

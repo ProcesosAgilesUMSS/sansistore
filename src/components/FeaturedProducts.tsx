@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
-import { ShoppingBag, Package, Search, X, History, Trash2 } from 'lucide-react';
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import { Package, Search, X, History, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { FaCartPlus, FaFilter } from 'react-icons/fa';
+import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { getOfferBadgeData, hasValidOffer } from '../lib/productOffers';
 import CategoryFilter from './CategoryFilter';
@@ -20,6 +21,7 @@ interface Product {
   stockTotal?: number;
   enabled?: boolean;
   categoryId?: string;
+  createdAt?: any;
 }
 
 interface Inventory {
@@ -111,7 +113,83 @@ export default function FeaturedProducts({
   const [inputFocused, setInputFocused] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showOffersOnly, setShowOffersOnly] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [invalidPage, setInvalidPage] = useState(false);
+  const [sortBy, setSortBy] = useState<'price-asc' | 'price-desc' | 'name' | 'recent'>('recent');
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
+  const ITEMS_PER_PAGE = 12;
   const searchRef = useRef<HTMLDivElement>(null);
+  const sortRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Sync category, offers, sort, and page with URL on mount (after hydration)
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      const pageParamStr = url.searchParams.get('page');
+      const categoryParam = url.searchParams.get('category');
+      const offersParam = url.searchParams.get('offers') === 'true';
+      const sortParam = url.searchParams.get('sort') as 'price-asc' | 'price-desc' | 'name' | 'recent' | null;
+      
+      // Validate page is numeric
+      const pageNum = pageParamStr ? parseInt(pageParamStr, 10) : 1;
+      const isValidPageNumber = !isNaN(pageNum) && pageNum > 0;
+      
+      // Remove invalid page param from URL
+      if (pageParamStr && !isValidPageNumber) {
+        url.searchParams.delete('page');
+        window.history.replaceState({}, '', url.toString());
+      }
+      
+      if (categoryParam !== selectedCategory) {
+        setSelectedCategory(categoryParam);
+      }
+      if (offersParam !== showOffersOnly) {
+        setShowOffersOnly(offersParam);
+      }
+      if (sortParam && sortParam !== sortBy) {
+        setSortBy(sortParam);
+      }
+    }
+  }, []);
+
+  // Validate page number when filters change
+  useEffect(() => {
+    if (typeof window !== 'undefined' && products.length > 0) {
+      const url = new URL(window.location.href);
+      const pageParamStr = url.searchParams.get('page');
+      const pageNum = pageParamStr ? parseInt(pageParamStr, 10) : 1;
+      const isValidPageNumber = !isNaN(pageNum) && pageNum > 0;
+      const pageParam = isValidPageNumber ? Math.max(1, pageNum) : 1;
+      
+      // Calculate totalPages - estimate based on products and filters
+      const filtered = products.filter((p) => {
+        if (showOffersOnly && !hasValidOffer(p)) return false;
+        if (selectedCategory && p.categoryId !== selectedCategory) return false;
+        return true;
+      });
+      
+      const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+      const validPage = Math.max(1, Math.min(pageParam, totalPages || 1));
+      const isOutOfRange = pageParam > validPage;
+      
+      // Remove invalid page param and update URL if needed
+      if (pageParamStr && !isValidPageNumber) {
+        url.searchParams.delete('page');
+        window.history.replaceState({}, '', url.toString());
+      }
+      
+      if (validPage !== currentPage || isOutOfRange) {
+        setCurrentPage(validPage);
+        setInvalidPage(isOutOfRange);
+        
+        // Remove page param if out of range
+        if (isOutOfRange) {
+          url.searchParams.delete('page');
+          window.history.replaceState({}, '', url.toString());
+        }
+      }
+    }
+  }, [products.length, selectedCategory, showOffersOnly]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -120,6 +198,12 @@ export default function FeaturedProducts({
         !searchRef.current.contains(event.target as Node)
       ) {
         setShowSuggestions(false);
+      }
+      if (
+        sortRef.current &&
+        !sortRef.current.contains(event.target as Node)
+      ) {
+        setShowSortDropdown(false);
       }
     };
 
@@ -134,6 +218,7 @@ export default function FeaturedProducts({
       try {
         const productsQuery = query(
           collection(db, 'products'),
+          where('active', '==', true),
           orderBy('createdAt', 'desc')
         );
         const [productsSnap, inventorySnap] = await Promise.all([
@@ -167,9 +252,9 @@ export default function FeaturedProducts({
                 enabled: inventory?.enabled ?? false,
               };
             })
-            .filter((product) => product.active !== false)
         );
-      } catch {
+      } catch (error) {
+        console.error('Error loading products:', error);
         setProducts([]);
         setError('No se pudo cargar el catálogo en este momento.');
       } finally {
@@ -187,6 +272,9 @@ export default function FeaturedProducts({
   const filteredProducts = useMemo(() => {
     let result = products;
 
+    // Hide products without stock
+    result = result.filter((product) => (product.stockAvailable ?? 0) > 0);
+
     if (showOffersOnly) {
       result = result.filter((product) => hasValidOffer(product));
     }
@@ -195,20 +283,40 @@ export default function FeaturedProducts({
       result = result.filter((p) => p.categoryId === selectedCategory);
     }
 
-    if (!appliedSearch) return result;
+    if (appliedSearch) {
+      const term = removeAccents(appliedSearch.toLowerCase());
+      const byName = result.filter((p) =>
+        removeAccents(p.name.toLowerCase()).includes(term)
+      );
+      const byDescription = result.filter(
+        (p) =>
+          !removeAccents(p.name.toLowerCase()).includes(term) &&
+          p.description &&
+          removeAccents(p.description.toLowerCase()).includes(term)
+      );
+      result = [...byName, ...byDescription];
+    }
 
-    const term = removeAccents(appliedSearch.toLowerCase());
-    const byName = result.filter((p) =>
-      removeAccents(p.name.toLowerCase()).includes(term)
-    );
-    const byDescription = result.filter(
-      (p) =>
-        !removeAccents(p.name.toLowerCase()).includes(term) &&
-        p.description &&
-        removeAccents(p.description.toLowerCase()).includes(term)
-    );
-    return [...byName, ...byDescription];
-  }, [products, appliedSearch, selectedCategory, showOffersOnly]);
+    // Apply sorting
+    const sorted = [...result];
+    switch (sortBy) {
+      case 'price-asc':
+        sorted.sort((a, b) => a.price - b.price);
+        break;
+      case 'price-desc':
+        sorted.sort((a, b) => b.price - a.price);
+        break;
+      case 'name':
+        sorted.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'recent':
+      default:
+        // Already sorted by createdAt desc from Firebase query
+        break;
+    }
+
+    return sorted;
+  }, [products, appliedSearch, selectedCategory, showOffersOnly, sortBy]);
 
   const searchSuggestions = useMemo(() => {
     if (!searchTerm || searchTerm.length < 1) {
@@ -311,12 +419,32 @@ export default function FeaturedProducts({
     }
   };
 
-  const updateUrl = (term: string) => {
+  const updateUrl = (term: string = '', offers: boolean = showOffersOnly, category: string | null = selectedCategory, page: number = currentPage, sort: typeof sortBy = sortBy) => {
     const url = new URL(window.location.href);
     if (term.trim()) {
       url.searchParams.set('q', term.trim());
     } else {
       url.searchParams.delete('q');
+    }
+    if (offers) {
+      url.searchParams.set('offers', 'true');
+    } else {
+      url.searchParams.delete('offers');
+    }
+    if (category) {
+      url.searchParams.set('category', category);
+    } else {
+      url.searchParams.delete('category');
+    }
+    if (sort !== 'recent') {
+      url.searchParams.set('sort', sort);
+    } else {
+      url.searchParams.delete('sort');
+    }
+    if (page > 1) {
+      url.searchParams.set('page', page.toString());
+    } else {
+      url.searchParams.delete('page');
     }
     window.history.pushState({}, '', url);
   };
@@ -337,151 +465,203 @@ export default function FeaturedProducts({
           </h2>
         </div>
 
-        <div className="mb-6 flex max-w-6xl flex-wrap items-center gap-3">
-          <CategoryFilter
-            selectedCategory={selectedCategory}
-            onCategoryChange={setSelectedCategory}
-          />
-          <button
-            type="button"
-            onClick={() => setShowOffersOnly((current) => !current)}
-            aria-pressed={showOffersOnly}
-            aria-label={
-              showOffersOnly
-                ? 'Quitar filtro Solo ofertas'
-                : 'Activar filtro Solo ofertas'
-            }
-            className={`inline-flex items-center rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200 ${
-              showOffersOnly
-                ? 'border-primary bg-primary text-bg-light hover:brightness-110'
-                : 'border-border-light text-text-light hover:border-primary hover:text-primary'
-            }`}
-          >
-            Solo ofertas
-            {showOffersOnly && (
-              <X size={14} className="ml-2" aria-hidden="true" />
-            )}
-          </button>
-          <div ref={searchRef} className="relative flex-1">
-            <Search
-              size={18}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light opacity-40"
-            />
-            <input
-              type="text"
-              placeholder="Buscar productos..."
-              value={searchTerm}
-              onChange={(e) => handleInputChange(e.target.value)}
-              onKeyDown={handleKeyDown}
-              maxLength={MAX_SEARCH_LENGTH}
-              disabled={loading}
-              onFocus={() => {
-                setInputFocused(true);
-                setShowSuggestions(true);
+        <div className="mb-8 flex flex-col gap-4">
+          <div className="flex w-full flex-row items-center gap-3">
+            <div className="relative w-auto">
+              <CategoryFilter
+                selectedCategory={selectedCategory}
+                onCategoryChange={(newCategory) => {
+                  setSelectedCategory(newCategory);
+                  setCurrentPage(1);
+                  updateUrl(appliedSearch, showOffersOnly, newCategory, 1, sortBy);
+                }}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                const newOffersState = !showOffersOnly;
+                setShowOffersOnly(newOffersState);
+                setCurrentPage(1);
+                updateUrl(appliedSearch, newOffersState, selectedCategory, 1, sortBy);
               }}
-              onBlur={() => setInputFocused(false)}
-              className="w-full rounded-full border border-border-light bg-card-bg-light py-2.5 pl-10 pr-10 text-sm text-text-light placeholder:text-text-light/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
-            />
-            {searchTerm && (
-              <button
-                type="button"
-                onClick={handleSearchClear}
-                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-text-light opacity-40 hover:bg-secondary-bg-light hover:opacity-100"
-                aria-label="Limpiar búsqueda"
-              >
-                <X size={14} />
-              </button>
-            )}
+              aria-pressed={showOffersOnly}
+              aria-label={
+                showOffersOnly
+                  ? 'Quitar filtro Solo ofertas'
+                  : 'Activar filtro Solo ofertas'
+              }
+              className={`inline-flex items-center justify-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition-all duration-200 ${
+                showOffersOnly
+                  ? 'border-primary bg-primary text-bg-light shadow-md shadow-primary/20 hover:brightness-105'
+                  : 'border-border-light text-text-light hover:border-primary hover:text-primary'
+              }`}
+            >
+              Ofertas
+            </button>
+          </div>
+          <div className="flex w-full flex-row items-center gap-3">
+            <div ref={searchRef} className="relative flex-1">
+              <Search
+                size={18}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-text-light opacity-40"
+              />
+              <input
+                type="text"
+                placeholder="¿Qué estás buscando hoy?"
+                value={searchTerm}
+                onChange={(e) => handleInputChange(e.target.value)}
+                onKeyDown={handleKeyDown}
+                maxLength={MAX_SEARCH_LENGTH}
+                disabled={loading}
+                onFocus={() => {
+                  setInputFocused(true);
+                  setShowSuggestions(true);
+                }}
+                onBlur={() => setInputFocused(false)}
+                className="w-full rounded-full border border-border-light bg-card-bg-light py-3 pl-11 pr-11 text-[15px] sm:text-sm text-text-light placeholder:text-text-light/30 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all disabled:opacity-50"
+              />
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={handleSearchClear}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-text-light opacity-40 hover:bg-secondary-bg-light hover:opacity-100 transition-colors"
+                  aria-label="Limpiar búsqueda"
+                >
+                  <X size={16} />
+                </button>
+              )}
 
-            {showSuggestions && searchSuggestions.length > 0 && (
-              <ul className="absolute top-full left-0 right-0 z-20 mt-1 max-h-60 overflow-y-auto rounded-lg border border-border-light bg-card-bg-light py-1 shadow-lg">
-                {searchSuggestions.map((suggestion) => (
-                  <li
-                    key={
-                      suggestion.type === 'history'
-                        ? `history-${suggestion.term}`
-                        : suggestion.product.id
-                    }
-                  >
-                    <div className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-text-light">
-                      <button
-                        type="button"
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          const term =
-                            suggestion.type === 'history'
-                              ? suggestion.term
-                              : suggestion.product.name;
-                          if (suggestion.type === 'history') {
-                            saveSearchTerm(term);
-                            setSearchHistory(getSearchHistory());
-                          } else {
-                            saveSearchTerm(term);
-                            setSearchHistory(getSearchHistory());
-                          }
-                          setSearchTerm(term);
-                          setAppliedSearch(term);
-                          updateUrl(term);
-                          setShowSuggestions(false);
-                        }}
-                        className="flex flex-1 items-center gap-2 hover:bg-secondary-bg-light rounded py-1 -my-1 cursor-pointer"
-                      >
-                        {suggestion.type === 'history' && (
-                          <History
-                            size={14}
-                            className="text-primary shrink-0"
-                          />
-                        )}
-                        <span className="line-clamp-1">
-                          {suggestion.type === 'history'
-                            ? highlightText(suggestion.term, searchTerm, true)
-                            : highlightText(
-                                suggestion.product.name,
-                                searchTerm,
-                                true
-                              )}
-                        </span>
-                      </button>
-                      {suggestion.type === 'history' && (
+              {showSuggestions && searchSuggestions.length > 0 && (
+                <ul className="absolute top-full left-0 right-0 z-20 mt-1 max-h-60 overflow-y-auto rounded-lg border border-border-light bg-card-bg-light py-1 shadow-lg">
+                  {searchSuggestions.map((suggestion) => (
+                    <li
+                      key={
+                        suggestion.type === 'history'
+                          ? `history-${suggestion.term}`
+                          : suggestion.product.id
+                      }
+                    >
+                      <div className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-text-light">
                         <button
                           type="button"
                           onMouseDown={(e) => {
-                            e.stopPropagation();
                             e.preventDefault();
-                            deleteSearchTerm(suggestion.term);
-                            setSearchHistory(getSearchHistory());
+                            const term =
+                              suggestion.type === 'history'
+                                ? suggestion.term
+                                : suggestion.product.name;
+                            if (suggestion.type === 'history') {
+                              saveSearchTerm(term);
+                              setSearchHistory(getSearchHistory());
+                            } else {
+                              saveSearchTerm(term);
+                              setSearchHistory(getSearchHistory());
+                            }
+                            setSearchTerm(term);
+                            setAppliedSearch(term);
+                            updateUrl(term, showOffersOnly, selectedCategory, 1, sortBy);
+                            setShowSuggestions(false);
                           }}
-                          className="shrink-0 p-1 text-text-light opacity-40 hover:text-red-500 hover:opacity-100 cursor-pointer rounded"
-                          aria-label="Eliminar de historial"
+                          className="flex flex-1 items-center gap-2 hover:bg-secondary-bg-light rounded py-1 -my-1 cursor-pointer"
                         >
-                          <Trash2 size={14} />
+                          {suggestion.type === 'history' && (
+                            <History
+                              size={14}
+                              className="text-primary shrink-0"
+                            />
+                          )}
+                          <span className="line-clamp-1">
+                            {suggestion.type === 'history'
+                              ? highlightText(suggestion.term, searchTerm, true)
+                              : highlightText(
+                                  suggestion.product.name,
+                                  searchTerm,
+                                  true
+                                )}
+                          </span>
                         </button>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {showSuggestions &&
-              searchSuggestions.length === 0 &&
-              searchTerm && (
-                <ul className="absolute top-full left-0 right-0 z-20 mt-1 rounded-lg border border-border-light bg-card-bg-light py-1 shadow-lg">
-                  <li>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        saveSearchTerm(searchTerm);
-                        setSearchHistory(getSearchHistory());
-                        setAppliedSearch(searchTerm);
-                        setShowSuggestions(false);
-                      }}
-                      className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm text-text-light hover:bg-secondary-bg-light"
-                    >
-                      Buscar &quot;{searchTerm}&quot;
-                    </button>
-                  </li>
+                        {suggestion.type === 'history' && (
+                          <button
+                            type="button"
+                            onMouseDown={(e) => {
+                              e.stopPropagation();
+                              e.preventDefault();
+                              deleteSearchTerm(suggestion.term);
+                              setSearchHistory(getSearchHistory());
+                            }}
+                            className="shrink-0 p-1 text-text-light opacity-40 hover:text-red-500 hover:opacity-100 cursor-pointer rounded"
+                            aria-label="Eliminar de historial"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
+                      </div>
+                    </li>
+                  ))}
                 </ul>
               )}
+              {showSuggestions &&
+                searchSuggestions.length === 0 &&
+                searchTerm && (
+                  <ul className="absolute top-full left-0 right-0 z-20 mt-1 rounded-lg border border-border-light bg-card-bg-light py-1 shadow-lg">
+                    <li>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          saveSearchTerm(searchTerm);
+                          setSearchHistory(getSearchHistory());
+                          setAppliedSearch(searchTerm);
+                          updateUrl(searchTerm, showOffersOnly, selectedCategory, 1, sortBy);
+                          setShowSuggestions(false);
+                        }}
+                        className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm text-text-light hover:bg-secondary-bg-light"
+                      >
+                        Buscar &quot;{searchTerm}&quot;
+                      </button>
+                    </li>
+                  </ul>
+                )}
+            </div>
+            <div ref={sortRef} className="relative shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowSortDropdown(!showSortDropdown)}
+                className="flex items-center justify-center rounded-full p-2.5 text-text-light transition-all hover:text-primary hover:bg-primary/10"
+                title="Ordenar productos"
+                aria-label="Ordenar productos"
+              >
+                <FaFilter size={16} />
+              </button>
+              {showSortDropdown && (
+                <div className="absolute right-0 top-full mt-1 min-w-56 rounded-lg border border-border-light bg-card-bg-light py-1 shadow-lg z-20">
+                  {[
+                    { value: 'recent' as const, label: 'Recientes' },
+                    { value: 'name' as const, label: 'Nombre A-Z' },
+                    { value: 'price-asc' as const, label: 'Precio: Menor a Mayor' },
+                    { value: 'price-desc' as const, label: 'Precio: Mayor a Menor' },
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => {
+                        setSortBy(option.value);
+                        setCurrentPage(1);
+                        updateUrl(appliedSearch, showOffersOnly, selectedCategory, 1, option.value);
+                        setShowSortDropdown(false);
+                      }}
+                      className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-colors ${
+                        sortBy === option.value
+                          ? 'bg-primary/15 text-primary'
+                          : 'text-text-light hover:bg-secondary-bg-light'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -538,15 +718,17 @@ export default function FeaturedProducts({
           </div>
         )}
 
-        {!loading && filteredProducts.length > 0 && (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-            {filteredProducts.map((product) => {
+        {!loading && filteredProducts.length > 0 && !invalidPage && (
+          <>
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+              {filteredProducts
+                .slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+                .map((product) => {
               const showOffer = hasValidOffer(product);
               const badgeData = getBadgeData(product);
               const currentPrice = showOffer
                 ? product.offerPrice!
                 : product.price;
-              const isAvailable = (product.stockAvailable ?? 0) > 0;
 
               return (
                 <article
@@ -579,78 +761,164 @@ export default function FeaturedProducts({
                     )}
                   </div>
 
-                  <div className="relative z-20 flex flex-1 flex-col p-4">
-                    <div className="flex items-center justify-between gap-3">
-                      <span
-                        className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                          isAvailable
-                            ? 'bg-primary/15 text-primary'
-                            : 'bg-primary-action text-white'
-                        }`}
-                      >
-                        {isAvailable ? 'Disponible' : 'Producto agotado'}
-                      </span>
-                      <ShoppingBag
-                        size={15}
-                        className="text-text-light opacity-35"
-                      />
-                    </div>
-
-                    <div className="mt-3 space-y-2">
-                      <span className="block line-clamp-2 text-sm font-semibold leading-5 text-text-light transition-colors group-hover:text-primary">
-                        {highlightText(
-                          product.name,
-                          appliedSearch,
-                          getMatchField(product, appliedSearch) === 'name'
-                        )}
-                      </span>
-
-                      {product.description && (
-                        <p className="mt-1 line-clamp-2 text-xs text-text-light opacity-65">
-                          {highlightText(
-                            product.description,
-                            appliedSearch,
-                            getMatchField(product, appliedSearch) ===
-                              'description'
-                          )}
-                        </p>
+                  <div className="relative z-20 flex flex-1 flex-col p-3 sm:p-4">
+                    <span 
+                      className="block w-full text-sm sm:text-base font-semibold text-text-light transition-colors group-hover:text-primary"
+                      style={{
+                        display: '-webkit-box',
+                        WebkitBoxOrient: 'vertical',
+                        WebkitLineClamp: 2,
+                        overflow: 'hidden',
+                      }}
+                      title={product.name}
+                    >
+                      {highlightText(
+                        product.name,
+                        appliedSearch,
+                        getMatchField(product, appliedSearch) === 'name'
                       )}
+                    </span>
 
+                    <div className="mt-auto flex items-center justify-between gap-2 pt-2 sm:pt-3">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-bold text-text-light">
+                        <span className="text-sm sm:text-base font-bold text-text-light">
                           {formatPrice(currentPrice)}
                         </span>
                         {showOffer && (
-                          <span className="text-xs text-text-light opacity-40 line-through">
+                          <span className="text-xs sm:text-sm text-text-light opacity-40 line-through">
                             {formatPrice(product.price)}
                           </span>
                         )}
                       </div>
-
-                      <p className="text-xs text-text-light opacity-65">
-                        {isAvailable
-                          ? `Stock: ${product.stockAvailable} disponibles`
-                          : 'Stock: 0 disponibles'}
-                      </p>
-                    </div>
-
-                    <div className="mt-auto pt-4">
                       <button
                         type="button"
-                        disabled={!isAvailable}
-                        className={`inline-flex w-full items-center justify-center rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${
-                          isAvailable
-                            ? 'bg-primary text-primary-action hover:opacity-90'
-                            : 'cursor-not-allowed bg-secondary-bg-light text-text-light opacity-45'
-                        }`}
+                        title="Agregar al carrito"
+                        className="flex items-center justify-center rounded-full p-2.5 sm:p-3 transition-all active:scale-95 text-primary hover:scale-110 hover:drop-shadow-lg shrink-0"
                       >
-                        Agregar al carrito
+                        <FaCartPlus className="text-lg sm:text-xl" />
                       </button>
                     </div>
+
+
                   </div>
                 </article>
               );
             })}
+            </div>
+
+            {Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) > 1 && (
+              <div className="mt-8 flex items-center justify-center gap-2">
+                <button
+                  type="button"
+                  disabled={currentPage === 1}
+                  onClick={() => {
+                    const newPage = currentPage - 1;
+                    setCurrentPage(newPage);
+                    updateUrl(appliedSearch, showOffersOnly, selectedCategory, newPage, sortBy);
+                    setInvalidPage(false);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="rounded-full border border-border-light p-2 text-text-light transition-all hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+
+                <div className="flex gap-1 flex-wrap justify-center items-center">
+                  {(() => {
+                    const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+                    const pages: (number | string)[] = [];
+                    const showRange = 1;
+                    let ellipsisCount = 0;
+                    
+                    // Always show first page
+                    pages.push(1);
+                    
+                    // Add ellipsis and pages before current
+                    const rangeStart = Math.max(2, currentPage - showRange);
+                    if (rangeStart > 2) {
+                      pages.push(`...left-${ellipsisCount++}`);
+                    }
+                    
+                    for (let i = rangeStart; i < currentPage; i++) {
+                      pages.push(i);
+                    }
+                    
+                    // Add current page
+                    if (currentPage !== 1) {
+                      pages.push(currentPage);
+                    }
+                    
+                    // Add pages after current
+                    const rangeEnd = Math.min(totalPages - 1, currentPage + showRange);
+                    for (let i = currentPage + 1; i <= rangeEnd; i++) {
+                      pages.push(i);
+                    }
+                    
+                    // Add ellipsis and last page
+                    if (rangeEnd < totalPages - 1) {
+                      pages.push(`...right-${ellipsisCount++}`);
+                    }
+                    if (totalPages > 1 && currentPage !== totalPages) {
+                      pages.push(totalPages);
+                    }
+                    
+                    return pages.map((page, index) => {
+                      const isEllipsis = typeof page === 'string' && page.startsWith('...');
+                      const pageNum = typeof page === 'number' ? page : null;
+                      
+                      return isEllipsis ? (
+                        <span key={`${page}-${index}`} className="px-2 py-2 text-text-light opacity-50">
+                          ...
+                        </span>
+                      ) : (
+                        <button
+                          key={`page-${pageNum}`}
+                          type="button"
+                          onClick={() => {
+                            setCurrentPage(pageNum as number);
+                            updateUrl(appliedSearch, showOffersOnly, selectedCategory, pageNum as number, sortBy);
+                            setInvalidPage(false);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }}
+                          className={`rounded-full px-3 py-2 text-sm font-semibold transition-all ${
+                            currentPage === pageNum
+                              ? 'bg-primary text-bg-light'
+                              : 'border border-border-light text-text-light hover:border-primary hover:text-primary'
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    });
+                  })()}
+                </div>
+
+                <button
+                  type="button"
+                  disabled={currentPage === Math.ceil(filteredProducts.length / ITEMS_PER_PAGE)}
+                  onClick={() => {
+                    const newPage = currentPage + 1;
+                    setCurrentPage(newPage);
+                    updateUrl(appliedSearch, showOffersOnly, selectedCategory, newPage, sortBy);
+                    setInvalidPage(false);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="rounded-full border border-border-light p-2 text-text-light transition-all hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+            )}
+          </>
+        )}
+
+        {!loading && invalidPage && (
+          <div className="flex h-96 items-center justify-center rounded-2xl border border-border-light bg-card-bg-light">
+            <div className="text-center">
+              <Package className="mx-auto h-12 w-12 text-text-light opacity-50 mb-4" />
+              <p className="text-lg font-semibold text-text-light">No hay más productos</p>
+              <p className="text-sm text-text-light opacity-70">La página que buscas no existe</p>
+            </div>
           </div>
         )}
       </div>

@@ -623,13 +623,14 @@ export default function ProductDetail({
             </span>
           </nav>
 
-          <a
-            href="/productos"
+          <button
+            type="button"
+            onClick={() => window.history.back()}
             className="inline-flex w-fit items-center gap-2 rounded-full border border-border-light bg-card-bg-light px-4 py-2 text-sm font-semibold text-text-light transition-colors hover:border-primary hover:text-primary"
           >
             <ArrowLeft size={16} />
-            Volver al catálogo
-          </a>
+            Atrás
+          </button>
         </div>
 
         {loading && (

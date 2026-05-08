@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import {
   ChevronDown,
   ShoppingBag,
-  Search,
   Menu,
   X,
   LogOut,
@@ -141,8 +140,6 @@ export default function Navbar() {
               {[
                 { label: 'Productos', href: '/productos' },
                 { label: 'Pedidos', href: '/orders/sent' },
-                { label: 'Novedades', href: '#' },
-                { label: 'Ofertas', href: '#' },
                 { label: 'Inventario', href: '/inventory' },
               ].map((item) => (
                 <a
@@ -164,11 +161,6 @@ export default function Navbar() {
 
             {/* ACTIONS */}
             <div className="flex items-center gap-3">   
-              {/* SEARCH */}
-              <button className="transition-all text-text-light opacity-[0.60] hover:text-primary hover:opacity-100">
-                <Search size={18} />
-              </button>
-
               {/* CART */}
               <button className="relative transition-all text-text-light opacity-[0.60] hover:text-primary hover:opacity-100">
                 <ShoppingBag size={18} />
@@ -311,8 +303,6 @@ export default function Navbar() {
           {menuOpen && (
             <div className="md:hidden py-3 flex flex-col gap-3 border-t border-border-light">
               {[
-                { label: 'Novedades', href: '#' },
-                { label: 'Ofertas', href: '#' },
                 { label: 'Colecciones', href: '#' },
                 { label: 'Inventario', href: '/inventory' },
               ].map((item) => (
