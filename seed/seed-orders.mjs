@@ -44,9 +44,13 @@ export async function run({ adminApp, db }) {
       total: orderData.total,
       locationId: orderData.locationId,
       paymentStatus: orderData.paymentStatus,
+      paymentMethod: orderData.paymentMethod,
       deliveryStatus: orderData.deliveryStatus,
       deliveryId: orderData.deliveryId,
       paymentId: orderData.paymentId,
+      customerName: orderData.customerName,
+      customerPhone: orderData.customerPhone,
+      address: orderData.address,
       incidentReason: orderData.incidentReason,
       confirmedAt: orderData.confirmedAt
         ? admin.firestore.Timestamp.fromDate(new Date(orderData.confirmedAt))
