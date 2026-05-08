@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { layout, prepare } from '@chenglou/pretext';
 import {
   ArrowLeft,
+  ChevronDown,
   ChevronRight,
   ChevronUp,
   MessageSquare,
@@ -58,6 +60,8 @@ interface InventoryRecord {
 type ReviewSortKey = 'recent' | 'oldest' | 'highest' | 'lowest';
 
 const REVIEW_PAGE_SIZE = 10;
+const PRODUCT_NAME_MAX_LINES = 3;
+const PRODUCT_DESCRIPTION_MAX_LINES = 7;
 
 function formatPrice(amount: number) {
   return `Bs ${amount.toFixed(2)}`;
@@ -165,6 +169,110 @@ function formatReviewDate(review: Review) {
   }).format(new Date(timestamp));
 }
 
+function getLineHeight(styles: CSSStyleDeclaration) {
+  const lineHeight = Number.parseFloat(styles.lineHeight);
+
+  if (!Number.isNaN(lineHeight)) return lineHeight;
+
+  const fontSize = Number.parseFloat(styles.fontSize);
+  return Number.isNaN(fontSize) ? 16 : fontSize * 1.2;
+}
+
+function getPretextFont(styles: CSSStyleDeclaration) {
+  if (styles.font) return styles.font;
+
+  return `${styles.fontWeight} ${styles.fontSize} ${styles.fontFamily}`;
+}
+
+function getLetterSpacing(styles: CSSStyleDeclaration) {
+  const letterSpacing = Number.parseFloat(styles.letterSpacing);
+  return Number.isNaN(letterSpacing) ? 0 : letterSpacing;
+}
+
+function hasHiddenText(element: HTMLElement, maxLines: number) {
+  const styles = window.getComputedStyle(element);
+  const width = element.getBoundingClientRect().width;
+
+  if (!width) return false;
+
+  if (element.scrollHeight > element.clientHeight + 1) return true;
+
+  const prepared = prepare(element.textContent ?? '', getPretextFont(styles), {
+    letterSpacing: getLetterSpacing(styles),
+    whiteSpace: 'normal',
+    wordBreak: styles.wordBreak === 'keep-all' ? 'keep-all' : 'normal',
+  });
+  const result = layout(prepared, width, getLineHeight(styles));
+
+  if (result.lineCount > maxLines) return true;
+
+  const clone = element.cloneNode(true) as HTMLElement;
+  clone.style.position = 'absolute';
+  clone.style.left = '-9999px';
+  clone.style.top = '0';
+  clone.style.visibility = 'hidden';
+  clone.style.pointerEvents = 'none';
+  clone.style.width = `${width}px`;
+  clone.style.height = 'auto';
+  clone.style.maxHeight = 'none';
+  clone.style.overflow = 'visible';
+  clone.style.display = 'block';
+  clone.style.webkitBoxOrient = 'unset';
+  clone.style.webkitLineClamp = 'unset';
+
+  document.body.appendChild(clone);
+  const fullHeight = clone.scrollHeight;
+  document.body.removeChild(clone);
+
+  return fullHeight > getLineHeight(styles) * maxLines + 1;
+}
+
+function getAnimatedClampStyle(expanded: boolean, maxLines: number) {
+  const collapsedMaxHeight = `${maxLines * 1.24}em`;
+
+  if (expanded) {
+    return {
+      display: 'block',
+      overflow: 'hidden',
+      maxHeight: '200rem',
+      transition: 'max-height 320ms ease',
+      willChange: 'max-height',
+    } as const;
+  }
+
+  return {
+    display: '-webkit-box',
+    WebkitBoxOrient: 'vertical',
+    WebkitLineClamp: maxLines,
+    overflow: 'hidden',
+    maxHeight: collapsedMaxHeight,
+    transition: 'max-height 320ms ease',
+    willChange: 'max-height',
+  } as const;
+}
+
+function getDescriptionWrapperStyle(expanded: boolean) {
+  return {
+    maxHeight: expanded ? '80rem' : '12.25rem',
+    overflow: 'hidden',
+    opacity: expanded ? 1 : 0.94,
+    transform: expanded ? 'translateY(0)' : 'translateY(-2px)',
+    transition:
+      'max-height 320ms ease, opacity 220ms ease, transform 220ms ease',
+    willChange: 'max-height, opacity, transform',
+  } as const;
+}
+
+function areSetsEqual<T>(left: Set<T>, right: Set<T>) {
+  if (left.size !== right.size) return false;
+
+  for (const value of left) {
+    if (!right.has(value)) return false;
+  }
+
+  return true;
+}
+
 export default function ProductDetail({
   productSlug,
   initialProduct,
@@ -180,6 +288,7 @@ export default function ProductDetail({
   const [nameExpanded, setNameExpanded] = useState(false);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [nameTruncated, setNameTruncated] = useState(false);
+  const [descriptionTruncated, setDescriptionTruncated] = useState(false);
   const [expandedReviews, setExpandedReviews] = useState<Set<string>>(
     new Set()
   );
@@ -187,7 +296,19 @@ export default function ProductDetail({
     new Set()
   );
   const titleRef = useRef<HTMLElement | null>(null);
+  const descriptionRef = useRef<HTMLParagraphElement | null>(null);
+  const fullDescriptionRef = useRef<HTMLParagraphElement | null>(null);
   const reviewRefs = useRef<Map<string, HTMLParagraphElement>>(new Map());
+  const nameExpandedRef = useRef(nameExpanded);
+  const descriptionExpandedRef = useRef(descriptionExpanded);
+
+  useEffect(() => {
+    nameExpandedRef.current = nameExpanded;
+  }, [nameExpanded]);
+
+  useEffect(() => {
+    descriptionExpandedRef.current = descriptionExpanded;
+  }, [descriptionExpanded]);
 
   const toggleReview = (reviewId: string) => {
     setExpandedReviews((previous) => {
@@ -214,6 +335,8 @@ export default function ProductDetail({
       setVisibleReviewsCount(REVIEW_PAGE_SIZE);
       setNameExpanded(false);
       setDescriptionExpanded(false);
+      setNameTruncated(false);
+      setDescriptionTruncated(false);
       setExpandedReviews(new Set<string>());
       setTruncatedReviews(new Set<string>());
 
@@ -336,21 +459,46 @@ export default function ProductDetail({
 
   useEffect(() => {
     const checkTitleTruncation = () => {
+      if (nameExpandedRef.current) return;
+
       if (titleRef.current) {
-        setNameTruncated(
-          titleRef.current.scrollHeight > titleRef.current.clientHeight
+        const nextNameTruncated = hasHiddenText(
+          titleRef.current,
+          PRODUCT_NAME_MAX_LINES
+        );
+        setNameTruncated((previous) =>
+          previous === nextNameTruncated ? previous : nextNameTruncated
         );
       }
     };
 
-    checkTitleTruncation();
+    const frameId = window.requestAnimationFrame(checkTitleTruncation);
+    const resizeObserver = titleRef.current
+      ? new ResizeObserver(checkTitleTruncation)
+      : null;
+
+    if (titleRef.current) {
+      resizeObserver?.observe(titleRef.current);
+    }
+
+    document.fonts?.ready.then(checkTitleTruncation);
     window.addEventListener('resize', checkTitleTruncation);
 
-    return () => window.removeEventListener('resize', checkTitleTruncation);
-  }, [product, nameExpanded]);
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      resizeObserver?.disconnect();
+      window.removeEventListener('resize', checkTitleTruncation);
+    };
+  }, [product?.name]);
 
-  const sortedReviews = sortReviews(reviews, reviewSort);
-  const visibleReviews = sortedReviews.slice(0, visibleReviewsCount);
+  const sortedReviews = useMemo(
+    () => sortReviews(reviews, reviewSort),
+    [reviews, reviewSort]
+  );
+  const visibleReviews = useMemo(
+    () => sortedReviews.slice(0, visibleReviewsCount),
+    [sortedReviews, visibleReviewsCount]
+  );
 
   useEffect(() => {
     const checkReviewTruncation = () => {
@@ -362,7 +510,9 @@ export default function ProductDetail({
         }
       });
 
-      setTruncatedReviews(truncated);
+      setTruncatedReviews((previous) =>
+        areSetsEqual(previous, truncated) ? previous : truncated
+      );
     };
 
     checkReviewTruncation();
@@ -384,13 +534,51 @@ export default function ProductDetail({
   const descriptionText = normalizedDescription
     ? normalizedDescription
     : 'Sin descripción';
+
+  useEffect(() => {
+    const checkDescriptionTruncation = () => {
+      if (descriptionExpandedRef.current) return;
+
+      if (descriptionRef.current) {
+        const measurementElement =
+          fullDescriptionRef.current ?? descriptionRef.current;
+        const nextDescriptionTruncated = hasHiddenText(
+          measurementElement,
+          PRODUCT_DESCRIPTION_MAX_LINES
+        );
+        setDescriptionTruncated((previous) =>
+          previous === nextDescriptionTruncated
+            ? previous
+            : nextDescriptionTruncated
+        );
+      }
+    };
+
+    const frameId = window.requestAnimationFrame(checkDescriptionTruncation);
+    const resizeObserver = descriptionRef.current
+      ? new ResizeObserver(checkDescriptionTruncation)
+      : null;
+
+    if (descriptionRef.current) {
+      resizeObserver?.observe(descriptionRef.current);
+    }
+
+    document.fonts?.ready.then(checkDescriptionTruncation);
+    window.addEventListener('resize', checkDescriptionTruncation);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      resizeObserver?.disconnect();
+      window.removeEventListener('resize', checkDescriptionTruncation);
+    };
+  }, [descriptionText]);
+
   const badgeData = getBadgeData(product);
   const hasMoreReviews = sortedReviews.length > visibleReviews.length;
   const reviewsCount = reviews.length;
   const averageRating = reviewsCount
     ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviewsCount
     : 0;
-  const roundedAverage = reviewsCount ? Math.round(averageRating) : 0;
   const averageLabel = reviewsCount
     ? `${averageRating.toFixed(1)} de 5`
     : 'Sin calificaciones';
@@ -548,37 +736,33 @@ export default function ProductDetail({
                   Detalle del producto
                 </p>
                 <h1 className="mt-3 text-3xl font-black tracking-tight text-text-light sm:text-4xl">
-                  {nameTruncated ? (
-                    <button
-                      ref={titleRef as React.RefObject<HTMLButtonElement>}
-                      type="button"
-                      onClick={() => setNameExpanded(!nameExpanded)}
-                      aria-expanded={nameExpanded}
-                      title={product.name}
-                      className={`w-full cursor-pointer text-left ${!nameExpanded ? 'line-clamp-3' : ''}`}
-                    >
-                      {product.name}
-                    </button>
-                  ) : (
-                    <span
-                      ref={titleRef as React.RefObject<HTMLSpanElement>}
-                      title={product.name}
-                      className={`${!nameExpanded ? 'line-clamp-3' : ''}`}
-                    >
-                      {product.name}
-                    </span>
-                  )}
+                  <span
+                    ref={titleRef as React.RefObject<HTMLSpanElement>}
+                    title={product.name}
+                    className="leading-[1.12] pb-1"
+                    style={getAnimatedClampStyle(
+                      nameExpanded,
+                      PRODUCT_NAME_MAX_LINES
+                    )}
+                  >
+                    {product.name}
+                  </span>
                 </h1>
-                {nameExpanded && (
+                {(nameTruncated || nameExpanded) && (
                   <button
                     type="button"
                     onClick={() => setNameExpanded(!nameExpanded)}
-                    className="mx-auto mt-1 flex animate-bounce cursor-pointer text-primary"
+                    className="mt-1 inline-flex h-7 w-7 items-center justify-center rounded-full text-primary transition-colors hover:bg-primary/10"
                     aria-label={
                       nameExpanded ? 'Mostrar menos nombre' : 'Mostrar más nombre'
                     }
+                    title={nameExpanded ? 'Mostrar menos' : 'Mostrar más'}
                   >
-                    <ChevronUp size={20} />
+                    {nameExpanded ? (
+                      <ChevronUp size={18} aria-hidden="true" />
+                    ) : (
+                      <ChevronDown size={18} aria-hidden="true" />
+                    )}
                   </button>
                 )}
 
@@ -609,19 +793,35 @@ export default function ProductDetail({
                   )}
                 </div>
 
-                <div className="mt-6">
+                <div className="relative mt-6">
+                  <div style={getDescriptionWrapperStyle(descriptionExpanded)}>
+                    <p
+                      ref={descriptionRef}
+                      className={`text-sm leading-7 text-text-light opacity-80 ${
+                        !descriptionExpanded ? 'line-clamp-7' : ''
+                      }`}
+                    >
+                      {descriptionText}
+                    </p>
+                  </div>
                   <p
-                    className={`text-sm leading-7 text-text-light opacity-80 ${!descriptionExpanded ? 'line-clamp-7' : ''}`}
+                    ref={fullDescriptionRef}
+                    aria-hidden="true"
+                    className="pointer-events-none absolute left-0 right-0 top-0 -z-10 text-sm leading-7 text-text-light opacity-0"
                   >
                     {descriptionText}
                   </p>
-                  <button
-                    type="button"
-                    onClick={() => setDescriptionExpanded(!descriptionExpanded)}
-                    className="mt-1 text-sm font-semibold text-primary hover:underline"
-                  >
-                    {descriptionExpanded ? 'mostrar menos' : 'mostrar más'}
-                  </button>
+                  {(descriptionTruncated || descriptionExpanded) && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setDescriptionExpanded(!descriptionExpanded)
+                      }
+                      className="mt-1 text-sm font-semibold text-primary hover:underline"
+                    >
+                      {descriptionExpanded ? 'mostrar menos' : 'mostrar más'}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
