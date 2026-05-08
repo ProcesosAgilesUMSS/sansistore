@@ -230,8 +230,6 @@ function hasHiddenText(element: HTMLElement, maxLines: number) {
 }
 
 function getAnimatedClampStyle(expanded: boolean, maxLines: number) {
-  const collapsedMaxHeight = `${maxLines * 1.24}em`;
-
   if (expanded) {
     return {
       display: 'block',
@@ -247,7 +245,6 @@ function getAnimatedClampStyle(expanded: boolean, maxLines: number) {
     WebkitBoxOrient: 'vertical',
     WebkitLineClamp: maxLines,
     overflow: 'hidden',
-    maxHeight: collapsedMaxHeight,
     transition: 'max-height 320ms ease',
     willChange: 'max-height',
   } as const;
@@ -255,7 +252,7 @@ function getAnimatedClampStyle(expanded: boolean, maxLines: number) {
 
 function getDescriptionWrapperStyle(expanded: boolean) {
   return {
-    maxHeight: expanded ? '80rem' : '12.25rem',
+    maxHeight: expanded ? '80rem' : 'none',
     overflow: 'hidden',
     opacity: expanded ? 1 : 0.94,
     transform: expanded ? 'translateY(0)' : 'translateY(-2px)',
@@ -463,14 +460,19 @@ export default function ProductDetail({
     const checkTitleTruncation = () => {
       if (nameExpandedRef.current) return;
 
-      if (titleRef.current) {
-        const nextNameTruncated =
-          (product?.name.trim().length ?? 0) > PRODUCT_NAME_EXPAND_LENGTH ||
-          hasHiddenText(titleRef.current, PRODUCT_NAME_MAX_LINES);
-        setNameTruncated((previous) =>
-          previous === nextNameTruncated ? previous : nextNameTruncated
+      const trimmedLength = product?.name.trim().length ?? 0;
+      let nextNameTruncated = trimmedLength > PRODUCT_NAME_EXPAND_LENGTH;
+
+      if (!nextNameTruncated && titleRef.current) {
+        nextNameTruncated = hasHiddenText(
+          titleRef.current,
+          PRODUCT_NAME_MAX_LINES
         );
       }
+
+      setNameTruncated((previous) =>
+        previous === nextNameTruncated ? previous : nextNameTruncated
+      );
     };
 
     const frameId = window.requestAnimationFrame(checkTitleTruncation);
@@ -490,7 +492,7 @@ export default function ProductDetail({
       resizeObserver?.disconnect();
       window.removeEventListener('resize', checkTitleTruncation);
     };
-  }, [product?.name]);
+  }, [product?.name, loading]);
 
   const sortedReviews = useMemo(
     () => sortReviews(reviews, reviewSort),
@@ -540,18 +542,23 @@ export default function ProductDetail({
     const checkDescriptionTruncation = () => {
       if (descriptionExpandedRef.current) return;
 
-      if (descriptionRef.current) {
+      let nextDescriptionTruncated =
+        descriptionText.length > PRODUCT_DESCRIPTION_EXPAND_LENGTH;
+
+      if (!nextDescriptionTruncated && descriptionRef.current) {
         const measurementElement =
           fullDescriptionRef.current ?? descriptionRef.current;
-        const nextDescriptionTruncated =
-          descriptionText.length > PRODUCT_DESCRIPTION_EXPAND_LENGTH ||
-          hasHiddenText(measurementElement, PRODUCT_DESCRIPTION_MAX_LINES);
-        setDescriptionTruncated((previous) =>
-          previous === nextDescriptionTruncated
-            ? previous
-            : nextDescriptionTruncated
+        nextDescriptionTruncated = hasHiddenText(
+          measurementElement,
+          PRODUCT_DESCRIPTION_MAX_LINES
         );
       }
+
+      setDescriptionTruncated((previous) =>
+        previous === nextDescriptionTruncated
+          ? previous
+          : nextDescriptionTruncated
+      );
     };
 
     const frameId = window.requestAnimationFrame(checkDescriptionTruncation);
@@ -571,7 +578,7 @@ export default function ProductDetail({
       resizeObserver?.disconnect();
       window.removeEventListener('resize', checkDescriptionTruncation);
     };
-  }, [descriptionText]);
+  }, [descriptionText, loading]);
 
   const badgeData = getBadgeData(product);
   const hasMoreReviews = sortedReviews.length > visibleReviews.length;
