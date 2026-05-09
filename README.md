@@ -2,16 +2,17 @@
 
 Internal team docs and contribution workflow for the Sansistore project.
 
-## Docs
-
-Project documentation (start here): https://procesosagilesumss.github.io/sansistore/
-
 ## Environments (Vercel)
 
 | Branch       | Purpose                    | Deploy URL                         |
 | ------------ | -------------------------- | ---------------------------------- |
 | `main`       | Staging / QA (pre-release) | https://sansistore-test.vercel.app |
 | `production` | Production (live)          | https://sansistore-umss.vercel.app |
+
+## Requirements
+
+- [Bun](https://bun.sh)
+- Java 21 (for Firestore emulator)
 
 ## New dev quick start
 
@@ -20,46 +21,87 @@ bun install
 bun dev
 ```
 
-### Local emulators (Firestore + Auth)
+### Local emulators
 
-For local development you can run the Firebase emulators for Firestore and Auth. The project includes an `emu` script that starts both emulators using the configuration in `firebase.json`:
+Run Firestore and Auth emulators:
 
 ```bash
-# starts Firestore and Auth emulators
 bun run emu
 ```
 
-When `PUBLIC_APP_ENV` is not `production` the frontend will automatically connect to the emulators (Firestore on localhost:8080, Auth on localhost:9099). See `src/lib/firebase.ts` for details.
+The frontend uses emulators when `PUBLIC_APP_ENV` is not `production` (Firestore: localhost:8080, Auth: localhost:9099).
 
-Seeding local emulator
+### Seeding
 
-The project includes a seeder at `seed/index.mjs` and a `seed/seed-products.mjs` example. Run the seeder with:
+Add test data to the local emulator:
 
 ```bash
-# run all seeders
 bun run seed
-# run an individual seeder
-node ./seed/index.mjs seed-products
 ```
 
-The seeder defaults to the Firestore emulator (it sets `FIRESTORE_EMULATOR_HOST=localhost:8080` if not provided) so it will not write to production by accident.
-
-For the current catalog seed, you can also sync products directly to Firestore with `node --env-file=.env scripts/push-products-to-firestore.mjs`.
-
-Java requirement
-
-- The Firebase Local Emulator requires Java 21 or newer. Confirm by running `java -version` and install/update Java if needed before running `bun run emu`.
-
-Scripts:
-
-```bash
-bun dev
-bun build
-bun preview
-bun astro check
-```
 
 If you need environment variables (Firebase, etc.), ask the team for the current `.env` values or check the Vercel project settings.
+
+## Testing Environment
+
+The repo contains the e2e testing suite powered by Playwright and Bun. To ensure consistent test results, you can run tests either directly on your machine or via Docker.
+
+### Native Setup
+
+Follow these steps to run tests directly on your OS.
+
+**Prerequisites**
+
+- Bun: [Installation Guide](https://bun.sh)
+- Java 21: Required for the Firestore Emulator.
+- Playwright Browsers: [Install the required binaries](https://playwright.dev/docs/browsers).
+
+**Installation**
+
+Install dependencies:
+
+```bash
+bun install
+```
+
+Install Playwright browsers and dependencies:
+
+```bash
+bunx playwright install --with-deps
+```
+
+**Running Tests**
+
+- Run all tests: `bunx playwright test`
+- Run a specific file: `bunx playwright test path/to/test.spec.ts`
+- Run tests matching a name: `bunx playwright test -g "login"`
+- View report: `bunx playwright show-report`
+
+### Docker Usage
+
+Use Docker to ensure a clean, isolated environment that matches CI.
+
+**Basic Commands**
+
+Run all tests:
+
+```bash
+docker compose up testing
+```
+
+Run specific tests:
+
+```bash
+docker compose run --rm testing bunx playwright test path/to/test.spec.ts
+```
+
+**Viewing Results**
+
+Since the container shares volumes with your host, you can view the report generated inside Docker on your native machine:
+
+```bash
+bunx playwright show-report
+```
 
 ## Data model
 
@@ -272,20 +314,6 @@ classDiagram
   orders "1" --> "0..*" notifications : triggers
 ```
 
-### Technical notes
-
-The model is a good base for an ecommerce app with delivery. Keep these implementation details consistent:
-
-- In Firestore, you do not always need to store `productId`, `orderId`, etc. inside the document if the document ID already represents that value. Store it only when exports or search flows need it.
-- In the current catalog seed, `products` and `reviews` use UUIDs as Firestore document IDs. In practice, the `productId` and `reviewId` shown in this diagram can map to the document ID itself.
-- `inventoryMovements` should belong under `products` or live as a root collection indexed by `productId`. Nesting it under `inventory` can make global audit queries harder.
-- `products` should include a human-readable `description` for the catalog detail flow. Optional presentation fields such as `badge` and `sourceUrl` can be stored when the frontend needs merchandising labels or traceability of seeded data.
-- `reviews` can be seeded with `authorName` when there is no authenticated `userId` yet. Once buyer reviews are enabled, define whether both fields will coexist or whether `authorName` becomes derived display data.
-- Define closed values for `role`, `status`, `type`, and `method` from the start to avoid inconsistent states.
-- Delivery lifecycle timestamps must be stored in `deliveries`: `assignedAt`, `pickedUpAt`, and `deliveredAt`, to support tracking and performance metrics.
-- `evidenceUrl` is optional and stores delivery or incident evidence when required.
-- (TODO) `roles` is an array accepting: admin | vendedor | mensajero | operador | comprador. Example: ["admin", "comprador"] -> CHECK. Use array-contains for queries.
-
 ## Branching and releases
 
 Daily work:
@@ -305,9 +333,9 @@ Hotfixes:
 2. PR into `production`.
 3. Back-merge `production` → `main` (so QA stays in sync).
 
-## Daily report (on the team issue)
+## Daily report
 
-Each team has one open issue for the sprint. Every day, each member adds one comment using:
+Use `@ScrumReports/` to log daily progress. Each team has a report file in `ScrumReports/` (e.g., `scrum_report_core_devs.md`).
 
 ```markdown
 - **Yesterday:** <what you did> (include commit SHAs / PR/Issue # if relevant)
@@ -322,3 +350,7 @@ Each team has one open issue for the sprint. Every day, each member adds one com
 - Always start from an issue (User Story / Bug / Task).
 - Use the PR template and keep descriptions clear.
 - CI must pass before merging.
+
+## Docs
+
+Project documentation (start here): https://procesosagilesumss.github.io/sansistore/

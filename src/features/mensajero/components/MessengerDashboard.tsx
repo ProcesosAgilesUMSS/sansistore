@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
+import { onAuthStateChanged } from 'firebase/auth';
 import {
   CheckCircle2,
   Clock3,
@@ -9,73 +10,25 @@ import {
   Phone,
   Send,
 } from 'lucide-react';
+import { auth } from '../../../lib/firebase';
+import {
+  getMessengerOrders,
+  setMessengerOrderStatus,
+} from '../services/messengerOrdersService';
 import type { MessengerOrder } from '../types';
 
-const initialOrders: MessengerOrder[] = [
-  {
-    id: 'ORD-2026-001',
-    customerName: 'María Fernández',
-    phone: '70712345',
-    address: 'Av. América #1234, Edificio Los Pinos, Piso 3',
-    city: 'Cochabamba',
-    reference: 'Casa con portón negro, llamar al llegar',
-    cashToCollect: 260,
-    paymentMethod: 'cash',
-    deliveryStatus: 'pending',
-    items: [
-      {
-        id: 'polera-verde',
-        name: 'Polera casual verde',
-        quantity: 1,
-        price: 90,
-      },
-      {
-        id: 'jeans-slim',
-        name: 'Jeans slim fit',
-        quantity: 1,
-        price: 160,
-      },
-    ],
-  },
-  {
-    id: 'ORD-2026-002',
-    customerName: 'Carlos Rojas',
-    phone: '76459821',
-    address: 'Calle Bolívar #456, entre España y 25 de Mayo',
-    city: 'Cochabamba',
-    cashToCollect: 60,
-    paymentMethod: 'cash',
-    deliveryStatus: 'pending',
-    items: [
-      {
-        id: 'sudadera-deportiva',
-        name: 'Sudadera deportiva',
-        quantity: 1,
-        price: 60,
-      },
-    ],
-  },
-  {
-    id: 'ORD-2026-003',
-    customerName: 'Ana Vargas',
-    phone: '70333444',
-    address: 'Zona Cala Cala, Cochabamba',
-    city: 'Cochabamba',
-    cashToCollect: 180,
-    paymentMethod: 'cash',
-    deliveryStatus: 'delivered',
-    items: [
-      {
-        id: 'zapatillas-urbanas',
-        name: 'Zapatillas urbanas',
-        quantity: 1,
-        price: 180,
-      },
-    ],
-  },
-];
+const DEV_COURIER_ID = 'user-mensajero-001';
+
 
 const formatBolivianos = (amount: number) => `Bs ${amount}`;
+
+const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']) => {
+  if (status === 'assigned') return 'Asignado';
+  if (status === 'accepted') return 'Aceptado';
+  if (status === 'pending_reassignment') return 'Pendiente de reasignacion';
+  if (status === 'in_transit') return 'En camino';
+  return 'Entregado';
+};
 
 const buildMapsUrl = (order: MessengerOrder) => {
   const query = encodeURIComponent(`${order.address}, ${order.city}, Bolivia`);
@@ -95,15 +48,13 @@ function SummaryCard({
 }) {
   return (
     <article
-      className={`messenger-summary-card rounded-lg border p-6 ${
-        featured ? 'messenger-summary-card--featured' : ''
-      }`}
+      className={`messenger-summary-card rounded-lg border p-6 ${featured ? 'messenger-summary-card--featured' : ''
+        }`}
     >
       <div className="flex items-center gap-4">
         <span
-          className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
-            featured ? 'messenger-icon--featured' : 'messenger-icon'
-          }`}
+          className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${featured ? 'messenger-icon--featured' : 'messenger-icon'
+            }`}
         >
           {icon}
         </span>
@@ -117,9 +68,11 @@ function SummaryCard({
 function PendingOrderCard({
   order,
   onDelivered,
+  onInTransit,
 }: {
   order: MessengerOrder;
   onDelivered: (orderId: string) => void;
+  onInTransit: (orderId: string) => void;
 }) {
   return (
     <article className="messenger-order-card rounded-lg border p-6">
@@ -127,6 +80,9 @@ function PendingOrderCard({
         <div>
           <div className="mb-6 flex items-center gap-3">
             <h3 className="text-base font-black">#{order.id}</h3>
+            <span className="messenger-status-badge rounded-full px-3 py-1 text-xs font-bold">
+              {formatDeliveryStatus(order.deliveryStatus)}
+            </span>
             <span className="messenger-charge-badge rounded-full px-3 py-1 text-xs font-bold">
               COBRAR
             </span>
@@ -199,14 +155,27 @@ function PendingOrderCard({
           <Send size={17} />
           Abrir en Maps
         </a>
-        <button
-          className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-lg px-6 text-sm font-bold transition"
-          onClick={() => onDelivered(order.id)}
-          type="button"
-        >
-          <CheckCircle2 size={17} />
-          Marcar como Entregado
-        </button>
+
+        {order.deliveryStatus === 'accepted' && (
+          <button
+            className="messenger-transit-button inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 text-sm font-bold text-white transition hover:bg-blue-700"
+            onClick={() => onInTransit(order.id)}
+            type="button"
+          >
+            Iniciar entrega
+          </button>
+        )}
+
+        {order.deliveryStatus === 'in_transit' && (
+          <button
+            className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-lg px-6 text-sm font-bold transition"
+            onClick={() => onDelivered(order.id)}
+            type="button"
+          >
+            <CheckCircle2 size={17} />
+            Marcar como Entregado
+          </button>
+        )}
       </div>
     </article>
   );
@@ -236,11 +205,65 @@ function DeliveredOrderRow({ order }: { order: MessengerOrder }) {
   );
 }
 
-export default function MessengerDashboard() {
-  const [orders, setOrders] = useState(initialOrders);
+interface MessengerDashboardProps {
+  embedded?: boolean;
+  clientSection?: 'assigned' | 'delivered';
+}
+
+export default function MessengerDashboard({
+  embedded = false,
+  clientSection = 'assigned',
+}: MessengerDashboardProps) {
+  const [orders, setOrders] = useState<MessengerOrder[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    const loadOrders = async (courierId: string) => {
+      setLoading(true);
+      setMessage('');
+
+      try {
+        let data = await getMessengerOrders(courierId);
+
+        if (
+          data.length === 0 &&
+          import.meta.env.PUBLIC_APP_ENV !== 'production' &&
+          courierId !== DEV_COURIER_ID
+        ) {
+          data = await getMessengerOrders(DEV_COURIER_ID);
+        }
+
+        setOrders(data);
+      } catch (error) {
+        console.error(error);
+        setOrders([]);
+        setMessage('No se pudieron cargar las entregas del emulador.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      const devCourierId =
+        import.meta.env.PUBLIC_APP_ENV !== 'production' ? DEV_COURIER_ID : null;
+      const courierId = user?.uid || devCourierId;
+
+      if (!courierId) {
+        setOrders([]);
+        setLoading(false);
+        setMessage('Inicia sesion para ver tus entregas asignadas.');
+        return;
+      }
+
+      void loadOrders(courierId);
+    });
+
+    return unsubscribe;
+  }, []);
 
   const pendingOrders = useMemo(
-    () => orders.filter((order) => order.deliveryStatus === 'pending'),
+    () => orders.filter((order) => order.deliveryStatus === 'accepted' || order.deliveryStatus === 'in_transit'),
     [orders]
   );
   const deliveredOrders = useMemo(
@@ -253,25 +276,52 @@ export default function MessengerDashboard() {
     [pendingOrders]
   );
 
-  const markAsDelivered = (orderId: string) => {
+  const updateOrderStatus = async (
+    orderId: string,
+    status: MessengerOrder['deliveryStatus'],
+  ) => {
+    const targetOrder = orders.find((order) => order.id === orderId);
+    if (!targetOrder) return;
+
     setOrders((currentOrders) =>
       currentOrders.map((order) =>
         order.id === orderId
           ? {
-              ...order,
-              deliveryStatus: 'delivered',
-            }
+            ...order,
+            deliveryStatus: status,
+          }
           : order
       )
     );
+
+    try {
+      await setMessengerOrderStatus(targetOrder, status);
+      setMessage('Estado actualizado correctamente.');
+    } catch (error) {
+      console.error(error);
+      setMessage('No se pudo actualizar el estado en Firestore.');
+      setOrders((currentOrders) =>
+        currentOrders.map((order) =>
+          order.id === orderId ? targetOrder : order
+        )
+      );
+    }
+  };
+
+  const markAsDelivered = (orderId: string) => {
+    void updateOrderStatus(orderId, 'delivered');
+  };
+
+  const markAsInTransit = (orderId: string) => {
+    void updateOrderStatus(orderId, 'in_transit');
   };
 
   return (
-    <main className="messenger-dashboard min-h-screen">
+    <main className={`messenger-dashboard ${embedded ? 'messenger-dashboard--embedded' : 'min-h-screen'}`}>
       <style>{`
         .messenger-dashboard {
-          background: #faf8f2;
-          color: #020817;
+          background: var(--theme-bg);
+          color: var(--theme-text);
           font-family:
             Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
             "Segoe UI", sans-serif;
@@ -288,10 +338,20 @@ export default function MessengerDashboard() {
           text-decoration: none;
         }
 
+        .messenger-dashboard--embedded {
+          min-height: auto;
+          background: transparent;
+        }
+
         .messenger-header-inner,
         .messenger-container {
           width: min(100% - 32px, 1216px);
           margin-inline: auto;
+        }
+
+        .messenger-dashboard--embedded .messenger-container {
+          width: 100%;
+          padding-block: 0;
         }
 
         .messenger-header-inner {
@@ -306,86 +366,127 @@ export default function MessengerDashboard() {
         .messenger-order-card,
         .messenger-summary-card,
         .messenger-delivered-row {
-          background: #ffffff;
-          border-color: #dff2e4;
-          color: #020817;
+          background: var(--theme-card-bg);
+          border-color: var(--theme-border);
+          color: var(--theme-text);
         }
 
         .messenger-header {
-          border-bottom-color: #d7dde7;
+          border-bottom-color: var(--theme-border);
         }
 
         .messenger-logo-accent {
-          color: #34a853;
+          color: #88b04b;
         }
 
         .messenger-buyer-link {
-          background: #ffffff;
-          border-color: #cfd6df;
-          color: #1f2a44;
+          background: var(--theme-card-bg);
+          border-color: var(--theme-border);
+          color: var(--theme-text);
         }
 
         .messenger-courier-link {
-          background: #45ad4d;
-          color: #ffffff;
+          background: #88b04b;
+          color: #0a0b0d;
         }
 
         .messenger-muted,
         .messenger-copy {
-          color: #334155;
+          color: color-mix(in srgb, var(--theme-text) 72%, transparent);
         }
 
         .messenger-icon,
         .messenger-icon--featured {
-          background: #e9f8ec;
-          color: #41ad4b;
+          background: color-mix(in srgb, #88b04b 16%, var(--theme-card-bg));
+          color: #6f9438;
         }
 
         .messenger-icon--featured {
-          background: #ffffff;
+          background: var(--theme-card-bg);
         }
 
         .messenger-summary-card--featured,
         .messenger-cash-box {
-          background: #eaf7ed;
-          border-color: #41ad4b;
-          color: #34a853;
+          background: color-mix(in srgb, #88b04b 14%, var(--theme-card-bg));
+          border-color: color-mix(in srgb, #88b04b 58%, var(--theme-border));
+          color: #5f8330;
         }
 
         .messenger-charge-badge {
-          background: #fff1bf;
+          background: color-mix(in srgb, #facc15 22%, var(--theme-card-bg));
           color: #8a6100;
         }
 
+        .messenger-status-badge {
+          background: color-mix(in srgb, #3b82f6 14%, var(--theme-card-bg));
+          color: #1d4ed8;
+        }
+
         .messenger-reference {
-          background: #fff3cd;
+          background: color-mix(in srgb, #facc15 18%, var(--theme-card-bg));
           border-left-color: #ffb703;
           color: #8a6100;
         }
 
         .messenger-map-button {
-          background: #ffffff;
-          border-color: #cfd6df;
-          color: #1f2a44;
+          background: var(--theme-card-bg);
+          border-color: var(--theme-border);
+          color: var(--theme-text);
         }
 
         .messenger-map-button:hover {
-          border-color: #41ad4b;
-          color: #2b9335;
+          border-color: #88b04b;
+          color: #6f9438;
         }
 
-        .messenger-deliver-button {
-          background: #45ad4d;
+        .messenger-transit-button {
+          background: #2563eb;
           color: #ffffff;
         }
 
+        .messenger-transit-button:hover {
+          background: #1d4ed8;
+        }
+
+        .messenger-deliver-button {
+          background: #88b04b;
+          color: #0a0b0d;
+        }
+
         .messenger-deliver-button:hover {
-          background: #2f9439;
+          background: #9fc462;
         }
 
         .messenger-delivered-badge {
-          background: #e9f8ec;
-          color: #2f9d3a;
+          background: color-mix(in srgb, #88b04b 16%, var(--theme-card-bg));
+          color: #5f8330;
+        }
+
+        html[data-theme='dark'] .messenger-icon,
+        html[data-theme='dark'] .messenger-icon--featured {
+          color: #b7dc78;
+        }
+
+        html[data-theme='dark'] .messenger-summary-card--featured,
+        html[data-theme='dark'] .messenger-cash-box {
+          color: #c4e48a;
+        }
+
+        html[data-theme='dark'] .messenger-charge-badge,
+        html[data-theme='dark'] .messenger-reference {
+          color: #fde68a;
+        }
+
+        html[data-theme='dark'] .messenger-status-badge {
+          color: #93c5fd;
+        }
+
+        html[data-theme='dark'] .messenger-map-button:hover {
+          color: #b7dc78;
+        }
+
+        html[data-theme='dark'] .messenger-delivered-badge {
+          color: #b7dc78;
         }
 
         @media (min-width: 768px) {
@@ -401,92 +502,133 @@ export default function MessengerDashboard() {
         }
       `}</style>
 
-      <header className="messenger-header border-b">
-        <div className="messenger-header-inner flex items-center justify-between">
-          <a className="text-xl font-black tracking-normal" href="/">
-            sansi <span className="messenger-logo-accent">store</span>
-          </a>
+      {!embedded && (
+        <header className="messenger-header border-b">
+          <div className="messenger-header-inner flex items-center justify-between">
+            <a className="text-xl font-black tracking-normal" href="/">
+              sansi <span className="messenger-logo-accent">store</span>
+            </a>
 
-          <div className="flex gap-2">
-            <a
-              className="messenger-buyer-link inline-flex h-10 items-center justify-center rounded-full border px-6 text-sm font-bold"
-              href="/"
-            >
-              Comprador
-            </a>
-            <a
-              className="messenger-courier-link inline-flex h-10 items-center justify-center rounded-full px-6 text-sm font-bold"
-              href="/mensajero"
-            >
-              Mensajero
-            </a>
+            <div className="flex gap-2">
+              <a
+                className="messenger-buyer-link inline-flex h-10 items-center justify-center rounded-full border px-6 text-sm font-bold"
+                href="/"
+              >
+                Comprador
+              </a>
+              <a
+                className="messenger-courier-link inline-flex h-10 items-center justify-center rounded-full px-6 text-sm font-bold"
+                href="/courier"
+              >
+                Mensajero
+              </a>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       <div className="messenger-container">
         <section>
           <h1 className="text-4xl font-black tracking-normal">
-            Panel del Mensajero
+            {clientSection === 'assigned' ? 'Pedidos aceptados' : 'Entregados'}
           </h1>
           <p className="messenger-copy mt-2 text-base">
-            Gestiona tus entregas y cobros
+            {clientSection === 'assigned'
+              ? 'Organiza tus entregas, revisa direcciones y cambia el estado de cada pedido.'
+              : 'Revisa las entregas completadas y el monto cobrado durante la jornada.'}
           </p>
         </section>
 
-        <section className="messenger-summary-grid mt-9 grid gap-6">
-          <SummaryCard
-            icon={<Clock3 size={20} />}
-            label="Pendientes"
-            value={pendingOrders.length}
-          />
-          <SummaryCard
-            icon={<CheckCircle2 size={20} />}
-            label="Entregados Hoy"
-            value={deliveredOrders.length}
-          />
-          <SummaryCard
-            featured
-            icon={<DollarSign size={20} />}
-            label="Total a Cobrar"
-            value={formatBolivianos(cashToCollect)}
-          />
-        </section>
+        {message && (
+          <div className="messenger-order-card mt-6 rounded-lg border p-4 text-sm font-semibold">
+            {message}
+          </div>
+        )}
 
-        <section className="mt-11">
-          <h2 className="mb-6 text-2xl font-black tracking-normal">
-            Pedidos Pendientes
-          </h2>
+        {loading && (
+          <div className="messenger-order-card mt-6 rounded-lg border p-8 text-sm font-semibold">
+            Cargando entregas...
+          </div>
+        )}
 
-          <div className="space-y-6">
-            {pendingOrders.length > 0 ? (
-              pendingOrders.map((order) => (
-                <PendingOrderCard
-                  key={order.id}
-                  onDelivered={markAsDelivered}
-                  order={order}
-                />
-              ))
-            ) : (
-              <div className="messenger-order-card rounded-lg border p-8 text-sm font-semibold">
-                No hay pedidos pendientes.
+        {!loading && clientSection === 'assigned' ? (
+          <>
+            <section className="messenger-summary-grid mt-9 grid gap-6">
+              <SummaryCard
+                icon={<Clock3 size={20} />}
+                label="Pendientes"
+                value={pendingOrders.length}
+              />
+              <SummaryCard
+                featured
+                icon={<DollarSign size={20} />}
+                label="Total a Cobrar"
+                value={formatBolivianos(cashToCollect)}
+              />
+            </section>
+
+            <section className="mt-11">
+              <h2 className="mb-6 text-2xl font-black tracking-normal">
+                Pedidos pendientes
+              </h2>
+
+              <div className="space-y-6">
+                {pendingOrders.length > 0 ? (
+                  pendingOrders.map((order) => (
+                    <PendingOrderCard
+                      key={order.id}
+                      order={order}
+                      onDelivered={markAsDelivered}
+                      onInTransit={markAsInTransit}
+                    />
+                  ))
+                ) : (
+                  <div className="messenger-order-card rounded-lg border p-8 text-sm font-semibold">
+                    No hay pedidos pendientes.
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </section>
+            </section>
+          </>
+        ) : !loading ? (
+          <>
+            <section className="messenger-summary-grid mt-9 grid gap-6">
+              <SummaryCard
+                icon={<CheckCircle2 size={20} />}
+                label="Cantidad completados"
+                value={deliveredOrders.length}
+              />
+              <SummaryCard
+                featured
+                icon={<DollarSign size={20} />}
+                label="Total cobrado"
+                value={formatBolivianos(
+                  deliveredOrders.reduce((total, order) => total + order.cashToCollect, 0),
+                )}
+              />
+            </section>
 
-        <section className="mt-11">
-          <h2 className="mb-6 text-2xl font-black tracking-normal">
-            Entregados Hoy
-          </h2>
+            <section className="mt-11">
+              <h2 className="mb-6 text-2xl font-black tracking-normal">
+                Historial
+              </h2>
 
-          <div className="space-y-4">
-            {deliveredOrders.map((order) => (
-              <DeliveredOrderRow key={order.id} order={order} />
-            ))}
-          </div>
-        </section>
+              <div className="space-y-4">
+                {deliveredOrders.length > 0 ? (
+                  deliveredOrders.map((order) => (
+                    <DeliveredOrderRow key={order.id} order={order} />
+                  ))
+                ) : (
+                  <div className="messenger-order-card rounded-lg border p-8 text-sm font-semibold">
+                    No hay entregas completadas hoy.
+                  </div>
+                )}
+              </div>
+            </section>
+          </>
+        ) : null}
       </div>
     </main>
   );
 }
+

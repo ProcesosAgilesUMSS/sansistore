@@ -1,3 +1,33 @@
+# 05/07/2026
+
+# Daily Report - Team 4
+
+## Anahi Sanabria Ugarte
+- *Yesterday:* Verificación de conexión con backend tanto en local como deploy
+- *Today:* Correccion de bugs de login 
+- *Blockers:* en deploy del pr no funcionaba el backend por lo que login se cerraba (SOLUCIONADO HABLANDO CON MARCOS SOBRE FIREBASE STUDIO)
+
+## José Ignacio Jaldin Janko
+- **Yesterday:** Conexion backend para registrar ubicaciones.
+- **Today:** Correción de bugs. 
+- **Blockers:** Ninguno.
+
+
+## Leonel Zeballos Aldunate
+- *Yesterday:* Verificación de conexión con backend tanto en local como deploy
+- *Today:* Correccion de bugs de login 
+- *Blockers:* En deploy del pr no funcionaba el backend por lo que login se cerraba (SOLUCIONADO HABLANDO CON MARCOS SOBRE FIREBASE STUDIO)
+
+
+## Sergio Andres Maldonado Sejas 
+ - *Yesterday*: Refactoricé el módulo de ubicaciones, migrando estilos inline a TailwindCSS y separando la lógica del componente MapPicker en hooks personalizados para mejorar la mantenibilidad y estructura del código.
+ - *Today*: Revisaré los criterios de aceptación y el alcance técnico de las siguientes historias de usuario asignadas.
+ - *Blockers*: None.
+
+## Valery Dariana Ortuño Panozo
+ - **Yesterday**: Refactoricé el módulo de ubicaciones, migrando estilos inline a TailwindCSS y separando la lógica del componente MapPicker en hooks personalizados para mejorar la mantenibilidad y estructura del código.
+ - **Today**: Revisaré los criterios de aceptación y el alcance técnico de las siguientes historias de usuario asignadas.
+ - **Blockers**: None.
 
 # 05/05/2026
 

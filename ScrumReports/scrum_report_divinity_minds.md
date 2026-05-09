@@ -101,3 +101,38 @@
 - **Yesterday:** Implementé las HUs de ver productos disponibles y ver detalles de producto, incluyendo el seed del catálogo, la conexión al emulador de Firebase por entorno, el catálogo completo en FeaturedProducts, la navegación por slug, la vista ProductDetail, skeletons, badges de oferta válidos, reseñas mejoradas y una página 404 personalizada.
 - **Today:** Realizar integración final y correcciones visuales y funcionales en catálogo y detalle de producto, validando ofertas, navegación, estados de error y reseñas antes del merge.
 - **Blockers:** n/a.
+
+
+# 07/05/2026
+
+# Daily Report - Team 1
+
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Trabajé en la corrección de algunas HUs para los siguientes sprints, que por ahora no están asignadas a ningún sprint.
+- **Today:** Se realizará la definición correcta de todos los criterios de aceptación y tareas relacionadas, según las HUs, siguiendo tareas, estados y mensajes.
+- **Blockers:** n/a
+
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Trabajé en las pruebas automatizadas de detalles de producto y en la automatización del workflow de GitHub para la ejecución y generación de reportes de pruebas.
+- **Today:** Planificaré y organizaré las pruebas correspondientes al Sprint 2, definiendo los escenarios y casos prioritarios a cubrir.
+- **Blockers:** n/a
+
+## Merudia Calderon Dayeza
+
+ - **Yesterday:** Realicé pruebas para la lista de productos, incluyendo categorías, ofertas y el buscador.
+ - **Today:** Me preparo para el siguiente sprint: revisión de pruebas, priorización de historias de usuario y planificación de tareas.
+ - **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Detecté y reporté bugs y errores funcionales en distintas HUs del Sprint 1.Además, creé y actualicé la documentación correspondiente de historias de usuario para mantener trazabilidad y claridad en los requerimientos.
+- **Today:** Continuar con la validación de funcionalidades y apoyo en la corrección de errores detectados durante la integración final del Sprint 1.
+- **Blockers:** n/a.
+
+## Marcos Velasquez Vela
+
+- **Yesterday:** Corregí los controles de expansión del detalle de producto (título y descripción), estabilicé la detección de overflow, ajusté la visibilidad del botón expandir y el alto de clamp; además actualicé dependencias menores.
+- **Today:** Validar los cambios en `ProductDetail` y apoyar la integración/QA antes del merge.
+- **Blockers:** n/a.

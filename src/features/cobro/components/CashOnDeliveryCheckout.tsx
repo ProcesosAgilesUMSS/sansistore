@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ShieldCheck, Truck } from 'lucide-react';
 import { ProductSelectionList } from './ProductSelectionList';
 import { CheckoutSummaryPanel } from './CheckoutSummaryPanel';
+import { OrderTrackingPanel } from './OrderTrackingPanel';
 import { getCheckoutProducts } from '../services/productCatalogService';
 import { createCashOnDeliveryOrder } from '../services/cashOnDeliveryService';
 import type {
@@ -16,13 +17,11 @@ const DELIVERY_FEE = 0;
 
 export default function CashOnDeliveryCheckout() {
   const [products, setProducts] = useState<CobroProduct[]>([]);
-  const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [paymentMethod, setPaymentMethod] =
     useState<CashPaymentMethod>('cash_on_delivery');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
   const [confirmedOrder, setConfirmedOrder] =
     useState<ConfirmedCashOrder | null>(null);
 
@@ -44,7 +43,7 @@ export default function CashOnDeliveryCheckout() {
     () =>
       products
         .map((product) => {
-          const quantity = quantities[product.id] ?? 0;
+          const quantity = product.quantity ?? 1;
           const unitPrice = getProductPrice(product);
 
           return {
@@ -56,7 +55,7 @@ export default function CashOnDeliveryCheckout() {
           };
         })
         .filter((item) => item.quantity > 0),
-    [products, quantities]
+    [products]
   );
 
   const productsTotal = useMemo(
@@ -74,17 +73,7 @@ export default function CashOnDeliveryCheckout() {
 
   const resetMessages = () => {
     setErrorMessage('');
-    setSuccessMessage('');
     setConfirmedOrder(null);
-  };
-
-  const updateQuantity = (productId: string, nextQuantity: number) => {
-    resetMessages();
-
-    setQuantities((current) => ({
-      ...current,
-      [productId]: Math.max(0, nextQuantity),
-    }));
   };
 
   const handlePaymentMethodChange = (method: CashPaymentMethod) => {
@@ -102,7 +91,6 @@ export default function CashOnDeliveryCheckout() {
 
     setSaving(true);
     setErrorMessage('');
-    setSuccessMessage('');
 
     try {
       const result = await createCashOnDeliveryOrder({
@@ -117,9 +105,6 @@ export default function CashOnDeliveryCheckout() {
         paymentId: result.paymentId,
         total: orderTotal,
       });
-      setSuccessMessage(
-        'Pedido registrado correctamente. El pago será realizado al momento de la entrega.'
-      );
       window.location.hash = 'seguimiento-pedido';
     } catch {
       setErrorMessage('No se pudo registrar el pedido. Intente nuevamente.');
@@ -161,9 +146,7 @@ export default function CashOnDeliveryCheckout() {
           <ProductSelectionList
             loading={loading}
             products={products}
-            quantities={quantities}
             selectedItems={orderItems}
-            onQuantityChange={updateQuantity}
           />
 
           <CheckoutSummaryPanel
@@ -174,12 +157,12 @@ export default function CashOnDeliveryCheckout() {
             paymentMethod={paymentMethod}
             saving={saving}
             errorMessage={errorMessage}
-            successMessage={successMessage}
-            confirmedOrder={confirmedOrder}
             onPaymentMethodChange={handlePaymentMethodChange}
             onConfirmOrder={handleConfirmOrder}
           />
         </div>
+
+        <OrderTrackingPanel confirmedOrder={confirmedOrder} />
       </div>
     </section>
   );

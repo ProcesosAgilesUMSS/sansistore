@@ -6,6 +6,7 @@ export interface CobroProduct {
   active?: boolean;
   hasOffer?: boolean;
   offerPrice?: number;
+  quantity?: number;
 }
 
 export interface CashOnDeliveryOrderItem {
@@ -21,11 +22,16 @@ export interface CashOnDeliveryOrderInput {
   productsTotal: number;
   additionalCharges: number;
   total: number;
+  customerName?: string;
+  customerPhone?: string;
+  address?: string;
+  courierId?: string;
 }
 
 export interface CashOnDeliveryOrderResult {
   orderId: string;
   paymentId: string;
+  deliveryId: string;
 }
 
 export interface ConfirmedCashOrder {
