@@ -1,0 +1,10 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar';
+import CourierDashboard from '../features/mensajero/components/CourierDashboard.tsx';
+---
+
+<Layout title="Panel del Mensajero | Sansistore">
+  <Navbar client:load />
+  <CourierDashboard client:load />
+</Layout>

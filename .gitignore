@@ -1,5 +1,6 @@
 # build output
 dist/
+.vercel/
 
 # generated types
 .astro/
@@ -26,3 +27,12 @@ pnpm-debug.log*
 /SKILL.md
 /.agents
 /skills-lock.json
+
+*.log
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/

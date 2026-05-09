@@ -3,7 +3,7 @@ name: Deploy mdBook docs to Pages
 on:
   push:
     branches: [main, production]
-    paths: ["docs/**"]
+    paths: ['docs/**']
   workflow_dispatch:
 
 permissions:
@@ -12,7 +12,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "docs-pages"
+  group: 'docs-pages'
   cancel-in-progress: false
 
 jobs:

@@ -1,0 +1,24 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SentOrdersList from '../../features/orders/components/SentOrdersList';
+import Navbar from '../../components/Navbar';
+import Footer from '../../components/Footer';
+---
+
+<Layout title="Pedidos Enviados">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+
+  <Navbar client:load />
+  <div class="pt-18">
+    <SentOrdersList client:load />
+  </div>
+  <Footer client:load />
+</Layout>

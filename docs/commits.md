@@ -8,15 +8,15 @@
 
 ## Types
 
-| Type | When to use |
-|------|-------------|
-| `feat` | New functionality |
-| `fix` | Bug fix |
-| `refactor` | Code change with no new behavior |
-| `chore` | Technical tasks, configs, dependencies |
-| `docs` | Documentation |
-| `style` | Formatting, spacing (no logic change) |
-| `test` | Add or update tests |
+| Type       | When to use                            |
+| ---------- | -------------------------------------- |
+| `feat`     | New functionality                      |
+| `fix`      | Bug fix                                |
+| `refactor` | Code change with no new behavior       |
+| `chore`    | Technical tasks, configs, dependencies |
+| `docs`     | Documentation                          |
+| `style`    | Formatting, spacing (no logic change)  |
+| `test`     | Add or update tests                    |
 
 ## Examples
 

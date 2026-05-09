@@ -13,9 +13,9 @@ Merge only happens with **approval + CI green**.
 
 We deploy from branches:
 
-| Branch | Deploy URL |
-|---|---|
-| `main` | https://sansistore-test.vercel.app |
+| Branch       | Deploy URL                         |
+| ------------ | ---------------------------------- |
+| `main`       | https://sansistore-test.vercel.app |
 | `production` | https://sansistore-umss.vercel.app |
 
 Release flow:

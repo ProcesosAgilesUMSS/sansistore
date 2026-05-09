@@ -1,0 +1,9 @@
+services:
+  testing:
+    build:
+      context: .
+      dockerfile: Dockerfile.testing
+    volumes:
+      - ./playwright-report:/app/playwright-report
+      - ./test-results:/app/test-results
+    command: ["bunx", "playwright", "test"]

@@ -1,0 +1,12 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar';
+import DeliveryActionsPanel from '../features/mensajero/components/DeliveryActionsPanel';
+---
+
+<Layout title="Courier | SansiStore">
+  <Navbar client:load />
+  <main class="min-h-screen bg-bg-light pt-14 text-text-light">
+    <DeliveryActionsPanel client:load />
+  </main>
+</Layout>

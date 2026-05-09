@@ -2,26 +2,26 @@
 
 ## Main branches
 
-| Branch | Purpose | Access |
-|---|---|---|
-| `main` | Staging / QA (pre-release) | Whole team (via PR) |
-| `production` | Production (live) | Limited (via PR) |
+| Branch       | Purpose                    | Access              |
+| ------------ | -------------------------- | ------------------- |
+| `main`       | Staging / QA (pre-release) | Whole team (via PR) |
+| `production` | Production (live)          | Limited (via PR)    |
 
 Deploy mapping (Vercel):
 
-| Branch | Deploy URL |
-|---|---|
-| `main` | https://sansistore-test.vercel.app |
+| Branch       | Deploy URL                         |
+| ------------ | ---------------------------------- |
+| `main`       | https://sansistore-test.vercel.app |
 | `production` | https://sansistore-umss.vercel.app |
 
 ## Working branches
 
-| Prefix | When to use | Example |
-|---|---|---|
-| `feature/` | New functionality | `feature/login-page` |
-| `fix/` | Bug fix | `fix/email-validation` |
-| `hotfix/` | Urgent fix for production | `hotfix/payment-crash` |
-| `chore/` | Technical tasks | `chore/update-deps` |
+| Prefix     | When to use               | Example                |
+| ---------- | ------------------------- | ---------------------- |
+| `feature/` | New functionality         | `feature/login-page`   |
+| `fix/`     | Bug fix                   | `fix/email-validation` |
+| `hotfix/`  | Urgent fix for production | `hotfix/payment-crash` |
+| `chore/`   | Technical tasks           | `chore/update-deps`    |
 
 ## Flow
 

@@ -1,0 +1,119 @@
+# 28704/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+
+- **Yesterday:** organice la planificacion de las colecciones necesarias para este primer sprint, y coordine con el inge sobre el avance creando una reunion de grupo y docente.
+- **Today:** Ayudar en la planificación del Sprint 1.
+- **Blockers:** None.
+
+## Jherlan Marcelo Calero Sardan
+- **Yesterday:** Ayude con la creacion de colecciones para el primer sprint presentando propuestas, y paticipe en la reunion de grupo para decidir sobre las HU del primer sprint y participe de la reunion grupo-docente.
+- **Today:** Ayudar con la finalizacion de la planificación del Sprint 1.
+- **Blockers:** None.
+
+## Fabricio Javier Córdova Caceres
+
+- **Yesterday:**  Participe en la planificación de la base de datos y  Revisión y análisis de las HU y participe en la reunion grupo-docente
+- **Today:** Ayudar en la planificación del Sprint 1.
+- **Blockers:** None.
+
+##  Camila Wara Fernandez Sandoval
+- **Yesterday:** Revise y analice la base de datos para el proyecto, tambien estuve presente en la reunion de grupo 
+- **Today:** Ayude con la planificación del primer sprint 
+- **Blockers:** None
+
+## Dylan Coca Beltran
+- **Yesterday:** Revisé la propuesta de base de datos del proyecto, analizando si cubre lo necesario para las historias de usuario del Sprint 1 del Team 5 y proponiendo los ajustes correspondientes.
+- **Today:** Finalizar la planificación del Sprint 1 con el resto del equipo, revisando que no falte nada necesario en la propuesta de base de datos para nuestro equipo.
+- **Blockers:** None.
+
+# 30/04/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+
+- **Yesterday:** organice la planificacion de las historias de usuario necesarias para este primer sprint, y coordine con con mi grupo de lo que se hara en este priemr sprint.
+- **Today:** Ayudar en la planificación de los mockups para este primer sprint.
+- **Blockers:** None.
+
+## Jherlan Marcelo Calero Sardan
+- **Yesterday:**  hice la instalacion y preparacion del entorno de desarollo.
+- **Today:** Se tuvo una reunion con el grupo para hacer los diseños(mockups) de las HU.
+- **Blockers:** None.
+
+## Fabricio Javier Córdova Caceres
+
+- **Yesterday:** Participación en la Reunión del equipo y configuración e instalación de entornos de desarrollo
+- **Today:** Participación en la Reunión del equipo y Diseño de los muck ups deacuerdo a los criterios de aceptacion
+- **Blockers:** None.
+
+## Dylan Coca Beltran
+* **Yesterday:** Revisé las HU y el modelo de la BD, junto con la configuración del entorno de desarrollo.
+* **Today:** Revisé algunos sitios web para ver cómo manejan funciones similares a las HU y obtener ideas para el mockup.
+* **Blockers:** None.
+
+##  Camila Wara Fernandez Sandoval
+- **Yesterday:**  Prepare e instale mi entorno de desarrollo 
+- **Today:**  participación en el diseño de mock ups 
+- **Blockers:** None
+
+# 05/05/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+- **Yesterday:** organice y revise de como van las hus de mis grupo.
+- **Today:** hice la integracion de las hus que nos toco para este primer sprint parte fronted.
+- **Blockers:** None.
+
+## Dylan Coca Beltran
+- **Yesterday:** Revise mis mockups y requisitos para mi hu 
+- **Today:** Realice un avance en el frontend del panel de administracion y mi hu 
+- **Blockers:** None
+
+## Jherlan Marcelo Calero Sardan
+- **Yesterday:** Revise el mockup y criterios de aceptacion de mi hu correspondiente.
+- **Today:** comencé primero con el desarollo del frontend de mi hu .
+- **Blockers:** None.
+
+## Camila Wara Fernandez Sandoval
+- **Yesterday:** Hice las ultimas revisiones y correcciones de los mockups de mi historia de usuario
+- **Today:** Trabaje en el desarrollo del frontend de mi historia de usuario    
+- **Blockers:** None
+
+## Fabricio Javier Cordova Caceres 
+- **Yesterday:** Hice las ultimas revisiones y correcciones de los mockups de mi historia de usuario y los criterios de aceptación 
+- **Today:** Trabaje en el desarrollo del frontend de mi historia de usuario  y se empezó con el desarrollo del backend 
+- **Blockers:** None
+
+# 07/05/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+- **Yesterday:** arregle algunas partes del diseño de mi hu que me corresponde
+- **Today:** cordine e hice pruebas de la integracion de las hus de este primer sprint
+- **Blockers:** Habria que tener una cuenta de administrador con su token ya listo para ver el panel de administracion
+
+## Dylan Coca Beltran
+* **Yesterday:** Estaba completando la parte del frontend de mi historia de usuario e integrando apartados
+* **Today:** Termine mi frontend con sus validaciones y tambien la parte del backend
+* **Blockers:** Hay necesidad de tener un usuario administrador con su token para poder ver el apartado del panel de administracion
+
+## Jherlan Marcelo Calero Sardan
+- **Yesterday:** Hice la conexion del backend con fronted de mi hu correspondiente.
+- **Today:** Reorganize mis carpetas y archivos de mi hu para tenerlos en un sola ruta.
+- **Blockers:** Hay necesidad de tener un usuario administrador con su token para poder ver el apartado del panel de administracion.
+
+## Camila Wara Fernandez Sandoval 
+- **Yesterday:** Trabaje en el desarrollo del frontend de mi historia 
+- **Today:**  Finalice y arregle algunas correcciones que tenia en la parte del front de mi historia, participe en la reunión con mi equipo 
+- **Blockers:** Hay necesidad de tener un usuario administrador con su token para poder ver el apartado del panel de administración
+
+## Fabricio Javier Cordova Caceres 
+- **Yesterday:** Trabaje en el desarrollo del backend de mi historia de usuario 
+- **Today:** Finalización del desarrollo del backend y revision del flujo del proyecto y participe en la reunioncon mis compañeros
+- **Blockers:** Hay necesidad de tener un usuario administrador con su token para poder ver el apartado del panel de administracion
