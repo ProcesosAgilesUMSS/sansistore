@@ -67,7 +67,7 @@ export const createCategory = async (
   const ref = await addDoc(collection(db, COLLECTION), {
     name: input.name.trim(),
     description: input.description?.trim() ?? '',
-    active: true,
+    active: input.active ?? true,
     createdBy: user.uid,
     createdAt: serverTimestamp(),
   });

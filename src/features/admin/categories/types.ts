@@ -10,6 +10,7 @@ export interface Category {
 export interface CreateCategoryInput {
   name: string;
   description?: string;
+  active?: boolean;
 }
 
 export interface UpdateCategoryInput {
