@@ -144,3 +144,8 @@
 - **Yesterday:** Trabajé en la integración a nuestro panel de mensajero de las historias de usuario del equipo de Webspire. Mantuve comunicación para que las funcionalidades del otro equipo no se vean alteradas ni eliminadas durante la integración.
 - **Today:** Escogeré una nueva historia de usuario para empezar con el siguiente sprint, participaré en el Sprint de Retrospectiva tal y como indica el protocolo Scrum LeSS.
 - **Blockers:** Trabajo duplicado y falta de coordinación **(solucionado)**.
+
+### Bruno Salcedo Cadiz
+- **Yesterday:** Realize el sprint retrospective y empeze a trabajar en la preparacion y desarrollo para el segundo sprint
+- **Today:** Escogere una o mas historias de usuario para trabajar en el segundo sprint
+- **Blockers:** None.
