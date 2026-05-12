@@ -131,3 +131,9 @@
 * **Yesterday:** Apoyé en la integración del módulo de courier junto con el grupo de Programming API's, revisando que el flujo relacionado con la HU*“Como mensajero, quiero ver el monto exacto a cobrar para evitar errores”* y *“Como mensajero, quiero marcar un pedido como entregado para registrar que la entrega fue completada”*, pueda conectarse correctamente con las funcionalidades necesarias del proceso de entrega y cobro.
 * **Today:** Se estuvieron revisando las historias de usuario correspondientes para el segundo parcial, verificando su estado, dependencias y posibles ajustes necesarios para continuar con el desarrollo del proyecto.
 * **Blockers:** None
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Participé en la retrospectiva del Sprint 1 y apoyé en la revisión del flujo y los criterios de aceptación de las historias de usuario.
+* **Today:** Analizar las historias de usuario planificadas para el segundo Sprint, considerando dependencias y posibles mejoras en el flujo de entrega.
+* **Blockers:** None
