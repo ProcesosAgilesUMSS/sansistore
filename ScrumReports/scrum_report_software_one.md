@@ -98,3 +98,56 @@
 - **Yesterday:** (02/05 - 03/05) Finalicé la configuración del entorno de desarrollo resolviendo conflictos de Firebase, establecí la arquitectura base de la HU-076 en src/features/orders y realicé una refactorización integral del componente SentOrdersList para mejorar su semántica, accesibilidad y alineación con el Design System oficial.
 - **Today:** Desarrollé el sistema de filtros interactivos mediante estados reactivos y componentes SVG personalizados, implementé la lógica de colapso con feedback visual y sincronicé la rama de trabajo siguiendo los estándares de commits y flujos de trabajo documentados en el proyecto.
 - **Blockers:** None
+
+------------------------------------------------------------------------------------------------------------------------------
+# 07/05/ 2026
+## Daily Reports - Team 6 SoftwareOne
+
+### Llanos Vega Juan Carlos
+
+- **Yesterday:** Presentación de la herramienta Retrospective Paddle.com a los representantes de los equipos del software, demostración del manejo y organización por equipos, descargar todas las actualizaciónes de la rama de mi equipo para continuar programando la HU-075
+- **Today:** Desarrollo de la HU-075 visualización de detalles del producto, desarrollo del archivo OrderProductDetail, pruebas de visualización mediante la ejecución del programa, subida de las actualizaciones a la rama de la Historia de Usuario.
+- **Blockers:** Ninguno por el momento.
+
+
+### Rodriguez Torrico Arnold Guery
+
+- **Yesterday:** Realice la codificación de la HU-75 que se me asignó, actualice la rama de mi HU para traer los cambios de la HU-76 para integrarlo y realizar un refactor sobre la rama en la que trabaje.
+- **Today:** Complemente mis cambios de mi local con la rama de mi HU, donde ya se integraron junto a la HU que se relaciona con la HU-76.
+- **Blockers:** Ninguna.
+
+
+### Pereira Fiorilo Oliver Do Santos
+
+- **Yesterday:** Cerré el análisis de los criterios de aceptación de la HU-074 y define cómo se van a organizar los elementos en la pantalla del vendedor. 
+- **Today:** Estoy trabajando en la codificación del componente principal de la bandeja de pedidos y preparando la estructura frontend que recibirá y mostrará la información (ID, fecha, estado). 
+- **Blockers:** Problemas con mi compañía de internet.
+
+
+### Paqui Rojas Aaron David
+
+- **Yesterday:** Consolidé la estructura de datos y las restricciones para la HU-074, y dejé definida la organización visual base para los pedidos pendientes. 
+- **Today:** Estoy implementando los componentes directamente en código y armando el layout para manejar la vista de estado vacío
+- **Blockers:** Ningún bloqueo 
+
+
+### Gutiérrez Fuentes Alexander Raul
+
+- **Yesterday:** Refactorización de arquitectura, mejoras de accesibilidad y refinamiento de UI en `SentOrdersList`.
+- **Today:**
+    - **Refactorización de `SentOrdersList`:** Descompuse el componente en subcomponentes (`OrderFilter`, `OrderHeader`, `OrderItem`) siguiendo el patrón *Feature-based*.
+    - **Optimizaciones de Carga:**
+        - Implementé un estado de carga con un `GridSpinner` personalizado.
+        - Optimicé la animación del spinner migrándola de la Web Animations API a animaciones CSS (`animate-pulse`), logrando feedback visual instantáneo.
+    - **Integración Global:** Integré el `Navbar` y `Footer` en `sent.astro` para mantener la consistencia sin afectar a otros equipos.
+    - **Estilos:** Añadí posicionamiento `sticky` a los filtros para mejorar la UX en escritorio.
+    - **Semillas de Datos:** Actualicé `seed/seed-orders.mjs` con 10 nuevas órdenes y 5 nuevas ubicaciones.
+    - **Funcionalidad de Detalle (HU-075 Integration):**
+        - Integración completa del detalle del pedido (`OrderProductDetail`) con el estado centralizado `selectedOrder`.
+        - Refactorización del servicio `getSentOrders` para cargar dinámicamente los ítems desde la subcolección `orderItems`.
+        - Refactorización del seed para soportar ítems múltiples con totales dinámicos y limpieza automática de datos.
+        - Refinamiento estético del detalle para coincidir con la grilla (invoice-style, borders, typography).
+    - **Interacción:** Convertí `OrderItem` en un elemento clickeable para disparar el detalle.
+    - **Integración con Main:** Actualización de la rama local con `main` para asegurar compatibilidad.
+- **Blockers:** None.
+
