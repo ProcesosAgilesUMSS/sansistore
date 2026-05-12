@@ -167,7 +167,7 @@
 
 
 - **Today:** Se preparó todo el entorno de la herramienta Retrospective en Trello para todo los equipos de desarrollo, asimismo se coordinó con el Product Owner coordinar con los equipos para la entrega de sus links de trabajo, y se hizo la entrega de sus links retrospectiva a cada grupo 
-- **Blockers:** None
+- **Blockers:** None.
 
 
 ### Rodriguez Torrico Arnold Guery
@@ -176,7 +176,7 @@
 - **Yesterday:** Realice la revisión y ajuste de la integración entre los componentes de listado y detalle de pedidos para asegurar una navegación consistente dentro del flujo de pedidos enviados, verificando que el cambio de vista no afecte el estado actual de la pantalla. 
 También realice pruebas funcionales en entorno local sobre el flujo completo de consulta de pedidos enviados, verificando apertura del detalle, retorno a la lista y correcta persistencia de la navegación del usuario. 
 - **Today:** realizar seguimiento del proceso de retrospectiva de los equipos dentro de Trello, verificando el acceso correcto a los tableros compartidos. Asimismo, se realizó el monitoreo de la recepción de enlaces de trabajo pendientes y se dio soporte en la coordinación para mantener el flujo de comunicación en equipos.
-- **Blockers:** None 
+- **Blockers:** None.
 
 
 ### Pereira Fiorilo Oliver Do Santos
@@ -188,9 +188,9 @@ También realice pruebas funcionales en entorno local sobre el flujo completo de
 ### Paqui Rojas Aaron David
 
 
-- **Yesterday:**Una vez resueltos los fallos técnicos que limitaron mi progreso, me enfoqué en un proceso de reintegración y nivelación. Esto incluyó el estudio detallado de los nuevos manuales y documentos técnicos del Sprint. 
-- **Today:**Para el día de hoy, mi prioridad es completar mis aportes correspondientes a la retrospectiva, además de realizar un seguimiento exhaustivo de las Historias de Usuario que aún permanecen pendientes o en revisión dentro del tablero de control. 
-- **Blockers:** None
+- **Yesterday:** Una vez resueltos los fallos técnicos que limitaron mi progreso, me enfoqué en un proceso de reintegración y nivelación. Esto incluyó el estudio detallado de los nuevos manuales y documentos técnicos del Sprint. 
+- **Today:** Para el día de hoy, mi prioridad es completar mis aportes correspondientes a la retrospectiva, además de realizar un seguimiento exhaustivo de las Historias de Usuario que aún permanecen pendientes o en revisión dentro del tablero de control. 
+- **Blockers:** None.
 
 
 ### Gutiérrez Fuentes Alexander Raul
@@ -203,4 +203,4 @@ También realice pruebas funcionales en entorno local sobre el flujo completo de
 	- Integración de ambas HUs a la rama main, resolviendo conflictos típicos de integración.
 	- Hice el demo desde el entorno desplegado, facilitando la revisión y validación de las funcionalidades.
 - **Today:** Preparé y completé la retrospective del sprint, incluyendo análisis de lo que salió bien, lo que salió mal, mejoras y reconocimientos.  
-- **Blockers:** Ninguno relevante por el momento
+- **Blockers:** Ninguno relevante por el momento.
