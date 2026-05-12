@@ -46,10 +46,17 @@ export default function Navbar() {
   const [theme, setTheme] = useState<ThemeMode>('light');
   const [themeReady, setThemeReady] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [roles, setRoles] = useState<string[]>([]);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
+    const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
+      if (u) {
+        const userSnap = await getDoc(doc(db, 'users', u.uid));
+        setRoles(userSnap.exists() ? (userSnap.data().roles ?? []) : []);
+      } else {
+        setRoles([]);
+      }
       setAuthReady(true);
     });
     return unsub;
@@ -98,6 +105,9 @@ export default function Navbar() {
           createdBy: 'system',
           createdAt: serverTimestamp(),
         });
+        setRoles(['comprador']);
+      } else {
+        setRoles(userSnap.data().roles ?? []);
       }
     } catch (e: unknown) {
       const ignored = [
@@ -113,6 +123,7 @@ export default function Navbar() {
 
   const handleLogout = () => {
     setProfileMenuOpen(false);
+    setRoles([]);
     signOut(auth).catch(console.error);
   };
 
@@ -152,12 +163,14 @@ export default function Navbar() {
               ))}
             </div>
 
-            <a
+            {roles.includes('admin') && (
+              <a
               href="/admin"
               className="text-[13px] text-primary font-semibold tracking-[0.02em] transition-all hover:opacity-70"
-            >
+              >
               Admin
-            </a>
+              </a>
+            )}
 
             {/* ACTIONS */}
             <div className="flex items-center gap-3">   
