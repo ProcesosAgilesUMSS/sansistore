@@ -144,3 +144,9 @@
 - **Yesterday:** Trabajé en la integración a nuestro panel de mensajero de las historias de usuario del equipo de Webspire. Mantuve comunicación para que las funcionalidades del otro equipo no se vean alteradas ni eliminadas durante la integración.
 - **Today:** Escogeré una nueva historia de usuario para empezar con el siguiente sprint, participaré en el Sprint de Retrospectiva tal y como indica el protocolo Scrum LeSS.
 - **Blockers:** Trabajo duplicado y falta de coordinación **(solucionado)**.
+
+### Jhoel Gustavo Aiza Arce
+
+- **Yesterday:** Finalización de las pruebas de integración del flujo de estados "EN CAMINO" y validación de la persistencia en Firebase para el cierre del Sprint 1.
+- **Today:** Participación en la **Sprint Retrospective** para analizar el desempeño del equipo y definición de objetivos para el inicio del **Sprint 2**. Selección de nuevas historias de usuario orientadas a la optimización del módulo de delivery.
+- **Blockers:** None.
