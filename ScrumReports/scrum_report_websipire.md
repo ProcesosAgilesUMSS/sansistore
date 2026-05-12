@@ -118,3 +118,11 @@
 * **Yesterday:** Trabajé en algunos ajustes de frontend y en la integración de la funcionalidad de la HU-03: “Como mensajero quiero ver el monto exacto a cobrar”, enfocándome en la presentación del monto total antes de confirmar la entrega. 
 * **Today:** Crear pedidos mockeados para visualizar correctamente el flujo de la HU-03 mientras se completan otras funcionalidades relacionadas con la gestión de pedidos en este Sprint.*.
 * **Blockers:** Dependencia de funcionalidades relacionadas con el cálculo y registro de pedidos para completar las validaciones de la HU.
+
+# Daily Reports - Team 3 Webspire 12/05/26
+
+## Dayana Saleth Ortuño Guzman
+
+ * **Yesterday:** Realice el retrospective del sprint 1 con mi equipo.
+* **Today:** Analizar que HUs podriamos hacer para el segundo Sprint, considerando despendencias y demas.
+* **Blockers:** none
