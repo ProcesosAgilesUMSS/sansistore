@@ -128,7 +128,7 @@
 * **Blockers:** none
 ## Maria Victoria Grageda Vallejos
 
-* **Yesterday:** Apoyé en la integración del módulo de courier junto con el grupo de Programming API's, revisando que el flujo relacionado con la HU*“Como mensajero, quiero ver el monto exacto a cobrar para evitar errores”* y *“Como mensajero, quiero marcar un pedido como entregado para registrar que la entrega fue completada”*, pueda conectarse correctamente con las funcionalidades necesarias del proceso de entrega y cobro.
+* **Yesterday:** Apoyé en la integración del módulo de courier junto con el grupo de Programming API's, revisando que el flujo relacionado con la HU *“Como mensajero, quiero ver el monto exacto a cobrar para evitar errores”* y *“Como mensajero, quiero marcar un pedido como entregado para registrar que la entrega fue completada”*, pueda conectarse correctamente con las funcionalidades necesarias del proceso de entrega y cobro.Realice el retrospective del sprint 1 con mi equipo.
 * **Today:** Se estuvieron revisando las historias de usuario correspondientes para el segundo parcial, verificando su estado, dependencias y posibles ajustes necesarios para continuar con el desarrollo del proyecto.
 * **Blockers:** None
 
