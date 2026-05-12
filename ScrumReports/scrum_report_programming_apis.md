@@ -149,3 +149,8 @@
 - **Yesterday:** Realize el sprint retrospective y empeze a trabajar en la preparacion y desarrollo para el segundo sprint
 - **Today:** Escogere una o mas historias de usuario para trabajar en el segundo sprint
 - **Blockers:** None.
+
+### Efrain Peralta Felipe
+- **Yesterday:** Realize el sprint retrospective y empeze a trabajar en las historias de usuario para el segundo sprint
+- **Today:** Elegire las historias de usuario que trabaje para este segundo sprint.
+- **Blockers:** None.
