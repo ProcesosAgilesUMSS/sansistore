@@ -150,6 +150,7 @@
 - **Yesterday:** Finalización de las pruebas de integración del flujo de estados "EN CAMINO" y validación de la persistencia en Firebase para el cierre del Sprint 1.
 - **Today:** Participación en la **Sprint Retrospective** para analizar el desempeño del equipo y definición de objetivos para el inicio del **Sprint 2**. Selección de nuevas historias de usuario orientadas a la optimización del módulo de delivery.
 - **Blockers:** None.
+
 ### Bruno Salcedo Cadiz
 - **Yesterday:** Realize el sprint retrospective y empeze a trabajar en la preparacion y desarrollo para el segundo sprint
 - **Today:** Escogere una o mas historias de usuario para trabajar en el segundo sprint
@@ -161,6 +162,6 @@
 - **Blockers:** None.
 
 ### Adrian Said Andrade Medina
-Yesterday: Participé en el Sprint Retrospective y avancé en el análisis y planificación de las historias de usuario correspondientes al segundo sprint.
-Today: Definiré y priorizaré las historias de usuario en las que trabajaré durante el Sprint 2, además de iniciar su desarrollo.
-Blockers: None.
+- **Yesterday:** Participé en el Sprint Retrospective y avancé en el análisis y planificación de las historias de usuario correspondientes al segundo sprint.
+- **Today:** Definiré y priorizaré las historias de usuario en las que trabajaré durante el Sprint 2, además de iniciar su desarrollo.
+- **Blockers:** None.
