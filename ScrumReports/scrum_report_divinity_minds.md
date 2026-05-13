@@ -103,7 +103,7 @@
 - **Blockers:** n/a.
 
 
-# 07/05/2026
+# 05/07/2026
 
 # Daily Report - Team 1
 
@@ -111,13 +111,13 @@
 
 - **Yesterday:** Trabajé en la corrección de algunas HUs para los siguientes sprints, que por ahora no están asignadas a ningún sprint.
 - **Today:** Se realizará la definición correcta de todos los criterios de aceptación y tareas relacionadas, según las HUs, siguiendo tareas, estados y mensajes.
-- **Blockers:** n/a
+- **Blockers:** n/a.
 
 ## Gutierrez Hinojosa Jhon Deymar
 
 - **Yesterday:** Trabajé en las pruebas automatizadas de detalles de producto y en la automatización del workflow de GitHub para la ejecución y generación de reportes de pruebas.
 - **Today:** Planificaré y organizaré las pruebas correspondientes al Sprint 2, definiendo los escenarios y casos prioritarios a cubrir.
-- **Blockers:** n/a
+- **Blockers:** n/a.
 
 ## Merudia Calderon Dayeza
 
@@ -135,4 +135,39 @@
 
 - **Yesterday:** Corregí los controles de expansión del detalle de producto (título y descripción), estabilicé la detección de overflow, ajusté la visibilidad del botón expandir y el alto de clamp; además actualicé dependencias menores.
 - **Today:** Validar los cambios en `ProductDetail` y apoyar la integración/QA antes del merge.
+- **Blockers:** n/a.
+
+
+# 05/12/2026
+
+# Daily Report - Team 1
+
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** En base a la reunión grupal, fui el encargado de organizar y registrar todas las ideas en tarjetas sobre el Sprint Retrospective en el tablero del equipo en Trello (aspectos positivos, puntos de mejora, felicitaciones y acuerdos a seguir).
+- **Today:** Revisar y consolidar las tarjetas del retrospective junto al equipo para dejar acuerdos claros y accionables.
+- **Blockers:** n/a.
+
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Ayer:** Hice un refinamiento completo del backlog para nuestro equipo y elaboré un plan para mejorar las pruebas y los datos de seed para todos los equipos.
+- **Hoy:** Trabajaré en las pruebas y en los datos de seed, ademas de iniciar las nuevas historias del sprint 2.
+- **Bloqueadores:** n/a.
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Cerramos el Sprint 1 con la sesión de retrospectiva. Identificamos puntos de mejora grupal y preparamos las Historias de Usuario (HUs) para el siguiente ciclo.    
+- **Today:** Revisar a detalle las HUs del Sprint 2 e iniciar con el desglose y asignación de tareas para arrancar formalmente las actividades.
+- **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Participé en la reunión de Sprint Retrospective aportando observaciones y mejoras del sprint. Además, trabajé en el ajuste y redacción de historias de usuario correspondientes al Sprint 2.
+- **Today:** Continuar con la revisión y organización de historias de usuario pendientes para el Sprint 2.
+- **Blockers:** n/a.
+
+## Marcos Velasquez Vela
+
+- **Yesterday:** Participé en la reunión de Sprint Retrospective junto al equipo y apoyé en la revisión y mejora de algunas historias de usuario del Sprint 2 para mantener claridad en tareas y criterios.
+- **Today:** Continuar apoyando en la validación de flujos y revisión de historias de usuario pendientes.
 - **Blockers:** n/a.
