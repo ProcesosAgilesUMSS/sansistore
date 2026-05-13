@@ -103,7 +103,7 @@
 - **Blockers:** n/a.
 
 
-# 07/05/2026
+# 05/07/2026
 
 # Daily Report - Team 1
 
@@ -136,3 +136,38 @@
 - **Yesterday:** Corregí los controles de expansión del detalle de producto (título y descripción), estabilicé la detección de overflow, ajusté la visibilidad del botón expandir y el alto de clamp; además actualicé dependencias menores.
 - **Today:** Validar los cambios en `ProductDetail` y apoyar la integración/QA antes del merge.
 - **Blockers:** n/a.
+
+
+# 05/12/2026
+
+# Daily Report - Team 1
+
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** En base a la reunión grupal, fui el encargado de organizar y registrar todas las ideas en tarjetas sobre el Sprint Retrospective en el tablero del equipo en Trello (aspectos positivos, puntos de mejora, felicitaciones y acuerdos a seguir).
+- **Today:** Revisar y consolidar las tarjetas del retrospective junto al equipo para dejar acuerdos claros y accionables.
+- **Blockers:** n/a
+
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** 
+- **Today:** 
+- **Blockers:** n/a
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:** 
+- **Today:** 
+- **Blockers:** n/a
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Participé en la reunión de Sprint Retrospective aportando observaciones y mejoras del sprint. Además, trabajé en el ajuste y redacción de historias de usuario correspondientes al Sprint 2.
+- **Today:** Continuar con la revisión y organización de historias de usuario pendientes para el Sprint 2.
+- **Blockers:** n/a
+
+## Marcos Velasquez Vela
+
+- **Yesterday:** Participé en la reunión de Sprint Retrospective junto al equipo y apoyé en la revisión y mejora de algunas historias de usuario del Sprint 2 para mantener claridad en tareas y criterios.
+- **Today:** Continuar apoyando en la validación de flujos y revisión de historias de usuario pendientes.
+- **Blockers:** n/a
