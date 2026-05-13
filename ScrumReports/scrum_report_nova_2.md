@@ -117,3 +117,32 @@
 - **Yesterday:** Trabaje en el desarrollo del backend de mi historia de usuario 
 - **Today:** Finalización del desarrollo del backend y revision del flujo del proyecto y participe en la reunioncon mis compañeros
 - **Blockers:** Hay necesidad de tener un usuario administrador con su token para poder ver el apartado del panel de administracion
+
+# 12/05/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+- **Yesterday:** empezamos a coordinar con mi grupo para el llenado del scrum retrospective
+- **Today:** coordine e informe al grupo de los puntos a tratar para la reunion. 
+- **Blockers:** none.
+
+## Dylan Coca Beltran
+- **Yesterday:** estuve revisando detalles de lo entregado y que se podria mejorar
+- **Today:** estuve viendo que hu podriamos hacer para el sig sprint
+- **Blockers:** None.
+
+## Fabricio Javier Cordova Caceres 
+- **Yesterday:** Revisión del sprint 1 y pulido de detalles
+- **Today:** Planteamiento de el sprint plannig 
+- **Blockers:** none
+
+## Jherlan Marcelo Calero Sardan
+* **Yesterday:**  revision de mi hu correspodiente del primer sprint y modificacion de algunos detalles.
+* **Today:**  revise las hus que podrian ser para el 2do sprint y coordinacion con el grupo.
+* **Blockers:** none.
+
+## Camila Wara Fernandez Sandoval 
+- **Yesterday:**  revision de mi hu correspodiente del primer sprint y refinando  algunos detalles.
+- **Today:**  revise las hus que podrian ser para el 2do sprint y coordinacion con el grupo.
+- **Blockers:** none.
