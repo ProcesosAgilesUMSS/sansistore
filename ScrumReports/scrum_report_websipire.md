@@ -151,3 +151,11 @@
 - **Today:** Analizar las historias de usuario disponibles para el Sprint 2, revisando su prioridad, dependencias y viabilidad para elegir correctamente cuáles se trabajarán durante el sprint.
 
 - **Blockers:** None
+
+# Daily Reports - Team 3 Webspire 14/05/26
+
+## Dayana Saleth Ortuño Guzman
+
+ * **Yesterday:** Nos juntamos con el equipo para definir qué HUs entran en el Sprint 2.
+* **Today:** Escribir los criterios de aceptación de la Hu que me toco y revisar si tiene alguna dependencia con las tareas de los demás.
+* **Blockers:** none
