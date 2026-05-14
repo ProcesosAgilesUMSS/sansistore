@@ -130,7 +130,7 @@
 
 * **Yesterday:** Apoyé en la integración del módulo de courier junto con el grupo de Programming API's, revisando que el flujo relacionado con la HU *“Como mensajero, quiero ver el monto exacto a cobrar para evitar errores”* y *“Como mensajero, quiero marcar un pedido como entregado para registrar que la entrega fue completada”*, pueda conectarse correctamente con las funcionalidades necesarias del proceso de entrega y cobro.Realice el retrospective del sprint 1 con mi equipo.
 * **Today:** Se estuvieron revisando las historias de usuario correspondientes para el segundo parcial, verificando su estado, dependencias y posibles ajustes necesarios para continuar con el desarrollo del proyecto.
-* **Blockers:** None
+* **Blockers:** Se presentaron dificultades en la integración con el grupo de Programming API's debido a dependencias entre módulos y cambios realizados en archivos relacionados al flujo de entrega y cobro, lo cual generó retrasos.
 
 ## Juan Daniel Vasquez Casana
 
@@ -158,4 +158,10 @@
 
  * **Yesterday:** Nos juntamos con el equipo para definir qué HUs entran en el Sprint 2.
 * **Today:** Escribir los criterios de aceptación de la Hu que me toco y revisar si tiene alguna dependencia con las tareas de los demás.
+* **Blockers:** none
+
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Reunion con equipo para definir qué HUs entran en el Sprint 2 y revisar las historias relacionadas al módulo de entrega y cobro.
+* **Today:** Escribir los criterios de aceptación de las HUs que me tocaron, relacionadas con entrega y cobro, y revisar si tienen dependencias con las tareas de los demás grupos.
 * **Blockers:** none
