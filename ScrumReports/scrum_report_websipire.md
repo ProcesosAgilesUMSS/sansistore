@@ -178,6 +178,7 @@
 * **Today:** Defini los criterios de aceptacion y analice el funcionamiento que debera tener para comunicarme con otras areas para la implementacion completa.
 * **Blockers:** none
 
+
 ## Jose Brandon Pinedo Gonzales
 
 * **Yesterday:** Me reuní con el equipo para revisar las HUs propuestas para el Sprint 2 y definir cuáles serán trabajadas durante este sprint.
