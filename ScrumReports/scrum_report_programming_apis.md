@@ -184,7 +184,7 @@
 - **Today:** Empezare a trabajar en la HU que escogi
 - **Blockers:** None.
 
-### Efrain Peralta
+### Efrain Peralta Felipe
 
 - **Yesterday:** Seleccion la historia de usuario que trabajare.
 - **Today:** Empezare a trabajar en la descripción, criterios de aceptación, tareas y desarrollo de la hu que escogi
