@@ -146,3 +146,32 @@
 - **Yesterday:**  revision de mi hu correspodiente del primer sprint y refinando  algunos detalles.
 - **Today:**  revise las hus que podrian ser para el 2do sprint y coordinacion con el grupo.
 - **Blockers:** none.
+
+# 14/05/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+- **Yesterday:** empece a discutir sobre los nuevos hus para este sprint 2
+- **Today:** coordine con mi grupo para definir y asignar a cada integrante las hus que se haran para este sprint 2 
+- **Blockers:** none.
+
+## Dylan Coca Beltran
+* **Yesterday:** estuve refinando mi hu y viendo que necesitare para implementar
+* **Today:** termine de refinar mi hu, coordinamos con mi equipo y comence con el mockup para tener una referencia
+* **Blockers:** None.
+
+## Jherlan Marcelo Calero Sardan
+* **Yesterday:**  revise si faltaba algun detalle mas en mi hu corespondiente del sprint 1 y adapte el tema claro/oscuro.
+* **Today:**  Participe de la reunion con el grupo para definir la asignacion de HUs a cada integrante y discutir sobre algunos detalles de las mismas.
+* **Blockers:** none
+
+## Camila Wara Fernandez Sandoval 
+* **Yesterday:**  Participe en la reunión con mi equipo para discutir sobre los hus del sprint 2
+* **Today:**  revise mi hus asignada a trabajar en este sprint y para definir los criterios de aceptación para poder empezar con los mock ups 
+* **Blockers:** none.
+
+## Fabricio Javier Cordova Caceres 
+* **Yesterday:**  refinacion de mi hu y sus criterios de aceptación para poder implementarlos
+* **Today:**  Hu refinada en su totalidad y coordinación en reunión con el equipo para empezar con los muckups 
+* **Blockers:** none
