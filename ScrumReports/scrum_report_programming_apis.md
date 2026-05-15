@@ -183,3 +183,8 @@
 - **Yesterday:** Seleccione mi historia de usuario a trabajar y añadir la descripcion, criteros de aceptacion y tareas
 - **Today:** Empezare a trabajar en la HU que escogi
 - **Blockers:** None.
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday:** Cierre de Sprint 1 y participación en la retrospectiva grupal.
+- **Today:** Selección y auto-asignación de la HU #101 "[US] Como mensajero, quiero registrar que el cliente pagó". Se redactó la descripción técnica y los criterios de aceptación en el tablero para iniciar el desarrollo.
+- **Blockers:** None.
