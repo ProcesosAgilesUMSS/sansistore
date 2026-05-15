@@ -13,7 +13,7 @@ export default async function globalTeardown() {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       console.log('✓ Emulator stopped');
     } catch (err) {
-      console.error('Error stopping emulator:', err.message);
+      console.error('Error stopping emulator:', err instanceof Error ? err.message : String(err));
     }
   }
 
