@@ -33,14 +33,14 @@ test.describe('Avaiable product list', () => {
         await page.goto('/productos');
 
         await (page.getByRole('button', { name: 'Solo Ofertas' }).click());
-        await expect(page.getByText(/Mocochinchi Test with Offer/)).toBeVisible();
+        await expect(page.getByText(/Detergente Liquido Ola Futuro Limpieza Completa 5 L/)).toBeVisible();
 
     });
 
     test('Categorias', async ({ page }) => {
         await page.goto('/productos');
         await (page.getByRole('button', { name: 'Todas las categorías' }).click());
-        await expect(page.getByText(/Lacteos/)).toBeVisible();
+        await expect(page.getByText(/Lácteos/)).toBeVisible();
         await expect(page.getByText(/Bebidas/)).toBeVisible();
 
     });
@@ -49,8 +49,8 @@ test.describe('Avaiable product list', () => {
         await page.goto('/productos');
 
         await (page.getByRole('textbox', { name: '¿Qué estás buscando hoy?' }).fill('Leche'));
-        await (page.getByRole('button', { name: 'Leche Test In Stock' }).click());
-        await expect(page.getByText(/9\.99/)).toBeVisible();
+        await (page.getByRole('button', { name: 'Leche PIL Natural 900 ml' }).click());
+        await expect(page.getByText(/9\.70/)).toBeVisible();
     });
 
     test('Search with URL params', async ({ page }) => {
@@ -58,14 +58,14 @@ test.describe('Avaiable product list', () => {
 
         const searchInput = page.getByRole('textbox', { name: '¿Qué estás buscando hoy?' });
         await expect(searchInput).toHaveValue('Leche');
-        await expect(page.getByText(/Leche Test In Stock/)).toBeVisible();
+        await expect(page.getByText(/Leche PIL Natural 900 ml/)).toBeVisible();
     });
 
     test('Category filter with URL params', async ({ page }) => {
-        await page.goto('/productos?category=test-lacteos');
+        await page.goto('/productos?category=lacteos');
 
-        await expect(page.getByRole('button', { name: 'Lacteos' })).toBeVisible();
-        await expect(page.getByText(/Leche Test In Stock/)).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Lácteos' })).toBeVisible();
+        await expect(page.getByText(/Queso Crema Bonle PIL Andina 200 gr/)).toBeVisible();
     });
 
     test('Offers filter with URL params', async ({ page }) => {
@@ -73,7 +73,7 @@ test.describe('Avaiable product list', () => {
 
         const offersButton = page.getByRole('button', { name: 'Solo Ofertas' });
         await expect(offersButton).toHaveAttribute('aria-pressed', 'true');
-        await expect(page.getByText(/Mocochinchi Test with Offer/)).toBeVisible();
+        await expect(page.getByText(/Detergente Liquido Ola Futuro Limpieza Completa 5 L/)).toBeVisible();
     });
 
     test('Sort by name A-Z', async ({ page }) => {
@@ -101,15 +101,15 @@ test.describe('Avaiable product list', () => {
     });
 
     test('Combined filters with URL params', async ({ page }) => {
-        await page.goto('/productos?q=Leche&category=test-lacteos&sort=name&page=1');
+        await page.goto('/productos?q=Leche&category=lacteos&sort=name&page=1');
 
         const searchInput = page.getByRole('textbox', { name: '¿Qué estás buscando hoy?' });
         await expect(searchInput).toHaveValue('Leche');
 
         const url = new URL(page.url());
         expect(url.searchParams.get('q')).toBe('Leche');
-        expect(url.searchParams.get('category')).toBe('test-lacteos');
-        await page.getByRole('button', { name: 'Lacteos' }).click();
+        expect(url.searchParams.get('category')).toBe('lacteos');
+        await page.getByRole('button', { name: 'Lácteos' }).click();
         expect(url.searchParams.get('sort')).toBe('name');
         expect(url.searchParams.get('page')).toBe('1');
     });
