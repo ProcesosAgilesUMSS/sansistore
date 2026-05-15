@@ -150,9 +150,9 @@
 
 ## Gutierrez Hinojosa Jhon Deymar
 
-- **Ayer:** Hice un refinamiento completo del backlog para nuestro equipo y elaboré un plan para mejorar las pruebas y los datos de seed para todos los equipos.
-- **Hoy:** Trabajaré en las pruebas y en los datos de seed, ademas de iniciar las nuevas historias del sprint 2.
-- **Bloqueadores:** n/a.
+- **Yesterday:** Hice un refinamiento completo del backlog para nuestro equipo y elaboré un plan para mejorar las pruebas y los datos de seed para todos los equipos.
+- **Today:** Trabajaré en las pruebas y en los datos de seed, ademas de iniciar las nuevas historias del sprint 2.
+- **Blockers:** n/a.
 
 ## Merudia Calderon Dayeza
 
@@ -173,6 +173,12 @@
 - **Blockers:** n/a.
 
 # 05/14/2026
+
+## Gutierrez Hinojosa Jhon Deymar
+
+ - **Yesterday:** Trabajé en el commit e8cec3d9f9972d46dccdf5cb92b9596191eb927f: reestructuración de los seeders, actualización del setup/teardown del emulador y mejoras en las pruebas automatizadas.
+ - **Today:** Definiré nuevas pruebas para la nueva HU y las tareas del Sprint 2.
+ - **Blockers:** n/a.
 
 ## Merudia Calderon Dayeza
 
