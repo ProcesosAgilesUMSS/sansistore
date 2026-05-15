@@ -189,3 +189,8 @@
 - **Yesterday:** Seleccion la historia de usuario que trabajare.
 - **Today:** Empezare a trabajar en la descripción, criterios de aceptación, tareas y desarrollo de la hu que escogi
 - **Blockers:** None.
+
+### Adrian Said Andrade Medina
+- **Yesterday:** Seleccione una historia de usuario.
+- **Today:** Definiré todo lo respecto a la historia de usuario
+- **Blockers:** None.
