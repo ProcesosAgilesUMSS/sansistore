@@ -171,3 +171,11 @@
 - **Yesterday:** Participé en la reunión de Sprint Retrospective junto al equipo y apoyé en la revisión y mejora de algunas historias de usuario del Sprint 2 para mantener claridad en tareas y criterios.
 - **Today:** Continuar apoyando en la validación de flujos y revisión de historias de usuario pendientes.
 - **Blockers:** n/a.
+
+# 05/14/2026
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Definí la HU "Gestión del carrito de compras" y seleccioné mis tareas asignadas.    
+- **Today:** Iniciaré el desarrollo de las tareas planificadas.
+- **Blockers:** n/a.
