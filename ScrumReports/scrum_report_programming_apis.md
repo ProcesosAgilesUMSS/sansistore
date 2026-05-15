@@ -188,3 +188,14 @@
 - **Yesterday:** Cierre de Sprint 1 y participación en la retrospectiva grupal.
 - **Today:** Selección y auto-asignación de la HU #101 "[US] Como mensajero, quiero registrar que el cliente pagó". Se redactó la descripción técnica y los criterios de aceptación en el tablero para iniciar el desarrollo.
 - **Blockers:** None.
+
+### Efrain Peralta Felipe
+
+- **Yesterday:** Seleccion la historia de usuario que trabajare.
+- **Today:** Empezare a trabajar en la descripción, criterios de aceptación, tareas y desarrollo de la hu que escogi
+- **Blockers:** None.
+
+### Adrian Said Andrade Medina
+- **Yesterday:** Seleccione una historia de usuario.
+- **Today:** Definiré todo lo respecto a la historia de usuario
+- **Blockers:** None.
