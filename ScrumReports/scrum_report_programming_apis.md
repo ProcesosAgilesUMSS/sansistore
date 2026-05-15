@@ -183,3 +183,9 @@
 - **Yesterday:** Seleccione mi historia de usuario a trabajar y añadir la descripcion, criteros de aceptacion y tareas
 - **Today:** Empezare a trabajar en la HU que escogi
 - **Blockers:** None.
+
+### Efrain Peralta
+
+- **Yesterday:** Seleccion la historia de usuario que trabajare.
+- **Today:** Empezare a trabajar en la descripción, criterios de aceptación, tareas y desarrollo de la hu que escogi
+- **Blockers:** None.
