@@ -171,3 +171,9 @@
 * **Yesterday:** Revisé junto al equipo las HUs propuestas para el Sprint 2 y las historias relacionadas con las funcionalidades que se trabajarán durante el sprint.
 * **Today:** Escribir los criterios de aceptación de las HUs que me tocaron y analizar posibles dependencias con las tareas de los demás integrantes del equipo.
 * **Blockers:** none
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Trabaje en el avance del mockup de la Hu que me toco para este sprint 
+* **Today:** Defini los criterios de aceptacion y analice el funcionamiento que debera tener para comunicarme con otras areas para la implementacion completa.
+* **Blockers:** none
