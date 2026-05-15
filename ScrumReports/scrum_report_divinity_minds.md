@@ -185,3 +185,10 @@
 - **Yesterday:** Definí la HU "Gestión del carrito de compras" y seleccioné mis tareas asignadas.    
 - **Today:** Iniciaré el desarrollo de las tareas planificadas.
 - **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Se avanzó con la definición de la HU “Gestión del carrito de compras” y se organizaron las tareas asignadas para el desarrollo.
+- **Today:** Se iniciará la implementación de las tareas planificadas correspondientes a la HU.
+- **Blockers:** Ninguno.
+
