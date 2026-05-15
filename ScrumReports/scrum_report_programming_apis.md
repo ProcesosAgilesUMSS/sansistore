@@ -165,3 +165,15 @@
 - **Yesterday:** Participé en el Sprint Retrospective y avancé en el análisis y planificación de las historias de usuario correspondientes al segundo sprint.
 - **Today:** Definiré y priorizaré las historias de usuario en las que trabajaré durante el Sprint 2, además de iniciar su desarrollo.
 - **Blockers:** None.
+
+***
+
+# Sprint 2
+
+## 14-05-2026
+
+### José Daniel Virreira Rufino
+
+- **Yesterday:** Participé en la elección de HU's de este segundo sprint, participé en el retrospective de todos los grupos en conjunto.
+- **Today:** Seleccionaré y empezaré a trabajar con una de las historias de usuario asignadas para este sprint.
+- **Blockers:** None.
