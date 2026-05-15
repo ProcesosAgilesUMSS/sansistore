@@ -125,12 +125,12 @@
 
  * **Yesterday:** Realice el retrospective del sprint 1 con mi equipo.
 * **Today:** Analizar que HUs podriamos hacer para el segundo Sprint, considerando despendencias y demas.
-* **Blockers:** none
+* **Blockers:** Dificultades a la hora de integrar, no nos dimos cuenta que esa parte tenia dependencia, lo cual nosotros creamos otro panel aparte, el problema fue que el grupo de Programing apis editaron nuestro codigo, para poner el sullo y no podiamos integrar.
 ## Maria Victoria Grageda Vallejos
 
 * **Yesterday:** Apoyé en la integración del módulo de courier junto con el grupo de Programming API's, revisando que el flujo relacionado con la HU *“Como mensajero, quiero ver el monto exacto a cobrar para evitar errores”* y *“Como mensajero, quiero marcar un pedido como entregado para registrar que la entrega fue completada”*, pueda conectarse correctamente con las funcionalidades necesarias del proceso de entrega y cobro.Realice el retrospective del sprint 1 con mi equipo.
 * **Today:** Se estuvieron revisando las historias de usuario correspondientes para el segundo parcial, verificando su estado, dependencias y posibles ajustes necesarios para continuar con el desarrollo del proyecto.
-* **Blockers:** None
+* **Blockers:** Se presentaron dificultades en la integración con el grupo de Programming API's debido a dependencias entre módulos y cambios realizados en archivos relacionados al flujo de entrega y cobro, lo cual generó retrasos.
 
 ## Juan Daniel Vasquez Casana
 
@@ -144,4 +144,43 @@
 
 - **Today:** Revisar las historias de usuario disponibles para el Sprint 2, considerando dependencias entre módulos, prioridades del proyecto y funcionalidades que pueden ser asignadas al equipo para avanzar de manera ordenada.
 
+- ## Alejandro Torrico Quispe
+
+- **Yesterday:** Participé en la retrospectiva del Sprint 1 y apoyé en la revisión de los problemas encontrados, especialmente las dependencias entre módulos que afectaron el avance del área de pagos.
+
+- **Today:** Analizar las historias de usuario disponibles para el Sprint 2, revisando su prioridad, dependencias y viabilidad para elegir correctamente cuáles se trabajarán durante el sprint.
+
 - **Blockers:** None
+
+# Daily Reports - Team 3 Webspire 14/05/26
+
+## Dayana Saleth Ortuño Guzman
+
+ * **Yesterday:** Nos juntamos con el equipo para definir qué HUs entran en el Sprint 2.
+* **Today:** Escribir los criterios de aceptación de la Hu que me toco y revisar si tiene alguna dependencia con las tareas de los demás.
+* **Blockers:** none
+
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Reunion con equipo para definir qué HUs entran en el Sprint 2 y revisar las historias relacionadas al módulo de entrega y cobro.
+* **Today:** Escribir los criterios de aceptación de las HUs que me tocaron, relacionadas con entrega y cobro, y revisar si tienen dependencias con las tareas de los demás grupos.
+* **Blockers:** none
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Revisé junto al equipo las HUs propuestas para el Sprint 2 y las historias relacionadas con las funcionalidades que se trabajarán durante el sprint.
+* **Today:** Escribir los criterios de aceptación de las HUs que me tocaron y analizar posibles dependencias con las tareas de los demás integrantes del equipo.
+* **Blockers:** none
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Trabaje en el avance del mockup de la Hu que me toco para este sprint 
+* **Today:** Defini los criterios de aceptacion y analice el funcionamiento que debera tener para comunicarme con otras areas para la implementacion completa.
+* **Blockers:** none
+
+
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Me reuní con el equipo para revisar las HUs propuestas para el Sprint 2 y definir cuáles serán trabajadas durante este sprint.
+* **Today:** Elaborar los criterios de aceptación de la HU que me tocó y revisar si tiene alguna dependencia con las tareas de los demás integrantes del equipo.
+* **Blockers:** none
