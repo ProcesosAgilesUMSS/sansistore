@@ -174,6 +174,12 @@
 
 # 05/14/2026
 
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Detalle la HU de "ver productos mas vendidos" y la deje lista con criterios de aceptacion, tareas y casos de prueba.
+- **Today:** Me asigne la HU de "ver productos mas vendidos" para su desarrollo.
+- **Blockers:** n/a.
+
 ## Gutierrez Hinojosa Jhon Deymar
 
  - **Yesterday:** Trabajé en el commit e8cec3d9f9972d46dccdf5cb92b9596191eb927f: reestructuración de los seeders, actualización del setup/teardown del emulador y mejoras en las pruebas automatizadas.
