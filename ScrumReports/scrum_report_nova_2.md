@@ -1,4 +1,4 @@
-# 28704/2026
+# 28/04/2026
 
 # Daily Report - Team 5 - Nova 2.0
 
@@ -117,3 +117,61 @@
 - **Yesterday:** Trabaje en el desarrollo del backend de mi historia de usuario 
 - **Today:** Finalización del desarrollo del backend y revision del flujo del proyecto y participe en la reunioncon mis compañeros
 - **Blockers:** Hay necesidad de tener un usuario administrador con su token para poder ver el apartado del panel de administracion
+
+# 12/05/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+- **Yesterday:** empezamos a coordinar con mi grupo para el llenado del scrum retrospective
+- **Today:** coordine e informe al grupo de los puntos a tratar para la reunion. 
+- **Blockers:** none.
+
+## Dylan Coca Beltran
+- **Yesterday:** estuve revisando detalles de lo entregado y que se podria mejorar
+- **Today:** estuve viendo que hu podriamos hacer para el sig sprint
+- **Blockers:** None.
+
+## Fabricio Javier Cordova Caceres 
+- **Yesterday:** Revisión del sprint 1 y pulido de detalles
+- **Today:** Planteamiento de el sprint plannig 
+- **Blockers:** none
+
+## Jherlan Marcelo Calero Sardan
+* **Yesterday:**  revision de mi hu correspodiente del primer sprint y modificacion de algunos detalles.
+* **Today:**  revise las hus que podrian ser para el 2do sprint y coordinacion con el grupo.
+* **Blockers:** none.
+
+## Camila Wara Fernandez Sandoval 
+- **Yesterday:**  revision de mi hu correspodiente del primer sprint y refinando  algunos detalles.
+- **Today:**  revise las hus que podrian ser para el 2do sprint y coordinacion con el grupo.
+- **Blockers:** none.
+
+# 14/05/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+- **Yesterday:** empece a discutir sobre los nuevos hus para este sprint 2
+- **Today:** coordine con mi grupo para definir y asignar a cada integrante las hus que se haran para este sprint 2 
+- **Blockers:** none.
+
+## Dylan Coca Beltran
+* **Yesterday:** estuve refinando mi hu y viendo que necesitare para implementar
+* **Today:** termine de refinar mi hu, coordinamos con mi equipo y comence con el mockup para tener una referencia
+* **Blockers:** None.
+
+## Jherlan Marcelo Calero Sardan
+* **Yesterday:**  revise si faltaba algun detalle mas en mi hu corespondiente del sprint 1 y adapte el tema claro/oscuro.
+* **Today:**  Participe de la reunion con el grupo para definir la asignacion de HUs a cada integrante y discutir sobre algunos detalles de las mismas.
+* **Blockers:** none
+
+## Camila Wara Fernandez Sandoval 
+* **Yesterday:**  Participe en la reunión con mi equipo para discutir sobre los hus del sprint 2
+* **Today:**  revise mi hus asignada a trabajar en este sprint y para definir los criterios de aceptación para poder empezar con los mock ups 
+* **Blockers:** none.
+
+## Fabricio Javier Cordova Caceres 
+* **Yesterday:**  refinacion de mi hu y sus criterios de aceptación para poder implementarlos
+* **Today:**  Hu refinada en su totalidad y coordinación en reunión con el equipo para empezar con los muckups 
+* **Blockers:** none

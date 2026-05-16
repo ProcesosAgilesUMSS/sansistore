@@ -48,7 +48,7 @@ function SummaryCard({
 }) {
   return (
     <article
-      className={`messenger-summary-card rounded-lg border p-6 ${featured ? 'messenger-summary-card--featured' : ''
+      className={`messenger-summary-card rounded-[28px] border px-7 py-8 shadow-[0_14px_30px_rgba(38,33,22,0.10)] ${featured ? 'messenger-summary-card--featured' : ''
         }`}
     >
       <div className="flex items-center gap-4">
@@ -75,7 +75,7 @@ function PendingOrderCard({
   onInTransit: (orderId: string) => void;
 }) {
   return (
-    <article className="messenger-order-card rounded-lg border p-6">
+    <article className="messenger-order-card rounded-[28px] border p-6 shadow-[0_14px_30px_rgba(38,33,22,0.10)]">
       <div className="messenger-order-grid grid gap-8">
         <div>
           <div className="mb-6 flex items-center gap-3">
@@ -133,7 +133,7 @@ function PendingOrderCard({
             ))}
           </div>
 
-          <div className="messenger-cash-box mt-5 rounded-lg border-2 p-5">
+          <div className="messenger-cash-box mt-5 rounded-2xl border-2 p-5">
             <p className="text-xs font-medium uppercase">
               Monto a cobrar
             </p>
@@ -147,7 +147,7 @@ function PendingOrderCard({
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <a
-          className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-lg border-2 px-6 text-sm font-bold transition"
+          className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
           href={buildMapsUrl(order)}
           rel="noreferrer"
           target="_blank"
@@ -158,7 +158,7 @@ function PendingOrderCard({
 
         {order.deliveryStatus === 'accepted' && (
           <button
-            className="messenger-transit-button inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 text-sm font-bold text-white transition hover:bg-blue-700"
+            className="messenger-transit-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 text-sm font-bold text-white transition hover:bg-blue-700"
             onClick={() => onInTransit(order.id)}
             type="button"
           >
@@ -168,7 +168,7 @@ function PendingOrderCard({
 
         {order.deliveryStatus === 'in_transit' && (
           <button
-            className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-lg px-6 text-sm font-bold transition"
+            className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
             onClick={() => onDelivered(order.id)}
             type="button"
           >
@@ -183,7 +183,7 @@ function PendingOrderCard({
 
 function DeliveredOrderRow({ order }: { order: MessengerOrder }) {
   return (
-    <article className="messenger-delivered-row flex items-center justify-between gap-4 rounded-lg border p-6">
+    <article className="messenger-delivered-row flex items-center justify-between gap-4 rounded-[26px] border p-6 shadow-[0_10px_24px_rgba(18,32,56,0.06)]">
       <div className="flex items-center gap-4">
         <span className="messenger-icon inline-flex h-10 w-10 items-center justify-center rounded-full">
           <CheckCircle2 size={20} />
@@ -343,15 +343,19 @@ export default function MessengerDashboard({
           background: transparent;
         }
 
-        .messenger-header-inner,
-        .messenger-container {
+        .messenger-header-inner {
           width: min(100% - 32px, 1216px);
           margin-inline: auto;
         }
 
+        .messenger-container {
+          width: min(100% - 32px, 1280px);
+          margin-inline: auto;
+        }
+
         .messenger-dashboard--embedded .messenger-container {
-          width: 100%;
-          padding-block: 0;
+          width: min(100% - 32px, 1280px);
+          padding-block: 8px 40px;
         }
 
         .messenger-header-inner {
@@ -359,7 +363,7 @@ export default function MessengerDashboard({
         }
 
         .messenger-container {
-          padding-block: 40px;
+          padding-block: 8px 40px;
         }
 
         .messenger-header,
@@ -528,11 +532,14 @@ export default function MessengerDashboard({
       )}
 
       <div className="messenger-container">
-        <section>
-          <h1 className="text-4xl font-black tracking-normal">
+        <section className="mb-10">
+          <p className="text-sm font-bold uppercase tracking-[0.28em] text-primary">
+            Operacion de entregas
+          </p>
+          <h1 className="mt-4 text-4xl font-black tracking-[-0.04em] sm:text-5xl">
             {clientSection === 'assigned' ? 'Pedidos aceptados' : 'Entregados'}
           </h1>
-          <p className="messenger-copy mt-2 text-base">
+          <p className="messenger-copy mt-2 max-w-2xl text-sm font-semibold">
             {clientSection === 'assigned'
               ? 'Organiza tus entregas, revisa direcciones y cambia el estado de cada pedido.'
               : 'Revisa las entregas completadas y el monto cobrado durante la jornada.'}
@@ -540,20 +547,20 @@ export default function MessengerDashboard({
         </section>
 
         {message && (
-          <div className="messenger-order-card mt-6 rounded-lg border p-4 text-sm font-semibold">
+          <div className="messenger-order-card mt-6 rounded-[26px] border p-4 text-sm font-semibold">
             {message}
           </div>
         )}
 
         {loading && (
-          <div className="messenger-order-card mt-6 rounded-lg border p-8 text-sm font-semibold">
+          <div className="messenger-order-card mt-6 rounded-[26px] border p-8 text-sm font-semibold">
             Cargando entregas...
           </div>
         )}
 
         {!loading && clientSection === 'assigned' ? (
           <>
-            <section className="messenger-summary-grid mt-9 grid gap-6">
+            <section className="messenger-summary-grid grid gap-5">
               <SummaryCard
                 icon={<Clock3 size={20} />}
                 label="Pendientes"
@@ -568,7 +575,7 @@ export default function MessengerDashboard({
             </section>
 
             <section className="mt-11">
-              <h2 className="mb-6 text-2xl font-black tracking-normal">
+                <h2 className="mb-6 text-2xl font-black tracking-[-0.04em]">
                 Pedidos pendientes
               </h2>
 
@@ -583,7 +590,7 @@ export default function MessengerDashboard({
                     />
                   ))
                 ) : (
-                  <div className="messenger-order-card rounded-lg border p-8 text-sm font-semibold">
+                  <div className="messenger-order-card rounded-[28px] border p-8 text-sm font-semibold">
                     No hay pedidos pendientes.
                   </div>
                 )}
@@ -592,7 +599,7 @@ export default function MessengerDashboard({
           </>
         ) : !loading ? (
           <>
-            <section className="messenger-summary-grid mt-9 grid gap-6">
+            <section className="messenger-summary-grid grid gap-5">
               <SummaryCard
                 icon={<CheckCircle2 size={20} />}
                 label="Cantidad completados"
@@ -609,7 +616,7 @@ export default function MessengerDashboard({
             </section>
 
             <section className="mt-11">
-              <h2 className="mb-6 text-2xl font-black tracking-normal">
+                <h2 className="mb-6 text-2xl font-black tracking-[-0.04em]">
                 Historial
               </h2>
 
@@ -619,7 +626,7 @@ export default function MessengerDashboard({
                     <DeliveredOrderRow key={order.id} order={order} />
                   ))
                 ) : (
-                  <div className="messenger-order-card rounded-lg border p-8 text-sm font-semibold">
+                  <div className="messenger-order-card rounded-[28px] border p-8 text-sm font-semibold">
                     No hay entregas completadas hoy.
                   </div>
                 )}

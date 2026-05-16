@@ -38,7 +38,10 @@ const formatMoney = (value: number) =>
 const INVALID_AMOUNT_MESSAGE =
   'No se puede mostrar el monto a cobrar. Verifique el detalle del pedido.';
 
-const pageClass = 'min-h-screen bg-bg-light pt-24 pb-12 text-text-light';
+const getPageClass = (embedded = false) =>
+  embedded
+    ? 'bg-transparent py-2 text-text-light'
+    : 'min-h-screen bg-bg-light pt-24 pb-12 text-text-light';
 const cardBaseClass =
   'rounded-[28px] border border-border-light bg-card-bg-light px-7 py-8 shadow-[0_14px_30px_rgba(38,33,22,0.10)]';
 const sectionCardClass =
@@ -57,6 +60,7 @@ function OrderDetailView({
   selectedItemsCount,
   selectedOrderHasValidAmount,
   updatingOrderId,
+  pageClassName,
   onBack,
   onOpenMaps,
   onMarkDelivered,
@@ -65,12 +69,13 @@ function OrderDetailView({
   selectedItemsCount: number;
   selectedOrderHasValidAmount: boolean;
   updatingOrderId: string;
+  pageClassName: string;
   onBack: () => void;
   onOpenMaps: (order: CourierOrder) => void;
   onMarkDelivered: (order: CourierOrder) => Promise<void>;
 }) {
   return (
-    <section className={pageClass}>
+    <section className={pageClassName}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <button
           type="button"
@@ -323,7 +328,7 @@ function OrderDetailView({
   );
 }
 
-export default function CourierDashboard() {
+export default function CourierDashboard({ embedded = false }: { embedded?: boolean }) {
   const [orders, setOrders] = useState<CourierOrder[]>([]);
   const [pendingOrders, setPendingOrders] = useState<CourierOrder[]>([]);
   const [stats, setStats] = useState<CourierDashboardStats>(emptyStats);
@@ -332,6 +337,7 @@ export default function CourierDashboard() {
   const [syncing, setSyncing] = useState(false);
   const [updatingOrderId, setUpdatingOrderId] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     const unsubscribe = subscribeToCourierOrders((payload) => {
@@ -365,10 +371,26 @@ export default function CourierDashboard() {
   );
 
   const handleMarkDelivered = async (order: CourierOrder) => {
+    const blockedStatuses = ['Entregado', 'Cancelado', 'No entregado'];
+
+    if (blockedStatuses.includes(order.status)) {
+      setSuccessMessage('');
+      setErrorMessage('No se puede marcar como entregado un pedido con ese estado.');
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Confirmar entrega de ${order.orderCode}. Monto a cobrar: ${formatMoney(order.total)}.`
+    );
+
+    if (!confirmed) return;
+
     try {
       setErrorMessage('');
+      setSuccessMessage('');
       setUpdatingOrderId(order.id);
       await markOrderAsDelivered(order);
+      setSuccessMessage('Pedido marcado como entregado correctamente.');
       if (selectedOrder?.id === order.id) {
         setSelectedOrder(null);
       }
@@ -415,6 +437,7 @@ export default function CourierDashboard() {
         selectedItemsCount={selectedItemsCount}
         selectedOrderHasValidAmount={selectedOrderHasValidAmount}
         updatingOrderId={updatingOrderId}
+        pageClassName={getPageClass(embedded)}
         onBack={() => setSelectedOrder(null)}
         onOpenMaps={handleOpenMaps}
         onMarkDelivered={handleMarkDelivered}
@@ -423,7 +446,7 @@ export default function CourierDashboard() {
   }
 
   return (
-    <section className={pageClass}>
+    <section className={getPageClass(embedded)}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="mb-10 flex flex-col gap-3">
           <p className="text-sm font-bold uppercase tracking-[0.28em] text-primary">
@@ -433,7 +456,7 @@ export default function CourierDashboard() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h1 className="text-4xl font-black tracking-[-0.04em] sm:text-5xl">
-                Panel del Mensajero
+                Gestion de entregas
               </h1>
               <p className={`mt-2 max-w-2xl text-sm font-semibold ${mutedTextClass}`}>
                 Gestiona pedidos pendientes, revisa lo cobrado y registra las
@@ -515,6 +538,12 @@ export default function CourierDashboard() {
           {errorMessage ? (
             <div className="border-b border-[#f97316]/15 bg-[#fff7ed] px-8 py-4 text-sm font-semibold text-[#9a3412] dark:border-[#f97316]/10 dark:bg-[#2a2117] dark:text-[#fdba74]">
               {errorMessage}
+            </div>
+          ) : null}
+
+          {successMessage ? (
+            <div className="border-b border-primary/20 bg-primary/10 px-8 py-4 text-sm font-semibold text-primary">
+              {successMessage}
             </div>
           ) : null}
 
