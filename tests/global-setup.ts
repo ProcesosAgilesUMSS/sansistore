@@ -7,14 +7,22 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 let emulatorProcess = null;
 
 process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080';
+process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
 
-async function waitForEmulator(maxAttempts = 60, delayMs = 500) {
+async function waitForEmulator(
+  host: string,
+  label: string,
+  maxAttempts = 60,
+  delayMs = 500
+) {
   let attempts = 0;
   while (attempts < maxAttempts) {
     try {
-      const response = await fetch('http://localhost:8080/', { signal: AbortSignal.timeout(2000) });
+      const response = await fetch(`http://${host}/`, {
+        signal: AbortSignal.timeout(2000),
+      });
       if (response.ok || response.status === 404) {
-        console.log('✓ Firestore emulator is ready');
+        console.log(`✓ ${label} emulator is ready`);
         return true;
       }
     } catch (err) {
@@ -23,7 +31,7 @@ async function waitForEmulator(maxAttempts = 60, delayMs = 500) {
     attempts++;
     await new Promise((resolve) => setTimeout(resolve, delayMs));
   }
-  throw new Error('Firestore emulator did not start within timeout');
+  throw new Error(`${label} emulator did not start within timeout`);
 }
 
 async function runSeed() {
@@ -34,7 +42,9 @@ async function runSeed() {
       env: {
         ...process.env,
         FIRESTORE_EMULATOR_HOST: 'localhost:8080',
-        PUBLIC_FIREBASE_PROJECT_ID: process.env.PUBLIC_FIREBASE_PROJECT_ID || 'sansistore',
+        FIREBASE_AUTH_EMULATOR_HOST: 'localhost:9099',
+        PUBLIC_FIREBASE_PROJECT_ID:
+          process.env.PUBLIC_FIREBASE_PROJECT_ID || 'sansistore',
       },
     });
 
@@ -45,7 +55,9 @@ async function runSeed() {
         return;
       }
 
-      reject(new Error(`Seed command failed with exit code ${code ?? 'unknown'}`));
+      reject(
+        new Error(`Seed command failed with exit code ${code ?? 'unknown'}`)
+      );
     });
   });
 }
@@ -53,11 +65,17 @@ async function runSeed() {
 export default async function globalSetup() {
   console.log('Starting Playwright global setup...');
 
-  console.log('Starting Firestore emulator on port 8080...');
-  emulatorProcess = spawn('firebase', ['emulators:start', '--only', 'firestore', '--project', 'sansistore'], {
-    stdio: ['ignore', 'pipe', 'pipe'],
-    detached: false,
-  });
+  console.log(
+    'Starting Firestore and Auth emulators on ports 8080 and 9099...'
+  );
+  emulatorProcess = spawn(
+    'firebase',
+    ['emulators:start', '--only', 'firestore,auth', '--project', 'sansistore'],
+    {
+      stdio: ['ignore', 'pipe', 'pipe'],
+      detached: false,
+    }
+  );
 
   if (emulatorProcess.stdout) {
     emulatorProcess.stdout.on('data', (data) => {
@@ -72,7 +90,8 @@ export default async function globalSetup() {
     });
   }
 
-  await waitForEmulator();
+  await waitForEmulator('localhost:8080', 'Firestore');
+  await waitForEmulator('localhost:9099', 'Auth');
 
   await runSeed();
   console.log('✓ Shared test data seeded');
