@@ -6,11 +6,16 @@ import { productList } from './data/products.mjs';
 import { locationList } from './data/locations.mjs';
 import { orderList } from './data/orders.mjs';
 import { deliveryList } from './data/deliveries.mjs';
+import { run as seedCartItems } from './seed-cartitems.mjs';
 
-process.env.FIRESTORE_EMULATOR_HOST = process.env.FIRESTORE_EMULATOR_HOST || 'localhost:8080';
-process.env.FIREBASE_AUTH_EMULATOR_HOST = process.env.FIREBASE_AUTH_EMULATOR_HOST || 'localhost:9099';
+process.env.FIRESTORE_EMULATOR_HOST =
+  process.env.FIRESTORE_EMULATOR_HOST || 'localhost:8080';
+process.env.FIREBASE_AUTH_EMULATOR_HOST =
+  process.env.FIREBASE_AUTH_EMULATOR_HOST || 'localhost:9099';
 
-admin.initializeApp({ projectId: process.env.PUBLIC_FIREBASE_PROJECT_ID || 'sansistore' });
+admin.initializeApp({
+  projectId: process.env.PUBLIC_FIREBASE_PROJECT_ID || 'sansistore',
+});
 const db = admin.firestore();
 const auth = admin.auth();
 
@@ -22,7 +27,9 @@ const toTimestamp = (value, fallback = TS()) => {
 };
 
 const setDoc = async (collection, id, data) => {
-  const ref = id ? db.collection(collection).doc(id) : db.collection(collection).doc();
+  const ref = id
+    ? db.collection(collection).doc(id)
+    : db.collection(collection).doc();
   await ref.set(data, { merge: true });
   console.log(`  ✓ ${collection}/${ref.id}`);
   return ref.id;
@@ -32,18 +39,52 @@ async function seedAuthUsers() {
   console.log('\n Seeding Auth users...');
   for (const user of userList) {
     try {
-      await auth.getUser(user.uid);
-      console.log(`  ✓ Auth: ${user.email} (exists)`);
+      const existing = await auth.getUser(user.uid);
+      const hasGoogle = existing.providerData.some(
+        (p) => p.providerId === 'google.com'
+      );
+
+      if (user.authType === 'google' && !hasGoogle) {
+        await auth.deleteUser(user.uid);
+      } else {
+        console.log(`  ✓ Auth: ${user.email} (exists)`);
+        continue;
+      }
     } catch {
       try {
-        await auth.createUser({
-          uid: user.uid,
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL || '',
-          emailVerified: user.authType === 'google',
-          password: user.authType === 'email' ? 'password123' : undefined,
-        });
+        if (user.authType === 'google') {
+          const result = await auth.importUsers([
+            {
+              uid: user.uid,
+              email: user.email,
+              displayName: user.displayName,
+              photoURL: user.photoURL || '',
+              emailVerified: true,
+              providerData: [
+                {
+                  providerId: 'google.com',
+                  uid: user.email,
+                  email: user.email,
+                  displayName: user.displayName,
+                  photoURL: user.photoURL || '',
+                },
+              ],
+            },
+          ]);
+
+          if (result.failureCount > 0) {
+            throw result.errors[0].error;
+          }
+        } else {
+          await auth.createUser({
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL || '',
+            emailVerified: false,
+            password: 'password123',
+          });
+        }
         console.log(`  ✓ Auth: ${user.email} (${user.authType})`);
       } catch (err) {
         console.log(`  ⚠ Auth: ${user.email} - ${err.message}`);
@@ -149,7 +190,9 @@ async function seedOrders() {
   console.log('\n Seeding orders & orderItems...');
   for (const order of orderList) {
     const items = order.items.map((item, idx) => {
-      const unitPrice = item.product.hasOffer ? item.product.offerPrice : item.product.price;
+      const unitPrice = item.product.hasOffer
+        ? item.product.offerPrice
+        : item.product.price;
       const subtotal = unitPrice * item.quantity;
       return {
         itemId: `${order.code}-item-${idx + 1}`,
@@ -248,6 +291,7 @@ async function main() {
   await seedFirestoreUsers();
   await seedCategories();
   await seedProducts();
+  await seedCartItems({ db });
   await seedLocations();
   await seedOrders();
   await seedDeliveries();
