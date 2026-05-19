@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import UndeliveredModal from '../modals/UndeliveredModal';
+import { saveUndeliveredOrder } from '../services/undeliveredOrdersService';
 
 import {
   ArrowLeft,
@@ -435,21 +436,35 @@ export default function CourierDashboard({ embedded = false }: { embedded?: bool
     setSelectedUndeliveredOrder(order);
   };
 
-  const handleConfirmUndelivered = async (
-    order: CourierOrder,
-    reason: string,
-    notes: string
-  ) => {
-    try {
-      console.log(order, reason, notes);
+ const handleConfirmUndelivered = async (
+  order: CourierOrder,
+  reason: string,
+  notes: string
+) => {
+  try {
+    setUpdatingOrderId(order.id);
 
-      // request backend
+    await saveUndeliveredOrder({
+      order,
+      reason,
+      notes,
+    });
 
-      setSelectedUndeliveredOrder(null);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+    setSuccessMessage(
+      'Incidente registrado correctamente.'
+    );
+
+    setSelectedUndeliveredOrder(null);
+  } catch (error) {
+    console.error(error);
+
+    setErrorMessage(
+      'No se pudo registrar el incidente.'
+    );
+  } finally {
+    setUpdatingOrderId('');
+  }
+};
 
   const handleOpenMaps = (order: CourierOrder) => {
     const query = encodeURIComponent(
