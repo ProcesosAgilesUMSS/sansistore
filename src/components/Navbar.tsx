@@ -41,6 +41,7 @@ const applyTheme = (theme: ThemeMode) => {
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [userRoles, setUserRoles] = useState<string[]>([]);
   const [authError, setAuthError] = useState<string | null>(null);
   const [authReady, setAuthReady] = useState(false);
   const [theme, setTheme] = useState<ThemeMode>('light');
@@ -51,13 +52,31 @@ export default function Navbar() {
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
       setAuthReady(true);
+
+      if (!u) {
+        setUserRoles([]);
+        return;
+      }
+
+      getDoc(doc(db, 'users', u.uid))
+        .then((userSnap) => {
+          const roles = userSnap.data()?.roles;
+          setUserRoles(Array.isArray(roles) ? roles : []);
+        })
+        .catch(() => setUserRoles([]));
     });
     return unsub;
   }, []);
 
+  const canAccessCourier = userRoles.includes('mensajero');
+
   useEffect(() => {
-    const savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode | null;
-    const currentTheme = savedTheme || (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
+    const savedTheme = window.localStorage.getItem(
+      THEME_STORAGE_KEY
+    ) as ThemeMode | null;
+    const currentTheme =
+      savedTheme ||
+      (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
     if (currentTheme !== theme) {
       setTheme(currentTheme);
     }
@@ -160,7 +179,7 @@ export default function Navbar() {
             </a>
 
             {/* ACTIONS */}
-            <div className="flex items-center gap-3">   
+            <div className="flex items-center gap-3">
               {/* CART */}
               <button className="relative transition-all text-text-light opacity-[0.60] hover:text-primary hover:opacity-100">
                 <ShoppingBag size={18} />
@@ -237,13 +256,15 @@ export default function Navbar() {
                         role="menu"
                         className="absolute right-0 top-11 w-48 overflow-hidden rounded-lg border border-border-light bg-bg-light shadow-lg"
                       >
-                        <a
-                          role="menuitem"
-                          href="/courier"
-                          className="block px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
-                        >
-                          Courier
-                        </a>
+                        {canAccessCourier && (
+                          <a
+                            role="menuitem"
+                            href="/courier"
+                            className="block px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
+                          >
+                            Courier
+                          </a>
+                        )}
 
                         <button
                           type="button"
@@ -256,7 +277,7 @@ export default function Navbar() {
                         </button>
                       </div>
                     )}
-                </div>
+                  </div>
                 ) : (
                   <button
                     onClick={handleLogin}
@@ -295,7 +316,6 @@ export default function Navbar() {
               >
                 {menuOpen ? <X size={18} /> : <Menu size={18} />}
               </button>
-
             </div>
           </div>
 
@@ -324,12 +344,14 @@ export default function Navbar() {
                     Mis direcciones
                   </a>
 
-                  <a
-                    href="/courier"
-                    className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
-                  >
-                    Courier
-                  </a>
+                  {canAccessCourier && (
+                    <a
+                      href="/courier"
+                      className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
+                    >
+                      Courier
+                    </a>
+                  )}
                 </>
               )}
             </div>
