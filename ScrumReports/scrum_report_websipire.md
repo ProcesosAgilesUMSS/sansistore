@@ -178,13 +178,11 @@
 * **Today:** Defini los criterios de aceptacion y analice el funcionamiento que debera tener para comunicarme con otras areas para la implementacion completa.
 * **Blockers:** none
 
-
 ## Jose Brandon Pinedo Gonzales
 
 * **Yesterday:** Me reuní con el equipo para revisar las HUs propuestas para el Sprint 2 y definir cuáles serán trabajadas durante este sprint.
 * **Today:** Elaborar los criterios de aceptación de la HU que me tocó y revisar si tiene alguna dependencia con las tareas de los demás integrantes del equipo.
 * **Blockers:** none
-
 
 # Daily Reports - Team 3 Webspire 19/05/26
 
@@ -193,3 +191,9 @@
  * **Yesterday:** Implementar la Hu de "Como Mensajero, quiero marcar un pedido como “NO ENTREGADO” si no logro entrega"
 * **Today:** Conectar con la BD la parte del boton y comenzar a realizar mi otra HU.
 * **Blockers:** Modificaciones que se hicieron en cuanto al diseño del panel de mensajero.
+  
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Avancé con la HU *“Como Mensajero, quiero registrar el pago en efectivo del cliente para cerrar la venta”*, revisando el flujo para que el mensajero pueda registrar correctamente el pago en efectivo al finalizar la entrega. También verifiqué que la HU *“Como vendedor quiero ver el total de dinero cobrado en el día para rendir cuentas”* ya se encontraba avanzada.
+* **Today:** Continuar con los ajustes y pruebas de la HU de registrar el pago en efectivo, validando que el flujo funcione correctamente y que la información se registre de manera adecuada para cerrar la venta.
+* **Blockers:** none
