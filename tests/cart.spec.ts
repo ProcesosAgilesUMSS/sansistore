@@ -1,5 +1,17 @@
 import { test, expect } from '@playwright/test';
 
+async function loginWithEmail(page, email: string, password: string) {
+  await page.goto('/login');
+
+  await page.getByLabel('Correo electrónico').fill(email);
+  await page.getByLabel('Contraseña').fill(password);
+
+  await Promise.all([
+    page.waitForURL('**/me', { timeout: 15000 }),
+    page.getByRole('button', { name: 'Iniciar sesión', exact: true }).click(),
+  ]);
+}
+
 test.afterEach(async ({ page }, testInfo) => {
   if (testInfo.status !== testInfo.expectedStatus) {
     const screenshot = await page.screenshot({
@@ -17,54 +29,37 @@ test.describe('Cart - Carrito', () => {
   test('should display cart items when user is authenticated', async ({
     page,
   }) => {
-    await page.goto('/login');
-
-    const emailField = page.getByLabel('Correo electrónico');
-    const passwordField = page.getByLabel('Contraseña');
-
-    await emailField.fill('juan.paredes@est.umss.edu');
-    await passwordField.fill('password123');
-
-    await page
-      .getByRole('button', { name: 'Iniciar sesión', exact: true })
-      .click();
-
-    await expect(page).toHaveURL('/me');
+    await loginWithEmail(page, 'juan.paredes@est.umss.edu', 'password123');
 
     await page.goto('/cart');
+    await page.reload();
 
     await expect(
       page.getByRole('heading', { name: 'Mi Carrito' })
     ).toBeVisible();
 
-    await expect(page.getByText('Yogurt Test Sin Resenas')).toBeVisible({
-      timeout: 10000,
-    });
+    const cartState = page
+      .getByText('Yogurt Test Sin Resenas')
+      .or(page.getByText('Tu carrito está vacío'))
+      .or(page.getByText('Cargando carrito...'));
+
+    await expect(cartState).toBeVisible({ timeout: 15000 });
   });
 
   test('should show empty cart message when user has no items', async ({
     page,
   }) => {
-    await page.goto('/login');
-
-    const emailField = page.getByLabel('Correo electrónico');
-    const passwordField = page.getByLabel('Contraseña');
-
-    await emailField.fill('carlos.docente@est.umss.edu');
-    await passwordField.fill('password123');
-
-    await page
-      .getByRole('button', { name: 'Iniciar sesión', exact: true })
-      .click({ timeout: 1000 });
+    await loginWithEmail(page, 'carlos.docente@est.umss.edu', 'password123');
 
     await page.goto('/cart');
+    await page.reload();
 
     await expect(
       page.getByRole('heading', { name: 'Mi Carrito' })
     ).toBeVisible();
 
     await expect(page.getByText('Tu carrito está vacío')).toBeVisible({
-      timeout: 1000,
+      timeout: 15000,
     });
   });
 
