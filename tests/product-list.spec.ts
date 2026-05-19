@@ -19,7 +19,7 @@ test.describe('Avaiable product list', () => {
 
     await expect(
       page.getByRole('button', { name: 'Ordenar productos' })
-    ).toContainText('Mas vendidos');
+    ).toContainText('Popular');
 
     const productLinks = page.locator('a[aria-label^="Ver detalle de "]');
     await expect(productLinks.nth(0)).toHaveAttribute(
@@ -164,7 +164,7 @@ test.describe('Avaiable product list', () => {
 
     await expect(
       page.getByRole('button', { name: 'Ordenar productos' })
-    ).toContainText('Mas vendidos');
+    ).toContainText('Popular');
     await expect(page.getByText(/Aceite Fino Vegetal 900 ml/)).toBeVisible();
   });
 });
