@@ -104,9 +104,9 @@
   - **Blockers:**     Ninguno
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:** Revisé los componentes del módulo de inventarios
+  - **Today:**  Continuar con mejoras en la interfaz de productos.      
+  - **Blockers:** Ninguno     
 
   ## Rios Quiruchi Edney Jhojan
   - **Yesterday:**    
@@ -131,9 +131,9 @@
   - **Blockers:**     Bug detectado.
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**   Apoyé en la revisión visual del módulo de inventarios. 
+  - **Today:**       Revisar la organización visual del stock 
+  - **Blockers:**    ninguno  
 
   ## Rios Quiruchi Edney Jhojan
   - **Yesterday:**    
@@ -161,9 +161,9 @@
   - **Blockers:**     El bug tomó mas tiempo del previsto.
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**  Colaboré con mejoras de diseño en el sistema de inventarios.  
+  - **Today:**      Continuar con detalles de interfaz y visualización. 
+  - **Blockers:**   ninguno  
 
   ## Rios Quiruchi Edney Jhojan
   - **Yesterday:**    
