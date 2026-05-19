@@ -1,18 +1,18 @@
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
-import CourierDashboard from './CourierDashboard';
 import MessengerDashboard from './MessengerDashboard';
 
-type DeliverySection = 'deliveries' | 'assigned' | 'delivered';
+type DeliverySection = 'assigned' | 'accepted' | 'delivered';
 
 const sections: Array<{ id: DeliverySection; label: string }> = [
-  { id: 'deliveries', label: 'Gestión Entregas' },
-  { id: 'assigned', label: 'Pedidos aceptados' },
+  { id: 'assigned', label: 'Gestión Entregas' },
+  { id: 'accepted', label: 'Pedidos aceptados' },
   { id: 'delivered', label: 'Entregados ' },
 ];
 
 export default function DeliveryActionsPanel() {
-  const [activeSection, setActiveSection] = useState<DeliverySection>('deliveries');
+  const [activeSection, setActiveSection] =
+    useState<DeliverySection>('assigned');
   const [menuOpen, setMenuOpen] = useState(false);
 
   const selectSection = (section: DeliverySection) => {
@@ -28,7 +28,9 @@ export default function DeliveryActionsPanel() {
           onClick={() => setMenuOpen((open) => !open)}
           className="flex w-full items-center justify-between rounded-xl border border-primary bg-secondary-bg-light p-2 text-left text-sm font-semibold text-primary"
         >
-          <span>{sections.find((section) => section.id === activeSection)?.label}</span>
+          <span>
+            {sections.find((section) => section.id === activeSection)?.label}
+          </span>
           {menuOpen ? <X size={18} /> : <Menu size={18} />}
         </button>
 
@@ -57,7 +59,9 @@ export default function DeliveryActionsPanel() {
       </div>
 
       <aside className="hidden rounded-xl border border-border-light bg-card-bg-light p-3 lg:block lg:min-h-[calc(100vh-5.5rem)] lg:w-56 lg:shrink-0">
-        <p className="mb-3 px-2 text-xs font-semibold uppercase text-primary">Delivery</p>
+        <p className="mb-3 px-2 text-xs font-semibold uppercase text-primary">
+          Delivery
+        </p>
 
         <div className="space-y-2">
           {sections.map((section) => {
@@ -82,11 +86,7 @@ export default function DeliveryActionsPanel() {
       </aside>
 
       <section className="min-h-[calc(100vh-5.5rem)] min-w-0 flex-1">
-        {activeSection === 'deliveries' ? (
-          <CourierDashboard embedded />
-        ) : (
-          <MessengerDashboard clientSection={activeSection} embedded />
-        )}
+        <MessengerDashboard clientSection={activeSection} embedded />
       </section>
     </section>
   );
