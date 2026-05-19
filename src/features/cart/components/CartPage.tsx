@@ -1,15 +1,140 @@
 import { useEffect, useMemo, useState } from 'react';
 import { onAuthStateChanged, type User } from 'firebase/auth';
-import { Package, ShoppingBag } from 'lucide-react';
+import { Package, ShoppingBag, Trash2 } from 'lucide-react';
 import { auth } from '../../../lib/firebase';
-import { formatMoney, getUserCartItems } from '../services/cartService';
+import {
+  formatMoney,
+  getUserCartItems,
+  removeCartItem,
+} from '../services/cartService';
 import type { CartItem } from '../types';
 
-function CartItemCard({ item }: { item: CartItem }) {
+function RemoveItemModal({
+  item,
+  isLoading,
+  onConfirm,
+  onCancel,
+}: {
+  item: CartItem;
+  isLoading: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !isLoading) onCancel();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isLoading, onCancel]);
+
   return (
-    <article className="border-b border-border-light py-4 last:border-b-0">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="remove-item-title"
+    >
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
+        onClick={isLoading ? undefined : onCancel}
+      />
+
+      <div className="relative z-10 w-full max-w-sm animate-in zoom-in-95 fade-in duration-200 rounded-2xl border border-(--theme-border) bg-(--theme-card-bg) p-6 shadow-2xl">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-500/10 text-red-600">
+            <Trash2 size={18} />
+          </div>
+          <h2
+            id="remove-item-title"
+            className="text-lg font-bold text-(--theme-text)"
+          >
+            Eliminar producto
+          </h2>
+        </div>
+
+        <p className="mt-4 text-sm leading-relaxed text-(--theme-text) opacity-70">
+          ¿Seguro que querés eliminar{' '}
+          <span className="font-semibold text-(--theme-text) opacity-100">
+            {item.name}
+          </span>{' '}
+          del carrito?
+        </p>
+
+        <div className="mt-6 flex gap-3">
+          <button
+            onClick={onCancel}
+            disabled={isLoading}
+            className="flex-1 rounded-full border border-(--theme-border) px-4 py-3 text-sm font-medium text-(--theme-text) transition hover:bg-(--theme-secondary-bg) disabled:opacity-40"
+          >
+            Cancelar
+          </button>
+
+          <button
+            onClick={onConfirm}
+            disabled={isLoading}
+            className="flex-1 rounded-full bg-red-600 px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90 active:scale-95 disabled:opacity-60"
+          >
+            {isLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z"
+                  />
+                </svg>
+                Eliminando…
+              </span>
+            ) : (
+              'Eliminar'
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AvailabilityPill({ item }: { item: CartItem }) {
+  const available = item.isAvailable;
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+        available
+          ? 'border border-(--theme-border) bg-primary/10 text-primary'
+          : 'border border-red-200 bg-red-500/10 text-red-600'
+      }`}
+    >
+      <span
+        className={`h-1.5 w-1.5 rounded-full ${available ? 'bg-primary' : 'bg-red-500'}`}
+      />
+      {available ? 'Disponible' : item.availabilityMessage}
+    </span>
+  );
+}
+
+function CartItemCard({
+  item,
+  removing,
+  onRemove,
+}: {
+  item: CartItem;
+  removing: boolean;
+  onRemove: (item: CartItem) => void;
+}) {
+  return (
+    <article className="rounded-xl border border-(--theme-border) bg-(--theme-card-bg) p-4 transition hover:border-(--theme-text)/20">
       <div className="grid gap-4 sm:grid-cols-[88px_1fr_auto] sm:items-start">
-        <div className="flex aspect-square items-center justify-center overflow-hidden rounded-lg bg-secondary-bg-light">
+        <div className="flex aspect-square items-center justify-center overflow-hidden rounded-xl border border-(--theme-border) bg-(--theme-secondary-bg)">
           {item.imageUrl ? (
             <img
               src={item.imageUrl}
@@ -17,36 +142,47 @@ function CartItemCard({ item }: { item: CartItem }) {
               className="h-full w-full object-cover"
             />
           ) : (
-            <Package size={26} className="text-text-light opacity-40" />
+            <Package size={26} className="text-(--theme-text) opacity-40" />
           )}
         </div>
 
-        <div>
-          <h2 className="font-semibold text-text-light">{item.name}</h2>
-          <p className="mt-1 text-sm text-text-light opacity-70">
-            Cantidad: {item.quantity}
-          </p>
-          <p className="mt-1 text-sm text-text-light opacity-70">
-            Precio unitario:{' '}
-            {item.unitPrice > 0 ? formatMoney(item.unitPrice) : 'No disponible'}
-          </p>
-          <p className="mt-1 text-sm text-text-light opacity-70">
-            Stock disponible: {item.stockAvailable}
-          </p>
-          {item.isAvailable ? (
-            <p className="mt-2 text-sm font-semibold text-primary">
-              Disponible para confirmar
-            </p>
-          ) : (
-            <p className="mt-2 text-sm font-semibold text-red-600">
-              {item.availabilityMessage}
-            </p>
-          )}
+        <div className="min-w-0">
+          <h2 className="font-semibold text-(--theme-text)">{item.name}</h2>
+
+          <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm text-(--theme-text) opacity-60">
+            <dt>Cantidad</dt>
+            <dd className="text-(--theme-text) opacity-90">{item.quantity}</dd>
+            <dt>Precio unitario</dt>
+            <dd className="text-(--theme-text) opacity-90">
+              {item.unitPrice > 0 ? formatMoney(item.unitPrice) : 'No disponible'}
+            </dd>
+            <dt>Stock</dt>
+            <dd className="text-(--theme-text) opacity-90">{item.stockAvailable}</dd>
+          </dl>
+
+          <div className="mt-3">
+            <AvailabilityPill item={item} />
+          </div>
         </div>
 
-        <div className="text-left sm:text-right">
-          <p className="text-sm text-text-light opacity-70">Subtotal</p>
-          <p className="font-bold text-text-light">{formatMoney(item.subtotal)}</p>
+        <div className="flex flex-row items-center justify-between gap-3 sm:flex-col sm:items-end sm:justify-start">
+          <div className="text-left sm:text-right">
+            <p className="text-xs uppercase text-(--theme-text) opacity-50">
+              Subtotal
+            </p>
+            <p className="font-bold text-primary">{formatMoney(item.subtotal)}</p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => onRemove(item)}
+            disabled={removing}
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-(--theme-border) text-red-600 transition hover:border-red-300 hover:bg-red-500/10 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+            aria-label={`Eliminar ${item.name}`}
+            title="Eliminar producto"
+          >
+            <Trash2 size={16} />
+          </button>
         </div>
       </div>
     </article>
@@ -61,28 +197,41 @@ function CartSummary({ items }: { items: CartItem[] }) {
   const hasItems = items.length > 0;
 
   return (
-    <aside className="cart-summary rounded-lg border border-border-light bg-bg-light p-4">
-      <div className="mb-4 flex items-center gap-2">
+    <aside className="cart-summary sticky top-4 h-fit overflow-hidden rounded-[1.25rem] border border-(--theme-border) bg-(--theme-card-bg) p-5">
+      <div className="mb-5 flex items-center gap-2">
         <ShoppingBag size={18} className="text-primary" />
-        <h2 className="text-lg font-semibold">Resumen del pedido</h2>
+        <h2 className="text-lg font-bold text-(--theme-text)">
+          Resumen del pedido
+        </h2>
       </div>
 
-      <div className="flex justify-between gap-3 mb-2">
-        <span>Subtotal</span>
-        <span>{formatMoney(subtotal)}</span>
+      <div className="space-y-2 text-sm">
+        <div className="flex justify-between gap-3 text-(--theme-text) opacity-70">
+          <span>Subtotal</span>
+          <span className="font-medium">{formatMoney(subtotal)}</span>
+        </div>
+        <div className="flex justify-between gap-3 text-(--theme-text) opacity-70">
+          <span>Envío</span>
+          <span className="font-medium">{formatMoney(shipping)}</span>
+        </div>
       </div>
-      <div className="flex justify-between gap-3 mb-2">
-        <span>Envío</span>
-        <span>{formatMoney(shipping)}</span>
-      </div>
-      <hr className="my-3" />
-      <div className="flex justify-between gap-3 text-lg font-bold mb-4">
-        <span>Total de compra</span>
-        <span>{formatMoney(total)}</span>
+
+      <div className="my-4 h-px bg-(--theme-border)" />
+
+      <div className="mb-5 flex items-end justify-between gap-3">
+        <span className="text-xs uppercase text-(--theme-text) opacity-50">
+          Total de compra
+        </span>
+        <span
+          data-testid="cart-total"
+          className="text-2xl font-bold text-primary"
+        >
+          {formatMoney(total)}
+        </span>
       </div>
 
       {hasUnavailableItems && (
-        <p className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700">
+        <p className="mb-4 rounded-xl border border-red-200 bg-red-500/10 p-3 text-xs font-medium text-red-600">
           Hay productos que no pudieron calcularse. Revisa el carrito antes de
           confirmar.
         </p>
@@ -91,7 +240,7 @@ function CartSummary({ items }: { items: CartItem[] }) {
       <button
         type="button"
         disabled={!hasItems || hasUnavailableItems}
-        className="w-full rounded-lg bg-primary py-2 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
       >
         Confirmar pedido
       </button>
@@ -122,6 +271,8 @@ export default function CartPage() {
   const [authReady, setAuthReady] = useState(false);
   const [items, setItems] = useState<CartItem[] | null>(null);
   const [error, setError] = useState('');
+  const [removingItemId, setRemovingItemId] = useState<string | null>(null);
+  const [itemToRemove, setItemToRemove] = useState<CartItem | null>(null);
 
   useEffect(() => {
     return onAuthStateChanged(auth, (currentUser) => {
@@ -155,6 +306,32 @@ export default function CartPage() {
     [items],
   );
 
+  const handleRemoveItem = (item: CartItem) => {
+    if (!user || removingItemId) return;
+    setItemToRemove(item);
+  };
+
+  const confirmRemoveItem = async () => {
+    if (!user || !itemToRemove) return;
+
+    setRemovingItemId(itemToRemove.id);
+    setError('');
+
+    try {
+      await removeCartItem(user.uid, itemToRemove.id);
+      setItems((currentItems) =>
+        currentItems
+          ? currentItems.filter((cartItem) => cartItem.id !== itemToRemove.id)
+          : currentItems,
+      );
+      setItemToRemove(null);
+    } catch {
+      setError('No se pudo eliminar el producto del carrito');
+    } finally {
+      setRemovingItemId(null);
+    }
+  };
+
   if (!authReady || (user && items === null && !error)) {
     return <div id="cart-status">Cargando...</div>;
   }
@@ -181,13 +358,29 @@ export default function CartPage() {
   }
 
   return (
-    <div className="grid gap-8 md:grid-cols-3">
-      <section className="rounded-lg border border-border-light bg-bg-light p-4 md:col-span-2">
-        {sortedItems.map((item) => (
-          <CartItemCard key={item.id} item={item} />
-        ))}
-      </section>
-      <CartSummary items={sortedItems} />
-    </div>
+    <>
+      <div className="grid gap-6 md:grid-cols-3">
+        <section className="space-y-3 md:col-span-2">
+          {sortedItems.map((item) => (
+            <CartItemCard
+              key={item.id}
+              item={item}
+              removing={removingItemId === item.id}
+              onRemove={handleRemoveItem}
+            />
+          ))}
+        </section>
+        <CartSummary items={sortedItems} />
+      </div>
+
+      {itemToRemove && (
+        <RemoveItemModal
+          item={itemToRemove}
+          isLoading={removingItemId === itemToRemove.id}
+          onConfirm={confirmRemoveItem}
+          onCancel={() => setItemToRemove(null)}
+        />
+      )}
+    </>
   );
 }

@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDoc, getDocs } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import type { CartInventory, CartItem, CartProduct } from '../types';
 
@@ -98,6 +98,10 @@ export async function getUserCartItems(userId: string): Promise<CartItem[]> {
       };
     }),
   );
+}
+
+export async function removeCartItem(userId: string, cartItemId: string) {
+  await deleteDoc(doc(db, 'users', userId, 'cartItems', cartItemId));
 }
 
 export function formatMoney(value: number) {
