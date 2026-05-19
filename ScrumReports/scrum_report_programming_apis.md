@@ -213,3 +213,8 @@
 - **Yesterday:** Estuve en contacto con el grupo de WebSpire para hablar sobre una hu que es igual a la que hicieron en el primer sprint.
 - **Today:** Trabajare en la hu de reasignar mensajero.
 - **Blockers:** None.
+
+### Adrian Said Andrade Medina
+- **Yesterday:** Investigué sobre el framework Leaflet para la implementación de mapas.
+- **Today:** Planeo practicar con el framework antes de comenzar la implementación.
+- **Blockers:** None.
