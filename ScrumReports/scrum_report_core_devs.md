@@ -119,9 +119,9 @@
   - **Blockers:**     
 
   ## Soliz Moya Alejandra
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Realizar el retrospective
+  - **Today:**        Buscar posibles errores en la pagina
+  - **Blockers:**     ninguno
 
 # Daily Report
 # 05/14/2026
@@ -146,9 +146,9 @@
   - **Blockers:**     
 
   ## Soliz Moya Alejandra
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**   Revisar las US que se nos asignaron
+  - **Today:**       Mejorar la US 4
+  - **Blockers:**    ninguno    
 
 
 
@@ -176,8 +176,8 @@
   - **Blockers:**     
 
   ## Soliz Moya Alejandra
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Mejorar las US definidas
+  - **Today:**        Colaborar en el diseño para visualizacion del stock
+  - **Blockers:**     ninguno
 
  
