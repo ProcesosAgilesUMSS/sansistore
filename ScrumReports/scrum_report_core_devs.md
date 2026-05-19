@@ -109,9 +109,9 @@
   - **Blockers:** Ninguno     
 
   ## Rios Quiruchi Edney Jhojan
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Implemente la subida de imagenes desde firebase
+  - **Today:**        Ayude en el retrospective
+  - **Blockers:**     ninguno
 
   ## Sejas Arze Eddy
   - **Yesterday:**    
@@ -136,9 +136,9 @@
   - **Blockers:**    ninguno  
 
   ## Rios Quiruchi Edney Jhojan
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Colaborar en la seleccion de US para el srpint 2
+  - **Today:**        Colaborar en el detalle de las US
+  - **Blockers:**     ninguno
 
   ## Sejas Arze Eddy
   - **Yesterday:**    
@@ -166,9 +166,9 @@
   - **Blockers:**   ninguno  
 
   ## Rios Quiruchi Edney Jhojan
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Avanzar con la US de stock de inventario
+  - **Today:**        continuar con la US de stock de inventario
+  - **Blockers:**     dudas con la US
 
   ## Sejas Arze Eddy
   - **Yesterday:**    
