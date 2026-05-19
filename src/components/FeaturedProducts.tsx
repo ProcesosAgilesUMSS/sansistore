@@ -114,6 +114,23 @@ function getBadgeData(product: Product) {
 
 interface FeaturedProductsProps {
   initialSearch?: string;
+  initialCategory?: string | null;
+  initialOffersOnly?: boolean;
+  initialSort?: string | null;
+  initialPage?: number;
+}
+
+function isSortOption(value: string | null | undefined): value is
+  | 'best-sellers'
+  | 'recent'
+  | 'name-asc'
+  | 'name-desc' {
+  return (
+    value === 'best-sellers' ||
+    value === 'recent' ||
+    value === 'name-asc' ||
+    value === 'name-desc'
+  );
 }
 
 const SORT_OPTIONS = [
@@ -125,6 +142,10 @@ const SORT_OPTIONS = [
 
 export default function FeaturedProducts({
   initialSearch = '',
+  initialCategory = null,
+  initialOffersOnly = false,
+  initialSort = 'best-sellers',
+  initialPage = 1,
 }: FeaturedProductsProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -136,13 +157,17 @@ export default function FeaturedProducts({
     getSearchHistory()
   );
   const [inputFocused, setInputFocused] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [showOffersOnly, setShowOffersOnly] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    initialCategory
+  );
+  const [showOffersOnly, setShowOffersOnly] = useState(initialOffersOnly);
+  const [currentPage, setCurrentPage] = useState(
+    Number.isFinite(initialPage) && initialPage > 0 ? initialPage : 1
+  );
   const [invalidPage, setInvalidPage] = useState(false);
   const [sortBy, setSortBy] = useState<
     'best-sellers' | 'recent' | 'name-asc' | 'name-desc'
-  >('best-sellers');
+  >(isSortOption(initialSort) ? initialSort : 'best-sellers');
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const ITEMS_PER_PAGE = 12;
   const searchRef = useRef<HTMLDivElement>(null);
@@ -180,6 +205,9 @@ export default function FeaturedProducts({
       }
       if (sortParam && sortParam !== sortBy) {
         setSortBy(sortParam);
+      }
+      if (isValidPageNumber && pageNum !== currentPage) {
+        setCurrentPage(pageNum);
       }
     }
   }, []);
