@@ -184,3 +184,12 @@
 * **Yesterday:** Me reuní con el equipo para revisar las HUs propuestas para el Sprint 2 y definir cuáles serán trabajadas durante este sprint.
 * **Today:** Elaborar los criterios de aceptación de la HU que me tocó y revisar si tiene alguna dependencia con las tareas de los demás integrantes del equipo.
 * **Blockers:** none
+
+
+# Daily Reports - Team 3 Webspire 19/05/26
+
+## Dayana Saleth Ortuño Guzman
+
+ * **Yesterday:** Implementar la Hu de "Como Mensajero, quiero marcar un pedido como “NO ENTREGADO” si no logro entrega"
+* **Today:** Conectar con la BD la parte del boton y comenzar a realizar mi otra HU.
+* **Blockers:** Modificaciones que se hicieron en cuanto al diseño del panel de mensajero.
