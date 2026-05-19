@@ -67,7 +67,6 @@ export const Products = {
     price: 18,
     imageUrl:
       'https://hipermaxi.com/tienda-api/marketfile/ImageEcommerce?hashfile=294b7aa_1b79_4bbc_aabe_4a15c769d068.webp&co=5&size=900x900',
-    badge: 'Popular',
     stockTotal: 42,
     stockAvailable: 17,
     sourceUrl:

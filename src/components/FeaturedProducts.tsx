@@ -4,6 +4,11 @@ import { FaCartPlus, FaFilter } from 'react-icons/fa';
 import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { getOfferBadgeData, hasValidOffer } from '../lib/productOffers';
+import {
+  getCreatedAtTimestamp,
+  getSoldCount,
+  isPopularProduct,
+} from '../lib/productPopularity';
 import CategoryFilter from './CategoryFilter';
 
 interface Product {
@@ -22,6 +27,7 @@ interface Product {
   enabled?: boolean;
   categoryId?: string;
   createdAt?: any;
+  soldCount?: number;
 }
 
 interface Inventory {
@@ -98,6 +104,13 @@ interface FeaturedProductsProps {
   initialSearch?: string;
 }
 
+const SORT_OPTIONS = [
+  { value: 'best-sellers', label: 'Mas vendidos' },
+  { value: 'recent', label: 'Recientes' },
+  { value: 'name-asc', label: 'A-Z' },
+  { value: 'name-desc', label: 'Z-A' },
+] as const;
+
 export default function FeaturedProducts({
   initialSearch = '',
 }: FeaturedProductsProps) {
@@ -115,7 +128,9 @@ export default function FeaturedProducts({
   const [showOffersOnly, setShowOffersOnly] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [invalidPage, setInvalidPage] = useState(false);
-  const [sortBy, setSortBy] = useState<'price-asc' | 'price-desc' | 'name' | 'recent'>('recent');
+  const [sortBy, setSortBy] = useState<
+    'best-sellers' | 'recent' | 'name-asc' | 'name-desc'
+  >('best-sellers');
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const ITEMS_PER_PAGE = 12;
   const searchRef = useRef<HTMLDivElement>(null);
@@ -128,7 +143,12 @@ export default function FeaturedProducts({
       const pageParamStr = url.searchParams.get('page');
       const categoryParam = url.searchParams.get('category');
       const offersParam = url.searchParams.get('offers') === 'true';
-      const sortParam = url.searchParams.get('sort') as 'price-asc' | 'price-desc' | 'name' | 'recent' | null;
+      const sortParam = url.searchParams.get('sort') as
+        | 'best-sellers'
+        | 'recent'
+        | 'name-asc'
+        | 'name-desc'
+        | null;
       
       // Validate page is numeric
       const pageNum = pageParamStr ? parseInt(pageParamStr, 10) : 1;
@@ -247,6 +267,7 @@ export default function FeaturedProducts({
 
               return {
                 ...product,
+                soldCount: getSoldCount(product),
                 stockAvailable: inventory?.stockAvailable ?? 0,
                 stockTotal: inventory?.stockTotal ?? 0,
                 enabled: inventory?.enabled ?? false,
@@ -255,7 +276,6 @@ export default function FeaturedProducts({
         );
       } catch (error) {
         console.error('Error loading products:', error);
-        setProducts([]);
         setError('No se pudo cargar el catálogo en este momento.');
       } finally {
         setLoading(false);
@@ -297,26 +317,50 @@ export default function FeaturedProducts({
       result = [...byName, ...byDescription];
     }
 
+    const allSoldCountsAreZero = result.every(
+      (product) => getSoldCount(product) === 0
+    );
+    const effectiveSortBy =
+      sortBy === 'best-sellers' && allSoldCountsAreZero ? 'recent' : sortBy;
+
     // Apply sorting
     const sorted = [...result];
-    switch (sortBy) {
-      case 'price-asc':
-        sorted.sort((a, b) => a.price - b.price);
+    switch (effectiveSortBy) {
+      case 'best-sellers':
+        sorted.sort(
+          (a, b) =>
+            getSoldCount(b) - getSoldCount(a) ||
+            getCreatedAtTimestamp(b) - getCreatedAtTimestamp(a)
+        );
         break;
-      case 'price-desc':
-        sorted.sort((a, b) => b.price - a.price);
-        break;
-      case 'name':
+      case 'name-asc':
         sorted.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'name-desc':
+        sorted.sort((a, b) => b.name.localeCompare(a.name));
         break;
       case 'recent':
       default:
-        // Already sorted by createdAt desc from Firebase query
+        sorted.sort(
+          (a, b) => getCreatedAtTimestamp(b) - getCreatedAtTimestamp(a)
+        );
         break;
     }
 
     return sorted;
   }, [products, appliedSearch, selectedCategory, showOffersOnly, sortBy]);
+
+  const showBestSellersFallbackMessage = useMemo(() => {
+    if (sortBy !== 'best-sellers' || filteredProducts.length === 0) {
+      return false;
+    }
+
+    return filteredProducts.every((product) => getSoldCount(product) === 0);
+  }, [filteredProducts, sortBy]);
+
+  const selectedSortLabel =
+    SORT_OPTIONS.find((option) => option.value === sortBy)?.label ??
+    'Mas vendidos';
 
   const searchSuggestions = useMemo(() => {
     if (!searchTerm || searchTerm.length < 1) {
@@ -436,7 +480,7 @@ export default function FeaturedProducts({
     } else {
       url.searchParams.delete('category');
     }
-    if (sort !== 'recent') {
+    if (sort !== 'best-sellers') {
       url.searchParams.set('sort', sort);
     } else {
       url.searchParams.delete('sort');
@@ -627,20 +671,16 @@ export default function FeaturedProducts({
               <button
                 type="button"
                 onClick={() => setShowSortDropdown(!showSortDropdown)}
-                className="flex items-center justify-center rounded-full p-2.5 text-text-light transition-all hover:text-primary hover:bg-primary/10"
+                className="flex items-center gap-2 rounded-full border border-border-light bg-card-bg-light px-4 py-2.5 text-sm font-semibold text-text-light transition-all hover:border-primary hover:text-primary"
                 title="Ordenar productos"
                 aria-label="Ordenar productos"
               >
                 <FaFilter size={16} />
+                <span>{selectedSortLabel}</span>
               </button>
               {showSortDropdown && (
                 <div className="absolute right-0 top-full mt-1 min-w-56 rounded-lg border border-border-light bg-card-bg-light py-1 shadow-lg z-20">
-                  {[
-                    { value: 'recent' as const, label: 'Recientes' },
-                    { value: 'name' as const, label: 'Nombre A-Z' },
-                    { value: 'price-asc' as const, label: 'Precio: Menor a Mayor' },
-                    { value: 'price-desc' as const, label: 'Precio: Mayor a Menor' },
-                  ].map((option) => (
+                  {SORT_OPTIONS.map((option) => (
                     <button
                       key={option.value}
                       type="button"
@@ -688,6 +728,12 @@ export default function FeaturedProducts({
           </div>
         )}
 
+        {!loading && showBestSellersFallbackMessage && (
+          <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            Aun no hay ventas registradas para este resultado. Mostrando los productos mas recientes mientras se generan ventas.
+          </div>
+        )}
+
         {!loading &&
           filteredProducts.length === 0 &&
           (appliedSearch || selectedCategory || showOffersOnly) && (
@@ -726,6 +772,7 @@ export default function FeaturedProducts({
                 .map((product) => {
               const showOffer = hasValidOffer(product);
               const badgeData = getBadgeData(product);
+              const showPopularBadge = isPopularProduct(product);
               const currentPrice = showOffer
                 ? product.offerPrice!
                 : product.price;
@@ -752,13 +799,20 @@ export default function FeaturedProducts({
                       }}
                     />
 
-                    {badgeData && (
-                      <span
-                        className={`absolute left-3 top-3 rounded-full px-2 py-0.5 text-xs font-semibold ${badgeData.className}`}
-                      >
-                        {badgeData.label}
-                      </span>
-                    )}
+                    <div className="absolute left-3 top-3 flex flex-wrap gap-2">
+                      {badgeData && (
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-xs font-semibold ${badgeData.className}`}
+                        >
+                          {badgeData.label}
+                        </span>
+                      )}
+                      {showPopularBadge && (
+                        <span className="rounded-full bg-amber-400 px-2 py-0.5 text-xs font-semibold text-amber-950">
+                          Popular
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   <div className="relative z-20 flex flex-1 flex-col p-3 sm:p-4">
@@ -777,6 +831,10 @@ export default function FeaturedProducts({
                         appliedSearch,
                         getMatchField(product, appliedSearch) === 'name'
                       )}
+                    </span>
+
+                    <span className="mt-2 text-xs text-text-light opacity-60">
+                      Vendidos: {getSoldCount(product)}
                     </span>
 
                     <div className="mt-auto flex items-center justify-between gap-2 pt-2 sm:pt-3">
