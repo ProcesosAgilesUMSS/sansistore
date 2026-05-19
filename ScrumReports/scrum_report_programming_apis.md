@@ -224,3 +224,9 @@
 - **Yesterday:** Investigación y análisis de la arquitectura del módulo de pagos para la HU #101, planificando cómo estructurar el flujo de datos y la interfaz de confirmación de cobro.
 - **Today:** Inicio del desarrollo de la HU #101 para el registro de pago del cliente. Trabajando en el maquetado inicial del componente y en el planteamiento de la lógica para actualizar el estado del pedido, continuando con el proceso de implementación.
 - **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+
+- **Yesterday:** Tambien investigué sobre el framework Leaflet para la implementación de mapas para el uso de rutas.
+- **Today:** Continue con el desarrollo de la HU 108 para la visualizacion de rutas de entrega
+- **Blockers:** None.
