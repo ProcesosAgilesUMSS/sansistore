@@ -140,6 +140,7 @@ export default function Navbar() {
               {[
                 { label: 'Productos', href: '/productos' },
                 { label: 'Pedidos', href: '/orders/sent' },
+                { label: 'Reservas', href: '/seller/reservations' },
                 { label: 'Inventario', href: '/inventory' },
               ].map((item) => (
                 <a
