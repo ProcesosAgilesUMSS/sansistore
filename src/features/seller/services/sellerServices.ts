@@ -140,7 +140,6 @@ export function subscribeSellerOrders(
 
   const qReserved = query(
     ordersRef,
-    where('sellerId', '==', sellerId),
     where('status', '==', 'RESERVADO'),
     orderBy('confirmedAt', 'asc'),
   );
