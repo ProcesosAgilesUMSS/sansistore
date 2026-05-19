@@ -74,6 +74,10 @@ function formatPrice(amount: number) {
 function getBadgeData(product: Product | null) {
   const badgeData = getOfferBadgeData(product);
 
+  if (badgeData?.label.trim().toLowerCase() === 'popular') {
+    return null;
+  }
+
   if (badgeData?.isDiscount) {
     return {
       label: badgeData.label,

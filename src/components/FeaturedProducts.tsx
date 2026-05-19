@@ -93,6 +93,10 @@ function formatPrice(amount: number) {
 function getBadgeData(product: Product) {
   const badgeData = getOfferBadgeData(product);
 
+  if (badgeData?.label.trim().toLowerCase() === 'popular') {
+    return null;
+  }
+
   if (badgeData?.isDiscount) {
     return {
       label: badgeData.label,
@@ -861,11 +865,7 @@ export default function FeaturedProducts({
                           )}
                         </span>
 
-                        <span className="mt-2 text-xs text-text-light opacity-60">
-                          Vendidos: {getSoldCount(product)}
-                        </span>
-
-                        <div className="mt-auto flex items-center justify-between gap-2 pt-2 sm:pt-3">
+                    <div className="mt-auto flex items-center justify-between gap-2 pt-2 sm:pt-3">
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="text-sm sm:text-base font-bold text-text-light">
                               {formatPrice(currentPrice)}
