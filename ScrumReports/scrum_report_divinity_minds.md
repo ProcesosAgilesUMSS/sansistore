@@ -204,3 +204,10 @@
 - **Today:** Dar seguimiento a los acuerdos obtenidos en la retrospectiva y continuar con la revisión de tareas e historias de usuario del Sprint 2.
 - **Blockers:** n/a.
 
+# 05/19/2026
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Desarrollé la vista básica /cart para iniciar el flujo e implementé la sección del resumen del pedido.   
+- **Today:** Mejoraré el diseño de la vista del carrito por su simplicidad actual e implementé el cálculo del envío estimado.
+- **Blockers:** No estaba bien definido cómo calcular el envío estimado y la tarea de dejar reseñas de productos quedó suspendida.
