@@ -157,7 +157,7 @@
 # 05/19/2026
   ## Gonza Rojas Willian D.
   - **Yesterday:**    Replantear solución al bug reportado, se resolvio el bug (es una US mal resuelta) y se estuvo terminando la US de visualizacion de stock en tiempo real
-  - **Today:**        ---
+  - **Today:**        Se realizó la US05 - visualización de stock en tiempo real, #62 pendiente de revision y coordinar con equipo de ventas y falta integrar a main
   - **Blockers:**     El bug tomó mas tiempo del previsto.
 
   ## Llanos Villarroel Vania F.

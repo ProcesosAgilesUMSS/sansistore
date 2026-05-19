@@ -49,12 +49,10 @@ export const StockTable: React.FC = () => {
     fetchProducts();
   }, []);
 
-  // Función para cumplir con la US #60 (Criterios 2, 3 y 4)
   const handleInitializeStock = async (productId: string, quantity: number) => {
     try {
       const batch = writeBatch(db);
       
-      // Criterio 3: Establecer stockTotal y stockAvailable
       const inventoryRef = doc(db, 'inventory', productId);
       batch.update(inventoryRef, {
         stockAvailable: quantity,
@@ -63,19 +61,19 @@ export const StockTable: React.FC = () => {
         enabled: true
       });
 
-      // Criterio 4: Registro en inventoryMovements
+      // Registro en inventoryMovements
       const movementRef = doc(collection(db, 'inventoryMovements'));
       batch.set(movementRef, {
         productId,
         type: 'INICIALIZACION',
         quantity,
-        reason: 'Carga inicial de stock - US #60',
+        reason: 'Carga inicial de stock',
         date: new Date()
       });
 
       await batch.commit();
 
-      // Actualizar estado local para que el botón desaparezca (Criterio 1)
+      // Actualizar estado local para que el botón desaparezca
       setProducts(prev => prev.map(p => 
         p.id === productId ? { ...p, stockAvailable: quantity } : p
       ));
@@ -85,7 +83,7 @@ export const StockTable: React.FC = () => {
 
       alert('¡Stock inicializado con éxito!');
     } catch (err) {
-      console.error("Error en US #60:", err);
+      console.error("Error", err);
       alert('Error al inicializar stock.');
     }
   };

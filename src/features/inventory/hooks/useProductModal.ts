@@ -158,7 +158,7 @@ export const useProductModal = () => {
 
         const formData = data as any;
 
-        // 1. DATOS PARA LA COLECCIÓN 'products'
+        // DATOS PARA LA COLECCIÓN 'products'
         const productData = {
           ...data,
           slug,
@@ -168,10 +168,10 @@ export const useProductModal = () => {
           price: Number(data.price),
           offerPrice: data.hasOffer ? Number(data.offerPrice) : null,
           soldCount: Number(data.soldCount) || 0,
-          categoryId: data.categoryId // Confirmamos que sea "bebidas"
+          categoryId: data.categoryId
         };
 
-        // 2. DATOS PARA LA COLECCIÓN 'inventory' (Lo que faltaba)
+        // DATOS PARA LA COLECCIÓN 'inventory' (Lo que faltaba)
         const inventoryData = {
           enabled: true,
           minStock: Number(formData.minStock || 5),
