@@ -218,3 +218,9 @@
 - **Yesterday:** Investigué sobre el framework Leaflet para la implementación de mapas.
 - **Today:** Planeo practicar con el framework antes de comenzar la implementación.
 - **Blockers:** None.
+
+### Jhoel Gustavo Aiza Arce
+
+- **Yesterday:** Investigación y análisis de la arquitectura del módulo de pagos para la HU #101, planificando cómo estructurar el flujo de datos y la interfaz de confirmación de cobro.
+- **Today:** Inicio del desarrollo de la HU #101 para el registro de pago del cliente. Trabajando en el maquetado inicial del componente y en el planteamiento de la lógica para actualizar el estado del pedido, continuando con el proceso de implementación.
+- **Blockers:** None.
