@@ -9,6 +9,7 @@ import {
   Package,
   Phone,
   Send,
+  XCircle,
 } from 'lucide-react';
 import { auth } from '../../../lib/firebase';
 import {
@@ -17,8 +18,7 @@ import {
 } from '../services/messengerOrdersService';
 import type { MessengerOrder } from '../types';
 
-const DEV_COURIER_ID = 'user-mensajero-001';
-
+const DEV_COURIER_ID = 'user-nadia';
 
 const formatBolivianos = (amount: number) => `Bs ${amount}`;
 
@@ -48,13 +48,15 @@ function SummaryCard({
 }) {
   return (
     <article
-      className={`messenger-summary-card rounded-[28px] border px-7 py-8 shadow-[0_14px_30px_rgba(38,33,22,0.10)] ${featured ? 'messenger-summary-card--featured' : ''
-        }`}
+      className={`messenger-summary-card rounded-[28px] border px-7 py-8 shadow-[0_14px_30px_rgba(38,33,22,0.10)] ${
+        featured ? 'messenger-summary-card--featured' : ''
+      }`}
     >
       <div className="flex items-center gap-4">
         <span
-          className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${featured ? 'messenger-icon--featured' : 'messenger-icon'
-            }`}
+          className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
+            featured ? 'messenger-icon--featured' : 'messenger-icon'
+          }`}
         >
           {icon}
         </span>
@@ -67,12 +69,16 @@ function SummaryCard({
 
 function PendingOrderCard({
   order,
+  onAccept,
   onDelivered,
   onInTransit,
+  onReject,
 }: {
   order: MessengerOrder;
+  onAccept: (orderId: string) => void;
   onDelivered: (orderId: string) => void;
   onInTransit: (orderId: string) => void;
+  onReject: (orderId: string) => void;
 }) {
   return (
     <article className="messenger-order-card rounded-[28px] border p-6 shadow-[0_14px_30px_rgba(38,33,22,0.10)]">
@@ -105,7 +111,9 @@ function PendingOrderCard({
               <MapPin className="mt-0.5 shrink-0" size={16} />
               <span>
                 {order.address}
-                <span className="messenger-muted block text-xs">{order.city}</span>
+                <span className="messenger-muted block text-xs">
+                  {order.city}
+                </span>
               </span>
             </p>
 
@@ -134,9 +142,7 @@ function PendingOrderCard({
           </div>
 
           <div className="messenger-cash-box mt-5 rounded-2xl border-2 p-5">
-            <p className="text-xs font-medium uppercase">
-              Monto a cobrar
-            </p>
+            <p className="text-xs font-medium uppercase">Monto a cobrar</p>
             <p className="mt-2 text-3xl font-black">
               {formatBolivianos(order.cashToCollect)}
             </p>
@@ -155,6 +161,27 @@ function PendingOrderCard({
           <Send size={17} />
           Abrir en Maps
         </a>
+
+        {order.deliveryStatus === 'assigned' && (
+          <>
+            <button
+              className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
+              onClick={() => onAccept(order.id)}
+              type="button"
+            >
+              <CheckCircle2 size={17} />
+              Aceptar pedido
+            </button>
+            <button
+              className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+              onClick={() => onReject(order.id)}
+              type="button"
+            >
+              <XCircle size={17} />
+              Rechazar
+            </button>
+          </>
+        )}
 
         {order.deliveryStatus === 'accepted' && (
           <button
@@ -197,9 +224,7 @@ function DeliveredOrderRow({ order }: { order: MessengerOrder }) {
         <span className="messenger-delivered-badge rounded-full px-3 py-1 text-xs font-bold">
           Entregado
         </span>
-        <strong>
-          {formatBolivianos(order.cashToCollect)}
-        </strong>
+        <strong>{formatBolivianos(order.cashToCollect)}</strong>
       </div>
     </article>
   );
@@ -207,7 +232,7 @@ function DeliveredOrderRow({ order }: { order: MessengerOrder }) {
 
 interface MessengerDashboardProps {
   embedded?: boolean;
-  clientSection?: 'assigned' | 'delivered';
+  clientSection?: 'assigned' | 'accepted' | 'delivered';
 }
 
 export default function MessengerDashboard({
@@ -219,7 +244,7 @@ export default function MessengerDashboard({
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    const loadOrders = async (courierId: string) => {
+    const loadOrders = async (courierId: string, allowDevFallback = false) => {
       setLoading(true);
       setMessage('');
 
@@ -228,6 +253,7 @@ export default function MessengerDashboard({
 
         if (
           data.length === 0 &&
+          allowDevFallback &&
           import.meta.env.PUBLIC_APP_ENV !== 'production' &&
           courierId !== DEV_COURIER_ID
         ) {
@@ -248,6 +274,7 @@ export default function MessengerDashboard({
       const devCourierId =
         import.meta.env.PUBLIC_APP_ENV !== 'production' ? DEV_COURIER_ID : null;
       const courierId = user?.uid || devCourierId;
+      const allowDevFallback = !user;
 
       if (!courierId) {
         setOrders([]);
@@ -256,29 +283,33 @@ export default function MessengerDashboard({
         return;
       }
 
-      void loadOrders(courierId);
+      void loadOrders(courierId, allowDevFallback);
     });
 
     return unsubscribe;
   }, []);
 
-  const pendingOrders = useMemo(
-    () => orders.filter((order) => order.deliveryStatus === 'accepted' || order.deliveryStatus === 'in_transit'),
+  const assignedOrders = useMemo(
+    () => orders.filter((order) => order.deliveryStatus === 'assigned'),
+    [orders]
+  );
+  const acceptedOrders = useMemo(
+    () =>
+      orders.filter(
+        (order) =>
+          order.deliveryStatus === 'accepted' ||
+          order.deliveryStatus === 'in_transit'
+      ),
     [orders]
   );
   const deliveredOrders = useMemo(
     () => orders.filter((order) => order.deliveryStatus === 'delivered'),
     [orders]
   );
-  const cashToCollect = useMemo(
-    () =>
-      pendingOrders.reduce((total, order) => total + order.cashToCollect, 0),
-    [pendingOrders]
-  );
 
   const updateOrderStatus = async (
     orderId: string,
-    status: MessengerOrder['deliveryStatus'],
+    status: MessengerOrder['deliveryStatus']
   ) => {
     const targetOrder = orders.find((order) => order.id === orderId);
     if (!targetOrder) return;
@@ -287,9 +318,9 @@ export default function MessengerDashboard({
       currentOrders.map((order) =>
         order.id === orderId
           ? {
-            ...order,
-            deliveryStatus: status,
-          }
+              ...order,
+              deliveryStatus: status,
+            }
           : order
       )
     );
@@ -312,12 +343,37 @@ export default function MessengerDashboard({
     void updateOrderStatus(orderId, 'delivered');
   };
 
+  const acceptOrder = (orderId: string) => {
+    void updateOrderStatus(orderId, 'accepted');
+  };
+
   const markAsInTransit = (orderId: string) => {
     void updateOrderStatus(orderId, 'in_transit');
   };
 
+  const rejectOrder = (orderId: string) => {
+    void updateOrderStatus(orderId, 'pending_reassignment');
+  };
+
+  const activeOrders =
+    clientSection === 'assigned' ? assignedOrders : acceptedOrders;
+  const activeTitle =
+    clientSection === 'assigned'
+      ? 'Gestión Entregas'
+      : clientSection === 'accepted'
+        ? 'Pedidos aceptados'
+        : 'Entregados';
+  const activeDescription =
+    clientSection === 'assigned'
+      ? 'Acepta o rechaza los pedidos asignados antes de iniciar la entrega.'
+      : clientSection === 'accepted'
+        ? 'Organiza tus entregas, revisa direcciones y cambia el estado de cada pedido.'
+        : 'Revisa las entregas completadas y el monto cobrado durante la jornada.';
+
   return (
-    <main className={`messenger-dashboard ${embedded ? 'messenger-dashboard--embedded' : 'min-h-screen'}`}>
+    <main
+      className={`messenger-dashboard ${embedded ? 'messenger-dashboard--embedded' : 'min-h-screen'}`}
+    >
       <style>{`
         .messenger-dashboard {
           background: var(--theme-bg);
@@ -461,6 +517,16 @@ export default function MessengerDashboard({
           background: #9fc462;
         }
 
+        .messenger-reject-button {
+          background: color-mix(in srgb, #ef4444 8%, var(--theme-card-bg));
+          border-color: color-mix(in srgb, #ef4444 46%, var(--theme-border));
+          color: #dc2626;
+        }
+
+        .messenger-reject-button:hover {
+          background: color-mix(in srgb, #ef4444 14%, var(--theme-card-bg));
+        }
+
         .messenger-delivered-badge {
           background: color-mix(in srgb, #88b04b 16%, var(--theme-card-bg));
           color: #5f8330;
@@ -491,6 +557,10 @@ export default function MessengerDashboard({
 
         html[data-theme='dark'] .messenger-delivered-badge {
           color: #b7dc78;
+        }
+
+        html[data-theme='dark'] .messenger-reject-button {
+          color: #fca5a5;
         }
 
         @media (min-width: 768px) {
@@ -537,12 +607,10 @@ export default function MessengerDashboard({
             Operacion de entregas
           </p>
           <h1 className="mt-4 text-4xl font-black tracking-[-0.04em] sm:text-5xl">
-            {clientSection === 'assigned' ? 'Pedidos aceptados' : 'Entregados'}
+            {activeTitle}
           </h1>
           <p className="messenger-copy mt-2 max-w-2xl text-sm font-semibold">
-            {clientSection === 'assigned'
-              ? 'Organiza tus entregas, revisa direcciones y cambia el estado de cada pedido.'
-              : 'Revisa las entregas completadas y el monto cobrado durante la jornada.'}
+            {activeDescription}
           </p>
         </section>
 
@@ -558,40 +626,53 @@ export default function MessengerDashboard({
           </div>
         )}
 
-        {!loading && clientSection === 'assigned' ? (
+        {!loading && clientSection !== 'delivered' ? (
           <>
             <section className="messenger-summary-grid grid gap-5">
               <SummaryCard
                 icon={<Clock3 size={20} />}
-                label="Pendientes"
-                value={pendingOrders.length}
+                label={
+                  clientSection === 'assigned' ? 'Asignados' : 'Pendientes'
+                }
+                value={activeOrders.length}
               />
               <SummaryCard
                 featured
                 icon={<DollarSign size={20} />}
                 label="Total a Cobrar"
-                value={formatBolivianos(cashToCollect)}
+                value={formatBolivianos(
+                  activeOrders.reduce(
+                    (total, order) => total + order.cashToCollect,
+                    0
+                  )
+                )}
               />
             </section>
 
             <section className="mt-11">
-                <h2 className="mb-6 text-2xl font-black tracking-[-0.04em]">
-                Pedidos pendientes
+              <h2 className="mb-6 text-2xl font-black tracking-[-0.04em]">
+                {clientSection === 'assigned'
+                  ? 'Pedidos asignados'
+                  : 'Pedidos pendientes'}
               </h2>
 
               <div className="space-y-6">
-                {pendingOrders.length > 0 ? (
-                  pendingOrders.map((order) => (
+                {activeOrders.length > 0 ? (
+                  activeOrders.map((order) => (
                     <PendingOrderCard
                       key={order.id}
                       order={order}
+                      onAccept={acceptOrder}
                       onDelivered={markAsDelivered}
                       onInTransit={markAsInTransit}
+                      onReject={rejectOrder}
                     />
                   ))
                 ) : (
                   <div className="messenger-order-card rounded-[28px] border p-8 text-sm font-semibold">
-                    No hay pedidos pendientes.
+                    {clientSection === 'assigned'
+                      ? 'No hay pedidos asignados.'
+                      : 'No hay pedidos pendientes.'}
                   </div>
                 )}
               </div>
@@ -610,13 +691,16 @@ export default function MessengerDashboard({
                 icon={<DollarSign size={20} />}
                 label="Total cobrado"
                 value={formatBolivianos(
-                  deliveredOrders.reduce((total, order) => total + order.cashToCollect, 0),
+                  deliveredOrders.reduce(
+                    (total, order) => total + order.cashToCollect,
+                    0
+                  )
                 )}
               />
             </section>
 
             <section className="mt-11">
-                <h2 className="mb-6 text-2xl font-black tracking-[-0.04em]">
+              <h2 className="mb-6 text-2xl font-black tracking-[-0.04em]">
                 Historial
               </h2>
 
@@ -638,4 +722,3 @@ export default function MessengerDashboard({
     </main>
   );
 }
-

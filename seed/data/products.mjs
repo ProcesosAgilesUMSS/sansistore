@@ -1,5 +1,7 @@
 import { Categories } from './categories.mjs';
 
+const PRODUCT_IMAGE = '/product-placeholder.svg';
+
 export const Products = {
   LECHE_PIL: {
     slug: 'leche-pil-natural-900-ml',
@@ -8,8 +10,7 @@ export const Products = {
     description:
       'Leche semidescremada UHT, rica en calcio y pensada para el consumo diario.',
     price: 9.7,
-    imageUrl:
-      'https://hipermaxi.com/tienda-api/marketfile/ImageEcommerce?hashfile=fb2d89f_c5dd_4212_905e_e69b8d28427e.webp&co=5&size=900x900',
+    imageUrl: PRODUCT_IMAGE,
     badge: 'Bolivia',
     hasOffer: false,
     stockTotal: 36,
@@ -36,8 +37,7 @@ export const Products = {
     name: 'Queso Crema Bonle PIL Andina 200 gr',
     description: 'Queso crema suave y facil de untar.',
     price: 32,
-    imageUrl:
-      'https://hipermaxi.com/tienda-api/marketfile/ImageEcommerce?hashfile=8f9ced6_36f7_4e4a_a190_77532c32c9ad.webp&co=5&size=900x900',
+    imageUrl: PRODUCT_IMAGE,
     badge: 'Oferta',
     hasOffer: true,
     offerPrice: 28,
@@ -65,8 +65,7 @@ export const Products = {
     name: 'Aceite Fino Vegetal 900 ml',
     description: 'Aceite vegetal de uso cotidiano.',
     price: 18,
-    imageUrl:
-      'https://hipermaxi.com/tienda-api/marketfile/ImageEcommerce?hashfile=294b7aa_1b79_4bbc_aabe_4a15c769d068.webp&co=5&size=900x900',
+    imageUrl: PRODUCT_IMAGE,
     badge: 'Popular',
     stockTotal: 42,
     stockAvailable: 17,
@@ -81,8 +80,7 @@ export const Products = {
     name: 'Arroz Grano de Oro Caisy 1 kg',
     description: 'Arroz de primera calidad.',
     price: 13.5,
-    imageUrl:
-      'https://hipermaxi.com/tienda-api/marketfile/ImageEcommerce?hashfile=a7aad26_2e85_4057_b8b4_dd06128d71f2.webp&co=5&size=900x900',
+    imageUrl: PRODUCT_IMAGE,
     stockTotal: 55,
     stockAvailable: 8,
     sourceUrl:
@@ -107,8 +105,7 @@ export const Products = {
     name: 'Fideo Lazzaroni Spaguetto 52 400 gr',
     description: 'Pasta seca tipo spaguetto.',
     price: 6.5,
-    imageUrl:
-      'https://hipermaxi.com/tienda-api/marketfile/ImageEcommerce?hashfile=9366ed1_1927_4112_9833_407bf0b2f34f.webp&co=5&size=900x900',
+    imageUrl: PRODUCT_IMAGE,
     stockTotal: 27,
     stockAvailable: 0,
     sourceUrl:
@@ -133,8 +130,7 @@ export const Products = {
     name: 'Mocochinchi Soproma 100 gr',
     description: 'Mocochinchi deshidratado listo para preparar.',
     price: 10,
-    imageUrl:
-      'https://hipermaxi.com/tienda-api/marketfile/ImageEcommerce?hashfile=demo-image-missing.webp&co=5&size=900x900',
+    imageUrl: PRODUCT_IMAGE,
     badge: 'Tradicional',
     stockTotal: 30,
     stockAvailable: 12,
@@ -160,8 +156,7 @@ export const Products = {
     name: 'Yogurt Test Sin Resenas',
     description: 'Producto de prueba sin inventario ni comentarios.',
     price: 21.5,
-    imageUrl:
-      'https://placehold.co/600x400/f5f5f5/555555?text=Yogurt+Test&font=roboto',
+    imageUrl: PRODUCT_IMAGE,
     hasOffer: false,
     offerPrice: null,
     stockTotal: 10,
@@ -176,8 +171,7 @@ export const Products = {
     name: 'Detergente Liquido Ola Futuro Limpieza Completa 5 L',
     description: 'Detergente liquido para lavado de ropa.',
     price: 123,
-    imageUrl:
-      'https://hipermaxi.com/tienda-api/marketfile/ImageEcommerce?hashfile=ff61f40_66f6_4b37_a21a_2730f4fc6c1f.webp&co=5&size=900x900',
+    imageUrl: PRODUCT_IMAGE,
     badge: 'Oferta',
     hasOffer: true,
     offerPrice: 109,
@@ -205,8 +199,7 @@ export const Products = {
     name: 'Galletas Agua Victoria 120 gr',
     description: 'Galletas ligeras y crocantes.',
     price: 8,
-    imageUrl:
-      'https://hipermaxi.com/tienda-api/marketfile/ImageEcommerce?hashfile=4f68019_a70a_438f_9131_f066da396bce.webp&co=5&size=900x900',
+    imageUrl: PRODUCT_IMAGE,
     badge: 'Oferta',
     hasOffer: true,
     offerPrice: 8,
