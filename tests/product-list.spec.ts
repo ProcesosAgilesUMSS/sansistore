@@ -144,8 +144,9 @@ test.describe('Avaiable product list', () => {
     expect(url.searchParams.get('q')).toBe('Leche');
     expect(url.searchParams.get('category')).toBe('lacteos');
     await page.getByRole('button', { name: 'Lácteos' }).click();
-    expect(url.searchParams.get('sort')).toBe('name-asc');
-    expect(url.searchParams.get('page')).toBe('1');
+    const updatedUrl = new URL(page.url());
+    expect(updatedUrl.searchParams.get('sort')).toBe('name-asc');
+    expect(updatedUrl.searchParams.get('page')).toBe('1');
   });
 
   test('shows popular badge in catalog', async ({ page }) => {
