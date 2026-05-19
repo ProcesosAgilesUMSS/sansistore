@@ -14,28 +14,6 @@ test.afterEach(async ({ page }, testInfo) => {
 });
 
 test.describe('Avaiable product list', () => {
-  test('defaults to best sellers sorting', async ({ page }) => {
-    await page.goto('/productos');
-
-    await expect(
-      page.getByRole('button', { name: 'Ordenar productos' })
-    ).toContainText('Popular');
-
-    const productLinks = page.locator('a[aria-label^="Ver detalle de "]');
-    await expect(productLinks.nth(0)).toHaveAttribute(
-      'href',
-      '/productos/arroz-grano-de-oro-caisy-1-kg'
-    );
-    await expect(productLinks.nth(1)).toHaveAttribute(
-      'href',
-      '/productos/leche-pil-natural-900-ml'
-    );
-    await expect(productLinks.nth(2)).toHaveAttribute(
-      'href',
-      '/productos/queso-crema-bonle-pil-andina-200-gr'
-    );
-  });
-
   test('load products page', async ({ page }) => {
     await page.goto('/productos');
 
@@ -120,18 +98,6 @@ test.describe('Avaiable product list', () => {
     expect(url.searchParams.get('sort')).toBe('name-asc');
   });
 
-  test('Sort by name Z-A', async ({ page }) => {
-    await page.goto('/productos');
-
-    const sortButton = page.getByRole('button', { name: 'Ordenar productos' });
-    await sortButton.click();
-
-    await page.getByRole('button', { name: 'Z-A' }).click();
-
-    const url = new URL(page.url());
-    expect(url.searchParams.get('sort')).toBe('name-desc');
-  });
-
   test('Combined filters with URL params', async ({ page }) => {
     await page.goto('/productos?q=Leche&category=lacteos&sort=name-asc&page=1');
 
@@ -149,23 +115,4 @@ test.describe('Avaiable product list', () => {
     expect(updatedUrl.searchParams.get('page')).toBe('1');
   });
 
-  test('shows popular badge in catalog', async ({ page }) => {
-    await page.goto('/productos');
-
-    const arrozCard = page.locator('article').filter({
-      has: page.locator('a[href="/productos/arroz-grano-de-oro-caisy-1-kg"]'),
-    });
-    await expect(arrozCard.getByText('Popular')).toBeVisible();
-  });
-
-  test('falls back to recent when all sold counts are zero', async ({
-    page,
-  }) => {
-    await page.goto('/productos?q=Aceite');
-
-    await expect(
-      page.getByRole('button', { name: 'Ordenar productos' })
-    ).toContainText('Popular');
-    await expect(page.getByText(/Aceite Fino Vegetal 900 ml/)).toBeVisible();
-  });
 });

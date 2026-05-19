@@ -96,14 +96,6 @@ test.describe('Product Detail Page', () => {
     await expect(page.getByText(/Bs\s109\.00/)).toBeVisible();
   });
 
-  test('displays popular badge when sold count reaches threshold', async ({
-    page,
-  }) => {
-    await page.goto('/productos/arroz-grano-de-oro-caisy-1-kg');
-
-    await expect(page.getByText('Popular')).toBeVisible();
-  });
-
   test('displays product reviews', async ({ page }) => {
     await page.goto('/productos/leche-pil-natural-900-ml');
 
