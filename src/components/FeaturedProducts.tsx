@@ -350,14 +350,6 @@ export default function FeaturedProducts({
     return sorted;
   }, [products, appliedSearch, selectedCategory, showOffersOnly, sortBy]);
 
-  const showBestSellersFallbackMessage = useMemo(() => {
-    if (sortBy !== 'best-sellers' || filteredProducts.length === 0) {
-      return false;
-    }
-
-    return filteredProducts.every((product) => getSoldCount(product) === 0);
-  }, [filteredProducts, sortBy]);
-
   const selectedSortLabel =
     SORT_OPTIONS.find((option) => option.value === sortBy)?.label ??
     'Mas vendidos';
@@ -725,12 +717,6 @@ export default function FeaturedProducts({
         {!loading && error && (
           <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error}
-          </div>
-        )}
-
-        {!loading && showBestSellersFallbackMessage && (
-          <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            Aun no hay ventas registradas para este resultado. Mostrando los productos mas recientes mientras se generan ventas.
           </div>
         )}
 

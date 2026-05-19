@@ -151,11 +151,9 @@ test.describe('Avaiable product list', () => {
   test('shows popular badge in catalog', async ({ page }) => {
     await page.goto('/productos');
 
-    const arrozCard = page
-      .locator('article')
-      .filter({
-        has: page.locator('a[href="/productos/arroz-grano-de-oro-caisy-1-kg"]'),
-      });
+    const arrozCard = page.locator('article').filter({
+      has: page.locator('a[href="/productos/arroz-grano-de-oro-caisy-1-kg"]'),
+    });
     await expect(arrozCard.getByText('Popular')).toBeVisible();
   });
 
@@ -164,9 +162,6 @@ test.describe('Avaiable product list', () => {
   }) => {
     await page.goto('/productos?q=Aceite');
 
-    await expect(
-      page.getByText(/Aun no hay ventas registradas para este resultado/)
-    ).toBeVisible();
     await expect(
       page.getByRole('button', { name: 'Ordenar productos' })
     ).toContainText('Mas vendidos');
