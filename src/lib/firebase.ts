@@ -40,20 +40,16 @@ export { app, auth, db, storage, googleProvider };
 if (import.meta.env.PUBLIC_APP_ENV !== 'production') {
   // Firestore emulator
   try {
-    connectFirestoreEmulator(db, 'localhost', 8080);
+    connectFirestoreEmulator(db, '127.0.0.1', 8080);
     // Connect auth emulator as well
     try {
-      connectAuthEmulator(auth, 'http://localhost:9099');
-      // eslint-disable-next-line no-console
-      console.log('Firebase Auth: connected to emulator at http://localhost:9099');
+      connectAuthEmulator(auth, 'http://127.0.0.1:9099');
+      console.log('Firebase Auth: connected to emulator at http://127.0.0.1:9099');
     } catch (e) {
-      // eslint-disable-next-line no-console
       console.warn('Firebase Auth: could not connect to emulator', e);
     }
-    // eslint-disable-next-line no-console
-    console.log('Firebase: connected to emulators (firestore at localhost:8080)');
+    console.log('Firebase: connected to emulators (firestore at 127.0.0.1:8080)');
   } catch (e) {
-    // eslint-disable-next-line no-console
     console.warn('Firebase: could not connect to emulators', e);
   }
 }

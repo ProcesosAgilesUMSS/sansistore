@@ -37,9 +37,15 @@ test.describe('Cart - Carrito', () => {
       page.getByRole('heading', { name: 'Mi Carrito' })
     ).toBeVisible();
 
-    await expect(page.getByText('Yogurt Test Sin Resenas')).toBeVisible({
+    await expect(page.getByText('Leche PIL Natural 900 ml')).toBeVisible({
       timeout: 10000,
     });
+    await expect(page.getByText('Galletas Agua Victoria 120 gr')).toBeVisible();
+    await expect(page.getByText('Subtotal')).toBeVisible();
+    await expect(page.getByText('Total de compra')).toBeVisible();
+    await expect(page.getByText('Bs 27.40')).toBeVisible();
+    await expect(page.getByText(/Stock disponible:/)).toBeVisible();
+    await expect(page.getByText('Disponible para confirmar')).toBeVisible();
   });
 
   test('should show empty cart message when user has no items', async ({
@@ -66,6 +72,8 @@ test.describe('Cart - Carrito', () => {
     await expect(page.getByText('Tu carrito está vacío')).toBeVisible({
       timeout: 1000,
     });
+    await expect(page.getByText('Total de compra')).toBeVisible();
+    await expect(page.getByText('Bs 0.00')).toBeVisible();
   });
 
   test('should show "No autenticado" when accessing cart without login', async ({
