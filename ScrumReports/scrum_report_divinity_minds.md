@@ -229,3 +229,9 @@
 - **Yesterday:** Se coordinó el diseño del carrito de compras, alineando la estructura visual y los flujos de interacción con el equipo para asegurar coherencia con las demás funcionalidades del sprint.
 - **Today:** Se desarrollarán los componentes necesarios para añadir productos al carrito, incluyendo la lógica de interacción entre la card de producto y el estado del carrito.
 - **Blockers:** Ninguno.
+
+## Velasquez Vela Marcos
+
+- **Yesterday:** Trabajé en el carrito de compras. Primero completé las descripciones y criterios de las tasks pendientes. Luego implementé que el comprador pueda ver el total antes de confirmar, validar la disponibilidad de los productos y remover productos del carrito para modificar su selección. También agregué datos de prueba para poder revisar mejor el flujo.
+- **Today:** Revisar el funcionamiento del carrito con el equipo y corregir cualquier detalle que salga en QA.
+- **Blockers:** n/a.
