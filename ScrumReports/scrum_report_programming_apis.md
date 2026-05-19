@@ -207,3 +207,9 @@
 - **Yesterday:** Estuve en contacto con el grupo de WebSpire para trabajar en las dependencias de nuestras historias de usuario.
 - **Today:** Trabajaré con el mapa ya implementado por el grupo de DivinityMinds para mi historia de usuario asignada.
 - **Blockers:** Entender la funcionalidad completa del mapa ya implementado.
+
+### Efrain Peralta Felipe
+
+- **Yesterday:** Estuve en contacto con el grupo de WebSpire para hablar sobre una hu que es igual a la que hicieron en el primer sprint.
+- **Today:** Trabajare en la hu de reasignar mensajero.
+- **Blockers:** None.
