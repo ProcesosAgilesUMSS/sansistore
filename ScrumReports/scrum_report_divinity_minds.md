@@ -206,6 +206,12 @@
 
 # 05/19/2026
 
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Complete el issue #34 ("Como comprador quiero ver los productos mas vendidos") en el PR #313, termine toda la seccion de preguntas y verifique que los tests pasen correctamente.
+- **Today:** Dar cierre a ajustes del PR #313 del issue #34 y dejarlo listo para merge.
+- **Blockers:** No avance una HU de la seccion de carrito porque otros integrantes debian hacer la base y hasta la fecha del reporte no terminaron, por lo que no pude continuar.
+
 ## Merudia Calderon Dayeza
 
 - **Yesterday:** Desarrollé la vista básica /cart para iniciar el flujo e implementé la sección del resumen del pedido.   
