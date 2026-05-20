@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react'; // 1. Agregado useState al import
 import {
   X,
   Tag,
@@ -16,13 +16,19 @@ interface Props {
   product: InventoryProduct;
   onClose: () => void;
   onToggleActive: () => void;
+  onInitializeStock: (productId: string, quantity: number) => Promise<void>;
 }
 
 export const ProductDetailModal: React.FC<Props> = ({
   product,
   onClose,
   onToggleActive,
+  onInitializeStock
 }) => {
+  // 2. Los Hooks movidos DENTRO de la función del componente
+  const [initialQty, setInitialQty] = useState<number>(0);
+  const [isInitializing, setIsInitializing] = useState(false);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
       <div className="bg-(--theme-card-bg) border border-(--theme-border) rounded-3xl w-full max-w-sm shadow-2xl animate-in fade-in zoom-in duration-200 overflow-hidden flex flex-col max-h-[90vh]">
@@ -117,6 +123,42 @@ export const ProductDetailModal: React.FC<Props> = ({
           {/* Divider */}
           <hr className="border-(--theme-border)" />
 
+          {/* Formulario de Inicialización (US #60) */}
+          {product.stockAvailable === 0 && (
+            <div className="p-4 rounded-2xl bg-primary/5 border border-primary/20 space-y-3">
+              <div className="flex flex-col">
+                <span className="text-[0.65rem] uppercase tracking-widest font-bold text-primary mb-2">
+                  Inicialice Stock
+                </span>
+                <p className="text-[0.7rem] opacity-70 mb-3">
+                  Este producto no tiene existencias todavia. Ingresa el stock inicial contado físicamente.
+                </p>
+                
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    min="0"
+                    value={initialQty}
+                    onChange={(e) => setInitialQty(Number(e.target.value))}
+                    placeholder="Cantidad..."
+                    className="flex-1 bg-(--theme-secondary-bg) border border-(--theme-border) rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-primary transition-colors"
+                  />
+                  <button
+                    disabled={isInitializing || initialQty <= 0}
+                    onClick={async () => {
+                      setIsInitializing(true);
+                      await onInitializeStock(product.id, initialQty);
+                      setIsInitializing(false);
+                    }}
+                    className="bg-primary text-white px-4 py-2 rounded-xl font-bold text-xs hover:brightness-110 disabled:opacity-50 disabled:grayscale transition-all"
+                  >
+                    {isInitializing ? 'Cargando...' : 'Inicializar'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Estado */}
           <div className="flex items-center justify-between pt-1">
             <span className="text-sm text-(--theme-text) opacity-60">
@@ -152,7 +194,7 @@ export const ProductDetailModal: React.FC<Props> = ({
             </a>
           )}
         </div>
-
+        
         {/* ── Acciones fijas al fondo ── */}
         <div className="px-5 py-4 border-t border-(--theme-border) shrink-0">
           <button
