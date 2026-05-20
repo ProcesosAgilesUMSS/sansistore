@@ -3,7 +3,6 @@ import {
   doc,
   query,
   where,
-  orderBy,
   onSnapshot,
   getDocs,
   runTransaction,
@@ -141,14 +140,12 @@ export function subscribeSellerOrders(
   const qReserved = query(
     ordersRef,
     where('status', '==', 'CONFIRMADO'),
-    orderBy('confirmedAt', 'asc'),
   );
 
   const qReady = query(
     ordersRef,
     where('sellerId', '==', sellerId),
     where('status', '==', 'LISTO'),
-    orderBy('updatedAt', 'desc'),
   );
 
   const unsubReserved = onSnapshot(
@@ -268,7 +265,6 @@ export function subscribeAssignedOrders(
     collection(db, 'orders'),
     where('sellerId', '==', sellerId),
     where('status', '==', 'ASIGNADO'),
-    orderBy('updatedAt', 'desc'),
   );
 
   return onSnapshot(
