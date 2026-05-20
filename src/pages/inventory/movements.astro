@@ -1,13 +1,31 @@
 ---
+// src/pages/inventory/movements.astro
 import InventoryLayout from '../../layouts/InventoryLayout.astro';
+import { StockMovementForm } from '../../features/inventory/components/StockMovementForm.tsx';
+import { MovementHistory } from '../../features/inventory/components/MovementHistory.tsx';
 ---
 
-<InventoryLayout title="Sansistore | Movimientos de Stock">
+<InventoryLayout title="Sansistore | Movimientos">
   <div class="flex items-center justify-between mb-8">
     <h1
       class="font-['Outfit'] font-black text-2xl tracking-tight text-(--theme-text)"
     >
-      Movimientos de <span class="text-primary">Stock</span>
+      Gestión de <span class="text-primary">Movimientos</span>
     </h1>
+  </div>
+
+  {/* Contenedor Grid: 1 columna en móviles, 2 columnas asimétricas en PC */}
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    
+    {/* Columna Izquierda: Formulario de Acción (Ocupa 7 columnas) */}
+    <div class="lg:col-span-7">
+      <StockMovementForm client:load />
+    </div>
+
+    {/* Columna Derecha: Historial en Tiempo Real (Ocupa 5 columnas) */}
+    <div class="lg:col-span-5">
+      <MovementHistory client:load />
+    </div>
+
   </div>
 </InventoryLayout>
