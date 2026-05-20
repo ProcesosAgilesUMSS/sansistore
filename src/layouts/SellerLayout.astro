@@ -3,6 +3,7 @@ import Layout from './Layout.astro';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { SideBarSeller } from '../features/seller/components/SideBarSeller';
+import SellerRouteGuard from '../features/seller/components/SellerRouteGuard';
 
 interface Props {
   title?: string;
@@ -13,15 +14,19 @@ const { title = 'Sansistore | Vendedor' } = Astro.props;
 
 <Layout title={title}>
   <Navbar client:load />
-  <main class="bg-(--theme-bg) pt-16 md:pt-20">
-    <div class="w-full px-2 pb-10 sm:px-3 md:px-4 lg:px-0">
-      <div class="grid gap-4 lg:grid-cols-[300px_minmax(0,1fr)] lg:items-start">
-        <div class="lg:sticky lg:top-10 lg:self-start lg:pl-0 xl:pl-2">
-          <SideBarSeller client:load />
+  <SellerRouteGuard client:load>
+    <main class="bg-(--theme-bg) pt-16 md:pt-20">
+      <div class="w-full px-2 pb-10 sm:px-3 md:px-4 lg:px-0">
+        <div
+          class="grid gap-4 lg:grid-cols-[300px_minmax(0,1fr)] lg:items-start"
+        >
+          <div class="lg:sticky lg:top-10 lg:self-start lg:pl-0 xl:pl-2">
+            <SideBarSeller />
+          </div>
+          <slot />
         </div>
-        <slot />
       </div>
-    </div>
-  </main>
+    </main>
+  </SellerRouteGuard>
   <Footer client:load />
 </Layout>

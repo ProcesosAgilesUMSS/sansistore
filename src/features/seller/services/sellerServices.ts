@@ -140,7 +140,7 @@ export function subscribeSellerOrders(
 
   const qReserved = query(
     ordersRef,
-    where('status', '==', 'RESERVADO'),
+    where('status', '==', 'CONFIRMADO'),
     orderBy('confirmedAt', 'asc'),
   );
 
@@ -218,9 +218,9 @@ export async function markOrderAsReady(
 
     const current = orderSnap.data();
 
-    if (current.status !== 'RESERVADO') {
+    if (current.status !== 'CONFIRMADO') {
       throw new Error(
-        `El pedido ya no está en RESERVADO (estado actual: ${current.status}).`,
+        `El pedido ya no está en CONFIRMADO (estado actual: ${current.status}).`,
       );
     }
 
