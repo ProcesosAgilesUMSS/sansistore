@@ -5,7 +5,7 @@ import type { TopProduct, CategoryOption } from '../types';
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🔧 MODO DEMO: cambiar a false para usar datos reales
-const USE_MOCK_DATA = true;
+const USE_MOCK_DATA = false;
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 const MOCK_CATEGORIES: CategoryOption[] = [
@@ -19,7 +19,7 @@ const MOCK_CATEGORIES: CategoryOption[] = [
 
 const MOCK_PRODUCTS: TopProduct[] = [
   {
-    id: '1',
+    productId: '1',
     name: 'Bolsa Ecológica Grande',
     categoryId: 'cat-1',
     categoryName: 'Bolsas',
@@ -28,7 +28,7 @@ const MOCK_PRODUCTS: TopProduct[] = [
     soldCount: 248,
   },
   {
-    id: '2',
+    productId: '2',
     name: 'Botella Reutilizable 750ml',
     categoryId: 'cat-2',
     categoryName: 'Botellas',
@@ -37,7 +37,7 @@ const MOCK_PRODUCTS: TopProduct[] = [
     soldCount: 215,
   },
   {
-    id: '3',
+    productId: '3',
     name: 'Set de Cubiertos Bambú',
     categoryId: 'cat-3',
     categoryName: 'Utensilios',
@@ -46,7 +46,7 @@ const MOCK_PRODUCTS: TopProduct[] = [
     soldCount: 189,
   },
   {
-    id: '4',
+    productId: '4',
     name: 'Plato Biodegradable Pack x10',
     categoryId: 'cat-4',
     categoryName: 'Desechables',
@@ -55,7 +55,7 @@ const MOCK_PRODUCTS: TopProduct[] = [
     soldCount: 167,
   },
   {
-    id: '5',
+    productId: '5',
     name: 'Vaso Térmico Acero',
     categoryId: 'cat-2',
     categoryName: 'Botellas',
@@ -64,7 +64,7 @@ const MOCK_PRODUCTS: TopProduct[] = [
     soldCount: 142,
   },
   {
-    id: '6',
+    productId: '6',
     name: 'Cepillo Dental Bambú x3',
     categoryId: 'cat-5',
     categoryName: 'Cuidado Personal',
@@ -73,7 +73,7 @@ const MOCK_PRODUCTS: TopProduct[] = [
     soldCount: 128,
   },
   {
-    id: '7',
+    productId: '7',
     name: 'Bolsa Malla Frutas x5',
     categoryId: 'cat-1',
     categoryName: 'Bolsas',
@@ -82,7 +82,7 @@ const MOCK_PRODUCTS: TopProduct[] = [
     soldCount: 115,
   },
   {
-    id: '8',
+    productId: '8',
     name: 'Jabón Artesanal Lavanda',
     categoryId: 'cat-5',
     categoryName: 'Cuidado Personal',
@@ -91,7 +91,7 @@ const MOCK_PRODUCTS: TopProduct[] = [
     soldCount: 98,
   },
   {
-    id: '9',
+    productId: '9',
     name: 'Esponja Natural Cocina x3',
     categoryId: 'cat-6',
     categoryName: 'Limpieza',
@@ -100,7 +100,7 @@ const MOCK_PRODUCTS: TopProduct[] = [
     soldCount: 87,
   },
   {
-    id: '10',
+    productId: '10',
     name: 'Pajillas Acero Inoxidable x6',
     categoryId: 'cat-3',
     categoryName: 'Utensilios',
@@ -313,7 +313,7 @@ export default function TopSellingProducts() {
 
             return (
               <div
-                key={product.id}
+                key={product.productId}
                 className={`flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-3.5 sm:py-4 transition-colors hover:bg-black/[0.02] ${
                   index > 0 ? 'border-t border-[var(--theme-border)]/30' : ''
                 }`}

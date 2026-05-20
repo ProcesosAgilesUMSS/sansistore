@@ -1,11 +1,13 @@
 export interface TopProduct {
-  id: string;
+  productId: string;
   name: string;
   categoryId: string;
   categoryName: string;
   price: number;
-  imageUrl: string;
+  imageUrl?: string;
   soldCount: number;
+  hasOffer?: boolean;
+  offerPrice?: number;
 }
 
 export interface TopProductsState {

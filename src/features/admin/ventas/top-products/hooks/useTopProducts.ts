@@ -1,18 +1,13 @@
-import { useEffect, useState } from 'react';
-import {
-  collection,
-  onSnapshot,
-  orderBy,
-  query,
-  limit,
-  getDocs,
-} from 'firebase/firestore';
+import { useEffect, useState, useCallback } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../../../../lib/firebase';
+import { getTopProducts } from '../../services/topProductServices';
 import type { TopProduct, TopProductsState, CategoryOption } from '../types';
 
 const TOP_LIMIT = 10;
+const POLLING_INTERVAL = 30000; // 30 segundos
 
-export function useTopProducts(): TopProductsState {
+export function useTopProducts(): TopProductsState & { refresh: () => void } {
   const [state, setState] = useState<TopProductsState>({
     products: [],
     categories: [],
@@ -20,76 +15,66 @@ export function useTopProducts(): TopProductsState {
     error: null,
   });
 
-  useEffect(() => {
-    let categoriesMap = new Map<string, string>();
-
-    const loadCategories = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, 'categories'));
-        const options: CategoryOption[] = [];
-
-        snapshot.docs.forEach((doc) => {
-          const data = doc.data();
-          categoriesMap.set(doc.id, data.name ?? 'Sin categoría');
-          options.push({ id: doc.id, name: data.name ?? 'Sin categoría' });
-        });
-
-        options.sort((a, b) => a.name.localeCompare(b.name));
-        return options;
-      } catch {
-        return [];
-      }
-    };
-
-    let unsubscribe: (() => void) | null = null;
-
-    loadCategories().then((categories) => {
-      const productsQuery = query(
-        collection(db, 'products'),
-        orderBy('soldCount', 'desc'),
-        limit(TOP_LIMIT),
-      );
-
-      unsubscribe = onSnapshot(
-        productsQuery,
-        (snapshot) => {
-          const products: TopProduct[] = snapshot.docs
-            .map((doc) => {
-              const data = doc.data();
-              return {
-                id: doc.id,
-                name: data.name ?? '',
-                categoryId: data.categoryId ?? '',
-                categoryName: categoriesMap.get(data.categoryId) ?? 'Sin categoría',
-                price: typeof data.price === 'number' ? data.price : 0,
-                imageUrl: data.imageUrl ?? '',
-                soldCount: typeof data.soldCount === 'number' ? data.soldCount : 0,
-              };
-            })
-            .filter((product) => product.soldCount > 0);
-
-          setState({
-            products,
-            categories,
-            loading: false,
-            error: null,
-          });
-        },
-        (error) => {
-          setState({
-            products: [],
-            categories,
-            loading: false,
-            error: error.message,
-          });
-        },
-      );
-    });
-
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
+  const loadCategories = useCallback(async (): Promise<CategoryOption[]> => {
+    try {
+      const snapshot = await getDocs(collection(db, 'categories'));
+      const options: CategoryOption[] = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        name: doc.data().name ?? 'Sin categoría',
+      }));
+      return options.sort((a, b) => a.name.localeCompare(b.name));
+    } catch {
+      return [];
+    }
   }, []);
 
-  return state;
+  const fetchProducts = useCallback(async (categories: CategoryOption[]) => {
+    try {
+      const { products } = await getTopProducts({ limit: TOP_LIMIT });
+      setState((prev) => ({
+        ...prev,
+        products,
+        categories,
+        loading: false,
+        error: null,
+      }));
+    } catch (error) {
+      setState((prev) => ({
+        ...prev,
+        loading: false,
+        error: error instanceof Error ? error.message : 'Error al cargar productos.',
+      }));
+    }
+  }, []);
+
+  const refresh = useCallback(() => {
+    setState((prev) => ({ ...prev, loading: true, error: null }));
+    loadCategories().then(fetchProducts);
+  }, [loadCategories, fetchProducts]);
+
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval> | null = null;
+    let cancelled = false;
+
+    const init = async () => {
+      const categories = await loadCategories();
+      if (cancelled) return;
+      await fetchProducts(categories);
+      if (cancelled) return;
+
+      // Polling cada 30 segundos
+      interval = setInterval(() => {
+        if (!cancelled) fetchProducts(categories);
+      }, POLLING_INTERVAL);
+    };
+
+    init();
+
+    return () => {
+      cancelled = true;
+      if (interval) clearInterval(interval);
+    };
+  }, [loadCategories, fetchProducts]);
+
+  return { ...state, refresh };
 }
