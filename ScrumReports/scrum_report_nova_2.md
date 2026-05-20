@@ -175,3 +175,32 @@
 * **Yesterday:**  refinacion de mi hu y sus criterios de aceptación para poder implementarlos
 * **Today:**  Hu refinada en su totalidad y coordinación en reunión con el equipo para empezar con los muckups 
 * **Blockers:** none
+
+# 19/05/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+* **Yesterday:** empece a realizar la parte del fronted de la hu que me toco
+* **Today:** coordine con mi grupo para decirle que la parte del fronted ya esta , yq ue esta en la seccion de ventas del panel administrativo
+* **Blockers:** habia que tener un dropdown en la parte de ventas para asi se mas ordenado la seccion de ventas.
+
+## Fabricio Javier Cordova Caceres 
+* **Yesterday:** empece a realizar la parte del.backend de mi hu designada 
+* **Today:** coordine con mi grupo para decirle que la parte del backend ya esta , y  que esta en la seccion de ventas del panel administrativo
+* **Blockers:** none
+
+## Jherlan Marcelo Calero Sardan
+* **Yesterday:**  Empece con el desarollo del fronted de mi hus
+* **Today:** revise si faltaba algun detalle en las hus para continuar luego con el backend. 
+* **Blockers:** none
+
+## Camila Wara Fernandez Sandoval 
+* **Yesterday:**  Comencé con el desarrollo de mi historia de usuario, la parte del front y revise los criterios de aceptación 
+* **Today:** revise si faltaba algun detalle en mi historia para poder afinar la 
+* **Blockers:** none
+
+## Dylan Coca Beltran
+* **Yesterday:** realice un avance en el endpoint y ver como conectarlo al front
+* **Today:** termine de hacer el endpoint y tambien el service para conectar con la base de datos
+* **Blockers:** None
