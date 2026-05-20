@@ -5,7 +5,7 @@ import { ConfirmModal } from './ConfirmModal';
 import { OrderCard } from './OrderCard';
 import { SectionHeader } from './SectionHeader';
 
-export default function SellerOrdersPanel() {
+export default function SellerOrdersPanel({ embedded = false }: { embedded?: boolean }) {
   const {
     reserved,
     ready,
@@ -35,11 +35,8 @@ export default function SellerOrdersPanel() {
 
   const handleCancel = () => setPendingOrder(null);
 
-  console.log('Reserved Orders:', reserved);
-  console.log('Ready Orders:', ready);
-
   return (
-    <div className="min-h-screen bg-(--theme-bg) px-4 pb-10 pt-10 md:px-8 xl:px-10">
+    <div className={embedded ? 'min-w-0' : 'min-h-screen bg-(--theme-bg) px-4 pb-10 pt-10 md:px-8 xl:px-10'}>
       {pendingOrder && (
         <ConfirmModal
           onConfirm={handleConfirm}
@@ -49,13 +46,6 @@ export default function SellerOrdersPanel() {
       )}
 
       <header className="mb-8 rounded-[1.75rem] border border-(--theme-border) bg-(--theme-card-bg) px-6 py-6 shadow-sm backdrop-blur-sm">
-        <p
-          className="mb-3 text-xs font-800 uppercase tracking-[0.25em]"
-          style={{ color: 'var(--color-primary)' }}
-        >
-          Panel del vendedor
-        </p>
-
         <h1
           className="text-3xl font-900 leading-tight text-(--theme-text) md:text-4xl"
           style={{ fontFamily: 'Outfit, sans-serif' }}

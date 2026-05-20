@@ -93,6 +93,16 @@ export async function getMessengerOrders(
   return orders.sort((a, b) => a.id.localeCompare(b.id));
 }
 
+const getStatusForORder = (status: DeliveryStatus) => {
+  switch (status) {
+    case 'accepted': return 'ACEPTADO';
+    case 'pending_reassignment': return 'PENDIENTE REASIGNACION';
+    case 'in_transit': return 'EN CAMINO';
+    case 'delivered': return 'ENTREGADO';
+    case 'not_delivered': return 'CANCELADO';
+  }
+}
+
 export async function setMessengerOrderStatus(
   order: MessengerOrder,
   status: DeliveryStatus
@@ -117,6 +127,7 @@ export async function setMessengerOrderStatus(
 
   if (order.id) {
     await updateDoc(doc(db, 'orders', order.id), {
+      status: getStatusForORder(status),
       deliveryStatus: normalizeOrderDeliveryStatus(status),
       updatedAt: serverTimestamp(),
     });

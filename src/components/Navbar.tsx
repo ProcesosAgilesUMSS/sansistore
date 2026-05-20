@@ -170,6 +170,7 @@ export default function Navbar() {
               {[
                 { label: 'Productos', href: '/productos' },
                 { label: 'Pedidos', href: '/orders/sent' },
+                { label: 'Ordenes', href: '/seller/orders' },
                 { label: 'Inventario', href: '/inventory' },
               ].map((item) => (
                 <a
@@ -184,10 +185,10 @@ export default function Navbar() {
 
             {roles.includes('admin') && (
               <a
-              href="/admin"
-              className="text-[13px] text-primary font-semibold tracking-[0.02em] transition-all hover:opacity-70"
+                href="/admin"
+                className="text-[13px] text-primary font-semibold tracking-[0.02em] transition-all hover:opacity-70"
               >
-              Admin
+                Admin
               </a>
             )}
 
@@ -197,11 +198,10 @@ export default function Navbar() {
               <button className="relative transition-all text-text-light opacity-[0.60] hover:text-primary hover:opacity-100">
                 <ShoppingBag size={18} />
                 <span
-                  className={`absolute -top-1 -right-1 text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold border border-primary ${
-                    theme === 'dark'
+                  className={`absolute -top-1 -right-1 text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold border border-primary ${theme === 'dark'
                       ? 'bg-primary text-bg-dark'
                       : 'bg-primary text-bg-dark'
-                  }`}
+                    }`}
                 >
                   0
                 </span>
@@ -258,9 +258,8 @@ export default function Navbar() {
 
                       <ChevronDown
                         size={14}
-                        className={`text-text-light opacity-50 transition-transform ${
-                          profileMenuOpen ? 'rotate-180' : ''
-                        }`}
+                        className={`text-text-light opacity-50 transition-transform ${profileMenuOpen ? 'rotate-180' : ''
+                          }`}
                       />
                     </button>
 
