@@ -4,6 +4,7 @@ import { db } from '../../../lib/firebase';
 import { Package, XCircle } from 'lucide-react';
 import { ProductDetailModal } from './ProductDetailModal';
 import { type InventoryProduct } from '../models/product.model';
+import { writeBatch } from 'firebase/firestore'; // 
 
 type LoadingState = 'loading' | 'error' | 'success';
 
@@ -16,11 +17,27 @@ export const StockTable: React.FC = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const snapshot = await getDocs(collection(db, 'products'));
-        const data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as InventoryProduct[];
+        // Traemos productos e inventario para cruzarlos
+        const [prodSnap, invSnap] = await Promise.all([
+          getDocs(collection(db, 'products')),
+          getDocs(collection(db, 'inventory'))
+        ]);
+
+        const inventoryMap = Object.fromEntries(
+          invSnap.docs.map(doc => [doc.id, doc.data()])
+        );
+
+        const data = prodSnap.docs.map((doc) => {
+          const productData = doc.data();
+          const invData = inventoryMap[doc.id] || { stockAvailable: 0 };
+          return {
+            id: doc.id,
+            ...productData,
+            // Inyectamos el stock actual para que el Modal sepa si debe mostrar el botón
+            stockAvailable: invData.stockAvailable || 0,
+          };
+        }) as InventoryProduct[];
+
         setProducts(data);
         setStatus('success');
       } catch (err) {
@@ -31,6 +48,46 @@ export const StockTable: React.FC = () => {
 
     fetchProducts();
   }, []);
+
+  const handleInitializeStock = async (productId: string, quantity: number) => {
+    try {
+      const batch = writeBatch(db);
+      
+      const inventoryRef = doc(db, 'inventory', productId);
+      batch.update(inventoryRef, {
+        stockAvailable: quantity,
+        stockTotal: quantity,
+        updatedAt: new Date(),
+        enabled: true
+      });
+
+      // Registro en inventoryMovements
+      const movementRef = doc(collection(db, 'inventoryMovements'));
+      batch.set(movementRef, {
+        productId,
+        type: 'INICIALIZACION',
+        quantity,
+        reason: 'Carga inicial de stock',
+        date: new Date()
+      });
+
+      await batch.commit();
+
+      // Actualizar estado local para que el botón desaparezca
+      setProducts(prev => prev.map(p => 
+        p.id === productId ? { ...p, stockAvailable: quantity } : p
+      ));
+      if (selectedProduct?.id === productId) {
+        setSelectedProduct({ ...selectedProduct, stockAvailable: quantity });
+      }
+
+      alert('¡Stock inicializado con éxito!');
+    } catch (err) {
+      console.error("Error", err);
+      alert('Error al inicializar stock.');
+    }
+  };
+
 
   const handleToggleActive = async () => {
     if (!selectedProduct) return;
@@ -116,6 +173,7 @@ export const StockTable: React.FC = () => {
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
           onToggleActive={handleToggleActive}
+          onInitializeStock={handleInitializeStock} // Nueva prop
         />
       )}
 
