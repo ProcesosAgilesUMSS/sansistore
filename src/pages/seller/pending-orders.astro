@@ -1,0 +1,14 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PendingOrdersPanel from '../../features/seller/components/PendingOrdersPanel';
+import Navbar from '../../components/Navbar';
+import Footer from '../../components/Footer';
+---
+
+<Layout title="Pedidos Pendientes">
+  <Navbar client:load />
+  <main class="pt-16 md:pt-20">
+    <PendingOrdersPanel client:load />
+  </main>
+  <Footer client:load />
+</Layout>

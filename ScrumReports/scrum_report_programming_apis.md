@@ -105,6 +105,8 @@
 - **Today:** Desarrollo de la historia de usario asignada.
 - **Blockers:** Duda sobre que campo de la colección orders se usara para que el vendedor marque el pedido como "listo para entrega", para que pueda ser asignado a un mensajero
 
+***
+
 ## 07-05-2026
 
 ### José Daniel Virreira Rufino
@@ -132,4 +134,68 @@
 
 - **Yesterday:** Sincronización de la rama de trabajo con los últimos cambios de `main`, integrando los nuevos servicios de seller y componentes de UI (Navbar, filtros de categorías y lógica de cobro) desarrollados por otros equipos.
 - **Today:** Implementación del **panel de entregas para el mensajero** y desarrollo de la lógica para **marcar pedidos como "EN CAMINO"** para permitir el seguimiento en tiempo real. Además, se integró el acceso directo al dashboard de mensajería en el Navbar principal y se validó la persistencia de datos en Firebase.
+- **Blockers:** None.
+
+***
+
+## 12-05-2026
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Trabajé en la integración a nuestro panel de mensajero de las historias de usuario del equipo de Webspire. Mantuve comunicación para que las funcionalidades del otro equipo no se vean alteradas ni eliminadas durante la integración.
+- **Today:** Escogeré una nueva historia de usuario para empezar con el siguiente sprint, participaré en el Sprint de Retrospectiva tal y como indica el protocolo Scrum LeSS.
+- **Blockers:** Trabajo duplicado y falta de coordinación **(solucionado)**.
+
+### Jhoel Gustavo Aiza Arce
+
+- **Yesterday:** Finalización de las pruebas de integración del flujo de estados "EN CAMINO" y validación de la persistencia en Firebase para el cierre del Sprint 1.
+- **Today:** Participación en la **Sprint Retrospective** para analizar el desempeño del equipo y definición de objetivos para el inicio del **Sprint 2**. Selección de nuevas historias de usuario orientadas a la optimización del módulo de delivery.
+- **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+- **Yesterday:** Realize el sprint retrospective y empeze a trabajar en la preparacion y desarrollo para el segundo sprint
+- **Today:** Escogere una o mas historias de usuario para trabajar en el segundo sprint
+- **Blockers:** None.
+
+### Efrain Peralta Felipe
+- **Yesterday:** Realize el sprint retrospective y empeze a trabajar en las historias de usuario para el segundo sprint
+- **Today:** Elegire las historias de usuario que trabaje para este segundo sprint.
+- **Blockers:** None.
+
+### Adrian Said Andrade Medina
+- **Yesterday:** Participé en el Sprint Retrospective y avancé en el análisis y planificación de las historias de usuario correspondientes al segundo sprint.
+- **Today:** Definiré y priorizaré las historias de usuario en las que trabajaré durante el Sprint 2, además de iniciar su desarrollo.
+- **Blockers:** None.
+
+***
+
+# Sprint 2
+
+## 14-05-2026
+
+### José Daniel Virreira Rufino
+
+- **Yesterday:** Participé en la elección de HU's de este segundo sprint, participé en el retrospective de todos los grupos en conjunto.
+- **Today:** Seleccionaré y empezaré a trabajar con una de las historias de usuario asignadas para este sprint.
+- **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+
+- **Yesterday:** Seleccione mi historia de usuario a trabajar y añadir la descripcion, criteros de aceptacion y tareas
+- **Today:** Empezare a trabajar en la HU que escogi
+- **Blockers:** None.
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday:** Cierre de Sprint 1 y participación en la retrospectiva grupal.
+- **Today:** Selección y auto-asignación de la HU #101 "[US] Como mensajero, quiero registrar que el cliente pagó". Se redactó la descripción técnica y los criterios de aceptación en el tablero para iniciar el desarrollo.
+- **Blockers:** None.
+
+### Efrain Peralta Felipe
+
+- **Yesterday:** Seleccion la historia de usuario que trabajare.
+- **Today:** Empezare a trabajar en la descripción, criterios de aceptación, tareas y desarrollo de la hu que escogi
+- **Blockers:** None.
+
+### Adrian Said Andrade Medina
+- **Yesterday:** Seleccione una historia de usuario.
+- **Today:** Definiré todo lo respecto a la historia de usuario
 - **Blockers:** None.

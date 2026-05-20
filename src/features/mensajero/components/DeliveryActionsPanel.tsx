@@ -1,18 +1,18 @@
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
-import CourierOrdersPanel from '../../courier/components/CourierOrdersPanel';
+import CourierDashboard from './CourierDashboard';
 import MessengerDashboard from './MessengerDashboard';
 
-type DeliverySection = 'courier-orders' | 'assigned' | 'delivered';
+type DeliverySection = 'deliveries' | 'assigned' | 'delivered';
 
 const sections: Array<{ id: DeliverySection; label: string }> = [
-  { id: 'courier-orders', label: 'Gestionar pedidos' },
+  { id: 'deliveries', label: 'Gestión Entregas' },
   { id: 'assigned', label: 'Pedidos aceptados' },
   { id: 'delivered', label: 'Entregados ' },
 ];
 
 export default function DeliveryActionsPanel() {
-  const [activeSection, setActiveSection] = useState<DeliverySection>('courier-orders');
+  const [activeSection, setActiveSection] = useState<DeliverySection>('deliveries');
   const [menuOpen, setMenuOpen] = useState(false);
 
   const selectSection = (section: DeliverySection) => {
@@ -81,9 +81,9 @@ export default function DeliveryActionsPanel() {
         </div>
       </aside>
 
-      <section className="min-h-[calc(100vh-5.5rem)] min-w-0 flex-1 rounded-xl border border-border-light bg-card-bg-light p-3 sm:p-4">
-        {activeSection === 'courier-orders' ? (
-          <CourierOrdersPanel embedded />
+      <section className="min-h-[calc(100vh-5.5rem)] min-w-0 flex-1">
+        {activeSection === 'deliveries' ? (
+          <CourierDashboard embedded />
         ) : (
           <MessengerDashboard clientSection={activeSection} embedded />
         )}
