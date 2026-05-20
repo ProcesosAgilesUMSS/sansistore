@@ -21,6 +21,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { getOfferBadgeData, hasValidOffer } from '../lib/productOffers';
+import { getSoldCount, isPopularProduct } from '../lib/productPopularity';
 
 interface Product {
   id: string;
@@ -36,6 +37,7 @@ interface Product {
   stockAvailable?: number;
   stockTotal?: number;
   enabled?: boolean;
+  soldCount?: number;
 }
 
 interface Review {
@@ -73,6 +75,10 @@ function formatPrice(amount: number) {
 
 function getBadgeData(product: Product | null) {
   const badgeData = getOfferBadgeData(product);
+
+  if (badgeData?.label.trim().toLowerCase() === 'popular') {
+    return null;
+  }
 
   if (badgeData?.isDiscount) {
     return {
@@ -361,6 +367,7 @@ function ProductDetailInner({
           if (!ignore) {
             setProduct({
               ...parsed,
+              soldCount: getSoldCount(parsed),
               enabled: inventoryData?.enabled ?? true,
               stockAvailable: inventoryData?.stockAvailable ?? 0,
               stockTotal: inventoryData?.stockTotal ?? inventoryData?.stockAvailable ?? 0,
@@ -413,6 +420,7 @@ function ProductDetailInner({
         if (!ignore) {
           setProduct({
             ...productData,
+            soldCount: getSoldCount(productData),
             enabled: inventoryData?.enabled ?? true,
             stockAvailable: inventoryData?.stockAvailable ?? 0,
             stockTotal: inventoryData?.stockTotal ?? inventoryData?.stockAvailable ?? 0,
@@ -545,6 +553,7 @@ function ProductDetailInner({
   }, [descriptionText, loading]);
 
   const badgeData = getBadgeData(product);
+  const showPopularBadge = isPopularProduct(product);
   const hasMoreReviews = sortedReviews.length > visibleReviews.length;
   const reviewsCount = reviews.length;
   const averageRating = reviewsCount
@@ -678,11 +687,20 @@ function ProductDetailInner({
                     </div>
                   )}
 
-                  {badgeData && (
-                    <span className={`absolute left-5 top-5 rounded-full px-3 py-1 text-xs font-semibold ${badgeData.className}`}>
-                      {badgeData.label}
-                    </span>
-                  )}
+                  <div className="absolute left-5 top-5 flex flex-wrap gap-2">
+                    {badgeData && (
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${badgeData.className}`}
+                      >
+                        {badgeData.label}
+                      </span>
+                    )}
+                    {showPopularBadge && (
+                      <span className="rounded-full bg-amber-400 px-3 py-1 text-xs font-semibold text-amber-950">
+                        Popular
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 

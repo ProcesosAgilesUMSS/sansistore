@@ -73,23 +73,49 @@ function CartButton() {
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [userRoles, setUserRoles] = useState<string[]>([]);
   const [authError, setAuthError] = useState<string | null>(null);
   const [authReady, setAuthReady] = useState(false);
   const [theme, setTheme] = useState<ThemeMode>('light');
   const [themeReady, setThemeReady] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [roles, setRoles] = useState<string[]>([]);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
+    const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
+      if (u) {
+        const userSnap = await getDoc(doc(db, 'users', u.uid));
+        setRoles(userSnap.exists() ? (userSnap.data().roles ?? []) : []);
+      } else {
+        setRoles([]);
+      }
       setAuthReady(true);
+
+      if (!u) {
+        setUserRoles([]);
+        return;
+      }
+
+      getDoc(doc(db, 'users', u.uid))
+        .then((userSnap) => {
+          const roles = userSnap.data()?.roles;
+          setUserRoles(Array.isArray(roles) ? roles : []);
+        })
+        .catch(() => setUserRoles([]));
     });
     return unsub;
   }, []);
 
+  const canAccessCourier = userRoles.includes('mensajero');
+
   useEffect(() => {
-    const savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode | null;
-    const currentTheme = savedTheme || (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
+    const savedTheme = window.localStorage.getItem(
+      THEME_STORAGE_KEY
+    ) as ThemeMode | null;
+    const currentTheme =
+      savedTheme ||
+      (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
     if (currentTheme !== theme) {
       setTheme(currentTheme);
     }
@@ -130,6 +156,9 @@ export default function Navbar() {
           createdBy: 'system',
           createdAt: serverTimestamp(),
         });
+        setRoles(['comprador']);
+      } else {
+        setRoles(userSnap.data().roles ?? []);
       }
     } catch (e: unknown) {
       const ignored = [
@@ -145,6 +174,7 @@ export default function Navbar() {
 
   const handleLogout = () => {
     setProfileMenuOpen(false);
+    setRoles([]);
     signOut(auth).catch(console.error);
   };
 
@@ -172,6 +202,7 @@ export default function Navbar() {
               {[
                 { label: 'Productos', href: '/productos' },
                 { label: 'Pedidos', href: '/orders/sent' },
+                { label: 'Ordenes', href: '/seller/orders' },
                 { label: 'Inventario', href: '/inventory' },
               ].map((item) => (
                 <a
@@ -184,15 +215,17 @@ export default function Navbar() {
               ))}
             </div>
 
-            <a
-              href="/admin"
-              className="text-[13px] text-primary font-semibold tracking-[0.02em] transition-all hover:opacity-70"
-            >
-              Admin
-            </a>
+            {roles.includes('admin') && (
+              <a
+                href="/admin"
+                className="text-[13px] text-primary font-semibold tracking-[0.02em] transition-all hover:opacity-70"
+              >
+                Admin
+              </a>
+            )}
 
             {/* ACTIONS */}
-            <div className="flex items-center gap-3">   
+            <div className="flex items-center gap-3">
               {/* CART */}
               <CartButton />
               {authReady && user && (
@@ -246,9 +279,8 @@ export default function Navbar() {
 
                       <ChevronDown
                         size={14}
-                        className={`text-text-light opacity-50 transition-transform ${
-                          profileMenuOpen ? 'rotate-180' : ''
-                        }`}
+                        className={`text-text-light opacity-50 transition-transform ${profileMenuOpen ? 'rotate-180' : ''
+                          }`}
                       />
                     </button>
 
@@ -257,13 +289,15 @@ export default function Navbar() {
                         role="menu"
                         className="absolute right-0 top-11 w-48 overflow-hidden rounded-lg border border-border-light bg-bg-light shadow-lg"
                       >
-                        <a
-                          role="menuitem"
-                          href="/courier"
-                          className="block px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
-                        >
-                          Courier
-                        </a>
+                        {canAccessCourier && (
+                          <a
+                            role="menuitem"
+                            href="/courier"
+                            className="block px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
+                          >
+                            Courier
+                          </a>
+                        )}
 
                         <button
                           type="button"
@@ -276,7 +310,7 @@ export default function Navbar() {
                         </button>
                       </div>
                     )}
-                </div>
+                  </div>
                 ) : (
                   <button
                     onClick={handleLogin}
@@ -315,7 +349,6 @@ export default function Navbar() {
               >
                 {menuOpen ? <X size={18} /> : <Menu size={18} />}
               </button>
-
             </div>
           </div>
 
@@ -344,12 +377,14 @@ export default function Navbar() {
                     Mis direcciones
                   </a>
 
-                  <a
-                    href="/courier"
-                    className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
-                  >
-                    Courier
-                  </a>
+                  {canAccessCourier && (
+                    <a
+                      href="/courier"
+                      className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
+                    >
+                      Courier
+                    </a>
+                  )}
                 </>
               )}
             </div>

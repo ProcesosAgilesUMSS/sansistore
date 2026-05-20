@@ -28,6 +28,7 @@ const mapOrder = (
   const data = snapshot.data();
   const createdAt = data.createdAt?.toDate?.() ?? null;
   const deliveredAt = data.deliveredAt?.toDate?.() ?? null;
+  const paymentCollectedAt = data.paymentCollectedAt?.toDate?.() ?? null;
 
   return {
     id: snapshot.id,
@@ -57,6 +58,8 @@ const mapOrder = (
     items: Array.isArray(data.items)
       ? (data.items as CourierOrderItem[])
       : [],
+    paymentCollectedAt,  // NUEVO
+    collectedBy: data.collectedBy ?? undefined,  // NUEVO
   };
 };
 
@@ -152,6 +155,25 @@ export const markOrderAsDelivered = async (order: CourierOrder) => {
   });
 
   await batch.commit();
+};
+
+// NUEVA FUNCIÓN: Registrar pago sin marcar como entregado
+export const registerPayment = async (order: CourierOrder) => {
+  // Validar que no esté ya pagado
+  if (order.paymentStatus === 'Cobrado') {
+    throw new Error('Este pedido ya fue cobrado');
+  }
+
+  const orderRef = doc(db, ORDERS_COLLECTION, order.id);
+  const collectedAt = serverTimestamp();
+  
+  // Solo actualizar campos de pago, NO el status de entrega
+  await updateDoc(orderRef, {
+    paymentStatus: 'Cobrado',
+    paymentStatusLabel: 'Cobrado',
+    paymentCollectedAt: collectedAt,
+    updatedAt: collectedAt,
+  });
 };
 
 export const backfillCourierOrderCodes = async () => {

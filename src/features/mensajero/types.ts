@@ -24,6 +24,8 @@ export interface CourierOrder {
   createdAt: Date | null;
   deliveredAt: Date | null;
   items: CourierOrderItem[];
+  paymentCollectedAt?: Date | null;  // NUEVO: Cuándo se registró el pago
+  collectedBy?: string;               // NUEVO: ID del mensajero que cobró
 }
 
 export interface CourierDashboardStats {
@@ -50,5 +52,11 @@ export interface MessengerOrder {
   items: MessengerOrderItem[];
   cashToCollect: number;
   paymentMethod: 'cash' | 'cash_on_delivery';
-  deliveryStatus: 'assigned' | 'accepted' | 'pending_reassignment' | 'in_transit' | 'delivered';
+  deliveryStatus:
+    | 'assigned'
+    | 'accepted'
+    | 'pending_reassignment'
+    | 'in_transit'
+    | 'delivered'
+    | 'not_delivered';
 }

@@ -142,6 +142,7 @@ async function seedProducts() {
       sourceUrl: p.sourceUrl,
       createdBy: 'seeder',
       createdAt: TS(),
+      soldCount: p.soldCount || 0,
     });
 
     await setDoc('inventory', productId, {
