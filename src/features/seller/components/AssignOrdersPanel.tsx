@@ -15,6 +15,7 @@ export default function AssignOrdersPanel({ embedded = false }: { embedded?: boo
     assigningOrderId,
     assignOrder,
     unassignOrder,
+    reassignOrder,
   } = useAssignOrders();
 
   const skeletons = (
@@ -126,6 +127,7 @@ export default function AssignOrdersPanel({ embedded = false }: { embedded?: boo
                     onSelectCourier={selectCourier}
                     onAssign={assignOrder}
                     onUnassign={unassignOrder}
+                    onReassign={reassignOrder}
                     isAssigning={assigningOrderId === order.orderId}
                     isSuccess={true}
                   />

@@ -339,3 +339,38 @@ export async function assignCourierToDelivery(
     }),
   ]);
 }
+
+export async function reassignCourierToDelivery(
+  db: Firestore,
+  deliveryId: string,
+  orderId: string,
+  newCourierId: string,
+): Promise<void> {
+  await runTransaction(db, async (tx) => {
+    const deliveryRef = doc(db, 'deliveries', deliveryId);
+    const orderRef = doc(db, 'orders', orderId);
+
+    const deliverySnap = await tx.get(deliveryRef);
+    const orderSnap = await tx.get(orderRef);
+
+    if (!deliverySnap.exists()) throw new Error('Delivery no existe.');
+    if (!orderSnap.exists()) throw new Error('Order no existe.');
+
+    const deliveryData: any = deliverySnap.data();
+    const orderData: any = orderSnap.data();
+
+    if (orderData.status !== 'ASIGNADO') {
+      throw new Error('No se puede reasignar: la orden no está en estado ASIGNADO.');
+    }
+
+    tx.update(deliveryRef, {
+      courierId: newCourierId,
+      assignedAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+
+    tx.update(orderRef, {
+      updatedAt: serverTimestamp(),
+    });
+  });
+}

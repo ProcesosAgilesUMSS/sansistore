@@ -54,6 +54,23 @@ export function useAssignOrders() {
       .finally(() => setMessengersLoading(false));
   }, []);
 
+  const reassignOrder = useCallback(
+    async (orderId: string, deliveryId: string, newCourierId: string) => {
+      if (!newCourierId || !deliveryId) return;
+
+      setAssigningOrderId(orderId);
+      try {
+        const { reassignCourierToDelivery } = await import('../services/sellerServices');
+        await reassignCourierToDelivery(db, deliveryId, orderId, newCourierId);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Error al reasignar mensajero.');
+      } finally {
+        setAssigningOrderId(null);
+      }
+    },
+    [],
+  );
+
   const selectCourier = useCallback((orderId: string, courierId: string) => {
     setSelectedCourier((prev) => ({ ...prev, [orderId]: courierId }));
   }, []);
@@ -98,5 +115,6 @@ export function useAssignOrders() {
     assigningOrderId,
     assignOrder,
     unassignOrder,
+    reassignOrder,
   };
 }
