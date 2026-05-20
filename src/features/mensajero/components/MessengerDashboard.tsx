@@ -22,6 +22,7 @@ import {
 } from '../services/messengerOrdersService';
 import type { MessengerOrder } from '../types';
 import UndeliveredModal from '../modals/UndeliveredModal';
+import './MessengerDashboard.css';
 
 const DEV_COURIER_ID = 'user-nadia';
 
@@ -40,6 +41,35 @@ const buildMapsUrl = (order: MessengerOrder) => {
   const query = encodeURIComponent(`${order.address}, ${order.city}, Bolivia`);
   return `https://www.google.com/maps/search/?api=1&query=${query}`;
 };
+
+function MessageToast({ message, onDismiss }: { message: string; onDismiss: () => void }) {
+  useEffect(() => {
+    const timer = setTimeout(onDismiss, 3000);
+    return () => clearTimeout(timer);
+  }, [message, onDismiss]);
+
+  const isError =
+    message.toLowerCase().includes('error') ||
+    message.toLowerCase().includes('no se pudo');
+
+  return (
+    <div
+      className={`messenger-toast mt-6 mb-6 flex items-center gap-4 rounded-[20px] border-2 px-5 py-4 text-sm font-bold shadow-lg ${
+        isError ? 'messenger-toast--error' : 'messenger-toast--success'
+      }`}
+    >
+      <span className="messenger-toast-dot h-2.5 w-2.5 shrink-0 rounded-full" />
+      <span className="flex-1">{message}</span>
+      <button
+        className="messenger-toast-close ml-2 opacity-50 transition hover:opacity-100"
+        onClick={onDismiss}
+        type="button"
+      >
+        <X size={15} />
+      </button>
+    </div>
+  );
+}
 
 function SummaryCard({
   icon,
@@ -639,209 +669,7 @@ export default function MessengerDashboard({
   return (
     <main
       className={`messenger-dashboard ${embedded ? 'messenger-dashboard--embedded' : 'min-h-screen'}`}
-    >
-      <style>{`
-        .messenger-dashboard {
-          background: var(--theme-bg);
-          color: var(--theme-text);
-          font-family:
-            Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-            "Segoe UI", sans-serif;
-          font-size: 16px;
-          line-height: 1.5;
-        }
-
-        .messenger-dashboard * {
-          box-sizing: border-box;
-        }
-
-        .messenger-dashboard a {
-          color: inherit;
-          text-decoration: none;
-        }
-
-        .messenger-dashboard--embedded {
-          min-height: auto;
-          background: transparent;
-        }
-
-        .messenger-header-inner {
-          width: min(100% - 32px, 1216px);
-          margin-inline: auto;
-        }
-
-        .messenger-container {
-          width: min(100% - 32px, 1280px);
-          margin-inline: auto;
-        }
-
-        .messenger-dashboard--embedded .messenger-container {
-          width: min(100% - 32px, 1280px);
-          padding-block: 8px 40px;
-        }
-
-        .messenger-header-inner {
-          min-height: 73px;
-        }
-
-        .messenger-container {
-          padding-block: 8px 40px;
-        }
-
-        .messenger-header,
-        .messenger-order-card,
-        .messenger-summary-card,
-        .messenger-delivered-row {
-          background: var(--theme-card-bg);
-          border-color: var(--theme-border);
-          color: var(--theme-text);
-        }
-
-        .messenger-header {
-          border-bottom-color: var(--theme-border);
-        }
-
-        .messenger-logo-accent {
-          color: #88b04b;
-        }
-
-        .messenger-buyer-link {
-          background: var(--theme-card-bg);
-          border-color: var(--theme-border);
-          color: var(--theme-text);
-        }
-
-        .messenger-courier-link {
-          background: #88b04b;
-          color: #0a0b0d;
-        }
-
-        .messenger-muted,
-        .messenger-copy {
-          color: color-mix(in srgb, var(--theme-text) 72%, transparent);
-        }
-
-        .messenger-icon,
-        .messenger-icon--featured {
-          background: color-mix(in srgb, #88b04b 16%, var(--theme-card-bg));
-          color: #6f9438;
-        }
-
-        .messenger-icon--featured {
-          background: var(--theme-card-bg);
-        }
-
-        .messenger-summary-card--featured,
-        .messenger-cash-box {
-          background: color-mix(in srgb, #88b04b 14%, var(--theme-card-bg));
-          border-color: color-mix(in srgb, #88b04b 58%, var(--theme-border));
-          color: #5f8330;
-        }
-
-        .messenger-charge-badge {
-          background: color-mix(in srgb, #facc15 22%, var(--theme-card-bg));
-          color: #8a6100;
-        }
-
-        .messenger-status-badge {
-          background: color-mix(in srgb, #3b82f6 14%, var(--theme-card-bg));
-          color: #1d4ed8;
-        }
-
-        .messenger-reference {
-          background: color-mix(in srgb, #facc15 18%, var(--theme-card-bg));
-          border-left-color: #ffb703;
-          color: #8a6100;
-        }
-
-        .messenger-map-button {
-          background: var(--theme-card-bg);
-          border-color: var(--theme-border);
-          color: var(--theme-text);
-        }
-
-        .messenger-map-button:hover {
-          border-color: #88b04b;
-          color: #6f9438;
-        }
-
-        .messenger-transit-button {
-          background: #2563eb;
-          color: #ffffff;
-        }
-
-        .messenger-transit-button:hover {
-          background: #1d4ed8;
-        }
-
-        .messenger-deliver-button {
-          background: #88b04b;
-          color: #0a0b0d;
-        }
-
-        .messenger-deliver-button:hover {
-          background: #9fc462;
-        }
-
-        .messenger-reject-button {
-          background: color-mix(in srgb, #ef4444 8%, var(--theme-card-bg));
-          border-color: color-mix(in srgb, #ef4444 46%, var(--theme-border));
-          color: #dc2626;
-        }
-
-        .messenger-reject-button:hover {
-          background: color-mix(in srgb, #ef4444 14%, var(--theme-card-bg));
-        }
-
-        .messenger-delivered-badge {
-          background: color-mix(in srgb, #88b04b 16%, var(--theme-card-bg));
-          color: #5f8330;
-        }
-
-        html[data-theme='dark'] .messenger-icon,
-        html[data-theme='dark'] .messenger-icon--featured {
-          color: #b7dc78;
-        }
-
-        html[data-theme='dark'] .messenger-summary-card--featured,
-        html[data-theme='dark'] .messenger-cash-box {
-          color: #c4e48a;
-        }
-
-        html[data-theme='dark'] .messenger-charge-badge,
-        html[data-theme='dark'] .messenger-reference {
-          color: #fde68a;
-        }
-
-        html[data-theme='dark'] .messenger-status-badge {
-          color: #93c5fd;
-        }
-
-        html[data-theme='dark'] .messenger-map-button:hover {
-          color: #b7dc78;
-        }
-
-        html[data-theme='dark'] .messenger-delivered-badge {
-          color: #b7dc78;
-        }
-
-        html[data-theme='dark'] .messenger-reject-button {
-          color: #fca5a5;
-        }
-
-        @media (min-width: 768px) {
-          .messenger-summary-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-          }
-        }
-
-        @media (min-width: 1024px) {
-          .messenger-order-grid {
-            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-          }
-        }
-      `}</style>
-
+    >      
       {!embedded && (
         <header className="messenger-header border-b">
           <div className="messenger-header-inner flex items-center justify-between">
@@ -880,11 +708,9 @@ export default function MessengerDashboard({
           </p>
         </section>
 
-        {message && (
-          <div className="messenger-order-card mt-6 rounded-[26px] border p-4 text-sm font-semibold">
-            {message}
-          </div>
-        )}
+          {message && (
+            <MessageToast message={message} onDismiss={() => setMessage('')} />
+          )}
 
         {loading && (
           <div className="messenger-order-card mt-6 rounded-[26px] border p-8 text-sm font-semibold">

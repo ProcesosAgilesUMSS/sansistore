@@ -177,7 +177,7 @@ export async function markMessengerOrderAsNotDelivered({
     address: order.address,
     reason,
     notes,
-    status: 'No entregado',          
+    status: 'not_delivered',          
     total: order.cashToCollect,
     paymentMethod: 'Contra entrega', 
     createdAt: serverTimestamp(),
