@@ -19,7 +19,7 @@ export function useTopProducts(): TopProductsState & { refresh: () => void } {
     try {
       const snapshot = await getDocs(collection(db, 'categories'));
       const options: CategoryOption[] = snapshot.docs.map((doc) => ({
-        id: doc.id,
+        id: doc.data().categoryId ?? doc.id,
         name: doc.data().name ?? 'Sin categoría',
       }));
       return options.sort((a, b) => a.name.localeCompare(b.name));

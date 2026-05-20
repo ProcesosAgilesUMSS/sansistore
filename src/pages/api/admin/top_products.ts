@@ -92,7 +92,9 @@ export const GET: APIRoute = async ({ request, url }) => {
     const categoriesSnap = await adminDb.collection('categories').get();
     const categoriesMap: Record<string, string> = {};
     categoriesSnap.docs.forEach((doc) => {
-      categoriesMap[doc.id] = doc.data().name ?? 'Sin categoría';
+      const data = doc.data();
+      const key = data.categoryId ?? doc.id;
+      categoriesMap[key] = data.name ?? 'Sin categoría';
     });
 
     const products: TopProduct[] = productsSnap.docs.map((doc) => {
