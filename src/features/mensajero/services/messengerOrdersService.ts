@@ -7,6 +7,7 @@ import {
   query,
   serverTimestamp,
   updateDoc,
+  setDoc,
   where,
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
@@ -78,19 +79,32 @@ export async function getMessengerOrders(
       return {
         id: orderId || deliveryDoc.id,
         deliveryId: deliveryDoc.id,
+        orderCode: String(order.orderCode || order.code || orderId || ''),  
         customerName: String(order.customerName || 'Cliente no registrado'),
+        buyerName: String(order.customerName || 'Comprador invitado'),       
         phone: String(order.customerPhone || 'Sin telefono'),
         address: String(order.address || 'Direccion no registrada'),
-        city: 'Cochabamba',
+        city: String(order.deliveryZone || 'Cochabamba'),
         items,
         cashToCollect: Number(delivery.amountCollected || order.total || 0),
-        paymentMethod: 'cash_on_delivery',
+        paymentMethod: 'cash_on_delivery' as const,
+        deliveryMethod: String(order.deliveryMethod || 'Delivery'),         
         deliveryStatus: normalizeDeliveryStatus(delivery.status),
       };
     })
   );
 
   return orders.sort((a, b) => a.id.localeCompare(b.id));
+}
+
+const getStatusForORder = (status: DeliveryStatus) => {
+  switch (status) {
+    case 'accepted': return 'ACEPTADO';
+    case 'pending_reassignment': return 'PENDIENTE REASIGNACION';
+    case 'in_transit': return 'EN CAMINO';
+    case 'delivered': return 'ENTREGADO';
+    case 'not_delivered': return 'CANCELADO';
+  }
 }
 
 export async function setMessengerOrderStatus(
@@ -117,6 +131,7 @@ export async function setMessengerOrderStatus(
 
   if (order.id) {
     await updateDoc(doc(db, 'orders', order.id), {
+      status: getStatusForORder(status),
       deliveryStatus: normalizeOrderDeliveryStatus(status),
       updatedAt: serverTimestamp(),
     });
@@ -151,17 +166,21 @@ export async function markMessengerOrderAsNotDelivered({
     });
   }
 
-  await addDoc(collection(db, 'undelivered_orders'), {
+  //Este es para los no entregados
+  await setDoc(doc(db, 'undelivered_orders', order.id), {
     orderId: order.id,
+    orderCode: order.orderCode,
     deliveryId: order.deliveryId,
-    customerName: order.customerName,
+    buyerName: order.buyerName || order.customerName,
     deliveryZone: order.city,
+    deliveryMethod: order.deliveryMethod,
     address: order.address,
     reason,
     notes,
-    status: 'not_delivered',
+    status: 'No entregado',          
     total: order.cashToCollect,
-    paymentMethod: order.paymentMethod,
+    paymentMethod: 'Contra entrega', 
     createdAt: serverTimestamp(),
   });
 }
+
