@@ -1,3 +1,4 @@
+
 export interface CartItem {
   cartItemId: string;
   userId: string;
@@ -31,3 +32,4 @@ export interface LocalCartItem {
   quantity: number;
   updatedAt: number;
 }
+
