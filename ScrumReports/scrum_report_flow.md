@@ -1,6 +1,37 @@
-# 05/14/2026
+# 19/14/2026
 
 # Daily Report - Team 4
+
+## Anahi Sanabria
+- **Yesterday**: revisar las tablas de datos y la lógica para la HU de actualizar datos personales
+- **Today**: implementacion de la HU
+- **Blockers**: none
+
+## José Ignacio Jaldin Janko    
+
+- **Yesterday**: Revisión e implementación de HUs
+- **Today**: implementacion de la HU
+- **Blockers**: none
+
+
+## Leonel Zeballos Aldunate
+- **Yesterday**: Revisión de HUs e implementación.
+- **Today**: Contiuar con la implementación de mi HU correspondiente 
+- **Blockers**: None.
+
+## Valery Dariana Ortuño Panozo
+- **Yesterday**: Avancé en la estructura de la lista de ubicaciones guardadas, además de revisar el flujo de edición y eliminación dentro del módulo de perfil.
+- **Today**: Continuaré implementando los modales de edición y confirmación de eliminación, además de conectar las acciones con la lógica de actualización y borrado de ubicaciones.
+- **Blockers**: Ninguno.
+
+## Sergio Maldonado Sejas
+- **Yesterday**: Revisión de HUs e implementación.
+- **Today**: Contiuar con la implementación de mi HU correspondiente 
+- **Blockers**: None.
+
+
+# 05/14/2026
+
 
 ## Anahi Sanabria Ugarte
 - **Yesterday:** Definición de historias de usuario y revisión de criterios de aceptación junto al equipo.
