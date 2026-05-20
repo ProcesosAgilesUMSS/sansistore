@@ -64,8 +64,8 @@ export function AssignOrderCard({
 
   return (
     <div
-      className={`overflow-hidden rounded-[1.25rem] border bg-(--theme-card-bg) transition-all duration-200 hover:-translate-y-px hover:shadow-lg ${isSuccess
-        ? 'border-emerald-400 shadow-[0_0_0_3px_rgba(136,176,75,0.25)]'
+      className={`overflow-hidden rounded-[1.25rem] bg-(--theme-card-bg) transition-all duration-200 hover:-translate-y-px hover:shadow-lg ${isSuccess
+        ? 'shadow-[0_0_0_3px_rgba(136,176,75,0.25)]'
         : 'border-(--theme-border)'
         }`}
     >
