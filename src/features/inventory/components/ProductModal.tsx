@@ -1,3 +1,5 @@
+//LotEntryModal...
+
 import React, { useCallback } from 'react';
 import { X } from 'lucide-react';
 import { useProductModal } from '../hooks/useProductModal';
