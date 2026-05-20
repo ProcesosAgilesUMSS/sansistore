@@ -16,8 +16,11 @@ import {
 } from 'lucide-react';
 import UserManagement from '../users/components/UserManagement.tsx';
 import CategoryList from '../categories/components/CategoryList.tsx';
+import ConfigPanel from '../settings/components/ConfigPanel.tsx';
 
-type Section = 'dashboard' | 'usuarios' | 'categorias' | null;
+// Section define qué pantalla se muestra en el contenido principal
+// null = ítem deshabilitado (aún no implementado)
+type Section = 'dashboard' | 'usuarios' | 'categorias' | 'parametros' | null;
 
 interface NavItem {
   label: string;
@@ -68,10 +71,11 @@ export default function AdminLayout() {
           section: 'categorias',
         },
         {
+          // ── HU #152: Parámetros del sistema ──
+          // Antes estaba disabled:true, ahora está habilitado
           label: 'Parámetros',
           icon: <Settings size={15} />,
-          section: null,
-          disabled: true,
+          section: 'parametros',
         },
       ],
     },
@@ -90,6 +94,7 @@ export default function AdminLayout() {
     dashboard: { title: 'Dashboard', subtitle: 'Panel de administración' },
     usuarios: { title: 'Gestión de usuarios', subtitle: 'Registra y administra usuarios' },
     categorias: { title: 'Categorías', subtitle: 'Gestiona las categorías de productos' },
+    parametros: { title: 'Parámetros del sistema', subtitle: 'Configura los parámetros globales del sistema' },
   };
 
   const currentPage = pageTitles[activeSection ?? 'dashboard'];
@@ -224,12 +229,10 @@ export default function AdminLayout() {
               Dashboard — próximamente
             </div>
           )}
-          {activeSection === 'usuarios' && (
-            <UserManagement />
-          )}
-          {activeSection === 'categorias' && (
-            <CategoryList />
-          )}
+          {activeSection === 'usuarios' && <UserManagement />}
+          {activeSection === 'categorias' && <CategoryList />}
+          {/* ── HU #152: renderiza ConfigPanel cuando se selecciona Parámetros ── */}
+          {activeSection === 'parametros' && <ConfigPanel />}
         </main>
 
       </div>
