@@ -5,6 +5,7 @@ import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { getOfferBadgeData, hasValidOffer } from '../lib/productOffers';
 import CategoryFilter from './CategoryFilter';
+import { useCartContext, CartProvider } from '../features/cart';
 
 interface Product {
   id: string;
@@ -36,6 +37,7 @@ const PRODUCT_PLACEHOLDER = '/product-placeholder.svg';
 const MAX_SEARCH_LENGTH = 100;
 const SEARCH_HISTORY_KEY = 'sansistore-search-history';
 const MAX_HISTORY_ITEMS = 5;
+
 
 function getSearchHistory(): string[] {
   try {
@@ -98,7 +100,7 @@ interface FeaturedProductsProps {
   initialSearch?: string;
 }
 
-export default function FeaturedProducts({
+function FeaturedProductsInner({
   initialSearch = '',
 }: FeaturedProductsProps) {
   const [products, setProducts] = useState<Product[]>([]);
@@ -107,6 +109,7 @@ export default function FeaturedProducts({
   const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [appliedSearch, setAppliedSearch] = useState(initialSearch);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const { addToCart } = useCartContext();
   const [searchHistory, setSearchHistory] = useState<string[]>(() =>
     getSearchHistory()
   );
@@ -791,12 +794,16 @@ export default function FeaturedProducts({
                         )}
                       </div>
                       <button
-                        type="button"
-                        title="Agregar al carrito"
-                        className="flex items-center justify-center rounded-full p-2.5 sm:p-3 transition-all active:scale-95 text-primary hover:scale-110 hover:drop-shadow-lg shrink-0"
-                      >
-                        <FaCartPlus className="text-lg sm:text-xl" />
-                      </button>
+                          type="button"
+                          title="Agregar al carrito"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            addToCart(product.id, product.stockAvailable ?? 0);
+                          }}
+                          className="flex items-center justify-center rounded-full p-2.5 sm:p-3 transition-all active:scale-95 text-primary hover:scale-110 hover:drop-shadow-lg shrink-0 relative z-20"
+                        >
+                          <FaCartPlus className="text-lg sm:text-xl" />
+                        </button>
                     </div>
 
 
@@ -923,5 +930,12 @@ export default function FeaturedProducts({
         )}
       </div>
     </section>
+  );
+}
+export default function FeaturedProducts(props: FeaturedProductsProps) {
+  return (
+    <CartProvider>
+      <FeaturedProductsInner {...props} />
+    </CartProvider>
   );
 }

@@ -21,6 +21,8 @@ import type { User } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, googleProvider, db } from '../lib/firebase';
 import ErrorCard from './ErrorCard';
+import { useStore } from '@nanostores/react';
+import { cartTotalUnits, cartAnimating, initCartStore } from '../features/cart/store/cartStore';
 
 type ThemeMode = 'light' | 'dark';
 
@@ -37,6 +39,36 @@ const applyTheme = (theme: ThemeMode) => {
     // Ignore storage errors and keep the visual theme change.
   }
 };
+
+
+function CartButton() {
+  const totalUnits = useStore(cartTotalUnits);
+  const isAnimating = useStore(cartAnimating);
+
+  useEffect(() => {
+    initCartStore();
+  }, []);
+
+  return (
+      <a href="/cart"
+      aria-label={`Carrito, ${totalUnits} unidades`}
+      className="relative transition-all text-text-light opacity-[0.60] hover:text-primary hover:opacity-100"
+    >
+      <ShoppingBag
+        size={18}
+        className={isAnimating ? 'animate-bounce text-primary opacity-100' : ''}
+      />
+      <span
+        key={totalUnits}
+        className={`absolute -top-1 -right-1 text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold border border-primary bg-primary text-bg-dark transition-transform ${
+          isAnimating ? 'scale-125' : 'scale-100'
+        }`}
+      >
+        {totalUnits > 99 ? '99+' : totalUnits}
+      </span>
+    </a>
+  );
+}
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -162,19 +194,7 @@ export default function Navbar() {
             {/* ACTIONS */}
             <div className="flex items-center gap-3">   
               {/* CART */}
-              <button className="relative transition-all text-text-light opacity-[0.60] hover:text-primary hover:opacity-100">
-                <ShoppingBag size={18} />
-                <span
-                  className={`absolute -top-1 -right-1 text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold border border-primary ${
-                    theme === 'dark'
-                      ? 'bg-primary text-bg-dark'
-                      : 'bg-primary text-bg-dark'
-                  }`}
-                >
-                  0
-                </span>
-              </button>
-
+              <CartButton />
               {authReady && user && (
                 <a
                   href="/location"
