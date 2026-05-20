@@ -65,8 +65,8 @@ export const Products = {
     name: 'Aceite Fino Vegetal 900 ml',
     description: 'Aceite vegetal de uso cotidiano.',
     price: 18,
-    imageUrl: PRODUCT_IMAGE,
-    badge: 'Popular',
+    imageUrl:
+      'https://hipermaxi.com/tienda-api/marketfile/ImageEcommerce?hashfile=294b7aa_1b79_4bbc_aabe_4a15c769d068.webp&co=5&size=900x900',
     stockTotal: 42,
     stockAvailable: 17,
     sourceUrl:

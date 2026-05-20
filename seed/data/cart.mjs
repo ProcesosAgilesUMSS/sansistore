@@ -19,16 +19,6 @@ const cartItemsData = [
     ],
   },
   {
-    user: Users.CARLOS,
-    items: [
-      {
-        cartItemId: 'cart-user-carlos-1',
-        producto: Products.ARROZ_CAISY,
-        quantity: 3,
-      },
-    ],
-  },
-  {
     user: Users.MARIA,
     items: [
       {
