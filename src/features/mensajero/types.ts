@@ -24,6 +24,8 @@ export interface CourierOrder {
   createdAt: Date | null;
   deliveredAt: Date | null;
   items: CourierOrderItem[];
+  paymentCollectedAt?: Date | null;  // NUEVO: Cuándo se registró el pago
+  collectedBy?: string;               // NUEVO: ID del mensajero que cobró
 }
 
 export interface CourierDashboardStats {
