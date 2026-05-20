@@ -2,10 +2,14 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc, getDocs, collection, query, where, limit } from 'firebase/firestore';
 import { auth, db } from '../../../lib/firebase';
-import { getLocalCart, addToLocalCart, updateLocalCartQuantity, removeFromLocalCart, getTotalUnits } from '../utils/localCart';
+import { getLocalCart, addToLocalCart, updateLocalCartQuantity, removeFromLocalCart, getTotalUnits, saveLocalCart } from '../utils/localCart';
 import { syncCartToFirestore, upsertCartItem, deleteCartItem } from '../services/cartFirestore';
 import { notifyCartUpdate } from '../store/cartStore';
 import type { LocalCartItem, CartProduct, CartItemWithProduct } from '../types';
+
+function cartCol(uid: string) {
+  return collection(db, 'users', uid, 'cartItems');
+}
 
 export function useCart() {
   const [items, setItems] = useState<LocalCartItem[]>([]);
@@ -17,20 +21,39 @@ export function useCart() {
   const productCacheRef = useRef<Map<string, CartProduct>>(new Map());
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (user) => {
-      uidRef.current = user?.uid ?? null;
-      const local = getLocalCart();
+  const unsub = onAuthStateChanged(auth, async (user) => {
+    uidRef.current = user?.uid ?? null;
+    const local = getLocalCart();
+    if (user) {
+      try {
+        if (local.length > 0) {
+          await syncCartToFirestore(user.uid, local);
+          setItems(local);
+          setTotalUnits(getTotalUnits(local));
+          notifyCartUpdate(getTotalUnits(local));
+        } else {
+          const snap = await getDocs(cartCol(user.uid));
+          if (!snap.empty) {
+            const fromFirestore: LocalCartItem[] = snap.docs.map((d) => ({
+              productId: d.data().productId,
+              quantity: d.data().quantity,
+              updatedAt: Date.now(),
+            }));
+            saveLocalCart(fromFirestore);
+            setItems(fromFirestore);
+            setTotalUnits(getTotalUnits(fromFirestore));
+            notifyCartUpdate(getTotalUnits(fromFirestore));
+          }
+        }
+      } catch {}
+    } else {
       setItems(local);
       setTotalUnits(getTotalUnits(local));
       notifyCartUpdate(getTotalUnits(local));
-      if (user) {
-        try {
-          await syncCartToFirestore(user.uid, local);
-        } catch {}
-      }
-    });
-    return () => unsub();
-  }, []);
+    }
+  });
+  return () => unsub();
+}, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -143,4 +166,4 @@ export function useCart() {
     removeItem,
     clearError,
   };
-};
+}
