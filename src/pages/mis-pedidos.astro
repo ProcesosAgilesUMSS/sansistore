@@ -1,0 +1,11 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar';
+import MyOrdersDashboard from '../features/orders/components/MyOrdersDashboard';
+---
+<Layout title="Mis Pedidos y Devoluciones | Sansistore">
+  <Navbar client:load />
+  <main class="pt-20 min-h-screen bg-bg-light dark:bg-bg-dark">
+    <MyOrdersDashboard client:only="react" />
+  </main>
+</Layout>
