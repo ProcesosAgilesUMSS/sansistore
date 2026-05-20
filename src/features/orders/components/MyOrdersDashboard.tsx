@@ -1,23 +1,36 @@
 import { useState, useEffect } from 'react';
 import { useAuthUser } from '../../../hooks/useAuthUser';
-import { getMyOrders } from '../services/ordersService';
-import type { Order } from '../types';
-import OrderCard from './OrderCard'; // Importamos tu nueva tarjeta
+import { getMyOrders, getMyReturns } from '../services/ordersService';
+import ReturnCard from './ReturnCard';
+import type { Order, ReturnRequest } from '../types';
+import OrderCard from './OrderCard';
 import OrderDetailsPanel from './OrderDetailsPanel';
 
 export default function MyOrdersDashboard() {
   const { user, authReady } = useAuthUser();
   const [activeTab, setActiveTab] = useState<'orders' | 'returns'>('orders');
   const [orders, setOrders] = useState<Order[]>([]);
+  const [returns, setReturns] = useState<ReturnRequest[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null); // Estado para la vista de detalle
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (authReady && user) {
-      getMyOrders(user.uid).then((data) => {
-        setOrders(data);
+useEffect(() => {
+    if (authReady) {
+      if (user) {
+        Promise.all([
+          getMyOrders(user.uid),
+          getMyReturns(user.uid)
+        ]).then(([ordersData, returnsData]) => {
+          setOrders(ordersData);
+          setReturns(returnsData);
+          setLoading(false);
+        }).catch(err => {
+          console.error("Error cargando datos:", err);
+          setLoading(false);
+        });
+      } else {
         setLoading(false);
-      });
+      }
     }
   }, [user, authReady]);
 
@@ -46,7 +59,7 @@ export default function MyOrdersDashboard() {
           onClick={() => { setActiveTab('returns'); setSelectedOrder(null); }}
           className={`pb-2.5 text-sm font-bold transition-all ${activeTab === 'returns' ? 'border-b-2 border-primary text-primary' : 'opacity-60 hover:opacity-100'}`}
         >
-          Devoluciones
+        Devoluciones ({returns.length})
         </button>
       </div>
 
@@ -74,9 +87,16 @@ export default function MyOrdersDashboard() {
           />
         )
       ) : (
-        <div className="text-center py-12 border border-dashed border-(--theme-border) rounded-2xl opacity-60">
-          {/* TODO: implementar lista de devoluciones */}
-          No tienes solicitudes de devolución actualmente.
+        <div className="flex flex-col gap-4">
+          {returns.length === 0 ? (
+            <div className="text-center py-12 border border-dashed border-(--theme-border) rounded-2xl opacity-60">
+            No tienes solicitudes de devolución actualmente.
+              </div>
+          ) : (
+          returns.map(ret => (
+            <ReturnCard key={ret.id} returnReq={ret} />
+          ))
+        )}
         </div>
       )}
     </div>

@@ -1,6 +1,7 @@
-import React from 'react';
-import { ArrowLeft, MapPin, Package, Calendar, AlertCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowLeft, MapPin, Package, Calendar, AlertCircle, CheckCircle } from 'lucide-react';
 import type { Order } from '../types';
+import { createReturnRequest } from '../services/ordersService';
 
 interface OrderDetailsPanelProps {
   order: Order;
@@ -26,12 +27,46 @@ const getStatusLabel = (status: string) => {
 };
 
 export default function OrderDetailsPanel({ order, onBack }: OrderDetailsPanelProps) {
-  const formattedDate = order.createdAt?.toDate 
-    ? order.createdAt.toDate().toLocaleDateString('es-BO', { 
-        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit' 
-      })
-    : 'Fecha no disponible';
-  const canRequestReturn = order.status === 'delivered';
+  const [showReturnForm, setShowReturnForm] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState<string>('');
+  const [returnReason, setReturnReason] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  const orderDate = order.createdAt?.toDate ? order.createdAt.toDate() : new Date();
+  const formattedDate = orderDate.toLocaleDateString('es-BO', { 
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit' 
+  });
+
+  const now = new Date();
+  const hoursSinceOrder = (now.getTime() - orderDate.getTime()) / (1000 * 60 * 60);
+  const isWithinTimeLimit = hoursSinceOrder <= 72;
+  const canRequestReturn = order.status === 'delivered' && isWithinTimeLimit;
+
+  const handleSubmitReturn = async () => {
+    if (!selectedProductId || !returnReason.trim()) return;
+    setIsSubmitting(true);
+    try {
+      const productToReturn = order.items.find(item => item.productId === selectedProductId);
+      await createReturnRequest({
+        orderId: order.id,
+        buyerId: order.buyerId,
+        productId: selectedProductId,
+        productName: productToReturn?.productName || 'Producto desconocido',
+        reason: returnReason
+      });
+      setSuccess(true);
+      setTimeout(() => {
+        onBack();
+      }, 2000);
+    } catch (error) {
+      console.error(error);
+      alert("Hubo un error al procesar tu solicitud.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="bg-(--theme-card-bg) border border-(--theme-border) rounded-[1.25rem] p-6 shadow-sm flex flex-col gap-6">
       
@@ -82,21 +117,77 @@ export default function OrderDetailsPanel({ order, onBack }: OrderDetailsPanelPr
         </div>
       </div>
 
-      <div className="border-t border-(--theme-border) pt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-        {canRequestReturn ? (
-          <button className="w-full sm:w-auto flex justify-center items-center gap-2 px-5 py-2.5 rounded-full border border-(--theme-text) text-sm font-bold transition-all hover:bg-(--theme-text) hover:text-(--theme-bg) active:scale-95">
-            <AlertCircle size={16} /> Solicitar Devolución
-          </button>
-        ) : (
-          <p className="text-xs opacity-50 italic">Las devoluciones solo están disponibles para pedidos entregados.</p>
-        )}
+      <div className="border-t border-(--theme-border) pt-4">
+        
+        {success ? (
+          <div className="bg-green-500/10 text-green-600 p-4 rounded-xl flex flex-col items-center justify-center gap-2 text-center">
+            <CheckCircle size={24} />
+            <span className="font-bold text-sm">¡Solicitud enviada con éxito!</span>
+            <span className="text-xs opacity-80">El equipo la revisará en breve.</span>
+          </div>
+        ) : showReturnForm ? (
+          <div className="bg-(--theme-secondary-bg) p-4 rounded-xl flex flex-col gap-4 animate-in fade-in slide-in-from-top-4">
+            <h4 className="font-bold text-sm">Detalles de la devolución</h4>
+            
+            <select 
+              value={selectedProductId}
+              onChange={(e) => setSelectedProductId(e.target.value)}
+              className="w-full p-2.5 rounded-lg border border-(--theme-border) bg-(--theme-bg) text-sm"
+            >
+              <option value="">Selecciona el producto a devolver...</option>
+              {order.items.map(item => (
+                <option key={item.productId} value={item.productId}>{item.productName}</option>
+              ))}
+            </select>
 
-        <div className="text-right w-full sm:w-auto">
-          <span className="text-xs uppercase tracking-wider opacity-60 font-bold mr-3">Total pagado</span>
-          <span className="text-2xl font-display font-black text-primary">
-            {order.total?.toFixed(2)} <small className="text-sm font-normal">Bs.</small>
-          </span>
-        </div>
+            <textarea 
+              value={returnReason}
+              onChange={(e) => setReturnReason(e.target.value)}
+              placeholder="Explica brevemente el motivo de la devolución..."
+              className="w-full p-2.5 rounded-lg border border-(--theme-border) bg-(--theme-bg) text-sm resize-none h-24"
+            />
+
+            <div className="flex justify-end gap-3 mt-2">
+              <button 
+                onClick={() => setShowReturnForm(false)}
+                className="px-4 py-2 text-sm font-bold opacity-60 hover:opacity-100"
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={handleSubmitReturn}
+                disabled={!selectedProductId || !returnReason.trim() || isSubmitting}
+                className="px-5 py-2 bg-primary text-(--theme-bg) rounded-full text-sm font-bold disabled:opacity-50 transition-all active:scale-95"
+              >
+                {isSubmitting ? 'Enviando...' : 'Confirmar Devolución'}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            {canRequestReturn ? (
+              <button 
+                onClick={() => setShowReturnForm(true)}
+                className="w-full sm:w-auto flex justify-center items-center gap-2 px-5 py-2.5 rounded-full border border-(--theme-text) text-sm font-bold transition-all hover:bg-(--theme-text) hover:text-(--theme-bg) active:scale-95"
+              >
+                <AlertCircle size={16} /> Solicitar Devolución
+              </button>
+            ) : (
+              <p className="text-xs opacity-50 italic">
+                {order.status !== 'delivered' 
+                  ? 'Las devoluciones solo están disponibles para pedidos entregados.' 
+                  : 'El plazo de 72 horas para devolver este pedido ha expirado.'}
+              </p>
+            )}
+
+            <div className="text-right w-full sm:w-auto mt-4 sm:mt-0">
+              <span className="text-xs uppercase tracking-wider opacity-60 font-bold mr-3">Total pagado</span>
+              <span className="text-2xl font-display font-black text-primary">
+                {order.total?.toFixed(2)} <small className="text-sm font-normal">Bs.</small>
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
     </div>

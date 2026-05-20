@@ -39,6 +39,7 @@ export interface ReturnRequest {
   orderId: string;
   buyerId: string;
   productId: string;
+  productName: string;
   reason: string;
   status: ReturnStatus;
   createdAt: any;

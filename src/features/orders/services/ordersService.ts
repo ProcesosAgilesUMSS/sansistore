@@ -89,3 +89,16 @@ export async function createReturnRequest(requestData: Omit<ReturnRequest, 'id' 
     throw error;
   }
 }
+
+export async function getMyReturns(userId: string): Promise<ReturnRequest[]> {
+  const q = query(
+    collection(db, "returns"),
+    where("buyerId", "==", userId),
+    orderBy("createdAt", "desc")
+  );
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  })) as ReturnRequest[];
+}

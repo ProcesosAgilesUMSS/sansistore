@@ -8,6 +8,8 @@ import {
   Moon,
   Sun,
   MapPin,
+  Package,
+  Search
 } from 'lucide-react';
 import { FirebaseError } from 'firebase/app';
 import {
@@ -252,6 +254,17 @@ export default function Navbar() {
                       >
                         <a
                           role="menuitem"
+                          href="/mis-pedidos"
+                          className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
+                        >
+                        { /*
+                          <Package size={14} />
+                        */ }
+                          Mis pedidos
+                        </a>
+
+                        <a
+                          role="menuitem"
                           href="/courier"
                           className="block px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
                         >
@@ -335,6 +348,13 @@ export default function Navbar() {
                     className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
                   >
                     Mis direcciones
+                  </a>
+
+                  <a
+                    href="/mis-pedidos"
+                    className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
+                  >
+                    Mis pedidos
                   </a>
 
                   <a
