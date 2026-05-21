@@ -237,3 +237,8 @@
 - **Yesterday:** Mantuve contacto con miembros de los equipos SoftwareOne, Flow y WebSpire, con el fin de tratar las historias de usuario en las que tenemos dependencias mutuas. Mantuvimos contacto para aclarar dudas sobre cómo debemos trabajar.
 - **Today:** Terminar la funcionalidad de las historias de usuario asignadas a mi persona para este segundo sprint (la funcionalidad del mensajero ubicando pedido en el mapa).
 - **Blockers:** None.
+
+### Efrain Peralta Felipe
+- **Yesterday:** Termine la hu que se me asigno.
+- **Today:** corregir posibles errores por la integración.
+- **Blockers:** None.
