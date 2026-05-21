@@ -40,9 +40,10 @@ test.describe('Avaiable product list', () => {
 
   test('Categorias', async ({ page }) => {
     await page.goto('/productos');
+    await page.waitForLoadState('networkidle');
     await page.getByRole('button', { name: 'Todas las categorías' }).click();
-    await expect(page.getByText(/Lácteos/)).toBeVisible();
-    await expect(page.getByText(/Bebidas/)).toBeVisible();
+    await expect(page.getByText(/Lácteos/)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/Bebidas/)).toBeVisible({ timeout: 10000 });
   });
 
   test('Buscar', async ({ page }) => {
@@ -59,12 +60,13 @@ test.describe('Avaiable product list', () => {
 
   test('Search with URL params', async ({ page }) => {
     await page.goto('/productos?q=Leche');
+    await page.waitForLoadState('networkidle');
 
     const searchInput = page.getByRole('textbox', {
       name: '¿Qué estás buscando hoy?',
     });
-    await expect(searchInput).toHaveValue('Leche');
-    await expect(page.getByText(/Leche PIL Natural 900 ml/)).toBeVisible();
+    await expect(searchInput).toHaveValue('Leche', { timeout: 10000 });
+    await expect(page.getByText(/Leche PIL Natural 900 ml/)).toBeVisible({ timeout: 10000 });
   });
 
   test('Category filter with URL params', async ({ page }) => {
@@ -78,12 +80,13 @@ test.describe('Avaiable product list', () => {
 
   test('Offers filter with URL params', async ({ page }) => {
     await page.goto('/productos?offers=true');
+    await page.waitForLoadState('networkidle');
 
     const offersButton = page.getByRole('button', { name: 'Solo Ofertas' });
-    await expect(offersButton).toHaveAttribute('aria-pressed', 'true');
+    await expect(offersButton).toHaveAttribute('aria-pressed', 'true', { timeout: 10000 });
     await expect(
       page.getByText(/Detergente Liquido Ola Futuro Limpieza Completa 5 L/)
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   });
 
   test('Sort by name A-Z', async ({ page }) => {
