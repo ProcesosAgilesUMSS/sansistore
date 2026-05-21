@@ -4,13 +4,23 @@ import type { Order } from "../types";
 interface OrderProductDetailProps {
   order: Order;
   onBack: () => void;
+  onConfirmReceived: (order: Order) => void;
+  confirming: boolean;
+  confirmationError: string;
 }
 
 export default function OrderProductDetail({
   order,
   onBack,
+  onConfirmReceived,
+  confirming,
+  confirmationError,
 }: OrderProductDetailProps) {
   const hasItems = order.items.length > 0;
+  const canConfirmReception =
+    order.status === "delivered" &&
+    Boolean(order.deliveryId) &&
+    !order.customerConfirmed;
 
   return (
     <section
@@ -40,6 +50,19 @@ export default function OrderProductDetail({
               />
             </div>
           </div>
+          {order.customerConfirmed && (
+            <p className="mt-3 text-sm font-semibold text-green-700">
+              Recepcion confirmada por el comprador
+              {order.customerConfirmedAt
+                ? ` el ${order.customerConfirmedAt.toLocaleString("es-BO")}`
+                : ""}
+            </p>
+          )}
+          {confirmationError && (
+            <p className="mt-3 max-w-xl text-sm font-semibold text-red-700">
+              {confirmationError}
+            </p>
+          )}
         </div>
 
         <button
@@ -50,6 +73,25 @@ export default function OrderProductDetail({
           Volver
         </button>
       </div>
+
+      {canConfirmReception && (
+        <div className="col-span-full rounded border border-dotted border-[#1e1e1e44] p-4">
+          <p className="text-sm font-semibold">
+            Este pedido fue marcado como entregado por el mensajero.
+          </p>
+          <p className="mt-1 text-sm opacity-70">
+            Confirma la recepcion solo si ya tienes los productos.
+          </p>
+          <button
+            type="button"
+            onClick={() => onConfirmReceived(order)}
+            disabled={confirming}
+            className="mt-4 rounded-full bg-primary px-5 py-2 text-sm font-bold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {confirming ? "Confirmando..." : "Confirmar recepcion"}
+          </button>
+        </div>
+      )}
 
       {!hasItems ? (
         <div className="col-span-full border border-dotted border-[#1e1e1e44] text-sm">

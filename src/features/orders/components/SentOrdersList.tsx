@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Order, OrderStatus } from "../types";
-import { getSentOrders } from "../services/ordersService";
+import { confirmOrderReceived, getSentOrders } from "../services/ordersService";
 import OrderFilter from "./OrderFilter";
 import OrderHeader from "./OrderHeader";
 import OrderItem from "./OrderItem";
@@ -14,6 +14,8 @@ export default function SentOrdersList() {
   const [selectedStatuses, setSelectedStatuses] = useState<OrderStatus[]>([]);
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [confirmingOrderId, setConfirmingOrderId] = useState<string | null>(null);
+  const [confirmationError, setConfirmationError] = useState("");
 
   useEffect(() => {
     getSentOrders().then((data) => {
@@ -33,6 +35,40 @@ export default function SentOrdersList() {
   const filteredOrders = selectedStatuses.length === 0
     ? orders
     : orders.filter((order) => selectedStatuses.includes(order.status));
+
+  const handleConfirmReceived = async (order: Order) => {
+    const shouldConfirm = window.confirm(
+      "Confirmar que recibiste este pedido? Esta accion no se puede repetir."
+    );
+    if (!shouldConfirm) return;
+
+    setConfirmingOrderId(order.id);
+    setConfirmationError("");
+
+    try {
+      const confirmedAt = await confirmOrderReceived(order);
+      const updatedOrder = {
+        ...order,
+        customerConfirmed: true,
+        customerConfirmedAt: confirmedAt,
+      };
+
+      setOrders((currentOrders) =>
+        currentOrders.map((currentOrder) =>
+          currentOrder.id === order.id ? updatedOrder : currentOrder
+        )
+      );
+      setSelectedOrder(updatedOrder);
+    } catch (error) {
+      setConfirmationError(
+        error instanceof Error
+          ? error.message
+          : "No se pudo confirmar la recepcion del pedido."
+      );
+    } finally {
+      setConfirmingOrderId(null);
+    }
+  };
 
   return (
     <section className="px-3 grid bg-bg-light
@@ -61,6 +97,9 @@ export default function SentOrdersList() {
         <OrderProductDetail
           order={selectedOrder}
           onBack={() => setSelectedOrder(null)}
+          onConfirmReceived={handleConfirmReceived}
+          confirming={confirmingOrderId === selectedOrder.id}
+          confirmationError={confirmationError}
         />
       ) : orders.length === 0 ? (
         <div className="col-span-full h-80" />
