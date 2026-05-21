@@ -73,7 +73,7 @@ export default function SentOrdersList() {
             setShowFilters={setShowFilters}
           />
 
-          <div className="grid grid-cols-subgrid col-span-full min-[960px]:col-start-8 min-[960px]:col-end-25 mb-10">
+          <div className="grid grid-cols-subgrid col-span-full min-[960px]:col-start-4 min-[960px]:col-end-22 mb-10">
             <OrderHeader />
             <ul className="col-span-full grid grid-cols-subgrid">
               {filteredOrders.map((order) => (
