@@ -22,7 +22,7 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 2 : 1,
+  retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -82,12 +82,16 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npm run dev',
+    command: 'bun run dev',
     url: 'http://localhost:4321',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
     env: {
-      FIRESTORE_EMULATOR_HOST: 'localhost:8080',
+      FIRESTORE_EMULATOR_HOST: '127.0.0.1:8180',
+      FIREBASE_AUTH_EMULATOR_HOST: '127.0.0.1:9199',
+      PUBLIC_FIRESTORE_EMULATOR_HOST: '127.0.0.1',
+      PUBLIC_FIRESTORE_EMULATOR_PORT: '8180',
+      PUBLIC_AUTH_EMULATOR_URL: 'http://127.0.0.1:9199',
       PUBLIC_APP_ENV: 'development',
       PUBLIC_FIREBASE_PROJECT_ID: 'sansistore',
       PUBLIC_FIREBASE_AUTH_DOMAIN: 'localhost',
