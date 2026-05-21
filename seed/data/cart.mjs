@@ -38,7 +38,12 @@ const cartItemsData = [
     items: [
       {
         cartItemId: 'cart-user-juan-1',
-        producto: Products.YOGURT_TEST_SIN_RESENAS,
+        producto: Products.LECHE_PIL,
+        quantity: 2,
+      },
+      {
+        cartItemId: 'cart-user-juan-2',
+        producto: Products.GALLETAS_VICTORIA,
         quantity: 1,
       },
     ],
@@ -49,10 +54,10 @@ export async function run({ db }) {
   const firestore = db;
 
   console.log('Clearing existing cartItems subcollections for seeded users...');
-  for (const entry of cartItemsData) {
+  for (const user of Object.values(Users)) {
     const snap = await firestore
       .collection('users')
-      .doc(entry.user.uid)
+      .doc(user.uid)
       .collection('cartItems')
       .get();
 

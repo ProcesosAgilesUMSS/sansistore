@@ -38,22 +38,28 @@ export { app, auth, db, storage, googleProvider };
 // Connect to emulators when not in production
 // PUBLIC_APP_ENV is set in .env (development or production)
 if (import.meta.env.PUBLIC_APP_ENV !== 'production') {
+  const firestoreEmulatorHost =
+    import.meta.env.PUBLIC_FIRESTORE_EMULATOR_HOST || '127.0.0.1';
+  const firestoreEmulatorPort = Number(
+    import.meta.env.PUBLIC_FIRESTORE_EMULATOR_PORT || 8080
+  );
+  const authEmulatorUrl =
+    import.meta.env.PUBLIC_AUTH_EMULATOR_URL || 'http://127.0.0.1:9099';
+
   // Firestore emulator
   try {
-    connectFirestoreEmulator(db, 'localhost', 8080);
+    connectFirestoreEmulator(db, firestoreEmulatorHost, firestoreEmulatorPort);
     // Connect auth emulator as well
     try {
-      connectAuthEmulator(auth, 'http://localhost:9099');
-      // eslint-disable-next-line no-console
-      console.log('Firebase Auth: connected to emulator at http://localhost:9099');
+      connectAuthEmulator(auth, authEmulatorUrl);
+      console.log(`Firebase Auth: connected to emulator at ${authEmulatorUrl}`);
     } catch (e) {
-      // eslint-disable-next-line no-console
       console.warn('Firebase Auth: could not connect to emulator', e);
     }
-    // eslint-disable-next-line no-console
-    console.log('Firebase: connected to emulators (firestore at localhost:8080)');
+    console.log(
+      `Firebase: connected to emulators (firestore at ${firestoreEmulatorHost}:${firestoreEmulatorPort})`
+    );
   } catch (e) {
-    // eslint-disable-next-line no-console
     console.warn('Firebase: could not connect to emulators', e);
   }
 }

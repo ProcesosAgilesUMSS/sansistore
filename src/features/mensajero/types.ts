@@ -44,6 +44,7 @@ export interface MessengerOrderItem {
 export interface MessengerOrder {
   id: string;
   deliveryId: string;
+  paymentId: string | null;
   orderCode: string;        
   customerName: string;
   buyerName: string;        
@@ -54,6 +55,10 @@ export interface MessengerOrder {
   items: MessengerOrderItem[];
   cashToCollect: number;
   paymentMethod: 'cash_on_delivery';
+  paymentStatus: string;
+  paymentStatusLabel: string;
+  paymentCollectedAt: Date | null;
+  collectedBy: string | null;
   deliveryMethod: string;   
   deliveryStatus: 'assigned' | 'accepted' | 'in_transit' | 'delivered' | 'not_delivered' | 'pending_reassignment';
 }

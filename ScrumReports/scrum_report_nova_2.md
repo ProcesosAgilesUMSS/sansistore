@@ -175,3 +175,27 @@
 * **Yesterday:**  refinacion de mi hu y sus criterios de aceptación para poder implementarlos
 * **Today:**  Hu refinada en su totalidad y coordinación en reunión con el equipo para empezar con los muckups 
 * **Blockers:** none
+
+# 19/05/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+* **Yesterday:** avancé con el desarrollo del frontend de la sección de ventas diarias dentro del panel administrativo correspondiente a la US-146 (ventas diarias), implementando la estructura visual y componentes principales.
+* **Today:** coordiné con mi grupo para informar el avance realizado de la US-146 y continuar con la integración de la sección de ventas.
+* **Blockers:** en la US-146 se identificó la necesidad de implementar un dropdown en la sección de ventas para mejorar el orden y visualización de la información.
+
+## Dylan Coca Beltran
+* **Yesterday:** realice un avance en el endpoint de la hu #147 de ver los productos mas vendidos y ver como conectarlo al front
+* **Today:** termine de hacer el endpoint y tambien el service para conectar con la base de datos de  la HU #147 - ver los productos mas vendidos
+* **Blockers:** hay cierta disonacia entre los datos de firebase y el modelo, cosa que ya se soluciono
+
+## Fabricio Javier Cordova Caceres 
+- **Yesterday:** desarrollo de la parte del.backend de mi hu designada  US-146
+- **Today:** coordine con mi grupo para decirle que la parte del backend de la US-146 ya esta , y  que esta en la seccion de ventas del panel administrativo
+- **Blockers:** none
+
+## Jherlan Marcelo Calero Sardan
+* **Yesterday:**  Empece con el desarollo del fronted de mi hus US-161(Reporte de ventas por fecha) y US-152(Tiempo reserva).
+* **Today:** revise si faltaba algun detalle en las hus para continuar luego con el backend. 
+* **Blockers:** none.

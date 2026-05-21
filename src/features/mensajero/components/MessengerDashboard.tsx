@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import {
@@ -16,9 +16,10 @@ import {
 } from 'lucide-react';
 import { auth } from '../../../lib/firebase';
 import {
-  getMessengerOrders,
   markMessengerOrderAsNotDelivered,
+  registerMessengerCashPayment,
   setMessengerOrderStatus,
+  subscribeToMessengerOrders,
 } from '../services/messengerOrdersService';
 import type { MessengerOrder } from '../types';
 import UndeliveredModal from '../modals/UndeliveredModal';
@@ -71,6 +72,59 @@ function MessageToast({ message, onDismiss }: { message: string; onDismiss: () =
   );
 }
 
+function NewOrderToast({
+  count,
+  onDismiss,
+}: {
+  count: number;
+  onDismiss: () => void;
+}) {
+  useEffect(() => {
+    const timer = setTimeout(onDismiss, 5000);
+    return () => clearTimeout(timer);
+  }, [count, onDismiss]);
+
+  const pedidoLabel = count === 1 ? 'pedido' : 'pedidos';
+
+  return (
+    <aside
+      aria-live="polite"
+      className="messenger-new-order-toast"
+      role="status"
+    >
+      <div className="flex items-start gap-4">
+        <span className="messenger-new-order-icon inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full">
+          <Package size={24} />
+        </span>
+
+        <div className="min-w-0 flex-1">
+          <h3 className="text-base font-black">Nuevo pedido disponible</h3>
+          <p className="messenger-copy mt-1 text-sm font-semibold">
+            Tienes {count} {pedidoLabel} por revisar.
+          </p>
+        </div>
+
+        <button
+          aria-label="Cerrar alerta de nuevo pedido"
+          className="messenger-new-order-close inline-flex h-8 w-8 items-center justify-center rounded-full transition"
+          onClick={onDismiss}
+          type="button"
+        >
+          <X size={17} />
+        </button>
+      </div>
+
+      <div className="messenger-new-order-progress mt-4" aria-hidden="true">
+        <span />
+      </div>
+
+      <p className="messenger-copy mt-2 text-xs font-semibold">
+        Se cerrará automáticamente en unos segundos.
+      </p>
+    </aside>
+  );
+}
+
 function SummaryCard({
   icon,
   label,
@@ -114,7 +168,7 @@ function PendingOrderCard({
 }: {
   order: MessengerOrder;
   onAccept: (orderId: string) => void;
-  onDelivered: (orderId: string) => void;
+  onDelivered: (order: MessengerOrder) => void;
   onDetail: (order: MessengerOrder) => void;
   onInTransit: (orderId: string) => void;
   onNotDelivered: (order: MessengerOrder) => void;
@@ -130,7 +184,7 @@ function PendingOrderCard({
               {formatDeliveryStatus(order.deliveryStatus)}
             </span>
             <span className="messenger-charge-badge rounded-full px-3 py-1 text-xs font-bold">
-              COBRAR
+              {order.paymentStatusLabel.toUpperCase()}
             </span>
           </div>
 
@@ -247,11 +301,11 @@ function PendingOrderCard({
         {order.deliveryStatus === 'in_transit' && (
           <button
             className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
-            onClick={() => onDelivered(order.id)}
+            onClick={() => onDelivered(order)}
             type="button"
           >
             <CheckCircle2 size={17} />
-            Marcar como Entregado
+            Registrar pago
           </button>
         )}
 
@@ -301,7 +355,7 @@ function OrderDetailModal({
 }: {
   order: MessengerOrder;
   onClose: () => void;
-  onDelivered: (orderId: string) => void;
+  onDelivered: (order: MessengerOrder) => void;
   onNotDelivered: (order: MessengerOrder) => void;
 }) {
   const subtotal = order.items.reduce(
@@ -346,7 +400,7 @@ function OrderDetailModal({
                   {formatDeliveryStatus(order.deliveryStatus)}
                 </span>
                 <span className="messenger-charge-badge rounded-full px-3 py-1 text-xs font-bold">
-                  COBRAR
+                  {order.paymentStatusLabel.toUpperCase()}
                 </span>
               </div>
               <p className="messenger-muted mt-5 text-xs font-bold uppercase">
@@ -445,13 +499,13 @@ function OrderDetailModal({
               <button
                 className="messenger-deliver-button mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
                 onClick={() => {
-                  onDelivered(order.id);
+                  onDelivered(order);
                   onClose();
                 }}
                 type="button"
               >
                 <CheckCircle2 size={17} />
-                Marcar como entregado
+                Registrar pago
               </button>
             )}
 
@@ -492,57 +546,134 @@ export default function MessengerDashboard({
   const [undeliveredOrder, setUndeliveredOrder] =
     useState<MessengerOrder | null>(null);
   const [savingUndelivered, setSavingUndelivered] = useState(false);
+  const [currentCourierId, setCurrentCourierId] = useState<string | null>(null);
+  const [newOrderCount, setNewOrderCount] = useState(0);
+  const notifiedOrderIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
-    const loadOrders = async (courierId: string, allowDevFallback = false) => {
+    let unsubscribeOrders: (() => void) | undefined;
+
+    const startOrdersSubscription = (
+      courierId: string,
+      allowDevFallback = false
+    ) => {
       setLoading(true);
       setMessage('');
 
-      try {
-        let data = await getMessengerOrders(courierId);
+      unsubscribeOrders?.();
 
-        if (
-          data.length === 0 &&
-          allowDevFallback &&
-          import.meta.env.PUBLIC_APP_ENV !== 'production' &&
-          courierId !== DEV_COURIER_ID
-        ) {
-          data = await getMessengerOrders(DEV_COURIER_ID);
+      unsubscribeOrders = subscribeToMessengerOrders(
+        courierId,
+        (data) => {
+          if (
+            data.length === 0 &&
+            allowDevFallback &&
+            import.meta.env.PUBLIC_APP_ENV !== 'production' &&
+            courierId !== DEV_COURIER_ID
+          ) {
+            startOrdersSubscription(DEV_COURIER_ID, false);
+            return;
+          }
+
+          setOrders(data);
+          setLoading(false);
+        },
+        (error) => {
+          console.error(error);
+          setOrders([]);
+          setLoading(false);
+          setMessage('No se pudieron cargar las entregas del emulador.');
         }
-
-        setOrders(data);
-      } catch (error) {
-        console.error(error);
-        setOrders([]);
-        setMessage('No se pudieron cargar las entregas del emulador.');
-      } finally {
-        setLoading(false);
-      }
+      );
     };
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       const devCourierId =
         import.meta.env.PUBLIC_APP_ENV !== 'production' ? DEV_COURIER_ID : null;
       const courierId = user?.uid || devCourierId;
       const allowDevFallback = !user;
 
+      setCurrentCourierId(courierId);
+
       if (!courierId) {
+        unsubscribeOrders?.();
         setOrders([]);
         setLoading(false);
         setMessage('Inicia sesion para ver tus entregas asignadas.');
         return;
       }
 
-      void loadOrders(courierId, allowDevFallback);
+      startOrdersSubscription(courierId, allowDevFallback);
     });
 
-    return unsubscribe;
+    return () => {
+      unsubscribeOrders?.();
+      unsubscribeAuth();
+    };
   }, []);
 
   const assignedOrders = useMemo(
     () => orders.filter((order) => order.deliveryStatus === 'assigned'),
     [orders]
   );
+
+  const assignedOrderIdsKey = useMemo(
+    () =>
+      assignedOrders
+        .map((order) => order.deliveryId || order.id)
+        .sort()
+        .join('|'),
+    [assignedOrders]
+  );
+
+  useEffect(() => {
+    if (loading || clientSection !== 'assigned') return;
+
+    const currentOrderIds = assignedOrderIdsKey
+      ? assignedOrderIdsKey.split('|')
+      : [];
+
+    if (currentOrderIds.length === 0) {
+      setNewOrderCount(0);
+      return;
+    }
+
+    const storageKey = 'sansistore:messenger:notified-order-ids';
+
+    let storedIds: string[] = [];
+
+    try {
+      storedIds = JSON.parse(
+        sessionStorage.getItem(storageKey) || '[]'
+      ) as string[];
+    } catch {
+      storedIds = [];
+    }
+
+    const alreadyNotifiedIds = new Set([
+      ...storedIds,
+      ...Array.from(notifiedOrderIdsRef.current),
+    ]);
+
+    const newIds = currentOrderIds.filter(
+      (orderId) => !alreadyNotifiedIds.has(orderId)
+    );
+
+    if (newIds.length === 0) return;
+
+    const updatedIds = Array.from(
+      new Set([...storedIds, ...currentOrderIds])
+    );
+
+    try {
+      sessionStorage.setItem(storageKey, JSON.stringify(updatedIds));
+    } catch {
+      
+    }
+    notifiedOrderIdsRef.current = new Set(updatedIds);
+    setNewOrderCount(newIds.length);
+  }, [assignedOrderIdsKey, clientSection, loading]);
+
   const acceptedOrders = useMemo(
     () =>
       orders.filter(
@@ -593,8 +724,51 @@ export default function MessengerDashboard({
     }
   };
 
-  const markAsDelivered = (orderId: string) => {
-    void updateOrderStatus(orderId, 'delivered');
+  const markAsDelivered = async (order: MessengerOrder) => {
+    if (!currentCourierId) {
+      setMessage('No se pudo identificar al mensajero para registrar el pago.');
+      return;
+    }
+
+    if (order.paymentStatusLabel === 'Cobrado') {
+      setMessage('Este pedido ya tiene el pago registrado.');
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Confirmar pago en efectivo de ${formatBolivianos(order.cashToCollect)} del pedido ${order.orderCode}.`
+    );
+
+    if (!confirmed) return;
+
+    const previousOrder = order;
+    setOrders((currentOrders) =>
+      currentOrders.map((currentOrder) =>
+        currentOrder.id === order.id
+          ? {
+              ...currentOrder,
+              deliveryStatus: 'delivered',
+              paymentStatus: 'COBRADO',
+              paymentStatusLabel: 'Cobrado',
+              collectedBy: currentCourierId,
+              paymentCollectedAt: new Date(),
+            }
+          : currentOrder
+      )
+    );
+
+    try {
+      await registerMessengerCashPayment(order, currentCourierId);
+      setMessage('Pago en efectivo registrado y venta cerrada correctamente.');
+    } catch (error) {
+      console.error(error);
+      setMessage('No se pudo registrar el pago en efectivo.');
+      setOrders((currentOrders) =>
+        currentOrders.map((currentOrder) =>
+          currentOrder.id === previousOrder.id ? previousOrder : currentOrder
+        )
+      );
+    }
   };
 
   const acceptOrder = (orderId: string) => {
@@ -670,6 +844,12 @@ export default function MessengerDashboard({
     <main
       className={`messenger-dashboard ${embedded ? 'messenger-dashboard--embedded' : 'min-h-screen'}`}
     >      
+      {newOrderCount > 0 && clientSection === 'assigned' && (
+        <NewOrderToast
+          count={newOrderCount}
+          onDismiss={() => setNewOrderCount(0)}
+        />
+      )}
       {!embedded && (
         <header className="messenger-header border-b">
           <div className="messenger-header-inner flex items-center justify-between">
