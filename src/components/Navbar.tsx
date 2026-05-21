@@ -44,14 +44,16 @@ const applyTheme = (theme: ThemeMode) => {
 function CartButton() {
   const totalUnits = useStore(cartTotalUnits);
   const isAnimating = useStore(cartAnimating);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     initCartStore();
+    setMounted(true);
   }, []);
 
   return (
       <a href="/cart"
-      aria-label={`Carrito, ${totalUnits} unidades`}
+      aria-label={`Carrito, ${mounted ? totalUnits : 0} unidades`}
       className="relative transition-all text-text-light opacity-[0.60] hover:text-primary hover:opacity-100"
     >
       <ShoppingBag
@@ -64,7 +66,7 @@ function CartButton() {
           isAnimating ? 'scale-125' : 'scale-100'
         }`}
       >
-        {totalUnits > 99 ? '99+' : totalUnits}
+        {mounted ? (totalUnits > 99 ? '99+' : totalUnits) : 0}
       </span>
     </a>
   );
