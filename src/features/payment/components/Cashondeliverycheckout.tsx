@@ -114,11 +114,7 @@ export default function CashOnDeliveryCheckout() {
         total: orderTotal,
       });
 
-      setConfirmedOrder({
-        orderId: result.orderId,
-        paymentId: result.paymentId,
-        total: orderTotal,
-      });
+      setConfirmedOrder(result);
       window.location.hash = 'seguimiento-pedido';
     } catch {
       setErrorMessage('No se pudo registrar el pedido. Intente nuevamente.');

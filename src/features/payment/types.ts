@@ -32,12 +32,30 @@ export interface CashOnDeliveryOrderResult {
   orderId: string;
   paymentId: string;
   deliveryId: string;
+  orderCode: string;
+  items: CashOnDeliveryOrderItem[];
+  productsTotal: number;
+  additionalCharges: number;
+  total: number;
+  paymentMethod: CashPaymentMethod;
+  paymentMethodLabel: string;
+  deliveryAddress: string;
+  status: string;
+  statusLabel: string;
 }
 
 export interface ConfirmedCashOrder {
   orderId: string;
   paymentId: string;
+  deliveryId: string;
+  orderCode: string;
+  items: CashOnDeliveryOrderItem[];
+  productsTotal: number;
+  additionalCharges: number;
   total: number;
+  paymentMethodLabel: string;
+  deliveryAddress: string;
+  statusLabel: string;
 }
 
 export type CashPaymentMethod = 'cash_on_delivery';
