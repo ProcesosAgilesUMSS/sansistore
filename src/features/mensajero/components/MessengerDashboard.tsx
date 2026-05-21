@@ -317,7 +317,7 @@ function PendingOrderCard({
             type="button"
           >
             <AlertTriangle size={17} />
-            Reportar problema
+            No entregado
           </button>
         )}
       </div>
@@ -520,7 +520,7 @@ function OrderDetailModal({
                 type="button"
               >
                 <AlertTriangle size={17} />
-                Reportar problema
+                No entregado
               </button>
             )}
           </aside>
