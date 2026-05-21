@@ -194,3 +194,8 @@
 - **Yesterday:** desarrollo de la parte del.backend de mi hu designada  US-146
 - **Today:** coordine con mi grupo para decirle que la parte del backend de la US-146 ya esta , y  que esta en la seccion de ventas del panel administrativo
 - **Blockers:** none
+
+## Jherlan Marcelo Calero Sardan
+* **Yesterday:**  Empece con el desarollo del fronted de mi hus US-161(Reporte de ventas por fecha) y US-152(Tiempo reserva).
+* **Today:** revise si faltaba algun detalle en las hus para continuar luego con el backend. 
+* **Blockers:** none.
