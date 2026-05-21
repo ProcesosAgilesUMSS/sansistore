@@ -35,11 +35,12 @@ const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']) => {
   if (status === 'not_delivered') return 'No entregado';
   return 'Entregado';
 };
-
+/*
 const buildMapsUrl = (order: MessengerOrder) => {
   const query = encodeURIComponent(`${order.address}, ${order.city}, Bolivia`);
   return `https://www.google.com/maps/search/?api=1&query=${query}`;
 };
+*/
 
 function SummaryCard({
   icon,
@@ -164,7 +165,7 @@ function PendingOrderCard({
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <a
           className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-          href={buildMapsUrl(order)}
+          href="/mapa"
           rel="noreferrer"
           target="_blank"
         >
