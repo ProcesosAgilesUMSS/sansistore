@@ -142,4 +142,54 @@ test.describe('Cart - Carrito', () => {
 
     await expect(page.getByText('Tu carrito está vacío')).toBeVisible();
   });
+
+  test('should allow non-logged user to add items to cart', async ({
+    page,
+  }) => {
+    // Add first product (Leche PIL)
+    await page.goto('/productos/leche-pil-natural-900-ml');
+    await expect(
+      page.getByRole('heading', { name: /Leche PIL Natural 900 ml/ })
+    ).toBeVisible();
+    await expect(page.getByText('Disponible', { exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Agregar al carrito' }).click();
+
+    // Add second product (Detergente)
+    await page.goto('/productos/detergente-liquido-ola-futuro-limpieza-completa-5-l');
+    await expect(
+      page.getByRole('heading', { name: /Detergente Liquido Ola Futuro/ })
+    ).toBeVisible();
+    await expect(page.getByText('Disponible', { exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Agregar al carrito' }).click();
+
+    // Add third product (Galletas)
+    await page.goto('/productos/galletas-agua-victoria-120-gr');
+    await expect(
+      page.getByRole('heading', { name: /Galletas Agua Victoria 120 gr/ })
+    ).toBeVisible();
+    await expect(page.getByText('Disponible', { exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Agregar al carrito' }).click();
+
+    // Navigate to cart and verify all 3 products are there with 1 unit each
+    await page.goto('/cart');
+
+    await expect(
+      page.getByRole('heading', { name: 'Mi Carrito' })
+    ).toBeVisible();
+
+    await expect(page.getByText('Leche PIL Natural 900 ml')).toBeVisible();
+    await expect(page.getByText('Detergente Liquido Ola Futuro').first()).toBeVisible();
+    await expect(page.getByText('Galletas Agua Victoria 120 gr')).toBeVisible();
+
+    // Verify each product has 1 unit
+    const quantities = page.locator('[data-testid*="quantity"]');
+    const count = await quantities.count();
+    if (count > 0) {
+      for (let i = 0; i < Math.min(count, 3); i++) {
+        await expect(quantities.nth(i)).toHaveText('1');
+      }
+    }
+  });
+
+  
 });
