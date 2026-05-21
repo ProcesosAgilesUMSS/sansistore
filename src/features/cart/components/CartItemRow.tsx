@@ -11,7 +11,6 @@ interface Props {
   onSetQuantity: (quantity: number) => void;
   onToggleIncluded: (included: boolean) => void;
   onRemove: () => void;
-  error?: string | null;
 }
 
 export function CartItemRow({
@@ -22,7 +21,6 @@ export function CartItemRow({
   onSetQuantity,
   onToggleIncluded,
   onRemove,
-  error,
 }: Props) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(String(item.quantity));
@@ -95,10 +93,7 @@ export function CartItemRow({
         <a href={productUrl} className="block line-clamp-1 font-semibold text-base hover:text-primary transition-colors">
           {name}
         </a>
-        <p className="text-sm text-text-light opacity-50 mt-0.5">Bs {price.toFixed(2)} / u</p>
-        {error && (
-          <p className="text-xs text-red-500 mt-1">{error}</p>
-        )}
+        <p className="text-sm text-text-light opacity-50 mt-0.5">Bs {price.toFixed(2)} / u <span className="opacity-60">· Stock: {stock}</span></p>
         <div className="mt-2 flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-1.5">
             <button
