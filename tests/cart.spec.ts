@@ -259,13 +259,14 @@ test.describe('Cart - Carrito', () => {
       price: 12.5,
       stockAvailable: 24,
     });
-    await seedUserCartItem({
-      userId: 'user-admin',
-      productId,
-      quantity: 1,
-    });
 
-    await loginWithEmail(page, 'admin@umss.edu');
+    await setLocalCartOnce(page, productId, 12.5);
+    await page.getByLabel('Correo electrónico').fill('admin@umss.edu');
+    await page.getByLabel('Contraseña').fill('password123');
+    await page
+      .getByRole('button', { name: 'Iniciar sesión', exact: true })
+      .click();
+    await expect(page).toHaveURL('/me');
 
     await page.goto('/carrito');
     await expectFilledCartPage(page);
@@ -315,13 +316,14 @@ test.describe('Cart - Carrito', () => {
       name: productName,
       price: 5,
     });
-    await seedUserCartItem({
-      userId: 'user-admin',
-      productId,
-      quantity: 1,
-    });
 
-    await loginWithEmail(page, 'admin@umss.edu');
+    await setLocalCartOnce(page, productId, 5);
+    await page.getByLabel('Correo electrónico').fill('admin@umss.edu');
+    await page.getByLabel('Contraseña').fill('password123');
+    await page
+      .getByRole('button', { name: 'Iniciar sesión', exact: true })
+      .click();
+    await expect(page).toHaveURL('/me');
 
     await page.goto('/carrito');
     await expect(page.locator(`a[href="/productos/${productId}"]`).filter({ hasText: productName })).toBeVisible();

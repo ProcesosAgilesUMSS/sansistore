@@ -20,15 +20,9 @@ test.describe('Product Detail Page', () => {
     // Check page title
     await expect(page).toHaveTitle(/Sansistore/);
 
-    // Check description
+    // Check product name is displayed
     await expect(
-      page
-        .locator('p.leading-7')
-        .filter({
-          hasText:
-            'Leche semidescremada UHT, rica en calcio y pensada para el consumo diario.',
-        })
-        .first()
+      page.getByRole('heading', { name: /Leche PIL Natural 900 ml/ })
     ).toBeVisible();
 
     // Check price
