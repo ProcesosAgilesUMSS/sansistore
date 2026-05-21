@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Check, Trash2 } from 'lucide-react';
 import { AnimatedAmount } from './AnimatedAmount';
 import type { CartItemWithProduct } from '../types';
@@ -7,6 +8,7 @@ interface Props {
   stock: number;
   onIncrement: () => void;
   onDecrement: () => void;
+  onSetQuantity: (quantity: number) => void;
   onToggleIncluded: (included: boolean) => void;
   onRemove: () => void;
   error?: string | null;
@@ -17,15 +19,37 @@ export function CartItemRow({
   stock,
   onIncrement,
   onDecrement,
+  onSetQuantity,
   onToggleIncluded,
   onRemove,
   error,
 }: Props) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(String(item.quantity));
+
   const product = item.product;
   const price = product?.hasOffer && product?.offerPrice != null ? product.offerPrice : product?.price ?? 0;
   const name = product?.name ?? item.productId;
   const imageUrl = product?.imageUrl ?? '';
   const productUrl = `/productos/${item.product?.slug ?? item.productId}`;
+
+  function commitQuantity() {
+    setEditing(false);
+    const n = parseInt(draft, 10);
+    if (Number.isFinite(n) && n >= 1 && n <= stock) {
+      onSetQuantity(n);
+    } else if (n < 1) {
+      onSetQuantity(1);
+    } else {
+      onSetQuantity(stock);
+    }
+    setDraft(String(item.quantity));
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Enter') commitQuantity();
+    if (e.key === 'Escape') { setEditing(false); setDraft(String(item.quantity)); }
+  }
 
   return (
     <div
@@ -84,7 +108,25 @@ export function CartItemRow({
             >
               −
             </button>
-            <span className="w-7 text-center text-base font-semibold">{item.quantity}</span>
+            {editing ? (
+              <input
+                type="text"
+                inputMode="numeric"
+                value={draft}
+                onChange={(e) => setDraft(e.target.value.replace(/[^0-9]/g, ''))}
+                onBlur={commitQuantity}
+                onKeyDown={handleKeyDown}
+                autoFocus
+                className="w-10 text-center text-base font-semibold bg-transparent border border-primary rounded outline-none"
+              />
+            ) : (
+              <button
+                onClick={() => { setEditing(true); setDraft(String(item.quantity)); }}
+                className="w-7 text-center text-base font-semibold hover:text-primary transition-colors"
+              >
+                {item.quantity}
+              </button>
+            )}
             <button
               onClick={onIncrement}
               disabled={item.quantity >= stock}

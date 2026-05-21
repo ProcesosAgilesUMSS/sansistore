@@ -81,6 +81,37 @@ export function removeFromLocalCart(productId: string): LocalCartItem[] {
   return items;
 }
 
+export function setQuantityLocalCart(
+  productId: string,
+  quantity: number,
+  stock: number
+): { success: boolean; error?: string; items: LocalCartItem[] } {
+  const items = getLocalCart();
+  const item = items.find((i) => i.productId === productId);
+  if (!item) return { success: false, error: 'Producto no encontrado en carrito.', items };
+
+  if (quantity < 1) {
+    const updated = items.filter((i) => i.productId !== productId);
+    saveLocalCart(updated);
+    return { success: true, items: updated };
+  }
+
+  if (quantity > stock) {
+    return { success: false, error: 'Sin stock suficiente.', items };
+  }
+
+  const totalWithoutItem = getTotalUnits(items) - item.quantity;
+  if (totalWithoutItem + quantity > MAX_UNITS) {
+    return { success: false, error: 'Límite máximo de 100 unidades alcanzado.', items };
+  }
+
+  const updated = items.map((i) =>
+    i.productId === productId ? { ...i, quantity, updatedAt: Date.now() } : i
+  );
+  saveLocalCart(updated);
+  return { success: true, items: updated };
+}
+
 export function clearLocalCart(): void {
   localStorage.removeItem(CART_KEY);
 }

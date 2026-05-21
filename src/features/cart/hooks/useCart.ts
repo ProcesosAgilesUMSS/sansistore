@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc, getDocs, collection, query, where, limit } from 'firebase/firestore';
 import { auth, db } from '../../../lib/firebase';
-import { getLocalCart, addToLocalCart, updateLocalCartQuantity, removeFromLocalCart, getTotalUnits, saveLocalCart } from '../utils/localCart';
+import { getLocalCart, addToLocalCart, updateLocalCartQuantity, setQuantityLocalCart, removeFromLocalCart, getTotalUnits, saveLocalCart } from '../utils/localCart';
 import { syncCartToFirestore, upsertCartItem, deleteCartItem } from '../services/cartFirestore';
 import { notifyCartUpdate } from '../store/cartStore';
 import type { LocalCartItem, CartProduct, CartItemWithProduct } from '../types';
@@ -153,6 +153,27 @@ export function useCart() {
     }
   }, []);
 
+  const setQuantity = useCallback(async (productId: string, quantity: number, stock: number) => {
+    setError(null);
+    const result = setQuantityLocalCart(productId, quantity, stock);
+    if (!result.success) {
+      setError(result.error ?? null);
+      return false;
+    }
+    setItems(result.items);
+    setTotalUnits(getTotalUnits(result.items));
+    notifyCartUpdate(getTotalUnits(result.items));
+    if (uidRef.current) {
+      const item = result.items.find((i) => i.productId === productId);
+      if (item) {
+        try { await upsertCartItem(uidRef.current, productId, item.quantity); } catch {}
+      } else {
+        try { await deleteCartItem(uidRef.current, productId); } catch {}
+      }
+    }
+    return true;
+  }, []);
+
   const clearError = useCallback(() => setError(null), []);
 
   return {
@@ -163,6 +184,7 @@ export function useCart() {
     error,
     addToCart,
     updateQuantity,
+    setQuantity,
     removeItem,
     clearError,
   };

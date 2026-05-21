@@ -346,7 +346,7 @@ function OrderSuccessModal({ onClose }: { onClose: () => void }) {
 }
 
 function CartViewInner() {
-  const { itemsWithProducts, loading, updateQuantity, removeItem, items } = useCartContext();
+  const { itemsWithProducts, loading, updateQuantity, setQuantity, removeItem, items } = useCartContext();
   const { user, authReady } = useAuthUser();
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [includedById, setIncludedById] = useState<Record<string, boolean>>({});
@@ -435,6 +435,17 @@ function CartViewInner() {
 
   async function handleDecrement(productId: string, stock: number) {
     await updateQuantity(productId, -1, stock);
+  }
+
+  async function handleSetQuantity(productId: string, quantity: number, stock: number) {
+    const clamped = Math.max(1, Math.min(quantity, stock));
+    const ok = await setQuantity(productId, clamped, stock);
+    if (!ok) {
+      setErrorsById((prev) => ({
+        ...prev,
+        [productId]: errorsById[productId] || 'No se pudo actualizar la cantidad.',
+      }));
+    }
   }
 
   async function handleRemove(productId: string) {
@@ -691,6 +702,7 @@ function CartViewInner() {
             error={item.error}
             onIncrement={() => handleIncrement(item.productId, item.product?.stockAvailable ?? 999)}
             onDecrement={() => handleDecrement(item.productId, item.product?.stockAvailable ?? 999)}
+            onSetQuantity={(qty) => handleSetQuantity(item.productId, qty, item.product?.stockAvailable ?? 999)}
             onToggleIncluded={(included) => handleToggleIncluded(item.productId, included)}
             onRemove={() => handleRemove(item.productId)}
           />
