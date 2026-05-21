@@ -176,7 +176,7 @@ function CartViewInner() {
                   return (
                     <div key={item.productId} className="flex items-start justify-between gap-3 text-sm">
                       <div>
-                        <p className="font-medium">{name}</p>
+                        <p className="line-clamp-1 font-medium">{name}</p>
                         <p className="text-xs text-text-light opacity-60">{item.quantity} x Bs {price.toFixed(2)}</p>
                       </div>
                       <AnimatedAmount value={lineTotal} className="font-semibold text-primary" />

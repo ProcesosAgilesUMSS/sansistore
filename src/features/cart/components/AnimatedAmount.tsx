@@ -7,5 +7,12 @@ interface Props {
 
 export function AnimatedAmount({ value, className }: Props) {
   const displayed = useAnimatedNumber(value);
-  return <span className={className}>Bs {displayed.toFixed(2)}</span>;
+  return (
+    <span
+      className={`inline-flex items-baseline whitespace-nowrap tabular-nums ${className ?? ''}`}
+      style={{ minWidth: '12ch' }}
+    >
+      Bs {displayed.toFixed(2)}
+    </span>
+  );
 }

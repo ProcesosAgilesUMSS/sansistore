@@ -33,6 +33,16 @@ export function CartItemRow({
         item.included ? 'opacity-100' : 'opacity-65'
       }`}
     >
+      <label className="inline-flex h-16 w-8 shrink-0 items-center justify-center">
+        <input
+          type="checkbox"
+          checked={item.included}
+          onChange={(event) => onToggleIncluded(event.target.checked)}
+          className="h-4 w-4 rounded border-border-light text-primary focus:ring-primary"
+          aria-label={`Incluir ${name} en el total`}
+        />
+      </label>
+
       <a href={productUrl} className="shrink-0">
         {imageUrl ? (
           <img src={imageUrl} alt={name} className="w-16 h-16 object-cover rounded-lg" />
@@ -48,21 +58,9 @@ export function CartItemRow({
       </a>
 
       <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-3">
-          <a href={productUrl} className="block font-semibold text-base truncate hover:text-primary transition-colors">
-            {name}
-          </a>
-          <label className="inline-flex items-center gap-2 text-xs font-medium text-text-light shrink-0">
-            <input
-              type="checkbox"
-              checked={item.included}
-              onChange={(event) => onToggleIncluded(event.target.checked)}
-              className="h-4 w-4 rounded border-border-light text-primary focus:ring-primary"
-              aria-label={`Incluir ${name} en el total`}
-            />
-            Incluir
-          </label>
-        </div>
+        <a href={productUrl} className="block line-clamp-1 font-semibold text-base hover:text-primary transition-colors">
+          {name}
+        </a>
         <p className="text-sm text-text-light opacity-50 mt-0.5">Bs {price.toFixed(2)} / u</p>
         {error && (
           <p className="text-xs text-red-500 mt-1">{error}</p>
