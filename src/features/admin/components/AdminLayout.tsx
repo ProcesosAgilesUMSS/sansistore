@@ -13,14 +13,18 @@ import {
   Menu,
   X,
   ChevronRight,
+  ArrowLeft, // <- Agregado para el botón de retroceso
 } from 'lucide-react';
 import UserManagement from '../users/components/UserManagement.tsx';
 import CategoryList from '../categories/components/CategoryList.tsx';
-import ConfigPanel from '../settings/components/ConfigPanel.tsx';
+import DailySales from '../ventas/components/DailySales.tsx';
 
-// Section define qué pantalla se muestra en el contenido principal
-// null = ítem deshabilitado (aún no implementado)
-type Section = 'dashboard' | 'usuarios' | 'categorias' | 'parametros' | null;
+type Section =
+  | 'dashboard'
+  | 'usuarios'
+  | 'categorias'
+  | 'ventas-diarias'
+  | null;
 
 interface NavItem {
   label: string;
@@ -38,6 +42,7 @@ interface NavSection {
 export default function AdminLayout() {
   const [activeSection, setActiveSection] = useState<Section>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [ventasOpen, setVentasOpen] = useState(true);
 
   const navSections: NavSection[] = [
     {
@@ -82,7 +87,7 @@ export default function AdminLayout() {
     {
       title: 'Analítica',
       items: [
-        { label: 'Ventas', icon: <BarChart2 size={15} />, section: null, disabled: true },
+        { label: 'Ventas', icon: <BarChart2 size={15} />, section: 'ventas-diarias' },
         { label: 'Inventario', icon: <Package size={15} />, section: null, disabled: true },
         { label: 'Mensajeros', icon: <Bike size={15} />, section: null, disabled: true },
         { label: 'Reportes', icon: <FileText size={15} />, section: null, disabled: true },
@@ -94,17 +99,10 @@ export default function AdminLayout() {
     dashboard: { title: 'Dashboard', subtitle: 'Panel de administración' },
     usuarios: { title: 'Gestión de usuarios', subtitle: 'Registra y administra usuarios' },
     categorias: { title: 'Categorías', subtitle: 'Gestiona las categorías de productos' },
-    parametros: { title: 'Parámetros del sistema', subtitle: 'Configura los parámetros globales del sistema' },
+    'ventas-diarias': { title: 'Ventas diarias', subtitle: 'Monitorea el rendimiento diario de ventas' },
   };
 
   const currentPage = pageTitles[activeSection ?? 'dashboard'];
-
-  const today = new Date().toLocaleDateString('es-BO', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
 
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--theme-bg)]">
@@ -145,6 +143,51 @@ export default function AdminLayout() {
                 {section.title}
               </p>
               {section.items.map((item) => {
+                if (item.label === 'Ventas') {
+                  return (
+                    <div key={item.label} className="mb-1">
+                      <button
+                        onClick={() => setVentasOpen(!ventasOpen)}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px]
+                        text-white/50 hover:text-white/80 hover:bg-white/5 transition-colors"
+                      >
+                        <span>{item.icon}</span>
+                        <span className="flex-1 text-left">Ventas</span>
+                        <ChevronRight
+                          size={12}
+                          className={`transition-transform ${ventasOpen ? 'rotate-90' : ''}`}
+                        />
+                      </button>
+
+                      {ventasOpen && (
+                        <div className="ml-7 mt-1 space-y-1">
+                          <button
+                            onClick={() => {
+                              setActiveSection('ventas-diarias');
+                              setSidebarOpen(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
+                            transition-colors ${
+                              activeSection === 'ventas-diarias'
+                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
+                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
+                            }`}
+                          >
+                            Ventas diarias
+                          </button>
+
+                          <button
+                            className="w-full text-left px-3 py-2 rounded-lg text-[12px]
+                            text-white/20 cursor-not-allowed"
+                          >
+                            Más vendidos
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+
                 const isActive = activeSection === item.section;
                 return (
                   <button
@@ -197,42 +240,60 @@ export default function AdminLayout() {
       </aside>
 
       {/* Main */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#fafafa]">
 
-        {/* Topbar */}
-        <header className="flex items-center justify-between px-5 py-3.5 border-b border-[var(--theme-border)] bg-[var(--theme-card-bg)]">
-          <div className="flex items-center gap-3">
+        {/* Topbar: Modificado para replicar el Mockup */}
+        <header className="flex items-center justify-between px-6 py-5 md:px-10 md:py-6 bg-[#0a0a0a]">
+          <div className="flex items-center gap-4 md:gap-8">
+            {/* Menú Hamburguesa Mobile */}
             <button
-              className="md:hidden p-1 text-[var(--theme-text)]/50 hover:text-[var(--theme-text)] transition-colors"
+              className="md:hidden p-1 text-white/50 hover:text-white transition-colors"
               onClick={() => setSidebarOpen(!sidebarOpen)}
             >
-              {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
+              {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
-            <div>
-              <h1 className="text-[15px] font-semibold text-[var(--theme-text)]">
+
+            {/* Grupo de Título y Botón Volver */}
+            <div className="flex items-center gap-4 md:gap-8">
+              {activeSection !== 'dashboard' && (
+                <button
+                  onClick={() => setActiveSection('dashboard')}
+                  className="hidden md:flex items-center gap-2 text-white/50 hover:text-white transition-colors text-sm font-medium"
+                >
+                  <ArrowLeft size={16} /> Dashboard
+                </button>
+              )}
+              
+              <h1 className="text-xl md:text-3xl font-bold text-white tracking-tight">
                 {currentPage.title}
               </h1>
-              <p className="text-[11px] text-[var(--theme-text)]/40">
-                {currentPage.subtitle}
-              </p>
             </div>
           </div>
-          <span className="text-[11px] text-[var(--theme-text)]/35 hidden sm:block capitalize">
-            {today}
-          </span>
+          
+          <div className="flex items-center gap-4">
+             {/* Badge Área 7 */}
+             <div className="px-5 py-1.5 border border-[#88b04b] text-[#88b04b] rounded-full text-xs md:text-sm font-medium tracking-wide">
+               Área 7
+             </div>
+          </div>
         </header>
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto p-5">
+        <main className="flex-1 overflow-y-auto p-6 md:p-10">
           {activeSection === 'dashboard' && (
-            <div className="flex items-center justify-center h-full text-[var(--theme-text)]/30 text-sm">
-              Dashboard — próximamente
+            <div className="flex items-center justify-center h-full text-black/30 text-sm font-medium">
+              Dashboard principal — Próximamente
             </div>
           )}
-          {activeSection === 'usuarios' && <UserManagement />}
-          {activeSection === 'categorias' && <CategoryList />}
-          {/* ── HU #152: renderiza ConfigPanel cuando se selecciona Parámetros ── */}
-          {activeSection === 'parametros' && <ConfigPanel />}
+          {activeSection === 'usuarios' && (
+            <UserManagement />
+          )}
+          {activeSection === 'categorias' && (
+            <CategoryList />
+          )}
+          {activeSection === 'ventas-diarias' && (
+            <DailySales />
+          )}
         </main>
 
       </div>
