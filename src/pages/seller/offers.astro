@@ -1,14 +1,9 @@
 ---
-// Volvemos al Layout general temporalmente para saltarnos la pantalla de login
-import Layout from '../../layouts/Layout.astro';
-import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import SellerLayout from '../../layouts/SellerLayout.astro';
 import OfferForm from '../../features/offers/components/OfferForm';
 ---
 
-<Layout title="Gestión de Ofertas | Sansistore (Modo Dev)">
-  <Navbar client:load />
-  
+<SellerLayout title="Gestión de Ofertas | Sansistore">
   <main class="min-h-screen transition-colors duration-200 py-24">
     <div class="max-w-4xl mx-auto px-4 mt-8">
       
@@ -19,6 +14,4 @@ import OfferForm from '../../features/offers/components/OfferForm';
 
     </div>
   </main>
-
-  <Footer client:load />
-</Layout>
+</SellerLayout>

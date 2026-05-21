@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { createOfferService } from '../services/offerService';
-// Importamos tu nueva etiqueta visual
 import DiscountBadge from './DiscountBadge';
 
 export default function OfferForm() {
@@ -13,7 +12,7 @@ export default function OfferForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
-  // Datos de prueba para no depender de una base de datos vacía
+  // Datos de prueba 
   const mockProducts = [
     { id: 'prod-001', name: 'Polera Oversize Blanca' },
     { id: 'prod-002', name: 'Pantalón Cargo Negro' },

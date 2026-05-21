@@ -1,16 +1,14 @@
 import React from 'react';
 
-// Definimos qué datos necesita recibir este componente del equipo "dmind"
+//  componente equipo "dmind"
 interface DiscountBadgeProps {
   originalPrice: number;
   discountPercentage: number;
 }
 
 export default function DiscountBadge({ originalPrice, discountPercentage }: DiscountBadgeProps) {
-  // Evitamos errores si el descuento es 0 o inválido
   if (!discountPercentage || discountPercentage <= 0) return null;
 
-  // Hacemos la matemática para calcular el precio final
   const discountAmount = originalPrice * (discountPercentage / 100);
   const finalPrice = originalPrice - discountAmount;
 
