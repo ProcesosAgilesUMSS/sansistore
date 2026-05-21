@@ -255,6 +255,82 @@ export async function markOrderAsReady(
   return { deliveryId };
 }
 
+export function subscribeConfirmedOrders(
+  db: Firestore,
+  sellerId: string,
+  onData: (orders: Order[]) => void,
+  onError?: (err: Error) => void,
+): Unsubscribe {
+  const q = query(
+    collection(db, 'orders'),
+    where('sellerId', '==', sellerId),
+    where('status', '==', 'CONFIRMADO'),
+  );
+
+  return onSnapshot(
+    q,
+    async (snap) => {
+      const orders = snap.docs.map((d) => docToOrder(d.id, d.data() as OrderDoc));
+      const enriched = await enrichOrdersWithData(db, orders);
+      onData(enriched);
+    },
+    (err) => onError?.(err),
+  );
+}
+
+export function subscribeReservedOrders(
+  db: Firestore,
+  sellerId: string,
+  onData: (orders: Order[]) => void,
+  onError?: (err: Error) => void,
+): Unsubscribe {
+  const q = query(
+    collection(db, 'orders'),
+    where('sellerId', '==', sellerId),
+    where('status', '==', 'RESERVADO'),
+  );
+
+  return onSnapshot(
+    q,
+    async (snap) => {
+      const orders = snap.docs.map((d) => docToOrder(d.id, d.data() as OrderDoc));
+      const enriched = await enrichOrdersWithData(db, orders);
+      onData(enriched);
+    },
+    (err) => onError?.(err),
+  );
+}
+
+export async function reserveConfirmedOrder(
+  db: Firestore,
+  orderId: string,
+  sellerId: string,
+): Promise<void> {
+  const orderRef = doc(db, 'orders', orderId);
+
+  await runTransaction(db, async (tx) => {
+    const orderSnap = await tx.get(orderRef);
+
+    if (!orderSnap.exists()) {
+      throw new Error('El pedido no existe.');
+    }
+
+    const current = orderSnap.data();
+
+    if (current.status !== 'CONFIRMADO') {
+      throw new Error(
+        `El pedido ya no está en CONFIRMADO (estado actual: ${current.status}).`,
+      );
+    }
+
+    tx.update(orderRef, {
+      status: 'RESERVADO',
+      sellerId,
+      updatedAt: serverTimestamp(),
+    });
+  });
+}
+
 export function subscribeAssignedOrders(
   db: Firestore,
   sellerId: string,

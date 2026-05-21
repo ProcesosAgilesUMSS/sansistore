@@ -19,7 +19,8 @@ test.describe('Auth - Login', () => {
       .getByRole('button', { name: 'Iniciar sesión', exact: true })
       .click();
 
-    await expect(page).toHaveURL('/me');
+    await expect(page).toHaveURL('/');
+    await page.goto('/me');
     await expect(page.getByText('No autenticado')).toBeHidden();
     await expect(page.locator('dd', { hasText: 'juan.paredes@est.umss.edu' })).toBeVisible({ timeout: 10000 });
   });

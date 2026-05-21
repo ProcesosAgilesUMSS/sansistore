@@ -8,6 +8,12 @@ import GridSpinner from "./GridSpinner";
 import LoadingMessage from "./LoadingMessage";
 import OrderProductDetail from "./OrderProductDetail";
 
+const currencyFormatter = new Intl.NumberFormat("es-BO", {
+  style: "currency",
+  currency: "BOB",
+  minimumFractionDigits: 2,
+});
+
 export default function SentOrdersList() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -33,6 +39,11 @@ export default function SentOrdersList() {
   const filteredOrders = selectedStatuses.length === 0
     ? orders
     : orders.filter((order) => selectedStatuses.includes(order.status));
+  const deliveredOrders = orders.filter((order) => order.status === "delivered");
+  const deliveredTotal = deliveredOrders.reduce(
+    (total, order) => total + (order.total ?? 0),
+    0
+  );
 
   return (
     <section className="px-3 grid bg-bg-light
@@ -51,6 +62,25 @@ export default function SentOrdersList() {
           </sup>
         )}
       </h2>
+
+      {!loading && (
+        <div className="col-span-full mb-12 grid gap-3 min-[760px]:col-start-1 min-[760px]:col-end-9 min-[960px]:col-end-11">
+          <div className="border-y border-[#1e1e1e] py-4">
+            <p className="uppercase text-xs flex gap-[4px]">
+              <span>/</span>
+              rendicion del dia
+            </p>
+            <div className="mt-3 flex flex-wrap items-end gap-x-4 gap-y-2">
+              <p className="text-[calc(.78125vw+24px)] leading-none">
+                {currencyFormatter.format(deliveredTotal)}
+              </p>
+              <p className="pb-1 text-sm text-[#1e1e1e99]">
+                {`${deliveredOrders.length} pedidos entregados cobrados`}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {loading ? (
         <div className="col-span-full flex justify-center items-center h-80 gap-x-5">

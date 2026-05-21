@@ -18,12 +18,14 @@ import {
 import UserManagement from '../users/components/UserManagement.tsx';
 import CategoryList from '../categories/components/CategoryList.tsx';
 import DailySales from '../ventas/components/DailySales.tsx';
+import TopSellingProducts from '../ventas/top-products/components/TopSellingProducts.tsx';
 
 type Section =
   | 'dashboard'
   | 'usuarios'
   | 'categorias'
   | 'ventas-diarias'
+  | 'mas-vendidos'
   | null;
 
 interface NavItem {
@@ -99,6 +101,7 @@ export default function AdminLayout() {
     usuarios: { title: 'Gestión de usuarios', subtitle: 'Registra y administra usuarios' },
     categorias: { title: 'Categorías', subtitle: 'Gestiona las categorías de productos' },
     'ventas-diarias': { title: 'Ventas diarias', subtitle: 'Monitorea el rendimiento diario de ventas' },
+    'mas-vendidos': { title: 'Más vendidos', subtitle: 'Productos con más unidades vendidas' },
   };
 
   const currentPage = pageTitles[activeSection ?? 'dashboard'];
@@ -176,8 +179,16 @@ export default function AdminLayout() {
                           </button>
 
                           <button
-                            className="w-full text-left px-3 py-2 rounded-lg text-[12px]
-                            text-white/20 cursor-not-allowed"
+                            onClick={() => {
+                              setActiveSection('mas-vendidos');
+                              setSidebarOpen(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
+                            transition-colors ${
+                              activeSection === 'mas-vendidos'
+                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
+                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
+                            }`}
                           >
                             Más vendidos
                           </button>
@@ -292,6 +303,9 @@ export default function AdminLayout() {
           )}
           {activeSection === 'ventas-diarias' && (
             <DailySales />
+          )}
+          {activeSection === 'mas-vendidos' && (
+            <TopSellingProducts />
           )}
         </main>
 

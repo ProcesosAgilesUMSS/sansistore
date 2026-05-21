@@ -53,7 +53,7 @@ export default function CourierRouteGuard() {
     <section className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center px-4 py-16">
       <div className="w-full max-w-md rounded-2xl border border-border-light bg-card-bg-light p-6 text-center shadow-sm">
         <p className="text-xs font-bold uppercase tracking-[0.24em] text-primary">
-          Courier
+          Mensajero
         </p>
         <h1 className="mt-3 text-2xl font-black text-text-light">{title}</h1>
         <p className="mt-2 text-sm font-semibold text-text-light/70">
