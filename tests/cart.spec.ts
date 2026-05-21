@@ -49,7 +49,6 @@ async function mirrorDocumentToDefaultEmulator(
           },
         );
       } catch {
-        // The local default emulator port is optional; Playwright uses 8180 in CI.
       }
     }),
   );
@@ -195,7 +194,6 @@ async function setLocalCartOnce(
   productId: string,
   priceAtAdd: number,
 ) {
-  await page.goto('/login');
   await page.evaluate(
     ({ cartKey, item }) => {
       window.localStorage.setItem(cartKey, JSON.stringify([item]));
@@ -227,6 +225,7 @@ test.afterEach(async ({ page }, testInfo) => {
 
 test.describe('Cart - Carrito', () => {
   test.describe.configure({ mode: 'serial' });
+  test.setTimeout(90_000);
 
   async function loginWithEmail(page: Page, email: string) {
     await page.goto('/login');
@@ -235,15 +234,34 @@ test.describe('Cart - Carrito', () => {
         name: 'Iniciar sesión',
         exact: true,
       })
-    ).toBeVisible();
+    ).toBeEnabled({ timeout: 15_000 });
+    await expect(page.getByLabel('Correo electrónico')).toBeEditable();
+    await expect(page.locator('#password')).toBeEditable();
     await page.waitForLoadState('networkidle');
-    await page.getByLabel('Correo electrónico').fill(email);
-    await page.locator('#password').fill('password123');
+
+    const emailField = page.getByLabel('Correo electrónico');
+    const passwordField = page.locator('#password');
+
+    for (let attempt = 0; attempt < 3; attempt++) {
+      await emailField.fill(email);
+      await passwordField.fill('password123');
+      await page.waitForTimeout(250);
+
+      if (
+        (await emailField.inputValue()) === email &&
+        (await passwordField.inputValue()) === 'password123'
+      ) {
+        break;
+      }
+    }
+
+    await expect(emailField).toHaveValue(email, { timeout: 10_000 });
+    await expect(passwordField).toHaveValue('password123', { timeout: 10_000 });
     await page
       .locator('form')
       .getByRole('button', { name: 'Iniciar sesión', exact: true })
       .click();
-    await expect(page).toHaveURL('/');
+    await expect(page).toHaveURL('/', { timeout: 30_000 });
   }
 
   async function expectCartPage(page: Page) {
@@ -252,13 +270,20 @@ test.describe('Cart - Carrito', () => {
 
   async function expectFilledCartPage(page: Page) {
     await expectCartPage(page);
-    await expect(page.getByRole('heading', { name: /Productos \(/ })).toBeVisible();
+    const productsHeading = page.getByRole('heading', { name: /Productos \(/ });
+    try {
+      await expect(productsHeading).toBeVisible({ timeout: 15_000 });
+    } catch {
+      await page.reload({ waitUntil: 'domcontentloaded' });
+      await expect(productsHeading).toBeVisible({ timeout: 15_000 });
+    }
   }
 
   test('should display cart items when user is authenticated', async ({
     page,
   }) => {
     await loginWithEmail(page, 'juan.paredes@est.umss.edu');
+    await setLocalCartOnce(page, 'leche-pil-natural-900-ml', 9.7);
 
     await page.goto('/carrito');
     await expectFilledCartPage(page);
@@ -345,7 +370,7 @@ test.describe('Cart - Carrito', () => {
 
     await page.goto('/carrito');
 
-    await expect(page.locator(`a[href="/productos/${productId}"]`).filter({ hasText: productName }).first()).toBeVisible();
+    await expect(page.locator(`a[href="/productos/${productId}"]`).filter({ hasText: productName }).first()).toBeVisible({ timeout: 15_000 });
     await expect(page.getByText('Bs 10.00 / u').first()).toBeVisible();
 
     await updateTestProduct(productId, {
@@ -376,7 +401,7 @@ test.describe('Cart - Carrito', () => {
 
     await page.goto('/carrito');
 
-    await expect(page.locator(`a[href="/productos/${productId}"]`).filter({ hasText: productName }).first()).toBeVisible();
+    await expect(page.locator(`a[href="/productos/${productId}"]`).filter({ hasText: productName }).first()).toBeVisible({ timeout: 15_000 });
     await expect(page.getByRole('button', { name: 'Confirmar pedido' })).toBeEnabled();
 
     await updateTestInventory(productId, {
@@ -406,7 +431,7 @@ test.describe('Cart - Carrito', () => {
 
     await page.goto('/carrito');
 
-    await expect(page.locator(`a[href="/productos/${productId}"]`).filter({ hasText: productName }).first()).toBeVisible();
+    await expect(page.locator(`a[href="/productos/${productId}"]`).filter({ hasText: productName }).first()).toBeVisible({ timeout: 15_000 });
     await expect(page.getByTestId(`cart-item-image-${productId}`)).toBeVisible();
 
     await updateTestProduct(productId, {

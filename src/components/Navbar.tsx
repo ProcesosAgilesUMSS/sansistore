@@ -92,8 +92,12 @@ export default function Navbar() {
         const unsub = onAuthStateChanged(auth, async (u) => {
             setUser(u);
             if (u) {
-                const userSnap = await getDoc(doc(db, 'users', u.uid));
-                setRoles(userSnap.exists() ? (userSnap.data().roles ?? []) : []);
+                try {
+                    const userSnap = await getDoc(doc(db, 'users', u.uid));
+                    setRoles(userSnap.exists() ? (userSnap.data().roles ?? []) : []);
+                } catch {
+                    setRoles([]);
+                }
             } else {
                 setRoles([]);
             }
