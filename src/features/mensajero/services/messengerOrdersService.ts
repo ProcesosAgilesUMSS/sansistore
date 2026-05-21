@@ -270,18 +270,24 @@ export async function markMessengerOrderAsNotDelivered({
   order,
   reason,
   notes,
+  courierId,
 }: {
   order: MessengerOrder;
   reason: string;
   notes: string;
+  courierId: string;
 }) {
   const deliveryRef = doc(db, 'deliveries', order.deliveryId);
   const failedAt = serverTimestamp();
 
   await updateDoc(deliveryRef, {
     status: 'not_delivered',
+    incidentType: 'delivery_problem',
     incidentReason: reason,
     incidentNotes: notes,
+    incidentStatus: 'reported',
+    reportedAt: failedAt,
+    reportedBy: courierId,
     failedAt,
     customerConfirmed: false,
     updatedAt: failedAt,
@@ -303,12 +309,15 @@ export async function markMessengerOrderAsNotDelivered({
     deliveryZone: order.city,
     deliveryMethod: order.deliveryMethod,
     address: order.address,
+    incidentType: 'delivery_problem',
+    incidentStatus: 'reported',
     reason,
     notes,
+    reportedBy: courierId,
+    reportedAt: serverTimestamp(),
     status: 'not_delivered',          
     total: order.cashToCollect,
     paymentMethod: 'Contra entrega', 
     createdAt: serverTimestamp(),
   });
 }
-
