@@ -1,5 +1,4 @@
 import {
-  addDoc,
   collection,
   doc,
   getDoc,
@@ -9,6 +8,7 @@ import {
   updateDoc,
   setDoc,
   where,
+  writeBatch,
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import type { MessengerOrder, MessengerOrderItem } from '../types';
@@ -75,10 +75,12 @@ export async function getMessengerOrders(
         : null;
       const order = orderSnap?.exists() ? orderSnap.data() : {};
       const items = orderId ? await readOrderItems(orderId) : [];
+      const paymentStatus = String(order.paymentStatus || 'PENDIENTE');
 
       return {
         id: orderId || deliveryDoc.id,
         deliveryId: deliveryDoc.id,
+        paymentId: typeof order.paymentId === 'string' ? order.paymentId : null,
         orderCode: String(order.orderCode || order.code || orderId || ''),  
         customerName: String(order.customerName || 'Cliente no registrado'),
         buyerName: String(order.customerName || 'Comprador invitado'),       
@@ -88,6 +90,14 @@ export async function getMessengerOrders(
         items,
         cashToCollect: Number(delivery.amountCollected || order.total || 0),
         paymentMethod: 'cash_on_delivery' as const,
+        paymentStatus,
+        paymentStatusLabel:
+          paymentStatus.toLowerCase() === 'cobrado' ||
+          paymentStatus.toLowerCase() === 'pagado'
+            ? 'Cobrado'
+            : 'Pendiente de cobro',
+        paymentCollectedAt: order.paymentCollectedAt?.toDate?.() ?? null,
+        collectedBy: typeof order.collectedBy === 'string' ? order.collectedBy : null,
         deliveryMethod: String(order.deliveryMethod || 'Delivery'),         
         deliveryStatus: normalizeDeliveryStatus(delivery.status),
       };
@@ -136,6 +146,49 @@ export async function setMessengerOrderStatus(
       updatedAt: serverTimestamp(),
     });
   }
+}
+
+export async function registerMessengerCashPayment(
+  order: MessengerOrder,
+  courierId: string
+) {
+  const orderRef = doc(db, 'orders', order.id);
+  const deliveryRef = doc(db, 'deliveries', order.deliveryId);
+  const collectedAt = serverTimestamp();
+  const batch = writeBatch(db);
+
+  batch.update(orderRef, {
+    status: 'ENTREGADO',
+    deliveryStatus: 'DELIVERED',
+    paymentStatus: 'COBRADO',
+    paymentStatusLabel: 'Cobrado',
+    paymentCollectedAt: collectedAt,
+    collectedBy: courierId,
+    deliveredAt: collectedAt,
+    updatedAt: collectedAt,
+  });
+
+  batch.update(deliveryRef, {
+    status: 'delivered',
+    amountCollected: order.cashToCollect,
+    customerConfirmed: true,
+    customerConfirmedAt: collectedAt,
+    deliveredAt: collectedAt,
+    updatedAt: collectedAt,
+  });
+
+  if (order.paymentId) {
+    batch.update(doc(db, 'payments', order.paymentId), {
+      status: 'COBRADO',
+      statusLabel: 'Cobrado',
+      amount: order.cashToCollect,
+      collectedAt,
+      collectedBy: courierId,
+      updatedAt: collectedAt,
+    });
+  }
+
+  await batch.commit();
 }
 
 export async function markMessengerOrderAsNotDelivered({

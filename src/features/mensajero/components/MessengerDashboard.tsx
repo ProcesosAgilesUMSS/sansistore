@@ -18,6 +18,7 @@ import { auth } from '../../../lib/firebase';
 import {
   getMessengerOrders,
   markMessengerOrderAsNotDelivered,
+  registerMessengerCashPayment,
   setMessengerOrderStatus,
 } from '../services/messengerOrdersService';
 import type { MessengerOrder } from '../types';
@@ -114,7 +115,7 @@ function PendingOrderCard({
 }: {
   order: MessengerOrder;
   onAccept: (orderId: string) => void;
-  onDelivered: (orderId: string) => void;
+  onDelivered: (order: MessengerOrder) => void;
   onDetail: (order: MessengerOrder) => void;
   onInTransit: (orderId: string) => void;
   onNotDelivered: (order: MessengerOrder) => void;
@@ -130,7 +131,7 @@ function PendingOrderCard({
               {formatDeliveryStatus(order.deliveryStatus)}
             </span>
             <span className="messenger-charge-badge rounded-full px-3 py-1 text-xs font-bold">
-              COBRAR
+              {order.paymentStatusLabel.toUpperCase()}
             </span>
           </div>
 
@@ -247,11 +248,11 @@ function PendingOrderCard({
         {order.deliveryStatus === 'in_transit' && (
           <button
             className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
-            onClick={() => onDelivered(order.id)}
+            onClick={() => onDelivered(order)}
             type="button"
           >
             <CheckCircle2 size={17} />
-            Marcar como Entregado
+            Registrar pago
           </button>
         )}
 
@@ -301,7 +302,7 @@ function OrderDetailModal({
 }: {
   order: MessengerOrder;
   onClose: () => void;
-  onDelivered: (orderId: string) => void;
+  onDelivered: (order: MessengerOrder) => void;
   onNotDelivered: (order: MessengerOrder) => void;
 }) {
   const subtotal = order.items.reduce(
@@ -346,7 +347,7 @@ function OrderDetailModal({
                   {formatDeliveryStatus(order.deliveryStatus)}
                 </span>
                 <span className="messenger-charge-badge rounded-full px-3 py-1 text-xs font-bold">
-                  COBRAR
+                  {order.paymentStatusLabel.toUpperCase()}
                 </span>
               </div>
               <p className="messenger-muted mt-5 text-xs font-bold uppercase">
@@ -445,13 +446,13 @@ function OrderDetailModal({
               <button
                 className="messenger-deliver-button mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
                 onClick={() => {
-                  onDelivered(order.id);
+                  onDelivered(order);
                   onClose();
                 }}
                 type="button"
               >
                 <CheckCircle2 size={17} />
-                Marcar como entregado
+                Registrar pago
               </button>
             )}
 
@@ -492,6 +493,7 @@ export default function MessengerDashboard({
   const [undeliveredOrder, setUndeliveredOrder] =
     useState<MessengerOrder | null>(null);
   const [savingUndelivered, setSavingUndelivered] = useState(false);
+  const [currentCourierId, setCurrentCourierId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadOrders = async (courierId: string, allowDevFallback = false) => {
@@ -525,6 +527,7 @@ export default function MessengerDashboard({
         import.meta.env.PUBLIC_APP_ENV !== 'production' ? DEV_COURIER_ID : null;
       const courierId = user?.uid || devCourierId;
       const allowDevFallback = !user;
+      setCurrentCourierId(courierId);
 
       if (!courierId) {
         setOrders([]);
@@ -593,8 +596,51 @@ export default function MessengerDashboard({
     }
   };
 
-  const markAsDelivered = (orderId: string) => {
-    void updateOrderStatus(orderId, 'delivered');
+  const markAsDelivered = async (order: MessengerOrder) => {
+    if (!currentCourierId) {
+      setMessage('No se pudo identificar al mensajero para registrar el pago.');
+      return;
+    }
+
+    if (order.paymentStatusLabel === 'Cobrado') {
+      setMessage('Este pedido ya tiene el pago registrado.');
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Confirmar pago en efectivo de ${formatBolivianos(order.cashToCollect)} del pedido ${order.orderCode}.`
+    );
+
+    if (!confirmed) return;
+
+    const previousOrder = order;
+    setOrders((currentOrders) =>
+      currentOrders.map((currentOrder) =>
+        currentOrder.id === order.id
+          ? {
+              ...currentOrder,
+              deliveryStatus: 'delivered',
+              paymentStatus: 'COBRADO',
+              paymentStatusLabel: 'Cobrado',
+              collectedBy: currentCourierId,
+              paymentCollectedAt: new Date(),
+            }
+          : currentOrder
+      )
+    );
+
+    try {
+      await registerMessengerCashPayment(order, currentCourierId);
+      setMessage('Pago en efectivo registrado y venta cerrada correctamente.');
+    } catch (error) {
+      console.error(error);
+      setMessage('No se pudo registrar el pago en efectivo.');
+      setOrders((currentOrders) =>
+        currentOrders.map((currentOrder) =>
+          currentOrder.id === previousOrder.id ? previousOrder : currentOrder
+        )
+      );
+    }
   };
 
   const acceptOrder = (orderId: string) => {
