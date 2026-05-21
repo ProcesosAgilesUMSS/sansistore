@@ -230,3 +230,10 @@
 - **Yesterday:** Tambien investigué sobre el framework Leaflet para la implementación de mapas para el uso de rutas.
 - **Today:** Continue con el desarrollo de la HU 108 para la visualizacion de rutas de entrega
 - **Blockers:** None.
+
+## 21-05-2026
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Mantuve contacto con miembros de los equipos SoftwareOne, Flow y WebSpire, con el fin de tratar las historias de usuario en las que tenemos dependencias mutuas. Mantuvimos contacto para aclarar dudas sobre cómo debemos trabajar.
+- **Today:** Terminar la funcionalidad de las historias de usuario asignadas a mi persona para este segundo sprint (la funcionalidad del mensajero ubicando pedido en el mapa).
+- **Blockers:** None.
