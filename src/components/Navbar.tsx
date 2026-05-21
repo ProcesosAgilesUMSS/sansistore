@@ -315,7 +315,7 @@ export default function Navbar() {
                                                         href="/courier"
                                                         className="block px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
                                                     >
-                                                        Courier
+                                                        Mensajero
                                                     </a>
                                                 )}
 
@@ -418,7 +418,7 @@ export default function Navbar() {
                                             href="/courier"
                                             className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
                                         >
-                                            Courier
+                                            Mensajero
                                         </a>
                                     )}
                                 </>

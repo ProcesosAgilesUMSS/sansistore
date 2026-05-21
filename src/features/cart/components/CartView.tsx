@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, ArrowLeft, ChevronDown, ChevronRight, ShoppingBag, Trash2, X, MapPin, Loader2 } from 'lucide-react';
 import { onAuthStateChanged, type User, signInWithPopup, setPersistence, browserLocalPersistence, signOut } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
-import { collection, doc, getDoc, setDoc, serverTimestamp, addDoc, writeBatch } from 'firebase/firestore';
+import { collection, doc, getDoc, setDoc, serverTimestamp, addDoc, writeBatch, increment } from 'firebase/firestore';
 import { CartItemRow } from './CartItemRow';
 import { AnimatedAmount } from './AnimatedAmount';
 import type { CartItemWithProduct } from '../types';
@@ -549,6 +549,26 @@ function CartViewInner() {
       for (const orderItem of orderItems) {
         const orderItemRef = doc(db, `orders/${orderCode}/orderItems`, orderItem.itemId);
         batch.set(orderItemRef, orderItem);
+      }
+
+      for (const orderItem of orderItems) {
+        const inventoryRef = doc(db, 'inventory', orderItem.productId);
+        batch.update(inventoryRef, {
+          stockAvailable: increment(-orderItem.quantity),
+          stockReserved: increment(orderItem.quantity),
+          updatedAt: serverTimestamp(),
+        });
+
+        const movementRef = doc(collection(db, 'inventoryMovements'));
+        batch.set(movementRef, {
+          movementId: movementRef.id,
+          productId: orderItem.productId,
+          operatorId: user.uid,
+          type: 'salida_venta',
+          quantity: orderItem.quantity,
+          orderId: orderCode,
+          createdAt: serverTimestamp(),
+        });
       }
 
       const paymentsRef = doc(db, 'payments', paymentCode);

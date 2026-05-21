@@ -10,10 +10,11 @@ interface Props {
   expandedItems: OrderItem[];
   itemsLoading: boolean;
   onToggle: (id: string) => void;
-  title: string;
+  title?: string;
   onClick?: (order: Order) => void;
   isMarking: boolean;
   isSuccess: boolean;
+  successLabel?: string;
 }
 
 export const OrderCard = ({
@@ -22,10 +23,11 @@ export const OrderCard = ({
   expandedItems,
   itemsLoading,
   onToggle,
-  title,
+  title = '',
   onClick,
   isMarking,
   isSuccess,
+  successLabel = 'Marcado como listo',
 }: Props) => {
   return (
     <div
@@ -164,7 +166,7 @@ export const OrderCard = ({
                 />
               </svg>
 
-              Marcado como listo
+              {successLabel}
             </span>
           ) : (
             <button
