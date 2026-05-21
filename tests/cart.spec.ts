@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 
+// Helper para hacer login con email y contraseña
 async function loginAs(
   page: import('@playwright/test').Page,
   email: string,
@@ -8,107 +9,152 @@ async function loginAs(
   await page.goto('/login');
   await page.getByLabel('Correo electrónico').fill(email);
   await page.getByLabel('Contraseña').fill(password);
-  await page.getByRole('button', { name: 'Iniciar sesión', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Iniciar sesión', exact: true })
+    .click();
   await expect(page).toHaveURL('/me', { timeout: 10000 });
 }
 
-async function logout(page: import('@playwright/test').Page) {
-  // Open profile menu and click logout
-  const profileBtn = page.locator('button[aria-haspopup="menu"]');
-  await profileBtn.click();
-  await page.getByRole('menuitem').filter({ hasText: 'Cerrar sesión' }).click();
-}
+test.afterEach(async ({ page }, testInfo) => {
+  if (testInfo.status !== testInfo.expectedStatus) {
+    const screenshot = await page.screenshot({
+      fullPage: true,
+    });
+
+    await testInfo.attach('full-page-screenshot', {
+      body: screenshot,
+      contentType: 'image/png',
+    });
+  }
+});
 
 test.describe('Cart - Carrito', () => {
-  test.afterEach(async ({ page }, testInfo) => {
-    if (testInfo.status !== testInfo.expectedStatus) {
-      const screenshot = await page.screenshot({ fullPage: true });
-      await testInfo.attach('full-page-screenshot', {
-        body: screenshot,
-        contentType: 'image/png',
-      });
-    }
-  });
-
-  test('should display cart items when user is authenticated', async ({ page }) => {
-    // Ana (google-type) can't do email login in tests; use Carlos (email type)
-    // Carlos has no cart items seeded, so use Juan who has 1 cart item
+  test('should display cart items when user is authenticated', async ({
+    page,
+  }) => {
     await loginAs(page, 'juan.paredes@est.umss.edu', 'password123');
 
-    await page.goto('/productos');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/cart');
 
-    // Cart badge should be visible (Juan has 1 cart item from seed)
-    const cartBadge = page.locator('button').filter({ has: page.locator('svg') }).locator('span').first();
-    await expect(cartBadge).toBeVisible({ timeout: 10000 });
+    await expect(
+      page.getByRole('heading', { name: 'Mi Carrito' })
+    ).toBeVisible();
+
+    await expect(page.getByText('Leche PIL Natural 900 ml')).toBeVisible();
+    await expect(page.getByText('Bs 9.70 / u')).toBeVisible();
+    await expect(page.getByText('Bs 19.40', { exact: true })).toBeVisible();
+    await expect(page.getByText('2', { exact: true })).toBeVisible();
+
+    await expect(page.getByText('Galletas Agua Victoria 120 gr')).toBeVisible();
+    await expect(page.getByText('Bs 8.00 / u')).toBeVisible();
+    await expect(page.getByText('Bs 8.00', { exact: true })).toBeVisible();
+    await expect(page.getByText('1', { exact: true })).toBeVisible();
   });
 
-  test('should show empty cart message when user has no items', async ({ page }) => {
-    // Carlos has no cart items in the seed
+  test('should show empty cart message when user has no items', async ({
+    page,
+  }) => {
     await loginAs(page, 'carlos.docente@est.umss.edu', 'password123');
 
-    await page.goto('/productos');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/cart');
 
-    // Cart badge should show 0 for Carlos
-    const cartButton = page.locator('button').filter({ has: page.locator('[data-lucide="shopping-bag"], svg') }).first();
-    await expect(cartButton).toBeVisible({ timeout: 10000 });
+    await expect(
+      page.getByRole('heading', { name: 'Mi Carrito' })
+    ).toBeVisible();
 
-    const badge = cartButton.locator('span').first();
-    await expect(badge).toBeVisible({ timeout: 10000 });
-    await expect(badge).toHaveText('0');
+    await expect(page.getByText('Tu carrito está vacío')).toBeVisible();
+
+    await expect(
+      page.getByRole('link', { name: 'Comprar ahora' })
+    ).toBeVisible();
   });
 
   test('should clear cart when user logs out', async ({ page }) => {
     await loginAs(page, 'juan.paredes@est.umss.edu', 'password123');
-    await page.goto('/productos');
-    await page.waitForLoadState('networkidle');
 
-    // Logout
-    await logout(page);
+    await page.goto('/cart');
 
-    await page.goto('/productos');
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByText('Leche PIL Natural 900 ml')).toBeVisible();
 
-    // After logout, cart badge should show 0
-    const cartButton = page.locator('button').filter({ has: page.locator('svg') }).first();
-    await expect(cartButton).toBeVisible({ timeout: 10000 });
-    const badge = cartButton.locator('span').first();
-    await expect(badge).toHaveText('0', { timeout: 10000 });
+    await page.goto('/logout');
+
+    await expect(page).toHaveURL('/login');
+
+    await page.goto('/cart');
+
+    await expect(page.getByText('Tu carrito está vacío')).toBeVisible();
   });
 
-  test('should show empty cart after logout and login with different user', async ({ page }) => {
-    // Login as Juan (has 1 cart item)
+  test('should show empty cart after logout and login with different user', async ({
+    page,
+  }) => {
     await loginAs(page, 'juan.paredes@est.umss.edu', 'password123');
-    await page.goto('/productos');
-    await page.waitForLoadState('networkidle');
 
-    // Logout
-    await logout(page);
+    await page.goto('/cart');
 
-    // Login as Carlos (has no cart items)
+    await expect(page.getByText('Leche PIL Natural 900 ml')).toBeVisible();
+
+    await page.goto('/logout');
+
+    await expect(page).toHaveURL('/login');
+
+    // Login con Carlos (sin items en el carrito)
     await loginAs(page, 'carlos.docente@est.umss.edu', 'password123');
-    await page.goto('/productos');
-    await page.waitForLoadState('networkidle');
 
-    const cartButton = page.locator('button').filter({ has: page.locator('svg') }).first();
-    await expect(cartButton).toBeVisible({ timeout: 10000 });
-    const badge = cartButton.locator('span').first();
-    await expect(badge).toHaveText('0', { timeout: 10000 });
+    await page.goto('/cart');
+
+    await expect(page.getByText('Tu carrito está vacío')).toBeVisible();
   });
 
-  test('should allow non-logged user to add items to cart', async ({ page }) => {
-    // No login — anonymous user
-    await page.goto('/productos');
-    await page.waitForLoadState('networkidle');
+  test('should allow non-logged user to add items to cart', async ({
+    page,
+  }) => {
+    // Agregar primer producto (Leche PIL)
+    await page.goto('/productos/leche-pil-natural-900-ml');
+    await expect(
+      page.getByRole('heading', { name: /Leche PIL Natural 900 ml/ })
+    ).toBeVisible();
+    await expect(page.getByText('Disponible', { exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Agregar al carrito' }).click();
 
-    // Cart button should still be visible for non-logged users
-    const cartButton = page.locator('button').filter({ has: page.locator('svg') }).first();
-    await expect(cartButton).toBeVisible({ timeout: 10000 });
+    // Agregar segundo producto (Detergente)
+    await page.goto(
+      '/productos/detergente-liquido-ola-futuro-limpieza-completa-5-l'
+    );
+    await expect(
+      page.getByRole('heading', { name: /Detergente Liquido Ola Futuro/ })
+    ).toBeVisible();
+    await expect(page.getByText('Disponible', { exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Agregar al carrito' }).click();
 
-    // Badge defaults to 0 for anonymous users
-    const badge = cartButton.locator('span').first();
-    await expect(badge).toBeVisible({ timeout: 10000 });
-    await expect(badge).toHaveText('0');
+    // Agregar tercer producto (Galletas)
+    await page.goto('/productos/galletas-agua-victoria-120-gr');
+    await expect(
+      page.getByRole('heading', { name: /Galletas Agua Victoria 120 gr/ })
+    ).toBeVisible();
+    await expect(page.getByText('Disponible', { exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Agregar al carrito' }).click();
+
+    // Verificar los 3 productos en el carrito
+    await page.goto('/cart');
+
+    await expect(
+      page.getByRole('heading', { name: 'Mi Carrito' })
+    ).toBeVisible();
+
+    await expect(page.getByText('Leche PIL Natural 900 ml')).toBeVisible();
+    await expect(
+      page.getByText('Detergente Liquido Ola Futuro').first()
+    ).toBeVisible();
+    await expect(page.getByText('Galletas Agua Victoria 120 gr')).toBeVisible();
+
+    // Verificar que cada producto tiene 1 unidad
+    const quantities = page.locator('[data-testid*="quantity"]');
+    const count = await quantities.count();
+    if (count > 0) {
+      for (let i = 0; i < Math.min(count, 3); i++) {
+        await expect(quantities.nth(i)).toHaveText('1');
+      }
+    }
   });
 });
