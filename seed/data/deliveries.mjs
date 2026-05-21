@@ -146,6 +146,30 @@ export const Deliveries = {
     createdAt: '2026-04-25T13:42:00.000Z',
     updatedAt: '2026-04-25T13:45:00.000Z',
   },
+  DELIVERY_012: {
+    code: 'delivery-012',
+    orderCode: 'order-012',
+    courier: Users.NADIA,
+    status: 'assigned',
+    attemptNumber: 1,
+    amountCollected: 34,
+    customerConfirmed: false,
+    assignedAt: '2026-04-25T13:45:00.000Z',
+    createdAt: '2026-04-25T13:42:00.000Z',
+    updatedAt: '2026-04-25T13:45:00.000Z',
+  },
+  DELIVERY_013: {
+    code: 'delivery-013',
+    orderCode: 'order-013',
+    courier: Users.NADIA,
+    status: 'assigned',
+    attemptNumber: 1,
+    amountCollected: 34,
+    customerConfirmed: false,
+    assignedAt: '2026-04-25T13:45:00.000Z',
+    createdAt: '2026-04-25T13:42:00.000Z',
+    updatedAt: '2026-04-25T13:45:00.000Z',
+  },
 };
 
 export const deliveryList = Object.values(Deliveries);

@@ -1,18 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, ChevronDown, ShoppingBag, Trash2, X, MapPin, Loader2 } from 'lucide-react';
-import { onAuthStateChanged, type User, signInWithPopup, setPersistence, browserLocalPersistence, signOut } from 'firebase/auth';
-import { FirebaseError } from 'firebase/app';
-import { collection, doc, getDoc, setDoc, serverTimestamp, addDoc, writeBatch, increment } from 'firebase/firestore';
+import { type User } from 'firebase/auth';
+import { doc, getDoc, serverTimestamp, writeBatch, increment, collection } from 'firebase/firestore';
 import { CartItemRow } from './CartItemRow';
 import { AnimatedAmount } from './AnimatedAmount';
 import type { CartItemWithProduct } from '../types';
 import { useCartContext, CartProvider } from './CartContext';
-import { auth, googleProvider, db } from '../../../lib/firebase';
+import { db } from '../../../lib/firebase';
 import { useAuthUser } from '../../../hooks/useAuthUser';
 import { subscribeToUserLocations } from '../../location/services/locationService';
 import type { Location } from '../../location/types';
-
-const INSTITUTIONAL_DOMAIN = '@est.umss.edu';
 
 function generateOrderCode() {
   const timestamp = Date.now().toString(36);
@@ -25,53 +22,6 @@ function generateItemId(orderCode: string, idx: number) {
 }
 
 function LoginModal({ onClose }: { onClose: () => void }) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function handleGoogleLogin() {
-    setLoading(true);
-    setError(null);
-    try {
-      googleProvider.setCustomParameters({
-        hd: INSTITUTIONAL_DOMAIN.replace('@', ''),
-      });
-      await setPersistence(auth, browserLocalPersistence);
-      const result = await signInWithPopup(auth, googleProvider);
-
-      if (result.user.email && !result.user.email.endsWith(INSTITUTIONAL_DOMAIN)) {
-        await signOut(auth);
-        setError('Solo se permiten cuentas institucionales.');
-        setLoading(false);
-        return;
-      }
-
-      const userRef = doc(db, 'users', result.user.uid);
-      const userSnap = await getDoc(userRef);
-
-      if (!userSnap.exists()) {
-        const institutionalId = result.user.email!.split('@')[0];
-        await setDoc(userRef, {
-          uid: result.user.uid,
-          email: result.user.email,
-          displayName: result.user.displayName || 'Usuario UMSS',
-          roles: ['comprador'],
-          institutionalId,
-          isActive: true,
-          createdBy: 'system',
-          createdAt: serverTimestamp(),
-        });
-      }
-      onClose();
-    } catch (e: unknown) {
-      const ignored = ['auth/popup-closed-by-user', 'auth/cancelled-popup-request'];
-      if (!(e instanceof FirebaseError) || !ignored.includes(e.code)) {
-        setError('Error al iniciar sesión. Intente nuevamente.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
-
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -81,7 +31,7 @@ function LoginModal({ onClose }: { onClose: () => void }) {
     >
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={loading ? undefined : onClose}
+        onClick={onClose}
       />
 
       <div className="relative z-10 w-full max-w-sm rounded-2xl border border-border-light bg-card-bg-light p-6 shadow-2xl">
@@ -91,23 +41,15 @@ function LoginModal({ onClose }: { onClose: () => void }) {
               aria-hidden="true"
               viewBox="0 0 24 24"
               className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
-              <path
-                fill="#EA4335"
-                d="M12 9.5v5h7.06C18.4 17.57 15.7 19.5 12 19.5a7.5 7.5 0 1 1 0-15c1.85 0 3.52.68 4.82 1.8l3.53-3.53A12 12 0 1 0 24 12c0-.82-.07-1.61-.2-2.36H12Z"
-              />
-              <path
-                fill="#4285F4"
-                d="M23.8 9.64H12v4.72h6.67A7.02 7.02 0 0 1 12 19.5c-3.7 0-6.87-2.23-8.22-5.41L.16 16.22A11.97 11.97 0 0 0 12 24c6.63 0 12-5.37 12-12 0-.83-.08-1.63-.2-2.36Z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M3.78 14.09A7.49 7.49 0 0 1 3.5 12c0-.73.11-1.43.28-2.09L.16 6.78A12 12 0 0 0 0 12c0 1.92.45 3.73 1.24 5.34l2.54-1.96Z"
-              />
-              <path
-                fill="#34A853"
-                d="m3.78 14.09 2.54-1.96A7.49 7.49 0 0 1 4.5 12c0-.74.11-1.44.28-2.09L1.24 8.66A11.94 11.94 0 0 0 0 12c0 1.92.45 3.73 1.24 5.34l2.54-1.96Z"
-              />
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+              <polyline points="10 17 15 12 10 7" />
+              <line x1="15" y1="12" x2="3" y2="12" />
             </svg>
           </div>
           <h2 id="login-title" className="text-lg font-bold text-text-light">
@@ -119,54 +61,19 @@ function LoginModal({ onClose }: { onClose: () => void }) {
           Debes iniciar sesión para confirmar tu pedido.
         </p>
 
-        {error && (
-          <p className="mt-3 text-sm text-red-600 font-medium">{error}</p>
-        )}
-
         <div className="mt-6">
-          <button
-            type="button"
-            onClick={handleGoogleLogin}
-            disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-full border border-border-light bg-white px-4 py-3 text-sm font-semibold text-text-light transition hover:bg-border-light/40 active:scale-95 disabled:opacity-50"
+          <a
+            href="/login"
+            className="flex w-full items-center justify-center rounded-full bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90 active:scale-95"
           >
-            {loading ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : (
-              <>
-                <svg
-                  aria-hidden="true"
-                  viewBox="0 0 24 24"
-                  className="h-4 w-4"
-                >
-                  <path
-                    fill="#EA4335"
-                    d="M12 9.5v5h7.06C18.4 17.57 15.7 19.5 12 19.5a7.5 7.5 0 1 1 0-15c1.85 0 3.52.68 4.82 1.8l3.53-3.53A12 12 0 1 0 24 12c0-.82-.07-1.61-.2-2.36H12Z"
-                  />
-                  <path
-                    fill="#4285F4"
-                    d="M23.8 9.64H12v4.72h6.67A7.02 7.02 0 0 1 12 19.5c-3.7 0-6.87-2.23-8.22-5.41L.16 16.22A11.97 11.97 0 0 0 12 24c6.63 0 12-5.37 12-12 0-.83-.08-1.63-.2-2.36Z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M3.78 14.09A7.49 7.49 0 0 1 3.5 12c0-.73.11-1.43.28-2.09L.16 6.78A12 12 0 0 0 0 12c0 1.92.45 3.73 1.24 5.34l2.54-1.96Z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="m3.78 14.09 2.54-1.96A7.49 7.49 0 0 1 4.5 12c0-.74.11-1.44.28-2.09L1.24 8.66A11.94 11.94 0 0 0 0 12c0 1.92.45 3.73 1.24 5.34l2.54-1.96Z"
-                  />
-                </svg>
-                Continuar con Google
-              </>
-            )}
-          </button>
+            Ir a iniciar sesión
+          </a>
         </div>
 
         <button
           type="button"
           onClick={onClose}
-          disabled={loading}
-          className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full border border-border-light text-text-light opacity-70 transition hover:opacity-100 disabled:opacity-30"
+          className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full border border-border-light text-text-light opacity-70 transition hover:opacity-100"
           aria-label="Cerrar modal"
         >
           <X size={16} />

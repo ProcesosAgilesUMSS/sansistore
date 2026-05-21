@@ -29,7 +29,7 @@ test.describe('Cart - Carrito', () => {
       .getByRole('button', { name: 'Iniciar sesión', exact: true })
       .click();
 
-    await expect(page).toHaveURL('/me');
+    await expect(page).toHaveURL('/');
 
     await page.goto('/cart');
 
@@ -63,7 +63,7 @@ test.describe('Cart - Carrito', () => {
       .getByRole('button', { name: 'Iniciar sesión', exact: true })
       .click();
 
-    await expect(page).toHaveURL('/me');
+    await expect(page).toHaveURL('/');
 
     await page.goto('/cart');
 
@@ -88,7 +88,7 @@ test.describe('Cart - Carrito', () => {
       .getByRole('button', { name: 'Iniciar sesión', exact: true })
       .click();
 
-    await expect(page).toHaveURL('/me');
+    await expect(page).toHaveURL('/');
 
     await page.goto('/cart');
 
@@ -117,7 +117,7 @@ test.describe('Cart - Carrito', () => {
       .getByRole('button', { name: 'Iniciar sesión', exact: true })
       .click();
 
-    await expect(page).toHaveURL('/me');
+    await expect(page).toHaveURL('/');
 
     await page.goto('/cart');
 

@@ -8,6 +8,12 @@
         --theme-card-bg: #ffffff;
         --theme-secondary-bg: #e8e5d8;
         --theme-border: rgba(136, 176, 75, 0.15);
+        --theme-error: #b91c1c;
+        --theme-error-bg: #fef2f2;
+        --theme-error-border: #fecaca;
+        --theme-success: #15803d;
+        --theme-success-bg: #f0fdf4;
+        --theme-success-border: #bbf7d0;
     }
 
     html[data-theme='dark'] {
@@ -17,6 +23,12 @@
         --theme-card-bg: #141518;
         --theme-secondary-bg: #1a1b1e;
         --theme-border: rgba(255, 255, 255, 0.08);
+        --theme-error: #fca5a5;
+        --theme-error-bg: #450a0a;
+        --theme-error-border: #7f1d1d;
+        --theme-success: #86efac;
+        --theme-success-bg: #052e16;
+        --theme-success-border: #166534;
     }
 
     html,
@@ -39,6 +51,12 @@
         --color-secondary-bg-dark: #1a1b1e;
         --color-border-light: var(--theme-border);
         --color-border-dark: rgba(255, 255, 255, 0.08);
+        --color-error: var(--theme-error);
+        --color-error-bg: var(--theme-error-bg);
+        --color-error-border: var(--theme-error-border);
+        --color-success: var(--theme-success);
+        --color-success-bg: var(--theme-success-bg);
+        --color-success-border: var(--theme-success-border);
 }
 
 @layer utilities {

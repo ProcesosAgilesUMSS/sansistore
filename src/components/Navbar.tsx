@@ -10,20 +10,18 @@ import {
     MapPin,
     Package,
     Search,
-    Settings
+    Settings,
+    User as UserIcon,
 } from 'lucide-react';
-import { FirebaseError } from 'firebase/app';
 import {
-    signInWithPopup,
     signOut,
     onAuthStateChanged,
-    setPersistence,
-    browserLocalPersistence,
 } from 'firebase/auth';
 import type { User } from 'firebase/auth';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { auth, googleProvider, db } from '../lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../lib/firebase';
 import ErrorCard from './ErrorCard';
+import GoogleLoginButton from './GoogleLoginButton';
 import { useStore } from '@nanostores/react';
 import { cartTotalUnits, cartAnimating, initCartStore } from '../features/cart/store/cartStore';
 import { clearLocalCart } from '../features/cart/utils/localCart';
@@ -31,7 +29,7 @@ import { clearLocalCart } from '../features/cart/utils/localCart';
 type ThemeMode = 'light' | 'dark';
 
 const THEME_STORAGE_KEY = 'sansistore-theme';
-const INSTITUTIONAL_DOMAIN = '@est.umss.edu';
+const INSTITUTIONAL_DOMAIN = 'umss.edu';
 
 const applyTheme = (theme: ThemeMode) => {
     document.documentElement.dataset.theme = theme;
@@ -85,6 +83,7 @@ export default function Navbar() {
     const [theme, setTheme] = useState<ThemeMode>('light');
     const [themeReady, setThemeReady] = useState(false);
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+    const [loginMenuOpen, setLoginMenuOpen] = useState(false);
     const [roles, setRoles] = useState<string[]>([]);
 
     useEffect(() => {
@@ -128,54 +127,15 @@ export default function Navbar() {
         setThemeReady(true);
     }, [theme]);
 
-    const handleLogin = async () => {
-        try {
-            googleProvider.setCustomParameters({
-                hd: INSTITUTIONAL_DOMAIN.replace('@', ''),
-            });
-            await setPersistence(auth, browserLocalPersistence);
-            const result = await signInWithPopup(auth, googleProvider);
-
-            if (
-                result.user.email &&
-                !result.user.email.endsWith(INSTITUTIONAL_DOMAIN)
-            ) {
-                await signOut(auth);
-                setAuthError(
-                    'Solo se permiten cuentas institucionales para acceder a SansiStore.'
-                );
-                return;
-            }
-
-            const userRef = doc(db, 'users', result.user.uid);
-            const userSnap = await getDoc(userRef);
-
-            if (!userSnap.exists()) {
-                const institutionalId = result.user.email!.split('@')[0];
-                await setDoc(userRef, {
-                    uid: result.user.uid,
-                    email: result.user.email,
-                    displayName: result.user.displayName || 'Usuario UMSS',
-                    roles: ['comprador'],
-                    institutionalId: institutionalId,
-                    isActive: true,
-                    createdBy: 'system',
-                    createdAt: serverTimestamp(),
-                });
-                setRoles(['comprador']);
-            } else {
-                setRoles(userSnap.data().roles ?? []);
-            }
-        } catch (e: unknown) {
-            const ignored = [
-                'auth/popup-closed-by-user',
-                'auth/cancelled-popup-request',
-            ];
-
-            if (!(e instanceof FirebaseError) || !ignored.includes(e.code)) {
-                console.error(e);
-            }
+    const handleLoginSuccess = async () => {
+        if (user) {
+            const userSnap = await getDoc(doc(db, 'users', user.uid));
+            setRoles(userSnap.exists() ? (userSnap.data().roles ?? []) : []);
         }
+    };
+
+    const handleLoginError = (error: string) => {
+        setAuthError(error);
     };
 
     const handleLogout = () => {
@@ -313,7 +273,7 @@ export default function Navbar() {
                                                         href="/courier"
                                                         className="block px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
                                                     >
-                                                        Courier
+                                                        Mensajero
                                                     </a>
                                                 )}
 
@@ -339,34 +299,36 @@ export default function Navbar() {
                                         )}
                                     </div>
                                 ) : (
-                                    <button
-                                        onClick={handleLogin}
-                                        className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border transition-all active:scale-95 text-[13px] font-semibold text-text-light border-border-light hover:border-primary hover:text-primary"
-                                    >
-                                        <svg
-                                            aria-hidden="true"
-                                            viewBox="0 0 24 24"
-                                            className="h-4 w-4 shrink-0"
+                                    <div className="relative">
+                                        <button
+                                            type="button"
+                                            aria-expanded={loginMenuOpen}
+                                            aria-haspopup="menu"
+                                            onClick={() => setLoginMenuOpen((open) => !open)}
+                                            className="flex items-center gap-2 rounded-full px-2 py-1 transition-all hover:bg-border-light/40"
                                         >
-                                            <path
-                                                fill="#EA4335"
-                                                d="M12 9.5v5h7.06C18.4 17.57 15.7 19.5 12 19.5a7.5 7.5 0 1 1 0-15c1.85 0 3.52.68 4.82 1.8l3.53-3.53A12 12 0 1 0 24 12c0-.82-.07-1.61-.2-2.36H12Z"
+                                            <UserIcon size={18} className="text-text-light opacity-60" />
+                                            <ChevronDown
+                                                size={14}
+                                                className={`text-text-light opacity-50 transition-transform ${loginMenuOpen ? 'rotate-180' : ''}`}
                                             />
-                                            <path
-                                                fill="#4285F4"
-                                                d="M23.8 9.64H12v4.72h6.67A7.02 7.02 0 0 1 12 19.5c-3.7 0-6.87-2.23-8.22-5.41L.16 16.22A11.97 11.97 0 0 0 12 24c6.63 0 12-5.37 12-12 0-.83-.08-1.63-.2-2.36Z"
-                                            />
-                                            <path
-                                                fill="#FBBC05"
-                                                d="M3.78 14.09A7.49 7.49 0 0 1 3.5 12c0-.73.11-1.43.28-2.09L.16 6.78A12 12 0 0 0 0 12c0 1.92.45 3.73 1.24 5.34l2.54-1.96Z"
-                                            />
-                                            <path
-                                                fill="#34A853"
-                                                d="m3.78 14.09 2.54-1.96A7.49 7.49 0 0 1 4.5 12c0-.74.11-1.44.28-2.09L1.24 8.66A11.94 11.94 0 0 0 0 12c0 1.92.45 3.73 1.24 5.34l2.54-1.96Z"
-                                            />
-                                        </svg>
-                                        Iniciar sesión
-                                    </button>
+                                        </button>
+
+                                        {loginMenuOpen && (
+                                            <div
+                                                role="menu"
+                                                className="absolute right-0 top-11 w-48 overflow-hidden rounded-lg border border-border-light bg-bg-light shadow-lg"
+                                            >
+                                                <a
+                                                    role="menuitem"
+                                                    href="/login"
+                                                    className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
+                                                >
+                                                    Iniciar sesión
+                                                </a>
+                                            </div>
+                                        )}
+                                    </div>
                                 ))}
 
                             {/* MOBILE */}
@@ -416,7 +378,7 @@ export default function Navbar() {
                                             href="/courier"
                                             className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
                                         >
-                                            Courier
+                                            Mensajero
                                         </a>
                                     )}
                                 </>
@@ -430,7 +392,7 @@ export default function Navbar() {
                 <ErrorCard
                     isOpen={authError !== null}
                     onClose={() => setAuthError(null)}
-                    message={`Para ingresar a Sansistore debes utilizar tu cuenta institucional terminada en ${INSTITUTIONAL_DOMAIN}.`}
+                    message={`Para ingresar a Sansistore debes utilizar tu cuenta institucional que contenga ${INSTITUTIONAL_DOMAIN}.`}
                     title="Acceso Denegado"
                 />
             )}

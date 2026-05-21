@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { DollarSign, ReceiptText } from 'lucide-react';
 import { useDailyCollections } from '../hooks/useDailyCollections';
-import { useSellerOrders } from '../hooks/useSellerOrders';
+import { useReservedOrdersPanel } from '../hooks/useReservedOrdersPanel';
 import type { Order } from '../types';
-import { ConfirmModal } from './ConfirmModal';
 import { OrderCard } from './OrderCard';
 import { SectionHeader } from './SectionHeader';
 
@@ -22,48 +21,119 @@ function formatDate(value?: string) {
   });
 }
 
-export default function SellerOrdersPanel({ embedded = false }: { embedded?: boolean }) {
+function ReserveModal({
+  isLoading,
+  onCancel,
+  onConfirm,
+}: {
+  isLoading: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="reserve-title"
+    >
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
+        onClick={onCancel}
+      />
+      <div className="relative z-10 w-full max-w-md animate-in zoom-in-95 fade-in duration-200 rounded-3xl border border-(--theme-border) bg-(--theme-card-bg) p-6 shadow-2xl">
+        <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-(--theme-secondary-bg)">
+          <svg
+            className="h-7 w-7"
+            style={{ color: 'var(--color-primary)' }}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M20 13V7a2 2 0 00-2-2h-3V3H9v2H6a2 2 0 00-2 2v6m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H4"
+            />
+          </svg>
+        </div>
+
+        <h2
+          id="reserve-title"
+          className="text-xl font-800 tracking-tight text-(--theme-text)"
+          style={{ fontFamily: 'Outfit, sans-serif' }}
+        >
+          Reservar pedido
+        </h2>
+
+        <p className="mt-2 text-sm leading-relaxed text-(--theme-text) opacity-70">
+          Este pedido pasará al panel de pedidos reservados.
+        </p>
+
+        <div className="mt-5 rounded-xl border border-(--theme-border) px-4 py-3">
+          <p className="text-xs leading-relaxed text-(--theme-text) opacity-60">
+            Esta acción no se puede deshacer.
+          </p>
+        </div>
+
+        <div className="mt-8 flex gap-3">
+          <button
+            onClick={onCancel}
+            disabled={isLoading}
+            className="flex-1 rounded-full border border-(--theme-border) px-4 py-3 text-sm font-600 text-(--theme-text) transition hover:bg-(--theme-secondary-bg) disabled:opacity-40"
+          >
+            Cancelar
+          </button>
+
+          <button
+            onClick={onConfirm}
+            disabled={isLoading}
+            className="flex-1 rounded-full bg-primary px-4 py-3 text-sm font-700 text-white transition hover:opacity-90 active:scale-95 disabled:opacity-60"
+          >
+            {isLoading ? 'Procesando…' : 'Confirmar'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function ReservedOrdersPanel({ embedded = false }: { embedded?: boolean }) {
   const {
+    confirmed,
     reserved,
-    ready,
     loading,
     error,
     expandedOrderId,
     expandedItems,
     itemsLoading,
     toggleOrderDetail,
-    markingOrderId,
-    markAsReady,
+    reservingOrderId,
+    reserveOrder,
     successOrderId,
-  } = useSellerOrders();
+  } = useReservedOrdersPanel();
   const {
     summary: dailyCollections,
     loading: collectionsLoading,
     error: collectionsError,
   } = useDailyCollections();
-
   const [pendingOrder, setPendingOrder] = useState<Order | null>(null);
 
-  const handleMarkReady = (order: Order) => {
-    setPendingOrder(order);
-  };
-
-  const handleConfirm = async () => {
+  async function handleConfirm() {
     if (!pendingOrder) return;
     const orderId = pendingOrder.orderId;
     setPendingOrder(null);
-    await markAsReady(orderId);
-  };
-
-  const handleCancel = () => setPendingOrder(null);
+    await reserveOrder(orderId);
+  }
 
   return (
     <div className={embedded ? 'min-w-0' : 'min-h-screen bg-(--theme-bg) px-4 pb-10 pt-10 md:px-8 xl:px-10'}>
       {pendingOrder && (
-        <ConfirmModal
+        <ReserveModal
+          isLoading={!!reservingOrderId}
+          onCancel={() => setPendingOrder(null)}
           onConfirm={handleConfirm}
-          onCancel={handleCancel}
-          isLoading={!!markingOrderId}
         />
       )}
 
@@ -72,12 +142,10 @@ export default function SellerOrdersPanel({ embedded = false }: { embedded?: boo
           className="text-3xl font-900 leading-tight text-(--theme-text) md:text-4xl"
           style={{ fontFamily: 'Outfit, sans-serif' }}
         >
-          Pedidos para entrega
+          Reservar pedidos
         </h1>
-
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-(--theme-text) opacity-70 md:text-base">
-          Revisa y prepara los pedidos confirmados
-          antes de su asignación a mensajeros.
+          Revisa todos los pedidos, reserva los que correspondan y visualiza los ya reservados.
         </p>
       </header>
 
@@ -87,7 +155,6 @@ export default function SellerOrdersPanel({ embedded = false }: { embedded?: boo
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
               <DollarSign size={22} />
             </div>
-
             <div className="min-w-0">
               <p className="text-xs font-800 uppercase tracking-[0.22em] text-(--theme-text) opacity-55">
                 Cobrado hoy
@@ -114,7 +181,6 @@ export default function SellerOrdersPanel({ embedded = false }: { embedded?: boo
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-(--theme-secondary-bg) text-(--theme-text)">
               <ReceiptText size={21} />
             </div>
-
             <div>
               <p className="text-xs font-800 uppercase tracking-[0.22em] text-(--theme-text) opacity-55">
                 Pedidos cobrados
@@ -148,7 +214,6 @@ export default function SellerOrdersPanel({ embedded = false }: { embedded?: boo
               d="M12 9v3m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-
           <p className="text-sm leading-relaxed text-red-700 dark:text-red-300">
             {error}
           </p>
@@ -163,9 +228,7 @@ export default function SellerOrdersPanel({ embedded = false }: { embedded?: boo
               className="animate-pulse rounded-3xl border border-(--theme-border) bg-(--theme-card-bg) p-5"
             >
               <div className="mb-4 h-5 w-1/3 rounded bg-(--theme-secondary-bg)" />
-
               <div className="mb-3 h-4 w-1/4 rounded bg-(--theme-secondary-bg)" />
-
               <div className="h-10 rounded-xl bg-(--theme-secondary-bg)" />
             </div>
           ))}
@@ -173,31 +236,40 @@ export default function SellerOrdersPanel({ embedded = false }: { embedded?: boo
       ) : (
         <div className="grid gap-6 xl:grid-cols-2">
           <section className="rounded-3xl border border-(--theme-border) bg-(--theme-card-bg) p-5 shadow-sm">
-            <SectionHeader
-              title="Reservados"
-              count={reserved.length}
-            />
+            <SectionHeader title="Todos los pedidos" count={confirmed.length} />
+            {confirmed.length === 0 ? (
+              <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-(--theme-border) px-6 py-14 text-center">
+                <p className="text-sm text-(--theme-text) opacity-50">
+                  No hay pedidos por reservar en este momento.
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4">
+                {confirmed.map((order) => (
+                  <OrderCard
+                    key={order.orderId}
+                    order={order}
+                    isExpanded={expandedOrderId === order.orderId}
+                    expandedItems={expandedOrderId === order.orderId ? expandedItems : []}
+                    itemsLoading={itemsLoading && expandedOrderId === order.orderId}
+                    onToggle={toggleOrderDetail}
+                    title="Reservar"
+                    onClick={() => setPendingOrder(order)}
+                    isMarking={reservingOrderId === order.orderId}
+                    isSuccess={successOrderId === order.orderId}
+                    successLabel="Pedido reservado"
+                  />
+                ))}
+              </div>
+            )}
+          </section>
 
+          <section className="rounded-3xl border border-(--theme-border) bg-(--theme-card-bg) p-5 shadow-sm">
+            <SectionHeader title="Pedidos reservados" count={reserved.length} />
             {reserved.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-(--theme-border) px-6 py-14 text-center">
-                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-(--theme-secondary-bg)">
-                  <svg
-                    className="h-6 w-6 opacity-40"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={1.8}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M20 13V7a2 2 0 00-2-2h-3V3H9v2H6a2 2 0 00-2 2v6"
-                    />
-                  </svg>
-                </div>
-
                 <p className="text-sm text-(--theme-text) opacity-50">
-                  No hay pedidos reservados en este momento.
+                  Aun no hay pedidos reservados.
                 </p>
               </div>
             ) : (
@@ -207,73 +279,10 @@ export default function SellerOrdersPanel({ embedded = false }: { embedded?: boo
                     key={order.orderId}
                     order={order}
                     isExpanded={expandedOrderId === order.orderId}
-                    expandedItems={
-                      expandedOrderId === order.orderId
-                        ? expandedItems
-                        : []
-                    }
-                    itemsLoading={
-                      itemsLoading &&
-                      expandedOrderId === order.orderId
-                    }
+                    expandedItems={expandedOrderId === order.orderId ? expandedItems : []}
+                    itemsLoading={itemsLoading && expandedOrderId === order.orderId}
                     onToggle={toggleOrderDetail}
-                    title="Marcar como listo"
-                    onClick={handleMarkReady}
-                    isMarking={markingOrderId === order.orderId}
-                    isSuccess={successOrderId === order.orderId}
-                  />
-                ))}
-              </div>
-            )}
-          </section>
-
-          <section className="rounded-3xl border border-(--theme-border) bg-(--theme-card-bg) p-5 shadow-sm">
-            <SectionHeader
-              title="Listos para entrega"
-              count={ready.length}
-            />
-
-            {ready.length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-(--theme-border) px-6 py-14 text-center">
-                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-(--theme-secondary-bg)">
-                  <svg
-                    className="h-6 w-6 opacity-40"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={1.8}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 12l2 2 4-4"
-                    />
-                  </svg>
-                </div>
-
-                <p className="text-sm text-(--theme-text) opacity-50">
-                  Aún no hay pedidos marcados como listos.
-                </p>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-4">
-                {ready.map((order) => (
-                  <OrderCard
-                    key={order.orderId}
-                    order={order}
-                    isExpanded={expandedOrderId === order.orderId}
-                    expandedItems={
-                      expandedOrderId === order.orderId
-                        ? expandedItems
-                        : []
-                    }
-                    itemsLoading={
-                      itemsLoading &&
-                      expandedOrderId === order.orderId
-                    }
-                    title="Asignar a mensajero"
-                    onClick={() => { window.location.href = '/seller/assign'; }}
-                    onToggle={toggleOrderDetail}
+                    title=""
                     isMarking={false}
                     isSuccess={false}
                   />
