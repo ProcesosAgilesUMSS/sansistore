@@ -17,7 +17,7 @@ export function useEditLocation(onSuccess?: () => void) {
         label: string,
         type: LocationType
     ) => {
-        // Validar que la ubicación esté dentro de la zona permitida
+
         if (!validateBeforeSave(lat, lng)) return;
 
         setIsEditing(true);
@@ -30,7 +30,7 @@ export function useEditLocation(onSuccess?: () => void) {
                 label,
                 type,
             });
-            onSuccess?.(); // Refrescar la lista de ubicaciones
+            onSuccess?.(); 
         } catch (err) {
             const message = err instanceof Error ? err.message : "Error al actualizar ubicación";
             setError(message);

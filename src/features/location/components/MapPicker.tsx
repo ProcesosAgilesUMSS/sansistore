@@ -33,7 +33,6 @@ function MapEvents({ onLocationChange }: MapEventsProps) {
     return null;
 }
 
-// NUEVO: Agregar prop editingLocation
 interface MapPickerProps {
     onSave?: () => void;
     editingLocation?: Location | null;  // NUEVO: ubicación a editar
@@ -54,7 +53,7 @@ export default function MapPicker({ onSave, editingLocation }: MapPickerProps) {
         allowedZones,
         handleSave,
         isSaving,
-        isEditMode,  // NUEVO: saber si estamos editando
+        isEditMode,  
     } = useMapPicker({ editingLocation, onSuccess: onSave });
 
     const handleSaveAndClose = async () => {
@@ -62,7 +61,6 @@ export default function MapPicker({ onSave, editingLocation }: MapPickerProps) {
         onSave?.();
     };
 
-    // NUEVO: Título dinámico según modo
     const title = isEditMode ? "Editar Ubicación" : "Nueva Ubicación";
 
     return (

@@ -58,6 +58,6 @@ export async function updateLocation(
     const locationRef = doc(db, "locations", locationId);
     await updateDoc(locationRef, {
         ...data,
-        updatedAt: new Date().toISOString(), // opcional: para saber cuándo se editó
+        updatedAt: new Date().toISOString(), 
     });
 }

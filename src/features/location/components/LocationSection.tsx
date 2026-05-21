@@ -40,17 +40,15 @@ export default function LocationSection() {
         setTimeout(() => setToast(false), 3000);
     };
 
-    // NUEVO: Función para manejar la edición
     const handleEditLocation = (location: Location) => {
-        setEditingLocation(location);  // Guardamos qué ubicación editar
-        setModalView('map');           // Abrimos el mapa
+        setEditingLocation(location);  
+        setModalView('map');           
     };
 
-    // NUEVO: Función que se ejecuta después de guardar (crear o editar)
     const handleSaveSuccess = () => {
-        setModalView('list');          // Volvemos a la lista
-        setEditingLocation(null);      // Limpiamos la edición
-        showToast();                   // Mostramos mensaje de éxito
+        setModalView('list');         
+        setEditingLocation(null);     
+        showToast();                   
     };
 
     return (
@@ -89,7 +87,6 @@ export default function LocationSection() {
                 </button>
             </div>
 
-            {/* MODAL DE LISTA DE UBICACIONES */}
             {modalView === 'list' && (
                 <LocationsModal
                     locations={locations}
@@ -102,20 +99,20 @@ export default function LocationSection() {
                         setModalView('none');
                     }}
                     onAddNew={() => {
-                        setEditingLocation(null);  // NUEVO: Limpiar edición cuando es nueva
+                        setEditingLocation(null); 
                         setModalView('map');
                     }}
-                    onEdit={handleEditLocation}  // NUEVO: Pasar función de edición
+                    onEdit={handleEditLocation}  
                 />
             )}
 
-            {/* MODAL DE MAPA (ahora soporta edición) */}
+
             {modalView === 'map' && (
                 <div
                     className="fixed inset-0 z-[100] flex items-center justify-center bg-(--theme-bg)/60 px-4 backdrop-blur-md"
                     onClick={() => {
                         setModalView('list');
-                        setEditingLocation(null);  // Limpiar edición al cerrar
+                        setEditingLocation(null);  
                     }}
                 >
                     <div
@@ -123,7 +120,7 @@ export default function LocationSection() {
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between border-b border-[#88B04B]/10 px-7 py-5">
-                            {/* Título dinámico según si estamos editando o creando */}
+                            {/* editando o creando */}
                             <h2 className="font-outfit text-lg font-black tracking-tight text-(--theme-text) transition-colors duration-300">
                                 {editingLocation ? "Editar Ubicación" : "Nueva Ubicación"}
                             </h2>
@@ -144,8 +141,8 @@ export default function LocationSection() {
                         </div>
                         <div className="p-5">
                             <MapPicker 
-                                onSave={handleSaveSuccess}  // Después de guardar, volvemos a la lista
-                                editingLocation={editingLocation}  // NUEVO: Pasamos la ubicación a editar
+                                onSave={handleSaveSuccess}  
+                                editingLocation={editingLocation}  
                             />
                         </div>
                     </div>

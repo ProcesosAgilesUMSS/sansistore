@@ -46,11 +46,6 @@ export default function LocationCard({
                     <span className="font-outfit text-sm font-extrabold leading-none text-(--theme-text) transition-colors duration-300">
                         {type}
                     </span>
-                    {isDefault && (
-                        <span className="rounded-full bg-[#88B04B] px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-white">
-                            Predeterminada
-                        </span>
-                    )}
                 </div>
 
                 <p className="mt-1 font-inter text-[10px] font-bold uppercase tracking-widest text-[#88B04B]">
@@ -63,7 +58,6 @@ export default function LocationCard({
             </div>
 
             <div className="flex items-center gap-1">
-                {/* 1. BOTÓN ESTRELLA (predeterminada) */}
                 <button
                     onClick={(e) => {
                         e.stopPropagation();
@@ -81,7 +75,6 @@ export default function LocationCard({
                     <Star size={16} fill={isDefault ? '#88B04B' : 'none'} />
                 </button>
 
-                {/* 2. BOTÓN EDITAR (lápiz) */}
                 <button
                     onClick={(e) => {
                         e.stopPropagation();
@@ -97,7 +90,6 @@ export default function LocationCard({
                     <Pencil size={16} />
                 </button>
 
-                {/* 3. BOTÓN ELIMINAR (basurero) */}
                 <button
                     onClick={(e) => {
                         e.stopPropagation();
