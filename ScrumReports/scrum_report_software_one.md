@@ -238,3 +238,46 @@ También realice pruebas funcionales en entorno local sobre el flujo completo de
 - **Yesterday:** Revisé las HU disponibles en GitHub y pensé cuáles podrían ir para el sprint 2.
 - **Today:** Revisé el borrador de las HU (HU 77 a HU 81) que subió un compañero al drive del grupo para entender mejor los requerimientos del segundo sprint.
 - **Blockers:** None
+
+
+# 19/05/ 2026
+## Daily Reports - Team 6 SoftwareOne
+
+
+### Llanos Vega Juan Carlos
+- **Yesterday:** Se creó el servicio src/features/seller/services/reservationsService.ts, encargado de consultar las reservas desde Firebase, se creó el hook src/features/seller/hooks/useReservations.ts, que permite manejar los datos de reservas y el estado de carga y los posibles errores. También se creó el componente visual src/features/seller/components/ReservationsListPanel.tsx, donde se muestra la interfaz de la lista de reservas.
+- **Today:** Se utilizó Firebase Firestore para obtener los pedidos que funcionan como reservas, la consulta filtra los documentos de la colección orders buscando aquellos que pertenecen al vendedor user-pedro y que tienen el estado RESERVADO. Para lograr la actualización en tiempo real, se usó onSnapshot, lo que permite que la lista cambie automáticamente cuando una reserva se crea, modifica o deja de estar reservada, sin necesidad de recargar la página.
+- **Blockers:** Ninguno
+
+
+### Rodriguez Torrico Arnold Guery
+- **Yesterday:** Revisé la HU #80 sobre la reserva de productos al confirmar un pedido, analizando los criterios de aceptación y el flujo, tambien avancé en la implementación de la HU, trabajando en la lógica para identificar los productos asociados a un pedido confirmado y el flujo de validación de stock.
+- **Today:**  Continuaré con la implementación de la reserva de productos, manejando los casos donde no exista suficiente stock y validando el comportamiento esperado del sistema.
+- **Blockers:** none 
+
+
+### Pereira Fiorilo Oliver Do Santos
+- **Yesterday:** Revisé la arquitectura actual del backend para planificar la creación del servicio de compras. Configuré localmente la estructura de datos requerida para el log de auditoría (movimientos de inventario tipo "entrada") y preparé el sembrado (seeding) de productos de prueba en los emuladores para poder realizar las simulaciones de compra. 
+- **Today:** Implementaré la lógica para registrar el movimiento en el historial de auditoría para incrementar el stock disponible. Dejaré listo el manejo de excepciones de la base de datos y control de errores en el registro. 
+- **Blockers:** Ninguno
+
+
+### Paqui Rojas Aaron David
+- **Yesterday:** realicé el análisis de los requerimientos de la HU, revisé la estructura de carpetas del proyecto y configuré el entorno de desarrollo local con los emuladores de Firebase y el sembrado de datos de prueba. 
+- **Today:** comenzaré a codificar la interfaz del frontend para el módulo de ofertas, iniciando con la creación del componente del formulario y la integración de los campos de selección de fecha según el sistema de diseño del equipo. 
+- **Blockers:** Ninguno 
+
+
+### Gutiérrez Fuentes Alexander Raul
+- **Yesterday:** Realicé un análisis exhaustivo del flujo de checkout y el modelo de datos de inventario en Firestore. Identifiqué que la
+     lógica de reserva de stock (decremento de disponible e incremento de reservado) no está implementada en el servicio de creación de
+     pedidos actual.
+- **Today:** :  Continuar con el análisis técnico de la HU #80 para definir la mejor estrategia de implementación. He detectado los
+     siguientes puntos que requieren evaluación:
+       1. Transaccionalidad: Evaluar el uso de runTransaction vs writeBatch para asegurar que el descuento de stock disponible y el
+          aumento de reservado sean atómicos y evitar condiciones de carrera.
+       2. Consistencia de Estados: Analizar el impacto de cambiar el estado inicial de "Registrado" a "RESERVADO" para que los pedidos
+          aparezcan correctamente en el panel del vendedor.
+       3. Validación de Disponibilidad: Definir dónde se realizará la validación de stock (si en el frontend o como regla de
+          seguridad/función en el backend) antes de confirmar la reserva.
+- **Blockers:** Ninguno.

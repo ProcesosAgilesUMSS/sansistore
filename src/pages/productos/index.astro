@@ -5,10 +5,24 @@ import FeaturedProducts from '../../components/FeaturedProducts';
 import Footer from '../../components/Footer';
 
 const initialSearch = Astro.url.searchParams.get('q') || '';
+const initialCategory = Astro.url.searchParams.get('category');
+const initialOffersOnly = Astro.url.searchParams.get('offers') === 'true';
+const initialSort = Astro.url.searchParams.get('sort');
+const initialPage = Number.parseInt(
+  Astro.url.searchParams.get('page') || '1',
+  10
+);
 ---
 
 <Layout title="Productos | Sansistore">
   <Navbar client:load />
-  <FeaturedProducts client:load initialSearch={initialSearch} />
+  <FeaturedProducts
+    client:load
+    initialSearch={initialSearch}
+    initialCategory={initialCategory}
+    initialOffersOnly={initialOffersOnly}
+    initialSort={initialSort}
+    initialPage={Number.isNaN(initialPage) ? 1 : initialPage}
+  />
   <Footer client:load />
 </Layout>

@@ -45,7 +45,7 @@ export const Users = {
   },
   PEDRO: {
     uid: 'user-pedro',
-    email: 'pedro.vendedor@fcyt.umss.edu.bo',
+    email: 'pedro.vendedor@est.umss.edu',
     displayName: 'Pedro Quiroga',
     photoURL:
       'https://ui-avatars.com/api/?name=Pedro+Quiroga&background=FFA07A&color=fff',
