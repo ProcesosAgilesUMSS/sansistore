@@ -12,6 +12,7 @@ export const Orders = {
     deliveryStatus: 'accepted',
     customerName: 'Ana Mamani',
     customerPhone: '70712345',
+    address: 'Calle Sucre 456, Cochabamba',
     items: [
       { product: Products.LECHE_PIL, quantity: 1 },
       { product: Products.ARROZ_CAISY, quantity: 1 },
@@ -29,6 +30,7 @@ export const Orders = {
     deliveryStatus: 'assigned',
     customerName: 'Carlos Flores',
     customerPhone: '76459821',
+    address: 'Av. Oquendo 1230, Cochabamba',
     items: [
       { product: Products.DETERGENTE_OLA, quantity: 1 },
       { product: Products.GALLETAS_VICTORIA, quantity: 2 },
@@ -46,6 +48,7 @@ export const Orders = {
     deliveryStatus: 'delivered',
     customerName: 'María Álvarez',
     customerPhone: '70333444',
+    address: 'Calle Jordán 89, Cochabamba',
     items: [
       { product: Products.MOCOCHINCHI, quantity: 1 },
     ],
@@ -62,6 +65,7 @@ export const Orders = {
     deliveryStatus: 'created',
     customerName: 'Juan Paredes',
     customerPhone: '70000004',
+    address: 'Av. Heroínas 340, Cochabamba',
     items: [
       { product: Products.ACEITE_FINO, quantity: 1 },
     ],
@@ -78,6 +82,7 @@ export const Orders = {
     deliveryStatus: 'assigned',
     customerName: 'María Álvarez',
     customerPhone: '70333444',
+    address: 'Calle Jordán 89, Cochabamba',
     items: [
       { product: Products.FIDEO_LAZZARONI, quantity: 2 },
       { product: Products.GALLETAS_VICTORIA, quantity: 2 },
@@ -95,6 +100,7 @@ export const Orders = {
     deliveryStatus: 'in_transit',
     customerName: 'Juan Paredes',
     customerPhone: '70000004',
+    address: 'Av. Heroínas 340, Cochabamba',
     items: [
       { product: Products.DETERGENTE_OLA, quantity: 1 },
       { product: Products.LECHE_PIL, quantity: 10 },
@@ -112,6 +118,7 @@ export const Orders = {
     deliveryStatus: 'delivered',
     customerName: 'Ana Mamani',
     customerPhone: '70712345',
+    address: 'Calle Sucre 456, Cochabamba',
     items: [
       { product: Products.ARROZ_CAISY, quantity: 2 },
     ],
@@ -128,6 +135,7 @@ export const Orders = {
     deliveryStatus: 'accepted',
     customerName: 'Ana Mamani',
     customerPhone: '70712345',
+    address: 'Calle Sucre 456, Cochabamba',
     items: [
       { product: Products.QUESO_CREMA, quantity: 1 },
       { product: Products.FIDEO_LAZZARONI, quantity: 3 },
@@ -145,6 +153,7 @@ export const Orders = {
     deliveryStatus: 'in_transit',
     customerName: 'Juan Paredes',
     customerPhone: '70000004',
+    address: 'Av. Heroínas 340, Cochabamba',
     items: [
       { product: Products.ACEITE_FINO, quantity: 1 },
       { product: Products.ARROZ_CAISY, quantity: 2 },
@@ -160,8 +169,9 @@ export const Orders = {
     location: Locations.LOC_MARIA,
     status: 'COMPLETADO',
     deliveryStatus: 'delivered',
-    customerName: 'MarÃ­a Ãlvarez',
+    customerName: 'María Álvarez',
     customerPhone: '70333444',
+    address: 'Calle Jordán 89, Cochabamba',
     items: [
       { product: Products.LECHE_PIL, quantity: 2 },
       { product: Products.MOCOCHINCHI, quantity: 2 },
@@ -179,6 +189,7 @@ export const Orders = {
     deliveryStatus: 'assigned',
     customerName: 'Carlos Flores',
     customerPhone: '76459821',
+    address: 'Av. Oquendo 1230, Cochabamba',
     items: [
       { product: Products.DETERGENTE_OLA, quantity: 2 },
     ],

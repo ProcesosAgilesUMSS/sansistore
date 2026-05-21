@@ -35,12 +35,6 @@ const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']) => {
   if (status === 'not_delivered') return 'No entregado';
   return 'Entregado';
 };
-/*
-const buildMapsUrl = (order: MessengerOrder) => {
-  const query = encodeURIComponent(`${order.address}, ${order.city}, Bolivia`);
-  return `https://www.google.com/maps/search/?api=1&query=${query}`;
-};
-*/
 
 function SummaryCard({
   icon,
@@ -163,15 +157,24 @@ function PendingOrderCard({
       </div>
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-        <a
+        <button
           className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-          href="/mapa"
-          rel="noreferrer"
-          target="_blank"
+          type="button"
+          onClick={() => {
+            localStorage.setItem('courier_panel_order', JSON.stringify({
+              customerName: order.customerName,
+              phone: order.phone,
+              address: order.address,
+              reference: order.reference,
+              items: order.items.map((i) => ({ name: i.name, quantity: i.quantity })),
+              cashToCollect: order.cashToCollect,
+            }));
+            window.location.href = `/mapa?address=${encodeURIComponent(`${order.address}`)}`;
+          }}
         >
           <Send size={17} />
           Abrir en Maps
-        </a>
+        </button>
 
         {order.deliveryStatus !== 'assigned' && (
           <button
@@ -372,15 +375,17 @@ function OrderDetailModal({
             </article>
 
             <div className="flex flex-col gap-3 sm:flex-row">
-              <a
+              <button
                 className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-                href={buildMapsUrl(order)}
-                rel="noreferrer"
-                target="_blank"
+                type="button"
+                onClick={() => {
+                  localStorage.setItem('courier_map_address', `${order.address}, ${order.city}`);
+                  window.location.href = '/mapa';
+                }}
               >
                 <Send size={17} />
                 Abrir en Maps
-              </a>
+              </button>
             </div>
           </div>
 
