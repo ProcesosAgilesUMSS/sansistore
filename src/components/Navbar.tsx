@@ -24,6 +24,9 @@ import type { User } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, googleProvider, db } from '../lib/firebase';
 import ErrorCard from './ErrorCard';
+import { useStore } from '@nanostores/react';
+import { cartTotalUnits, cartAnimating, initCartStore } from '../features/cart/store/cartStore';
+import { clearLocalCart } from '../features/cart/utils/localCart';
 
 type ThemeMode = 'light' | 'dark';
 
@@ -40,6 +43,38 @@ const applyTheme = (theme: ThemeMode) => {
         // Ignore storage errors and keep the visual theme change.
     }
 };
+
+
+function CartButton() {
+  const totalUnits = useStore(cartTotalUnits);
+  const isAnimating = useStore(cartAnimating);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    initCartStore();
+    setMounted(true);
+  }, []);
+
+  return (
+      <a href="/cart"
+      aria-label={`Carrito, ${mounted ? totalUnits : 0} unidades`}
+      className="relative transition-all text-text-light opacity-[0.60] hover:text-primary hover:opacity-100"
+    >
+      <ShoppingBag
+        size={18}
+        className={isAnimating ? 'animate-bounce text-primary opacity-100' : ''}
+      />
+      <span
+        key={totalUnits}
+        className={`absolute -top-1 -right-1 text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold border border-primary bg-primary text-bg-dark transition-transform ${
+          isAnimating ? 'scale-125' : 'scale-100'
+        }`}
+      >
+        {mounted ? (totalUnits > 99 ? '99+' : totalUnits) : 0}
+      </span>
+    </a>
+  );
+}
 
 export default function Navbar() {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -146,6 +181,7 @@ export default function Navbar() {
     const handleLogout = () => {
         setProfileMenuOpen(false);
         setRoles([]);
+        clearLocalCart();
         signOut(auth).catch(console.error);
     };
 
@@ -195,30 +231,19 @@ export default function Navbar() {
                             </a>
                         )}
 
-                        {/* ACTIONS */}
-                        <div className="flex items-center gap-3">
-                            {/* CART */}
-                            <button className="relative transition-all text-text-light opacity-[0.60] hover:text-primary hover:opacity-100">
-                                <ShoppingBag size={18} />
-                                <span
-                                    className={`absolute -top-1 -right-1 text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold border border-primary ${theme === 'dark'
-                                        ? 'bg-primary text-bg-dark'
-                                        : 'bg-primary text-bg-dark'
-                                        }`}
-                                >
-                                    0
-                                </span>
-                            </button>
-
-                            {authReady && user && (
-                                <a
-                                    href="/location"
-                                    className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-primary/40 px-3 py-1.5 text-[12px] font-semibold text-primary transition-all hover:bg-primary hover:text-white hover:border-primary"
-                                >
-                                    <MapPin size={13} />
-                                    Mis direcciones
-                                </a>
-                            )}
+            {/* ACTIONS */}
+            <div className="flex items-center gap-3">
+              {/* CART */}
+              <CartButton />
+              {authReady && user && (
+                <a
+                  href="/location"
+                  className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-primary/40 px-3 py-1.5 text-[12px] font-semibold text-primary transition-all hover:bg-primary hover:text-white hover:border-primary"
+                >
+                  <MapPin size={13} />
+                  Mis direcciones
+                </a>
+              )}
 
                             {/* THEME */}
                             <button

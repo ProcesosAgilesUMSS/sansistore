@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar';
 import FeaturedProducts from '../../components/FeaturedProducts';
 import Footer from '../../components/Footer';
+import { CartProvider } from '../../features/cart';
 
 const initialSearch = Astro.url.searchParams.get('q') || '';
 const initialCategory = Astro.url.searchParams.get('category');
@@ -16,6 +17,7 @@ const initialPage = Number.parseInt(
 
 <Layout title="Productos | Sansistore">
   <Navbar client:load />
+  <CartProvider client:load>
   <FeaturedProducts
     client:load
     initialSearch={initialSearch}
@@ -24,5 +26,6 @@ const initialPage = Number.parseInt(
     initialSort={initialSort}
     initialPage={Number.isNaN(initialPage) ? 1 : initialPage}
   />
+  </CartProvider>
   <Footer client:load />
 </Layout>
