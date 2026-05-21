@@ -233,3 +233,15 @@ html[data-theme='dark'] .messenger-toast--error {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
 }
+
+.messenger-cancel-payment-button {
+  border-color: rgba(220, 38, 38, 0.35);
+  background: rgba(220, 38, 38, 0.08);
+  color: #b91c1c;
+}
+
+.messenger-cancel-payment-button:hover {
+  border-color: rgba(220, 38, 38, 0.75);
+  background: rgba(220, 38, 38, 0.14);
+  color: #991b1b;
+}

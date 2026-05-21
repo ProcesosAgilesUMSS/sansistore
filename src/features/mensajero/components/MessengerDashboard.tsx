@@ -17,12 +17,14 @@ import {
 import { auth } from '../../../lib/firebase';
 import {
   getMessengerOrders,
+  markMessengerOrderAsCancelledByNoPayment,
   markMessengerOrderAsNotDelivered,
   registerMessengerCashPayment,
   setMessengerOrderStatus,
 } from '../services/messengerOrdersService';
 import type { MessengerOrder } from '../types';
 import UndeliveredModal from '../modals/UndeliveredModal';
+import CancelNoPaymentModal from '../modals/CancelNoPaymentModal';
 import './MessengerDashboard.css';
 
 const DEV_COURIER_ID = 'user-nadia';
@@ -35,12 +37,26 @@ const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']) => {
   if (status === 'pending_reassignment') return 'Pendiente de reasignacion';
   if (status === 'in_transit') return 'En camino';
   if (status === 'not_delivered') return 'No entregado';
+  if (status === 'cancelled') return 'Cancelado';
   return 'Entregado';
 };
 
 const buildMapsUrl = (order: MessengerOrder) => {
   const query = encodeURIComponent(`${order.address}, ${order.city}, Bolivia`);
   return `https://www.google.com/maps/search/?api=1&query=${query}`;
+};
+
+const canCancelByNoPayment = (order: MessengerOrder) => {
+  const paymentText = `${order.paymentStatus} ${order.paymentStatusLabel}`
+    .toLowerCase()
+    .trim();
+
+  return (
+    (order.deliveryStatus === 'accepted' || order.deliveryStatus === 'in_transit') &&
+    !paymentText.includes('cobrado') &&
+    !paymentText.includes('pagado') &&
+    !paymentText.includes('cancelado')
+  );
 };
 
 function MessageToast({ message, onDismiss }: { message: string; onDismiss: () => void }) {
@@ -108,6 +124,7 @@ function PendingOrderCard({
   order,
   onAccept,
   onDelivered,
+  onCancelNoPayment,
   onDetail,
   onInTransit,
   onNotDelivered,
@@ -116,6 +133,7 @@ function PendingOrderCard({
   order: MessengerOrder;
   onAccept: (orderId: string) => void;
   onDelivered: (order: MessengerOrder) => void;
+  onCancelNoPayment: (order: MessengerOrder) => void;
   onDetail: (order: MessengerOrder) => void;
   onInTransit: (orderId: string) => void;
   onNotDelivered: (order: MessengerOrder) => void;
@@ -256,6 +274,17 @@ function PendingOrderCard({
           </button>
         )}
 
+        {canCancelByNoPayment(order) && (
+          <button
+            className="messenger-cancel-payment-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+            onClick={() => onCancelNoPayment(order)}
+            type="button"
+          >
+            <DollarSign size={17} />
+            Cancelar por falta de pago
+          </button>
+        )}
+
         {(order.deliveryStatus === 'accepted' ||
           order.deliveryStatus === 'in_transit') && (
           <button
@@ -298,11 +327,13 @@ function OrderDetailModal({
   order,
   onClose,
   onDelivered,
+  onCancelNoPayment,
   onNotDelivered,
 }: {
   order: MessengerOrder;
   onClose: () => void;
   onDelivered: (order: MessengerOrder) => void;
+  onCancelNoPayment: (order: MessengerOrder) => void;
   onNotDelivered: (order: MessengerOrder) => void;
 }) {
   const subtotal = order.items.reduce(
@@ -455,7 +486,20 @@ function OrderDetailModal({
                 Registrar pago
               </button>
             )}
-
+             
+            {canCancelByNoPayment(order) && (
+              <button
+                className="messenger-cancel-payment-button mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+                onClick={() => {
+                  onClose();
+                  onCancelNoPayment(order);
+                }}
+                type="button"
+              >
+                <DollarSign size={17} />
+                Cancelar por falta de pago
+              </button>
+            )}
             {(order.deliveryStatus === 'accepted' ||
               order.deliveryStatus === 'in_transit') && (
               <button
@@ -493,6 +537,9 @@ export default function MessengerDashboard({
   const [undeliveredOrder, setUndeliveredOrder] =
     useState<MessengerOrder | null>(null);
   const [savingUndelivered, setSavingUndelivered] = useState(false);
+  const [cancelNoPaymentOrder, setCancelNoPaymentOrder] =
+    useState<MessengerOrder | null>(null);
+  const [savingCancelNoPayment, setSavingCancelNoPayment] = useState(false);
   const [currentCourierId, setCurrentCourierId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -689,6 +736,48 @@ export default function MessengerDashboard({
     }
   };
 
+  const registerCancelNoPayment = async (notes: string) => {
+  if (!cancelNoPaymentOrder) return;
+
+  const targetOrder = cancelNoPaymentOrder;
+  setSavingCancelNoPayment(true);
+
+  setOrders((currentOrders) =>
+    currentOrders.map((order) =>
+      order.id === targetOrder.id
+        ? {
+            ...order,
+            deliveryStatus: 'cancelled',
+            paymentStatus: 'CANCELADO',
+            paymentStatusLabel: 'Cancelado por falta de pago',
+          }
+        : order
+    )
+  );
+
+  try {
+    await markMessengerOrderAsCancelledByNoPayment({
+      order: targetOrder,
+      notes,
+      courierId: currentCourierId,
+    });
+
+    setMessage('Pedido cancelado por falta de pago.');
+    setCancelNoPaymentOrder(null);
+  } catch (error) {
+    console.error(error);
+    setMessage('No se pudo cancelar el pedido por falta de pago.');
+
+    setOrders((currentOrders) =>
+      currentOrders.map((order) =>
+        order.id === targetOrder.id ? targetOrder : order
+      )
+    );
+  } finally {
+    setSavingCancelNoPayment(false);
+  }
+};
+
   const activeOrders =
     clientSection === 'assigned'
       ? assignedOrders
@@ -803,6 +892,7 @@ export default function MessengerDashboard({
                       key={order.id}
                       order={order}
                       onAccept={acceptOrder}
+                      onCancelNoPayment={setCancelNoPaymentOrder}
                       onDelivered={markAsDelivered}
                       onDetail={setDetailOrder}
                       onInTransit={markAsInTransit}
@@ -868,9 +958,10 @@ export default function MessengerDashboard({
         <OrderDetailModal
           order={detailOrder}
           onClose={() => setDetailOrder(null)}
+          onCancelNoPayment={setCancelNoPaymentOrder}
           onDelivered={markAsDelivered}
           onNotDelivered={setUndeliveredOrder}
-        />
+      />
       )}
 
       {undeliveredOrder && (
@@ -879,6 +970,14 @@ export default function MessengerDashboard({
           order={undeliveredOrder}
           onClose={() => setUndeliveredOrder(null)}
           onConfirm={registerUndeliveredOrder}
+        />
+      )}
+      {cancelNoPaymentOrder && (
+        <CancelNoPaymentModal
+          isSaving={savingCancelNoPayment}
+          order={cancelNoPaymentOrder}
+          onClose={() => setCancelNoPaymentOrder(null)}
+          onConfirm={registerCancelNoPayment}
         />
       )}
     </main>
