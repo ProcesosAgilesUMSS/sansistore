@@ -40,6 +40,15 @@ const normalizeOrderDeliveryStatus = (status: DeliveryStatus) => {
   return 'ASSIGNED';
 };
 
+function toDate(value: unknown): Date | null {
+  if (!value) return null;
+  if (typeof (value as { toDate?: unknown }).toDate === 'function') {
+    return (value as { toDate: () => Date }).toDate();
+  }
+  const parsed = new Date(value as string);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
 const readOrderItems = async (
   orderId: string
 ): Promise<MessengerOrderItem[]> => {
@@ -102,6 +111,9 @@ export async function getMessengerOrders(
         collectedBy: typeof order.collectedBy === 'string' ? order.collectedBy : null,
         deliveryMethod: String(order.deliveryMethod || 'Delivery'),         
         deliveryStatus: normalizeDeliveryStatus(delivery.status),
+        assignedAt: toDate(delivery.assignedAt),
+        createdAt: toDate(delivery.createdAt) ?? toDate(order.createdAt),
+        updatedAt: toDate(delivery.updatedAt) ?? toDate(order.updatedAt),
       };
     })
   );
@@ -164,6 +176,9 @@ export function subscribeToMessengerOrders(
                   : null,
               deliveryMethod: String(order.deliveryMethod || 'Delivery'),
               deliveryStatus: normalizeDeliveryStatus(delivery.status),
+              assignedAt: toDate(delivery.assignedAt),
+              createdAt: toDate(delivery.createdAt) ?? toDate(order.createdAt),
+              updatedAt: toDate(delivery.updatedAt) ?? toDate(order.updatedAt),
             };
           })
         );
