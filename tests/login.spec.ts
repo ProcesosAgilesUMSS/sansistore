@@ -1,13 +1,24 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Auth - Login', () => {
+  async function waitForLoginForm(page: import('@playwright/test').Page) {
+    await expect(
+      page.locator('form').getByRole('button', {
+        name: 'Iniciar sesión',
+        exact: true,
+      })
+    ).toBeVisible();
+    await page.waitForLoadState('networkidle');
+  }
+
   test('should login with email/password and show user on /me', async ({
     page,
   }) => {
     await page.goto('/login');
+    await waitForLoginForm(page);
 
     const emailField = page.getByLabel('Correo electrónico');
-    const passwordField = page.getByLabel('Contraseña');
+    const passwordField = page.locator('#password');
 
     await emailField.fill('juan.paredes@est.umss.edu');
     await passwordField.fill('password123');
@@ -16,10 +27,12 @@ test.describe('Auth - Login', () => {
     expect(await passwordField.inputValue()).toBe('password123');
 
     await page
+      .locator('form')
       .getByRole('button', { name: 'Iniciar sesión', exact: true })
       .click();
 
-    await expect(page).toHaveURL('/me');
+    await expect(page).toHaveURL('/');
+    await page.goto('/me');
     await expect(page.getByText('No autenticado')).toBeHidden();
     await expect(page.locator('dd', { hasText: 'juan.paredes@est.umss.edu' })).toBeVisible({ timeout: 10000 });
   });
@@ -40,14 +53,15 @@ test.describe('Auth - Login', () => {
     page,
   }) => {
     await page.goto('/login');
+    await waitForLoginForm(page);
     await expect(page).toHaveTitle('Iniciar sesión | SansiStore');
     await expect(
-      page.getByRole('heading', { name: 'Iniciar sesión' })
+      page.getByRole('heading', { name: /sansistore/i })
     ).toBeVisible();
     await expect(page.getByLabel('Correo electrónico')).toBeVisible();
-    await expect(page.getByLabel('Contraseña')).toBeVisible();
+    await expect(page.locator('#password')).toBeVisible();
     await expect(
-      page.getByRole('button', { name: 'Iniciar sesión', exact: true })
+      page.locator('form').getByRole('button', { name: 'Iniciar sesión', exact: true })
     ).toBeVisible();
   });
 });

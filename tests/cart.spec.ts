@@ -230,12 +230,20 @@ test.describe('Cart - Carrito', () => {
 
   async function loginWithEmail(page: Page, email: string) {
     await page.goto('/login');
+    await expect(
+      page.locator('form').getByRole('button', {
+        name: 'Iniciar sesión',
+        exact: true,
+      })
+    ).toBeVisible();
+    await page.waitForLoadState('networkidle');
     await page.getByLabel('Correo electrónico').fill(email);
-    await page.getByLabel('Contraseña').fill('password123');
+    await page.locator('#password').fill('password123');
     await page
+      .locator('form')
       .getByRole('button', { name: 'Iniciar sesión', exact: true })
       .click();
-    await expect(page).toHaveURL('/me');
+    await expect(page).toHaveURL('/');
   }
 
   async function expectCartPage(page: Page) {
