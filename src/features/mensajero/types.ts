@@ -44,19 +44,21 @@ export interface MessengerOrderItem {
 export interface MessengerOrder {
   id: string;
   deliveryId: string;
+  paymentId: string | null;
+  orderCode: string;        
   customerName: string;
+  buyerName: string;        
   phone: string;
   address: string;
   city: string;
   reference?: string;
   items: MessengerOrderItem[];
   cashToCollect: number;
-  paymentMethod: 'cash' | 'cash_on_delivery';
-  deliveryStatus:
-    | 'assigned'
-    | 'accepted'
-    | 'pending_reassignment'
-    | 'in_transit'
-    | 'delivered'
-    | 'not_delivered';
+  paymentMethod: 'cash_on_delivery';
+  paymentStatus: string;
+  paymentStatusLabel: string;
+  paymentCollectedAt: Date | null;
+  collectedBy: string | null;
+  deliveryMethod: string;   
+  deliveryStatus: 'assigned' | 'accepted' | 'in_transit' | 'delivered' | 'not_delivered' | 'pending_reassignment';
 }
