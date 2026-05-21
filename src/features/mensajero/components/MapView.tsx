@@ -23,7 +23,7 @@ type MapOrder = {
 const mockOrder = {
   customerName: 'María López',
   phone: '70012345',
-  address: 'Av. Ayacucho #456, entre Heroínas y Sucre',
+  address: 'Torres Del Prado, Cochabamba',
   city: 'Cochabamba',
   reference: 'Edificio azul, 2do piso',
   cashToCollect: 180,
@@ -43,7 +43,7 @@ type Position = [number, number];
 
 function DeliveryMarker({ position, name, zone }: { position: Position; name: string; zone: string }) {
   return (
-    <Marker position={position} icon={deliveryIcon}>
+    <Marker position={position}>
       <Popup>
         <strong>{name}</strong><br />{zone}
       </Popup>
@@ -52,17 +52,17 @@ function DeliveryMarker({ position, name, zone }: { position: Position; name: st
 }
 
 async function geocodeAddress(address: string): Promise<Position | null> {
-  const apiKey = import.meta.env.PUBLIC_GOOGLE_MAPS_API_KEY;
+  const apiKey = import.meta.env.PUBLIC_GEOCODE_MAPS_API_KEY;
   if (!apiKey) return null;
   try {
     const res = await fetch(
-      `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`
+      `https://geocode.maps.co/search?q=${address}&api_key=${apiKey}`
     );
     const data = await res.json();
-    if (data.results?.length > 0) {
-      const { lat, lng } = data.results[0].geometry.location;
-      return [lat, lng];
-    }
+    if (!Array.isArray(data) || data.length === 0) return null;
+    const cercado = data.find((r: { address?: { county?: string } }) => r.address?.county === 'Cercado');
+    const best = cercado ?? data[0];
+    return [parseFloat(best.lat), parseFloat(best.lon)];
   } catch { /* ignore */ }
   return null;
 }
@@ -90,7 +90,7 @@ export default function MapView() {
     if (stored?.deliveryLat != null && stored?.deliveryLng != null) {
       setDeliveryPosition([stored.deliveryLat, stored.deliveryLng]);
     } else {
-      const address = `${mockOrder.address}, ${mockOrder.city}, Bolivia`;
+      const address = mockOrder.address;
       geocodeAddress(address).then((pos) => {
         if (pos) setDeliveryPosition(pos);
       });

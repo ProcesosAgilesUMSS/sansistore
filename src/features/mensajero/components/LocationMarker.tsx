@@ -20,7 +20,7 @@ function LocationMarker() {
       (pos) => {
         const coords: Position = [pos.coords.latitude, pos.coords.longitude];
         setPosition(coords);
-        //map.setView(coords, 17);
+        map.setView(coords, 20);
       },
       (err) => {
         console.error(err);
