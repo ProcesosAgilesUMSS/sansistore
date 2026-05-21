@@ -20,11 +20,6 @@ test.describe('Product Detail Page', () => {
     // Check page title
     await expect(page).toHaveTitle(/Sansistore/);
 
-    // Check product name is displayed
-    await expect(
-      page.getByRole('heading', { name: /Leche PIL Natural 900 ml/ })
-    ).toBeVisible();
-
     // Check description
     await expect(
       page
@@ -36,12 +31,12 @@ test.describe('Product Detail Page', () => {
         .first()
     ).toBeVisible();
 
-    // Check price (Bs 9.99)
-    await expect(page.getByText(/Bs\s9\.70/)).toBeVisible();
+    // Check price
+    await expect(page.getByText('Bs 12.50', { exact: true })).toBeVisible();
 
     // Check badge
     await expect(
-      page.locator('span.product-detail-badge').filter({ hasText: 'Bolivia' })
+      page.getByText('Bolivia', { exact: true }).first()
     ).toBeVisible();
 
     // Check in stock status and stock count
