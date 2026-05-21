@@ -96,12 +96,11 @@ export function CartItemRow({
           <button
             type="button"
             onClick={onRemove}
-            className="inline-flex items-center gap-1.5 rounded-full border border-border-light px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:border-red-300 hover:bg-red-500/10"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-primary/30 bg-primary/10 text-primary transition hover:border-primary hover:bg-primary/15 active:scale-95"
             aria-label={`Eliminar ${name}`}
             title="Eliminar producto"
           >
-            <Trash2 size={14} />
-            Eliminar
+            <Trash2 size={15} />
           </button>
         </div>
       </div>

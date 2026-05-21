@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ChevronDown, ShoppingBag } from 'lucide-react';
+import { ChevronDown, ShoppingBag, Trash2, X } from 'lucide-react';
 import { CartItemRow } from './CartItemRow';
 import { AnimatedAmount } from './AnimatedAmount';
 import type { CartItemWithProduct } from '../types';
@@ -10,6 +10,7 @@ function CartViewInner() {
   const [includedById, setIncludedById] = useState<Record<string, boolean>>({});
   const [errorsById, setErrorsById] = useState<Record<string, string | undefined>>({});
   const [summaryOpen, setSummaryOpen] = useState(true);
+  const [itemToRemove, setItemToRemove] = useState<CartItemWithProduct | null>(null);
 
   useEffect(() => {
     setIncludedById((current) => {
@@ -77,6 +78,14 @@ function CartViewInner() {
   }
 
   async function handleRemove(productId: string) {
+    const item = itemsWithProducts.find((current) => current.productId === productId) ?? null;
+    setItemToRemove(item);
+  }
+
+  async function confirmRemoveItem() {
+    if (!itemToRemove) return;
+
+    const productId = itemToRemove.productId;
     await removeItem(productId);
     setIncludedById((current) => {
       const next = { ...current };
@@ -88,6 +97,7 @@ function CartViewInner() {
       delete next[productId];
       return next;
     });
+    setItemToRemove(null);
   }
 
   function handleToggleIncluded(productId: string, included: boolean) {
@@ -131,6 +141,71 @@ function CartViewInner() {
         >
           Comprar ahora
         </a>
+      </div>
+    );
+  }
+
+  function RemoveItemModal() {
+    if (!itemToRemove) return null;
+
+    const productName = itemToRemove.product?.name ?? itemToRemove.productId;
+
+    return (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="remove-item-title"
+      >
+        <div
+          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+          onClick={() => setItemToRemove(null)}
+        />
+
+        <div className="relative z-10 w-full max-w-sm rounded-2xl border border-border-light bg-card-bg-light p-6 shadow-2xl">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <Trash2 size={18} />
+            </div>
+            <h2 id="remove-item-title" className="text-lg font-bold text-text-light">
+              Eliminar producto
+            </h2>
+          </div>
+
+          <p className="mt-4 text-sm leading-relaxed text-text-light opacity-70">
+            ¿Está seguro/a de que quieres eliminar este producto?
+            <span className="mt-1 block font-semibold text-text-light opacity-100">
+              {productName}
+            </span>
+          </p>
+
+          <div className="mt-6 flex gap-3">
+            <button
+              type="button"
+              onClick={() => setItemToRemove(null)}
+              className="flex-1 rounded-full bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90 active:scale-95"
+            >
+              No
+            </button>
+
+            <button
+              type="button"
+              onClick={confirmRemoveItem}
+              className="flex-1 rounded-full border border-primary bg-white px-4 py-3 text-sm font-semibold text-primary transition hover:bg-primary/5 active:scale-95"
+            >
+              Sí
+            </button>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setItemToRemove(null)}
+            className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full border border-border-light text-text-light opacity-70 transition hover:opacity-100"
+            aria-label="Cerrar modal"
+          >
+            <X size={16} />
+          </button>
+        </div>
       </div>
     );
   }
@@ -218,6 +293,8 @@ function CartViewInner() {
           </div>
         </details>
       </aside>
+
+      <RemoveItemModal />
     </div>
   );
 }
