@@ -1,8 +1,12 @@
-export type OrderStatus = 'in_transit' | 'delivered';
+export type OrderStatus = 'in_transit' | 'delivered' | 'CREADO' | 'RESERVADO' | 'PENDIENTE' | 'EMPAQUETADO';
 
 export const STATUS_LABELS: Record<OrderStatus, string> = {
   in_transit: "en camino",
-  delivered: "entregado"
+  delivered: "entregado",
+  CREADO: "creado",
+  RESERVADO: "reservado",
+  PENDIENTE: "pendiente",
+  EMPAQUETADO: "empaquetado"
 };
 
 export const AVAILABLE_STATUSES = Object.keys(STATUS_LABELS) as OrderStatus[];

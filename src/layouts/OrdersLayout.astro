@@ -1,0 +1,65 @@
+---
+import Layout from './Layout.astro';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+
+interface Props {
+  title: string;
+  activeTab: 'sent' | 'created';
+}
+
+const { title, activeTab } = Astro.props;
+---
+
+<Layout title={title}>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+
+  <Navbar client:load />
+  
+  <div class="pt-18 bg-bg-light">
+    <nav class="px-3 mb-4" aria-label="Orders navigation">
+      <div class="grid     
+      grid-cols-[repeat(8,1fr)]
+      min-[760px]:grid-cols-[repeat(16,1fr)]
+      min-[960px]:grid-cols-[repeat(24,1fr)]"
+      >
+        <a 
+          href="/orders/created" 
+          class:list={[
+            "col-start-1 col-end-4 min-[960px]:col-start-2 min-[960px]:col-end-6",
+            activeTab === 'created' 
+              ? "underline decoration-2 underline-offset-4" 
+              : "text-black/53"
+          ]}
+        >
+          Pedidos creados
+        </a>
+        <a
+          href="/orders/sent" 
+          class:list={[
+            "col-start-4 col-end-8 min-[760px]:col-start-6 min-[760px]:col-end-10",
+            activeTab === 'sent' 
+              ? "underline decoration-2 underline-offset-4"
+              : "text-black/53"
+          ]}
+        >
+          Pedidos enviados
+        </a>
+      </div>
+    </nav>
+
+    <div class="pb-20">
+      <slot />
+    </div>
+  </div>
+
+  <Footer client:load />
+</Layout>

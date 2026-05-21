@@ -1,25 +1,26 @@
 import { useEffect, useState } from "react";
 import type { Order, OrderStatus } from "../types";
-import { getSentOrders } from "../services/ordersService";
+import { getCreatedOrders } from "../services/ordersService";
 import OrderFilter from "./OrderFilter";
-import OrderHeader from "./OrderHeader";
-import OrderItem from "./OrderItem";
+import CreatedOrderItem from "./CreatedOrderItem";
 import GridSpinner from "./GridSpinner";
 import LoadingMessage from "./LoadingMessage";
-import OrderProductDetail from "./OrderProductDetail";
 
-export default function SentOrdersList() {
+export default function CreatedOrdersList() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedStatuses, setSelectedStatuses] = useState<OrderStatus[]>([]);
   const [showFilters, setShowFilters] = useState<boolean>(false);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-  useEffect(() => {
-    getSentOrders().then((data) => {
+  const loadOrders = () => {
+    getCreatedOrders().then((data) => {
       setOrders(data);
       setLoading(false);
     });
+  };
+
+  useEffect(() => {
+    loadOrders();
   }, []);
 
   const toggleStatus = (status: OrderStatus) => {
@@ -30,23 +31,27 @@ export default function SentOrdersList() {
     );
   };
 
+  const handleOrderReverved = () => {
+    loadOrders();
+  };
+
   const filteredOrders = selectedStatuses.length === 0
     ? orders
     : orders.filter((order) => selectedStatuses.includes(order.status));
 
   return (
-    <section className="px-3 grid bg-bg-light
-    grid-cols-[repeat(8,1fr)]
-    min-[760px]:grid-cols-[repeat(16,1fr)]
-    min-[960px]:grid-cols-[repeat(24,1fr)]"
-      aria-labelledby="orders-title"
+    <section
+      key="created-orders-section"
+      className="px-3 grid bg-bg-light
+      grid-cols-[repeat(8,1fr)]
+      min-[760px]:grid-cols-[repeat(16,1fr)]
+      min-[960px]:grid-cols-[repeat(24,1fr)]"
+      aria-labelledby="orders-created-title"
     >
-      <h2 className="col-start-1 min-[960px]:col-start-2   col-span-full tracking-[-0.07em] text-[calc(4.48431vw+32.5112px)] leading-[100%] mb-4">
-        Pedidos enviados
+      <h2 className="col-start-1 min-[960px]:col-start-2 col-span-full tracking-[-0.07em] text-[calc(4.48431vw+32.5112px)] leading-[100%] mb-4">
+        Pedidos creados
         {!loading && (
-          <sup
-            className="top-[-1.5em] text-[0.35em] tracking-tight ml-5"
-          >
+          <sup className="top-[-1.5em] text-[0.35em] tracking-tight ml-5">
             ({orders.length === 0 ? "sin pedidos" : orders.length})
           </sup>
         )}
@@ -55,13 +60,8 @@ export default function SentOrdersList() {
       {loading ? (
         <div className="col-span-full flex justify-center items-center h-80 gap-x-5">
           <GridSpinner />
-          <LoadingMessage text={"Receiving shipped orders"} />
+          <LoadingMessage text="Receiving created orders" />
         </div>
-      ) : selectedOrder ? (
-        <OrderProductDetail
-          order={selectedOrder}
-          onBack={() => setSelectedOrder(null)}
-        />
       ) : orders.length === 0 ? (
         <div className="col-span-full h-80" />
       ) : (
@@ -71,17 +71,17 @@ export default function SentOrdersList() {
             toggleStatus={toggleStatus}
             showFilters={showFilters}
             setShowFilters={setShowFilters}
-            availableStatuses={['in_transit', 'delivered']}
+            availableStatuses={['CREADO', 'RESERVADO', 'EMPAQUETADO', 'PENDIENTE']}
           />
 
-          <div className="grid grid-cols-subgrid col-span-full min-[960px]:col-start-4 min-[960px]:col-end-22 mb-10">
+          <div className="grid grid-cols-subgrid col-span-full min-[960px]:col-start-2 min-[960px]:col-end-24 mb-10">
             <OrderHeader />
             <ul className="col-span-full grid grid-cols-subgrid">
               {filteredOrders.map((order) => (
-                <OrderItem
+                <CreatedOrderItem
                   key={order.id}
                   order={order}
-                  onViewDetail={() => setSelectedOrder(order)}
+                  onOrderReserved={handleOrderReverved}
                 />
               ))}
             </ul>
@@ -90,4 +90,23 @@ export default function SentOrdersList() {
       )}
     </section>
   );
+}
+
+function OrderHeader() {
+  return (
+    <header className="hidden grid-cols-subgrid border-b min-[760px]:grid min-[760px]:col-span-full min-[760px]:pb-1.5">
+      <div className="uppercase col-start-1 col-end-3 text-xs flex gap-[4px]">
+        <span>/</span>
+        orden
+      </div>
+      <div className="uppercase col-start-3 col-end-9 text-xs flex gap-[4px]">
+        <span>/</span>
+        dirección
+      </div>
+      <div className="col-start-12 col-end-15 uppercase min-[960px]:col-start-15 min-[960px]:col-end-19 text-xs flex gap-[4px]">
+        <span>/</span>
+        estado
+      </div>
+    </header>
+  )
 }

@@ -8,6 +8,7 @@ interface OrderFilterProps {
   toggleStatus: (status: OrderStatus) => void;
   showFilters: boolean;
   setShowFilters: (show: boolean) => void;
+  availableStatuses?: OrderStatus[];
 }
 
 //[todo]: clamp ul when min-[760px] font size
@@ -17,6 +18,7 @@ export default function OrderFilter({
   toggleStatus,
   showFilters,
   setShowFilters,
+  availableStatuses = AVAILABLE_STATUSES,
 }: OrderFilterProps) {
   return (
     <div className="grid grid-cols-subgrid mb-[32px] col-start-1 col-end-9 border-y border-dotted border-black/53 py-1 min-[960px]:col-start-2 min-[960px]:col-end-11">
@@ -33,9 +35,13 @@ export default function OrderFilter({
 
       {showFilters && (
         <ul className="col-start-2 col-end-9 flex gap-x-6 items-center ml-4 min-[760px]:col-start-3 min-[960px]:col-start-4 min-[960px]:col-end-10">
-          {AVAILABLE_STATUSES.map((status) => {
+          {availableStatuses.map((status) => {
             const isSelected = selectedStatuses.includes(status);
-            const highlightClass = status === 'in_transit' ? "bg-blue-300/50" : "bg-green-300/50";
+            const highlightClass = 
+              status === 'in_transit' ? "bg-blue-300/50" : 
+              status === 'delivered' ? "bg-green-300/50" :
+              status === 'CREADO' ? "bg-orange-300/50" :
+              "bg-black/5";
 
             return (
               <li key={status}>
