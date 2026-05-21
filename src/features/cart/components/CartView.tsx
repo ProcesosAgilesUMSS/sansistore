@@ -1,16 +1,376 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ChevronDown, ShoppingBag, Trash2, X } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ShoppingBag, Trash2, X, MapPin, Loader2 } from 'lucide-react';
+import { onAuthStateChanged, type User, signInWithPopup, setPersistence, browserLocalPersistence, signOut } from 'firebase/auth';
+import { FirebaseError } from 'firebase/app';
+import { collection, doc, getDoc, setDoc, serverTimestamp, addDoc, writeBatch } from 'firebase/firestore';
 import { CartItemRow } from './CartItemRow';
 import { AnimatedAmount } from './AnimatedAmount';
 import type { CartItemWithProduct } from '../types';
 import { useCartContext, CartProvider } from './CartContext';
+import { auth, googleProvider, db } from '../../../lib/firebase';
+import { useAuthUser } from '../../../hooks/useAuthUser';
+import { subscribeToUserLocations } from '../../location/services/locationService';
+import type { Location } from '../../location/types';
+
+const INSTITUTIONAL_DOMAIN = '@est.umss.edu';
+
+function generateOrderCode() {
+  const timestamp = Date.now().toString(36);
+  const random = Math.random().toString(36).substring(2, 6);
+  return `order-${timestamp}-${random}`;
+}
+
+function generateItemId(orderCode: string, idx: number) {
+  return `${orderCode}-item-${idx + 1}`;
+}
+
+function LoginModal({ onClose }: { onClose: () => void }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleGoogleLogin() {
+    setLoading(true);
+    setError(null);
+    try {
+      googleProvider.setCustomParameters({
+        hd: INSTITUTIONAL_DOMAIN.replace('@', ''),
+      });
+      await setPersistence(auth, browserLocalPersistence);
+      const result = await signInWithPopup(auth, googleProvider);
+
+      if (result.user.email && !result.user.email.endsWith(INSTITUTIONAL_DOMAIN)) {
+        await signOut(auth);
+        setError('Solo se permiten cuentas institucionales.');
+        setLoading(false);
+        return;
+      }
+
+      const userRef = doc(db, 'users', result.user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        const institutionalId = result.user.email!.split('@')[0];
+        await setDoc(userRef, {
+          uid: result.user.uid,
+          email: result.user.email,
+          displayName: result.user.displayName || 'Usuario UMSS',
+          roles: ['comprador'],
+          institutionalId,
+          isActive: true,
+          createdBy: 'system',
+          createdAt: serverTimestamp(),
+        });
+      }
+      onClose();
+    } catch (e: unknown) {
+      const ignored = ['auth/popup-closed-by-user', 'auth/cancelled-popup-request'];
+      if (!(e instanceof FirebaseError) || !ignored.includes(e.code)) {
+        setError('Error al iniciar sesión. Intente nuevamente.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="login-title"
+    >
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={loading ? undefined : onClose}
+      />
+
+      <div className="relative z-10 w-full max-w-sm rounded-2xl border border-border-light bg-card-bg-light p-6 shadow-2xl">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              className="h-5 w-5"
+            >
+              <path
+                fill="#EA4335"
+                d="M12 9.5v5h7.06C18.4 17.57 15.7 19.5 12 19.5a7.5 7.5 0 1 1 0-15c1.85 0 3.52.68 4.82 1.8l3.53-3.53A12 12 0 1 0 24 12c0-.82-.07-1.61-.2-2.36H12Z"
+              />
+              <path
+                fill="#4285F4"
+                d="M23.8 9.64H12v4.72h6.67A7.02 7.02 0 0 1 12 19.5c-3.7 0-6.87-2.23-8.22-5.41L.16 16.22A11.97 11.97 0 0 0 12 24c6.63 0 12-5.37 12-12 0-.83-.08-1.63-.2-2.36Z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M3.78 14.09A7.49 7.49 0 0 1 3.5 12c0-.73.11-1.43.28-2.09L.16 6.78A12 12 0 0 0 0 12c0 1.92.45 3.73 1.24 5.34l2.54-1.96Z"
+              />
+              <path
+                fill="#34A853"
+                d="m3.78 14.09 2.54-1.96A7.49 7.49 0 0 1 4.5 12c0-.74.11-1.44.28-2.09L1.24 8.66A11.94 11.94 0 0 0 0 12c0 1.92.45 3.73 1.24 5.34l2.54-1.96Z"
+              />
+            </svg>
+          </div>
+          <h2 id="login-title" className="text-lg font-bold text-text-light">
+            Iniciar sesión
+          </h2>
+        </div>
+
+        <p className="mt-4 text-sm leading-relaxed text-text-light opacity-70">
+          Debes iniciar sesión para confirmar tu pedido.
+        </p>
+
+        {error && (
+          <p className="mt-3 text-sm text-red-600 font-medium">{error}</p>
+        )}
+
+        <div className="mt-6">
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={loading}
+            className="flex w-full items-center justify-center gap-2 rounded-full border border-border-light bg-white px-4 py-3 text-sm font-semibold text-text-light transition hover:bg-border-light/40 active:scale-95 disabled:opacity-50"
+          >
+            {loading ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <>
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  className="h-4 w-4"
+                >
+                  <path
+                    fill="#EA4335"
+                    d="M12 9.5v5h7.06C18.4 17.57 15.7 19.5 12 19.5a7.5 7.5 0 1 1 0-15c1.85 0 3.52.68 4.82 1.8l3.53-3.53A12 12 0 1 0 24 12c0-.82-.07-1.61-.2-2.36H12Z"
+                  />
+                  <path
+                    fill="#4285F4"
+                    d="M23.8 9.64H12v4.72h6.67A7.02 7.02 0 0 1 12 19.5c-3.7 0-6.87-2.23-8.22-5.41L.16 16.22A11.97 11.97 0 0 0 12 24c6.63 0 12-5.37 12-12 0-.83-.08-1.63-.2-2.36Z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M3.78 14.09A7.49 7.49 0 0 1 3.5 12c0-.73.11-1.43.28-2.09L.16 6.78A12 12 0 0 0 0 12c0 1.92.45 3.73 1.24 5.34l2.54-1.96Z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="m3.78 14.09 2.54-1.96A7.49 7.49 0 0 1 4.5 12c0-.74.11-1.44.28-2.09L1.24 8.66A11.94 11.94 0 0 0 0 12c0 1.92.45 3.73 1.24 5.34l2.54-1.96Z"
+                  />
+                </svg>
+                Continuar con Google
+              </>
+            )}
+          </button>
+        </div>
+
+        <button
+          type="button"
+          onClick={onClose}
+          disabled={loading}
+          className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full border border-border-light text-text-light opacity-70 transition hover:opacity-100 disabled:opacity-30"
+          aria-label="Cerrar modal"
+        >
+          <X size={16} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function LocationSelectorModal({
+  user,
+  onClose,
+  onConfirm,
+}: {
+  user: User;
+  onClose: () => void;
+  onConfirm: (location: Location) => void;
+}) {
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const unsub = subscribeToUserLocations(user.uid, (locs) => {
+      setLocations(locs);
+      setLoading(false);
+      const defaultLoc = locs.find((l) => l.isDefault);
+      if (defaultLoc?.id) {
+        setSelectedId(defaultLoc.id);
+      }
+    });
+    return () => unsub();
+  }, [user.uid]);
+
+  function handleConfirm() {
+    const selected = locations.find((l) => l.id === selectedId);
+    if (selected) {
+      onConfirm(selected);
+    }
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="location-title"
+    >
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      <div className="relative z-10 w-full max-w-sm rounded-2xl border border-border-light bg-card-bg-light p-6 shadow-2xl">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <MapPin size={18} />
+          </div>
+          <h2 id="location-title" className="text-lg font-bold text-text-light">
+            Seleccionar ubicación
+          </h2>
+        </div>
+
+        <div className="mt-4 flex max-h-60 flex-col gap-3 overflow-y-auto">
+          {loading ? (
+            <div className="flex flex-col items-center gap-3 py-12 text-text-light/40">
+              <Loader2 size={28} className="animate-spin text-primary/60" />
+              <p className="text-sm font-bold">Cargando ubicaciones...</p>
+            </div>
+          ) : locations.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 py-12 text-text-light/40">
+              <MapPin size={32} className="text-primary/40" />
+              <p className="text-sm font-bold">No hay ubicaciones guardadas</p>
+              <a
+                href="/location"
+                className="text-xs font-semibold text-primary hover:underline"
+              >
+                Agregar ubicación
+              </a>
+            </div>
+          ) : (
+            locations.map((loc) => (
+              <button
+                key={loc.id}
+                type="button"
+                onClick={() => setSelectedId(loc.id ?? null)}
+                className={`w-full rounded-xl border p-3 text-left transition ${
+                  selectedId === loc.id
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border-light hover:border-primary/50'
+                }`}
+              >
+                <p className="text-sm font-semibold text-text-light">{loc.label}</p>
+                <p className="mt-1 text-xs text-text-light opacity-60 capitalize">
+                  {loc.type}
+                  {loc.isDefault && ' (Predeterminada)'}
+                </p>
+              </button>
+            ))
+          )}
+        </div>
+
+        <div className="mt-6">
+          <button
+            type="button"
+            onClick={handleConfirm}
+            disabled={!selectedId}
+            className="flex w-full items-center justify-center rounded-full bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Confirmar ubicación
+          </button>
+        </div>
+
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full border border-border-light text-text-light opacity-70 transition hover:opacity-100"
+          aria-label="Cerrar modal"
+        >
+          <X size={16} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function OrderSuccessModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="success-title"
+    >
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      <div className="relative z-10 w-full max-w-sm rounded-2xl border border-border-light bg-card-bg-light p-6 shadow-2xl">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <h2 id="success-title" className="text-lg font-bold text-text-light">
+            ¡Pedido confirmado!
+          </h2>
+          <p className="text-sm text-text-light opacity-70">
+            Tu pedido ha sido creado exitosamente.
+          </p>
+        </div>
+
+        <div className="mt-6">
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex w-full items-center justify-center rounded-full bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90 active:scale-95"
+          >
+            Aceptar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function CartViewInner() {
-  const { itemsWithProducts, loading, updateQuantity, removeItem } = useCartContext();
+  const { itemsWithProducts, loading, updateQuantity, removeItem, items } = useCartContext();
+  const { user, authReady } = useAuthUser();
+  const [userRoles, setUserRoles] = useState<string[]>([]);
   const [includedById, setIncludedById] = useState<Record<string, boolean>>({});
   const [errorsById, setErrorsById] = useState<Record<string, string | undefined>>({});
   const [summaryOpen, setSummaryOpen] = useState(true);
   const [itemToRemove, setItemToRemove] = useState<CartItemWithProduct | null>(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [creatingOrder, setCreatingOrder] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      setUserRoles([]);
+      return;
+    }
+
+    getDoc(doc(db, 'users', user.uid))
+      .then((userSnap) => {
+        const roles = userSnap.data()?.roles;
+        setUserRoles(Array.isArray(roles) ? roles : []);
+      })
+      .catch(() => setUserRoles([]));
+  }, [user]);
 
   useEffect(() => {
     setIncludedById((current) => {
@@ -49,13 +409,13 @@ function CartViewInner() {
       const price = item.product?.hasOffer && item.product?.offerPrice != null
         ? item.product.offerPrice
         : item.product?.price ?? 0;
-      return sum + price * item.quantity;
+      return sum + Number((price * item.quantity).toFixed(2));
     }, 0),
     [includedItems],
   );
 
   const shippingFee = includedItems.length > 0 ? 0 : 0;
-  const total = subtotal + shippingFee;
+  const total = Number((subtotal + shippingFee).toFixed(2));
 
   async function handleIncrement(productId: string, stock: number) {
     const ok = await updateQuantity(productId, 1, stock);
@@ -107,6 +467,102 @@ function CartViewInner() {
     }));
   }
 
+  async function handleConfirmOrder() {
+    if (!authReady) return;
+
+    if (!user) {
+      setShowLoginModal(true);
+      return;
+    }
+
+    const isComprador = userRoles.includes('comprador');
+    if (!isComprador) {
+      return;
+    }
+
+    setShowLocationModal(true);
+  }
+
+  async function handleLocationSelected(location: Location) {
+    if (!user || creatingOrder) return;
+
+    setCreatingOrder(true);
+    setShowLocationModal(false);
+
+    try {
+      const orderCode = generateOrderCode();
+      const paymentCode = orderCode.replace('order', 'payment');
+      const deliveryCode = orderCode.replace('order', 'delivery');
+
+      const orderItems = includedItems.map((item, idx) => {
+        const unitPrice = item.product?.hasOffer && item.product?.offerPrice != null
+          ? item.product.offerPrice
+          : item.product?.price ?? 0;
+        const lineSubtotal = Number((unitPrice * item.quantity).toFixed(2));
+        return {
+          itemId: generateItemId(orderCode, idx),
+          productId: item.productId,
+          productName: item.product?.name ?? item.productId,
+          unitPrice,
+          quantity: item.quantity,
+          subtotal: lineSubtotal,
+        };
+      });
+
+      const batch = writeBatch(db);
+
+      const ordersRef = doc(db, 'orders', orderCode);
+      batch.set(ordersRef, {
+        orderId: orderCode,
+        buyerId: user.uid,
+        sellerId: null,
+        status: 'CREADO',
+        incidentReason: null,
+        total,
+        locationId: location.id,
+        paymentStatus: 'PENDIENTE',
+        deliveryStatus: 'created',
+        deliveryId: null,
+        paymentId: paymentCode,
+        confirmedAt: serverTimestamp(),
+        cancelledAt: null,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+
+      for (const orderItem of orderItems) {
+        const orderItemRef = doc(db, `orders/${orderCode}/orderItems`, orderItem.itemId);
+        batch.set(orderItemRef, orderItem);
+      }
+
+      const paymentsRef = doc(db, 'payments', paymentCode);
+      batch.set(paymentsRef, {
+        paymentId: paymentCode,
+        orderId: orderCode,
+        amount: total,
+        method: 'cash_on_delivery',
+        status: 'PENDIENTE',
+        registeredBy: user.uid,
+        verifiedBy: null,
+        registeredAt: serverTimestamp(),
+        verifiedAt: null,
+        updatedAt: serverTimestamp(),
+      });
+
+      await batch.commit();
+
+      for (const item of items) {
+        await removeItem(item.productId);
+      }
+
+      setShowSuccessModal(true);
+    } catch (error) {
+      console.error('Error creating order:', error);
+    } finally {
+      setCreatingOrder(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-24">
@@ -115,7 +571,7 @@ function CartViewInner() {
     );
   }
 
-  if (enriched.length === 0) {
+  if (enriched.length === 0 && !showSuccessModal) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
         <svg
@@ -211,7 +667,20 @@ function CartViewInner() {
   }
 
   return (
-    <div className="grid gap-6 md:grid-cols-3 md:items-start">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold text-text-light">Mi Carrito</h1>
+        <button
+          type="button"
+          onClick={() => window.history.back()}
+          className="inline-flex items-center gap-2 rounded-full border border-border-light bg-card-bg-light px-4 py-2 text-sm font-semibold text-text-light transition-colors hover:border-primary hover:text-primary"
+        >
+          <ArrowLeft size={16} />
+          Atrás
+        </button>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-3 md:items-start">
       <section className="min-w-0 rounded-xl border border-border-light bg-card-bg-light p-4 md:col-span-2">
         <h2 className="mb-2 text-lg font-semibold">Productos ({enriched.length})</h2>
         {enriched.map((item) => (
@@ -245,7 +714,7 @@ function CartViewInner() {
                   const price = item.product?.hasOffer && item.product?.offerPrice != null
                     ? item.product.offerPrice
                     : item.product?.price ?? 0;
-                  const lineTotal = price * item.quantity;
+                  const lineTotal = Number((price * item.quantity).toFixed(2));
                   const name = item.product?.name ?? item.productId;
 
                   return (
@@ -285,16 +754,31 @@ function CartViewInner() {
 
             <button
               type="button"
-              disabled={includedItems.length === 0}
+              disabled={includedItems.length === 0 || creatingOrder}
+              onClick={handleConfirmOrder}
               className="flex w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Confirmar pedido
+              {creatingOrder ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                'Confirmar pedido'
+              )}
             </button>
           </div>
         </details>
       </aside>
 
       <RemoveItemModal />
+      {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
+      {user && showLocationModal && (
+        <LocationSelectorModal
+          user={user}
+          onClose={() => setShowLocationModal(false)}
+          onConfirm={handleLocationSelected}
+        />
+      )}
+      {showSuccessModal && <OrderSuccessModal onClose={() => setShowSuccessModal(false)} />}
+      </div>
     </div>
   );
 }
