@@ -1,4 +1,4 @@
-import { Trash2 } from 'lucide-react';
+import { Check, Trash2 } from 'lucide-react';
 import { AnimatedAmount } from './AnimatedAmount';
 import type { CartItemWithProduct } from '../types';
 
@@ -38,9 +38,19 @@ export function CartItemRow({
           type="checkbox"
           checked={item.included}
           onChange={(event) => onToggleIncluded(event.target.checked)}
-          className="h-4 w-4 rounded border-border-light text-primary focus:ring-primary"
+          className="sr-only"
           aria-label={`Incluir ${name} en el total`}
         />
+        <span
+          className={`flex h-5 w-5 items-center justify-center rounded border transition-colors ${
+            item.included
+              ? 'border-primary bg-primary text-white'
+              : 'border-primary/45 bg-card-bg-light text-transparent shadow-[inset_0_0_0_1px_rgba(136,176,75,0.18)]'
+          }`}
+          aria-hidden="true"
+        >
+          <Check size={13} strokeWidth={3} className="text-white" />
+        </span>
       </label>
 
       <a href={productUrl} className="shrink-0">
