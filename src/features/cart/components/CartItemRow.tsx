@@ -51,11 +51,11 @@ export function CartItemRow({
 
   return (
     <div
-      className={`flex gap-3 items-center py-4 border-b border-border-light last:border-0 transition-opacity ${
+      className={`flex gap-3 py-4 border-b border-border-light last:border-0 transition-opacity ${
         item.included ? 'opacity-100' : 'opacity-65'
       }`}
     >
-      <label className="inline-flex h-16 w-8 shrink-0 items-center justify-center">
+      <label className="inline-flex h-14 w-8 shrink-0 items-start justify-center pt-1">
         <input
           type="checkbox"
           checked={item.included}
@@ -77,9 +77,9 @@ export function CartItemRow({
 
       <a href={productUrl} className="shrink-0">
         {imageUrl ? (
-          <img src={imageUrl} alt={name} className="w-16 h-16 object-cover rounded-lg" />
+          <img src={imageUrl} alt={name} className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-lg" />
         ) : (
-          <div className="w-16 h-16 bg-secondary-bg-light rounded-lg flex items-center justify-center opacity-40">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 bg-secondary-bg-light rounded-lg flex items-center justify-center opacity-40">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <rect x="3" y="3" width="18" height="18" rx="2" />
               <circle cx="8.5" cy="8.5" r="1.5" />
@@ -90,11 +90,14 @@ export function CartItemRow({
       </a>
 
       <div className="flex-1 min-w-0">
-        <a href={productUrl} className="block line-clamp-1 font-semibold text-base hover:text-primary transition-colors">
-          {name}
-        </a>
-        <p className="text-sm text-text-light opacity-50 mt-0.5">Bs {price.toFixed(2)} / u <span className="opacity-60">· Stock: {stock}</span></p>
-        <div className="mt-2 flex flex-wrap items-center gap-3">
+        <div className="flex items-start justify-between gap-2">
+          <a href={productUrl} className="block line-clamp-1 font-semibold text-sm sm:text-base hover:text-primary transition-colors">
+            {name}
+          </a>
+          <AnimatedAmount value={price * item.quantity} className="text-sm sm:text-base font-bold text-text-light shrink-0" />
+        </div>
+        <p className="text-xs sm:text-sm text-text-light opacity-50 mt-0.5">Bs {price.toFixed(2)} / u <span className="opacity-60">· Stock: {stock}</span></p>
+        <div className="mt-2 flex items-center gap-3">
           <div className="flex items-center gap-1.5">
             <button
               onClick={onDecrement}
@@ -112,12 +115,12 @@ export function CartItemRow({
                 onBlur={commitQuantity}
                 onKeyDown={handleKeyDown}
                 autoFocus
-                className="w-10 text-center text-base font-semibold bg-transparent border border-primary rounded outline-none"
+                className="w-10 text-center text-sm sm:text-base font-semibold bg-transparent border border-primary rounded outline-none"
               />
             ) : (
               <button
                 onClick={() => { setEditing(true); setDraft(String(item.quantity)); }}
-                className="w-7 text-center text-base font-semibold hover:text-primary transition-colors"
+                className="w-7 text-center text-sm sm:text-base font-semibold hover:text-primary transition-colors"
               >
                 {item.quantity}
               </button>
@@ -133,15 +136,14 @@ export function CartItemRow({
           <button
             type="button"
             onClick={onRemove}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-primary/30 bg-primary/10 text-primary transition hover:border-primary hover:bg-primary/15 active:scale-95"
+            className="inline-flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-primary/30 bg-primary/10 text-primary transition hover:border-primary hover:bg-primary/15 active:scale-95"
             aria-label={`Eliminar ${name}`}
             title="Eliminar producto"
           >
-            <Trash2 size={15} />
+            <Trash2 size={14} />
           </button>
         </div>
       </div>
-      <AnimatedAmount value={price * item.quantity} className="text-base font-bold text-text-light shrink-0" />
     </div>
   );
 }

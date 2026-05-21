@@ -680,26 +680,25 @@ function CartViewInner() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-text-light">Mi Carrito</h1>
+        <h1 className="text-lg sm:text-xl font-bold text-text-light">Mi Carrito</h1>
         <button
           type="button"
           onClick={() => window.history.back()}
-          className="inline-flex items-center gap-2 rounded-full border border-border-light bg-card-bg-light px-4 py-2 text-sm font-semibold text-text-light transition-colors hover:border-primary hover:text-primary"
+          className="inline-flex items-center gap-2 rounded-full border border-border-light bg-card-bg-light px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-text-light transition-colors hover:border-primary hover:text-primary"
         >
           <ArrowLeft size={16} />
           Atrás
         </button>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3 md:items-start">
-      <section className="min-w-0 rounded-xl border border-border-light bg-card-bg-light p-4 md:col-span-2">
-        <h2 className="mb-2 text-lg font-semibold">Productos ({enriched.length})</h2>
+      <div className="grid gap-4 md:gap-6 md:grid-cols-3 md:items-start">
+      <section className="min-w-0 rounded-xl border border-border-light bg-card-bg-light p-3 sm:p-4 md:col-span-2">
+        <h2 className="mb-2 text-base sm:text-lg font-semibold">Productos ({enriched.length})</h2>
         {enriched.map((item) => (
           <CartItemRow
             key={item.productId}
             item={item}
             stock={item.product?.stockAvailable ?? 999}
-            error={item.error}
             onIncrement={() => handleIncrement(item.productId, item.product?.stockAvailable ?? 999)}
             onDecrement={() => handleDecrement(item.productId, item.product?.stockAvailable ?? 999)}
             onSetQuantity={(qty) => handleSetQuantity(item.productId, qty, item.product?.stockAvailable ?? 999)}
@@ -709,11 +708,11 @@ function CartViewInner() {
         ))}
       </section>
 
-      <aside className="sticky top-4 h-fit rounded-xl border border-border-light bg-card-bg-light p-4 shadow-sm md:col-span-1">
+      <aside className="rounded-xl border border-border-light bg-card-bg-light p-3 sm:p-4 shadow-sm md:sticky md:top-4 md:h-fit md:col-span-1">
         <details open={summaryOpen} onToggle={(event) => setSummaryOpen((event.currentTarget as HTMLDetailsElement).open)}>
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-lg outline-none">
-            <span className="flex items-center gap-2 text-lg font-semibold">
-              <ShoppingBag size={18} className="text-primary" />
+            <span className="flex items-center gap-2 text-base sm:text-lg font-semibold">
+              <ShoppingBag size={16} className="text-primary" />
               Resumen de pago
             </span>
             <ChevronDown className={`h-5 w-5 shrink-0 transition-transform ${summaryOpen ? 'rotate-180' : ''}`} />
@@ -761,7 +760,7 @@ function CartViewInner() {
 
             <div className="flex items-end justify-between gap-3">
               <span className="text-xs uppercase tracking-wide text-text-light opacity-60">Total final</span>
-              <AnimatedAmount value={total} className="text-2xl font-bold text-primary" />
+              <AnimatedAmount value={total} className="text-xl sm:text-2xl font-bold text-primary" />
             </div>
 
             <button

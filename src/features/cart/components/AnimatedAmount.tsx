@@ -1,59 +1,53 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 interface Props {
   value: number;
   className?: string;
 }
 
-function DigitColumn({ target, delay }: { target: number; delay: number }) {
-  const [y, setY] = useState(target);
-  const current = useRef(target);
+export function AnimatedAmount({ value, className }: Props) {
+  const [displayValue, setDisplayValue] = useState(value);
+  const prevValueRef = useRef(value);
+  const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const from = current.current;
-    const to = target;
-    if (from === to) return;
-    current.current = to;
+    const prevValue = prevValueRef.current;
+    if (prevValue === value) return;
 
-    const start = performance.now();
-    const dur = 250 + delay;
+    prevValueRef.current = value;
 
-    const step = (now: number) => {
-      const t = Math.min((now - start) / dur, 1);
-      const ease = t * (2 - t);
-      setY(from + (to - from) * ease);
-      if (t < 1) requestAnimationFrame(step);
-      else setY(to);
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
+
+    const duration = 600;
+    const startTime = performance.now();
+
+    function animate(currentTime: number) {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      
+      const currentValue = prevValue + (value - prevValue) * eased;
+      setDisplayValue(currentValue);
+
+      if (progress < 1) {
+        animationRef.current = requestAnimationFrame(animate);
+      }
+    }
+
+    animationRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
     };
-
-    requestAnimationFrame(step);
-  }, [target, delay]);
-
-  return (
-    <span className="inline-block overflow-hidden align-bottom" style={{ height: '1.2em', lineHeight: '1.2em' }}>
-      <span style={{ display: 'block', transform: `translateY(-${y * 1.2}em)` }}>
-        {Array.from({ length: 10 }, (_, i) => (
-          <span key={i} style={{ display: 'block', height: '1.2em' }}>{i}</span>
-        ))}
-      </span>
-    </span>
-  );
-}
-
-export function AnimatedAmount({ value, className }: Props) {
-  const formatted = value.toFixed(2);
-  let di = 0;
+  }, [value]);
 
   return (
     <span className={`inline-flex items-baseline whitespace-nowrap tabular-nums ${className ?? ''}`}>
-      {formatted.split('').map((ch, i) => {
-        if (/\d/.test(ch)) {
-          const d = parseInt(ch, 10);
-          const idx = di++;
-          return <DigitColumn key={i} target={d} delay={idx * 30} />;
-        }
-        return <span key={i}>{ch}</span>;
-      })}&nbsp;Bs
+      Bs {displayValue.toFixed(2)}
     </span>
   );
 }
