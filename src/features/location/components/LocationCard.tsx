@@ -2,15 +2,17 @@
 
 import { useState } from 'react';
 import { Trash2, Star, Pencil } from 'lucide-react';
-import ConfirmModal from './ConfirmModal'; 
+import ConfirmModal from './ConfirmModal';
+import ErrorModal from './ErrorModal';
 import type { Location } from '../types';
 import { TYPE_ICONS } from '../constants/locationIcons';
+import { hasActiveOrders } from '../services/locationService';
 
 interface LocationCardProps {
     location: Location;
     isSelected: boolean;
     onSelect: (id: string) => void;
-    onDelete: (id: string) => void;
+    onDelete: (id: string) => Promise<void>;
     onSetDefault: (id: string) => void;
     onEdit: (location: Location) => void;
 }
@@ -24,14 +26,70 @@ export default function LocationCard({
     onEdit
 }: LocationCardProps) {
     const { id, label, type, lat, lng, isDefault } = location;
-
+    
     const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [showErrorModal, setShowErrorModal] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [isDeleting, setIsDeleting] = useState(false);
 
     if (!id) return null;
 
-    const handleConfirmDelete = () => {
-        onDelete(id);
+    const handleConfirmDelete = async () => {
         setShowConfirmModal(false);
+        setIsDeleting(true);
+        setErrorMessage('');
+        setShowErrorModal(false);
+        
+        try {
+            await onDelete(id);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Error al eliminar la ubicación';
+            setErrorMessage(message);
+            setShowErrorModal(true);
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+    const handleEditClick = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        
+        try {
+            const hasActive = await hasActiveOrders(id);
+            
+            if (hasActive) {
+                setErrorMessage('No se puede editar esta ubicación porque tiene pedidos pendientes o en camino');
+                setShowErrorModal(true);
+                return;
+            }
+            onEdit(location);
+        } catch (error) {
+            setErrorMessage('Error al verificar la ubicación');
+            setShowErrorModal(true);
+        }
+    };
+
+    const handleSetDefaultClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onSetDefault(id);
+    };
+
+    const handleDeleteClick = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        
+        try {
+            const hasActive = await hasActiveOrders(id);
+            
+            if (hasActive) {
+                setErrorMessage('No se puede eliminar esta ubicación porque tiene pedidos pendientes o en camino');
+                setShowErrorModal(true);
+                return;
+            }
+            setShowConfirmModal(true);
+        } catch (error) {
+            setErrorMessage('Error al verificar la ubicación');
+            setShowErrorModal(true);
+        }
     };
 
     return (
@@ -45,6 +103,7 @@ export default function LocationCard({
                         ? 'border-[#88B04B] bg-[#88B04B]/10 shadow-[0_0_0_2px_rgba(136,176,75,0.15)]'
                         : 'border-(--theme-border) bg-(--theme-card-bg) hover:border-[#88B04B]'
                     }
+                    ${isDeleting ? 'opacity-50 pointer-events-none' : ''}
                 `}
             >
                 <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#88B04B]/10 text-[#88B04B] transition-colors duration-300">
@@ -68,12 +127,8 @@ export default function LocationCard({
                 </div>
 
                 <div className="flex items-center gap-1">
-                    {/* estrella */}
                     <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onSetDefault(id);
-                        }}
+                        onClick={handleSetDefaultClick}
                         aria-label={`Establecer ${label} como predeterminada`}
                         className={`
                             flex h-8 w-8 items-center justify-center rounded-full transition-all
@@ -86,12 +141,8 @@ export default function LocationCard({
                         <Star size={16} fill={isDefault ? '#88B04B' : 'none'} />
                     </button>
 
-                    {/* editar */}
                     <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onEdit(location);
-                        }}
+                        onClick={handleEditClick}
                         aria-label={`Editar ${label}`}
                         className="
                             flex h-8 w-8 items-center justify-center rounded-full
@@ -102,17 +153,15 @@ export default function LocationCard({
                         <Pencil size={16} />
                     </button>
 
-                    {/* eliminar */}
                     <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setShowConfirmModal(true); 
-                        }}
+                        onClick={handleDeleteClick}
+                        disabled={isDeleting}
                         aria-label={`Eliminar ${label}`}
                         className="
                             flex h-8 w-8 items-center justify-center rounded-full
                             text-red-500 opacity-40 transition-all
                             hover:opacity-100
+                            disabled:opacity-20 disabled:cursor-not-allowed
                         "
                     >
                         <Trash2 size={16} />
@@ -120,15 +169,21 @@ export default function LocationCard({
                 </div>
             </div>
 
-            {/* Modal  */}
             <ConfirmModal
                 isOpen={showConfirmModal}
                 title="Eliminar ubicación"
-                message={`¿Estás seguro que deseas eliminar la ubicacion?`}
+                message={`¿Estás seguro que deseas eliminar "${type}"?`}
                 onConfirm={handleConfirmDelete}
                 onCancel={() => setShowConfirmModal(false)}
                 confirmText="Eliminar"
                 cancelText="Cancelar"
+            />
+
+            <ErrorModal
+                isOpen={showErrorModal}
+                title="No se puede eliminar/editar"
+                message={errorMessage}
+                onClose={() => setShowErrorModal(false)}
             />
         </>
     );
