@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
+import { Truck } from 'lucide-react';
 import { onAuthStateChanged } from 'firebase/auth';
 import {
   AlertTriangle,
@@ -210,93 +211,96 @@ function PendingOrderCard({
         </div>
       </div>
 
-      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-        <a
-          className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-          href={buildMapsUrl(order)}
-          rel="noreferrer"
-          target="_blank"
-        >
-          <Send size={17} />
-          Abrir en Maps
-        </a>
+      <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+  {/* SIEMPRE VISIBLES */}
+  <a
+    className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+    href={buildMapsUrl(order)}
+    rel="noreferrer"
+    target="_blank"
+  >
+    <Send size={17} />
+    Abrir Maps
+  </a>
 
-        {order.deliveryStatus !== 'assigned' && (
-          <button
-            className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-            onClick={() => onDetail(order)}
-            type="button"
-          >
-            <Eye size={17} />
-            Ver detalle
-          </button>
-        )}
+  {order.deliveryStatus !== 'assigned' && (
+    <button
+      className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+      onClick={() => onDetail(order)}
+      type="button"
+    >
+      <Eye size={17} />
+      Ver detalle
+    </button>
+  )}
 
-        {order.deliveryStatus === 'assigned' && (
-          <>
-            <button
-              className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
-              onClick={() => onAccept(order.id)}
-              type="button"
-            >
-              <CheckCircle2 size={17} />
-              Aceptar pedido
-            </button>
-            <button
-              className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-              onClick={() => onReject(order.id)}
-              type="button"
-            >
-              <XCircle size={17} />
-              Rechazar
-            </button>
-          </>
-        )}
+  {/* ACEPTAR / RECHAZAR */}
+  {order.deliveryStatus === 'assigned' && (
+    <>
+      <button
+        className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
+        onClick={() => onAccept(order.id)}
+        type="button"
+      >
+        <CheckCircle2 size={17} />
+        Aceptar pedido
+      </button>
 
-        {order.deliveryStatus === 'accepted' && (
-          <button
-            className="messenger-transit-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 text-sm font-bold text-white transition hover:bg-blue-700"
-            onClick={() => onInTransit(order.id)}
-            type="button"
-          >
-            Iniciar entrega
-          </button>
-        )}
+      <button
+        className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+        onClick={() => onReject(order.id)}
+        type="button"
+      >
+        <XCircle size={17} />
+        Rechazar
+      </button>
+    </>
+  )}
 
-        {order.deliveryStatus === 'in_transit' && (
-          <button
-            className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
-            onClick={() => onDelivered(order)}
-            type="button"
-          >
-            <CheckCircle2 size={17} />
-            Registrar pago
-          </button>
-        )}
+  {/* INICIAR ENTREGA */}
+  {order.deliveryStatus === 'accepted' && (
+    <button
+      className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 text-sm font-bold text-white shadow-lg transition hover:scale-[1.02] hover:bg-blue-700"
+      onClick={() => onInTransit(order.id)}
+      type="button"
+    >
+      <Truck size={17} />
+      Iniciar entrega
+    </button>
+  )}
 
-        {canCancelByNoPayment(order) && (
-          <button
-            className="messenger-cancel-payment-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-            onClick={() => onCancelNoPayment(order)}
-            type="button"
-          >
-            <DollarSign size={17} />
-            Cancelar por falta de pago
-          </button>
-        )}
+  {/* CUANDO YA ESTA EN CAMINO */}
+  {order.deliveryStatus === 'in_transit' && (
+    <>
+      <button
+        className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
+        onClick={() => onDelivered(order)}
+        type="button"
+      >
+        <CheckCircle2 size={17} />
+        Registrar pago
+      </button>
 
-        {(order.deliveryStatus === 'accepted' ||
-          order.deliveryStatus === 'in_transit') && (
-          <button
-            className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-            onClick={() => onNotDelivered(order)}
-            type="button"
-          >
-            <AlertTriangle size={17} />
-            No entregado
-          </button>
-        )}
-      </div>
+<button
+  className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 border-amber-500 bg-amber-950/40 px-6 text-sm font-bold text-amber-300 transition-all duration-300 hover:border-amber-400 hover:shadow-[0_0_12px_rgba(251,191,36,0.65)]"
+  onClick={() => onCancelNoPayment(order)}
+  type="button"
+>
+  <DollarSign size={17} />
+  Cancelar por falta de pago
+</button>
+
+<button
+  className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 border-red-500 bg-red-950/40 px-6 text-sm font-bold text-red-300 transition-all duration-300 hover:border-red-400 hover:shadow-[0_0_12px_rgba(248,113,113,0.65)]"
+  onClick={() => onNotDelivered(order)}
+  type="button"
+>
+  <AlertTriangle size={17} />
+  No entregado
+</button>
+    </>
+  )}
+</div>
     </article>
   );
 }
@@ -487,33 +491,36 @@ function OrderDetailModal({
               </button>
             )}
              
-            {canCancelByNoPayment(order) && (
-              <button
-                className="messenger-cancel-payment-button mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-                onClick={() => {
-                  onClose();
-                  onCancelNoPayment(order);
-                }}
-                type="button"
-              >
-                <DollarSign size={17} />
-                Cancelar por falta de pago
-              </button>
-            )}
-            {(order.deliveryStatus === 'accepted' ||
-              order.deliveryStatus === 'in_transit') && (
-              <button
-                className="messenger-reject-button mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-                onClick={() => {
-                  onClose();
-                  onNotDelivered(order);
-                }}
-                type="button"
-              >
-                <AlertTriangle size={17} />
-                No entregado
-              </button>
-            )}
+{canCancelByNoPayment(order) && (
+  <button
+    className=" mt-3 inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 border-amber-500 bg-amber-950/40 px-6 text-sm font-bold text-amber-300 transition-all duration-300 hover:border-amber-400 hover:shadow-[0_0_12px_rgba(251,191,36,0.65)]"
+    onClick={() => {
+      onClose();
+      onCancelNoPayment(order);
+    }}
+    type="button"
+  >
+    <DollarSign size={17} />
+    Cancelar por falta de pago
+  </button>
+)}
+
+{(order.deliveryStatus === 'accepted' ||
+  order.deliveryStatus === 'in_transit') && (
+  <button
+    className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-red-500 bg-red-950/40 px-6 text-sm font-bold text-red-300 transition-all duration-300 hover:border-red-400 hover:shadow-[0_0_12px_rgba(248,113,113,0.65)]"
+    onClick={() => {
+      onClose();
+      onNotDelivered(order);
+    }}
+    type="button"
+  >
+    <AlertTriangle size={17} />
+    No entregado
+  </button>
+)}
+
+            
           </aside>
         </div>
       </section>
