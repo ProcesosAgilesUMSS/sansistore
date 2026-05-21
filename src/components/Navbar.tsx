@@ -26,6 +26,7 @@ import { auth, googleProvider, db } from '../lib/firebase';
 import ErrorCard from './ErrorCard';
 import { useStore } from '@nanostores/react';
 import { cartTotalUnits, cartAnimating, initCartStore } from '../features/cart/store/cartStore';
+import { clearLocalCart } from '../features/cart/utils/localCart';
 
 type ThemeMode = 'light' | 'dark';
 
@@ -180,6 +181,7 @@ export default function Navbar() {
     const handleLogout = () => {
         setProfileMenuOpen(false);
         setRoles([]);
+        clearLocalCart();
         signOut(auth).catch(console.error);
     };
 

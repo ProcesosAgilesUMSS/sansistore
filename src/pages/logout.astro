@@ -6,6 +6,8 @@
   import { signOut } from 'firebase/auth';
   import { auth } from '../lib/firebase';
 
+  localStorage.removeItem('sansistore_cart');
+
   signOut(auth)
     .then(() => {
       window.location.href = '/login';
