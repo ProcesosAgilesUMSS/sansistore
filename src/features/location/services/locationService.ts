@@ -1,6 +1,7 @@
 import { db } from "../../../lib/firebase";
 import { addDoc, collection, query, where, deleteDoc, doc, onSnapshot, writeBatch, getDocs } from "firebase/firestore";
 import type { Location } from "../types";
+import { updateDoc } from "firebase/firestore";
 
 export async function saveLocation(location: Location) {
     await addDoc(collection(db, "locations"), location);
@@ -43,4 +44,20 @@ export async function setDefaultLocation(userId: string, locationId: string): Pr
 
     batch.update(doc(db, 'locations', locationId), { isDefault: true });
     await batch.commit();
+}
+
+export async function updateLocation(
+    locationId: string,
+    data: {
+        lat: number;
+        lng: number;
+        label: string;
+        type: string;
+    }
+): Promise<void> {
+    const locationRef = doc(db, "locations", locationId);
+    await updateDoc(locationRef, {
+        ...data,
+        updatedAt: new Date().toISOString(), // opcional: para saber cuándo se editó
+    });
 }

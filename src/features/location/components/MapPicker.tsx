@@ -1,7 +1,9 @@
+// src/features/location/components/MapPicker.tsx
+
 import React from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents, Polygon } from "react-leaflet";
 import { useMapPicker } from "../hooks/useMapPicker";
-import type { LocationType } from "../types";
+import type { LocationType, Location } from "../types"; // NUEVO: importar Location
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -31,11 +33,13 @@ function MapEvents({ onLocationChange }: MapEventsProps) {
     return null;
 }
 
+// NUEVO: Agregar prop editingLocation
 interface MapPickerProps {
     onSave?: () => void;
+    editingLocation?: Location | null;  // NUEVO: ubicación a editar
 }
 
-export default function MapPicker({ onSave }: MapPickerProps) {
+export default function MapPicker({ onSave, editingLocation }: MapPickerProps) {
     const {
         lat,
         lng,
@@ -49,18 +53,23 @@ export default function MapPicker({ onSave }: MapPickerProps) {
         errorMessage,
         allowedZones,
         handleSave,
-    } = useMapPicker();
+        isSaving,
+        isEditMode,  // NUEVO: saber si estamos editando
+    } = useMapPicker({ editingLocation, onSuccess: onSave });
 
     const handleSaveAndClose = async () => {
         await handleSave();
         onSave?.();
     };
 
+    // NUEVO: Título dinámico según modo
+    const title = isEditMode ? "Editar Ubicación" : "Nueva Ubicación";
+
     return (
         <div className="bg-(--theme-card-bg) text-(--theme-text) p-4 rounded-2xl border border-(--theme-border) flex flex-col gap-3.5">
 
             <h1 className="font-extrabold text-lg">
-                Seleccionar ubicacion
+                {title}
             </h1>
 
             {showError && errorMessage && (
@@ -144,7 +153,7 @@ export default function MapPicker({ onSave }: MapPickerProps) {
                         <option value="OFICINA">Oficina</option>
                         <option value="AUDITORIO">Auditorio</option>
                         <option value="BIBLIOTECA">Biblioteca</option>
-                        <option value="CENTRO DE ESTUDIANTES">Centro de estudiantes</option>
+                        <option value="CENTRO_ESTUDIANTES">Centro de estudiantes</option>
                         <option value="CAFETERIA">Cafeteria</option>
                         <option value="OTRO">Otro</option>
                     </select>
@@ -166,9 +175,10 @@ export default function MapPicker({ onSave }: MapPickerProps) {
 
             <button
                 onClick={handleSaveAndClose}
-                className="bg-(--color-primary) text-white py-3 rounded-full font-bold mt-1.5 cursor-pointer"
+                disabled={isSaving}
+                className="bg-(--color-primary) text-white py-3 rounded-full font-bold mt-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-                Guardar
+                {isSaving ? "Guardando..." : (isEditMode ? "Actualizar" : "Guardar")}
             </button>
         </div>
     );
