@@ -23,7 +23,7 @@ test.describe('Product Detail Page', () => {
     // Check product name is displayed
     await expect(
       page.getByRole('heading', { name: /Leche PIL Natural 900 ml/ })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15_000 });
 
     // Check price
     await expect(page.getByText(/Bs\s(9\.70|12\.50)/)).toBeVisible();

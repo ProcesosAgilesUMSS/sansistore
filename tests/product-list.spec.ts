@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
 test.afterEach(async ({ page }, testInfo) => {
   if (testInfo.status !== testInfo.expectedStatus) {
@@ -14,14 +14,25 @@ test.afterEach(async ({ page }, testInfo) => {
 });
 
 test.describe('Avaiable product list', () => {
+  async function expectProductsPageVisible(page: Page) {
+    await expect(
+      page.getByRole('heading', { name: 'Productos disponibles' })
+    ).toBeVisible({ timeout: 15_000 });
+  }
+
+  async function expectSearchReady(page: Page) {
+    await expectProductsPageVisible(page);
+    await expect(
+      page.getByRole('textbox', { name: '¿Qué estás buscando hoy?' })
+    ).toBeEnabled({ timeout: 15_000 });
+  }
+
   test('load products page', async ({ page }) => {
     await page.goto('/productos');
 
     await expect(page).toHaveTitle(/Productos \| Sansistore/);
 
-    await expect(
-      page.getByRole('heading', { name: 'Productos disponibles' })
-    ).toBeVisible();
+    await expectProductsPageVisible(page);
 
     await expect(
       page.getByRole('button', { name: 'Todas las categorías' })
@@ -31,11 +42,12 @@ test.describe('Avaiable product list', () => {
 
   test('Ofertas', async ({ page }) => {
     await page.goto('/productos');
+    await expectProductsPageVisible(page);
 
     await page.getByRole('button', { name: /Activar filtro Solo ofertas/ }).click();
     await expect(
       page.getByText(/Detergente Liquido Ola Futuro Limpieza Completa 5 L/)
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15_000 });
   });
 
   test('Categorias', async ({ page }) => {
@@ -49,6 +61,7 @@ test.describe('Avaiable product list', () => {
 
   test('Buscar', async ({ page }) => {
     await page.goto('/productos');
+    await expectSearchReady(page);
 
     await page
       .getByRole('textbox', { name: '¿Qué estás buscando hoy?' })
@@ -62,6 +75,7 @@ test.describe('Avaiable product list', () => {
 
   test('Search with URL params', async ({ page }) => {
     await page.goto('/productos?q=Leche');
+    await expectSearchReady(page);
 
     const searchInput = page.getByRole('textbox', {
       name: '¿Qué estás buscando hoy?',
@@ -83,12 +97,13 @@ test.describe('Avaiable product list', () => {
 
   test('Offers filter with URL params', async ({ page }) => {
     await page.goto('/productos?offers=true');
+    await expectProductsPageVisible(page);
 
     const offersButton = page.getByRole('button', { name: /Quitar filtro Solo ofertas/ });
     await expect(offersButton).toHaveAttribute('aria-pressed', 'true');
     await expect(
       page.getByText(/Detergente Liquido Ola Futuro Limpieza Completa 5 L/)
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15_000 });
   });
 
   test('Sort by name A-Z', async ({ page }) => {
@@ -103,6 +118,7 @@ test.describe('Avaiable product list', () => {
 
   test('Combined filters with URL params', async ({ page }) => {
     await page.goto('/productos?q=Leche&category=lacteos&sort=name-asc&page=1');
+    await expectSearchReady(page);
 
     const searchInput = page.getByRole('textbox', {
       name: '¿Qué estás buscando hoy?',

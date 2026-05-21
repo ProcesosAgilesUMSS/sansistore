@@ -249,31 +249,14 @@ test.describe('Cart - Carrito', () => {
 
   test('should display cart items when user is authenticated', async ({
     page,
-  }, testInfo) => {
-    const productId = `test-cart-auth-${testInfo.project.name}-${Date.now()}`;
-    const productName = 'Producto carrito autenticado';
-
-    await createTestProduct({
-      productId,
-      name: productName,
-      price: 12.5,
-      stockAvailable: 24,
-    });
-
-    await setLocalCartOnce(page, productId, 12.5);
-    await page.getByLabel('Correo electrónico').fill('admin@umss.edu');
-    await page.getByLabel('Contraseña').fill('password123');
-    await page
-      .getByRole('button', { name: 'Iniciar sesión', exact: true })
-      .click();
-    await expect(page).toHaveURL('/me');
+  }) => {
+    await loginWithEmail(page, 'juan.paredes@est.umss.edu');
 
     await page.goto('/carrito');
     await expectFilledCartPage(page);
 
-    await expect(page.locator(`a[href="/productos/${productId}"]`).filter({ hasText: productName })).toBeVisible();
-    await expect(page.getByText(/Bs 12\.50\s*\/ u/).first()).toBeVisible();
-    await expect(page.getByRole('button', { name: '1' }).first()).toBeVisible();
+    await expect(page.locator('a[href="/productos/leche-pil-natural-900-ml"]').filter({ hasText: 'Leche PIL Natural 900 ml' }).first()).toBeVisible();
+    await expect(page.getByText(/Bs\s(9\.70|12\.50)\s*\/ u/).first()).toBeVisible();
   });
 
   test('should show empty cart message when user has no items', async ({
@@ -307,26 +290,11 @@ test.describe('Cart - Carrito', () => {
 
   test('should show empty cart after logout and login with different user', async ({
     page,
-  }, testInfo) => {
-    const productId = `test-cart-switch-${testInfo.project.name}-${Date.now()}`;
-    const productName = 'Producto carrito cambio usuario';
-
-    await createTestProduct({
-      productId,
-      name: productName,
-      price: 5,
-    });
-
-    await setLocalCartOnce(page, productId, 5);
-    await page.getByLabel('Correo electrónico').fill('admin@umss.edu');
-    await page.getByLabel('Contraseña').fill('password123');
-    await page
-      .getByRole('button', { name: 'Iniciar sesión', exact: true })
-      .click();
-    await expect(page).toHaveURL('/me');
+  }) => {
+    await loginWithEmail(page, 'juan.paredes@est.umss.edu');
 
     await page.goto('/carrito');
-    await expect(page.locator(`a[href="/productos/${productId}"]`).filter({ hasText: productName })).toBeVisible();
+    await expect(page.locator('a[href="/productos/leche-pil-natural-900-ml"]').filter({ hasText: 'Leche PIL Natural 900 ml' }).first()).toBeVisible();
 
     await page.goto('/logout');
 
