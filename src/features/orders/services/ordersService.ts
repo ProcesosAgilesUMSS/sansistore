@@ -20,9 +20,18 @@ export async function getSentOrders(): Promise<Order[]> {
       }
     }
     const itemsSnapshot = await getDocs(collection(orderDoc.ref, "orderItems"));
-    const items = itemsSnapshot.docs.map(itemDoc => ({
-      ...itemDoc.data()
-    })) as OrderItem[];
+    const items = itemsSnapshot.docs.map(itemDoc => {
+      const item = itemDoc.data();
+      return {
+        itemId: item.itemId ?? itemDoc.id,
+        productId: item.productId,
+        productName: item.productName,
+        price: item.price ?? item.unitPrice ?? 0,
+        quantity: item.quantity,
+        subtotal: item.subtotal,
+        description: item.description,
+      };
+    }) as OrderItem[];
 
     return {
       id: orderDoc.id,
