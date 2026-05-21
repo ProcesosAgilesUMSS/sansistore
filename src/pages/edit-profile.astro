@@ -1,0 +1,13 @@
+---
+import Layout from "../layouts/Layout.astro"
+import EditProfileForm from "../features/profile/EditProfileForm.tsx"
+import Navbar from "../components/Navbar"
+---
+
+<Layout>
+    <Navbar client:load />
+    
+    <div class="flex min-h-[calc(100vh-3.5rem)] items-center justify-center px-4">
+        <EditProfileForm client:load />
+    </div>
+</Layout>
