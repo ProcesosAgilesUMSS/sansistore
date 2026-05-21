@@ -248,3 +248,9 @@
 - **Yesterday:** Implementación completa de la HU #101 "registrar pago como mensajero", separando la lógica de pago de la entrega. Se habilitó el botón "Registrar pago" en el dashboard del mensajero, con validaciones para no entregar sin pagar. Se creó el PR #326 para revisión del equipo.
 - **Today:** Esperar la aprobación del PR #326 y estar atento a cualquier feedback o corrección solicitada por el equipo para proceder con el merge.
 - **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+
+- **Yesterday:** Continue trabajando con la implementacion de la HU #108 y preveo terminarla para el final del día.
+- **Today:** Terminar la HU #108 e integrarla correctamente
+- **Blockers:** Leves retrasos por la dependencia de mi HU #108 con la HU #105
