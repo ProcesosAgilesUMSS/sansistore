@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, ChevronDown, ShoppingBag, Trash2, X, MapPin, Loader2 } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ShoppingBag, Trash2, X, MapPin, Loader2, CreditCard } from 'lucide-react';
 import { type User } from 'firebase/auth';
 import { doc, getDoc, serverTimestamp, writeBatch, increment, collection } from 'firebase/firestore';
 import { CartItemRow } from './CartItemRow';
@@ -10,6 +10,7 @@ import { db } from '../../../lib/firebase';
 import { useAuthUser } from '../../../hooks/useAuthUser';
 import { subscribeToUserLocations } from '../../location/services/locationService';
 import type { Location } from '../../location/types';
+import { AlertCircle } from 'lucide-react';
 
 function generateOrderCode() {
   const timestamp = Date.now().toString(36);
@@ -200,6 +201,101 @@ function LocationSelectorModal({
   );
 }
 
+function PaymentConfirmModal({
+  location,
+  total,
+  onClose,
+  onConfirm,
+  loading,
+}: {
+  location: Location;
+  total: number;
+  onClose: () => void;
+  onConfirm: () => void;
+  loading: boolean;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="payment-title"
+    >
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      <div className="relative z-10 w-full max-w-sm rounded-2xl border border-border-light bg-card-bg-light p-6 shadow-2xl">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <CreditCard size={18} />
+          </div>
+          <h2 id="payment-title" className="text-lg font-bold text-text-light">
+            Pago contra entrega
+          </h2>
+        </div>
+
+        <div className="mt-4 flex flex-col gap-3">
+  
+          <div className="w-full rounded-xl border border-primary bg-primary/5 p-3 text-left">
+            <p className="text-sm font-semibold text-text-light">{location.label}</p>
+            <p className="mt-1 text-xs text-text-light opacity-60 capitalize">
+              {location.type}
+              {location.isDefault && ' (Predeterminada)'}
+            </p>
+          </div>
+
+          <div className="w-full rounded-xl border border-border-light p-3 text-left">
+            <p className="text-xs text-text-light opacity-60">Total a pagar</p>
+            <p className="mt-1 text-2xl font-bold text-primary">Bs {total.toFixed(2)}</p>
+          </div>
+
+<div className="w-full rounded-xl border border-primary bg-primary/5 p-3 text-left">
+  <div className="flex items-start gap-3">
+    <AlertCircle className="mt-0.5 text-primary" size={20} />
+
+    <div>
+      <p className="text-sm font-semibold text-primary">
+        Importante
+      </p>
+
+      <p className="text-sm text-text-light opacity-80">
+        Su pago se realizará contra entrega.
+      </p>
+    </div>
+  </div>
+</div>
+        </div>
+
+        <div className="mt-6">
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={loading}
+            className="flex w-full items-center justify-center rounded-full bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {loading ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              'Confirmar'
+            )}
+          </button>
+        </div>
+
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full border border-border-light text-text-light opacity-70 transition hover:opacity-100"
+          aria-label="Cerrar modal"
+        >
+          <X size={16} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function OrderSuccessModal({ onClose }: { onClose: () => void }) {
   return (
     <div
@@ -262,8 +358,10 @@ function CartViewInner() {
   const [itemToRemove, setItemToRemove] = useState<CartItemWithProduct | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showLocationModal, setShowLocationModal] = useState(false);
+  const [showPaymentConfirmModal, setShowPaymentConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [creatingOrder, setCreatingOrder] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -401,11 +499,19 @@ function CartViewInner() {
     setShowLocationModal(true);
   }
 
-  async function handleLocationSelected(location: Location) {
-    if (!user || creatingOrder) return;
+  // Cuando el usuario confirma la ubicación, guardamos y abrimos el modal de pago
+  function handleLocationSelected(location: Location) {
+    setSelectedLocation(location);
+    setShowLocationModal(false);
+    setShowPaymentConfirmModal(true);
+  }
+
+  // La creación de la orden ocurre al confirmar en el modal de pago
+  async function handlePaymentConfirm() {
+    if (!user || creatingOrder || !selectedLocation) return;
 
     setCreatingOrder(true);
-    setShowLocationModal(false);
+    setShowPaymentConfirmModal(false);
 
     try {
       const orderCode = generateOrderCode();
@@ -437,7 +543,7 @@ function CartViewInner() {
         status: 'CREADO',
         incidentReason: null,
         total,
-        locationId: location.id,
+        locationId: selectedLocation.id,
         paymentStatus: 'PENDIENTE',
         deliveryStatus: 'created',
         deliveryId: null,
@@ -619,103 +725,112 @@ function CartViewInner() {
       </div>
 
       <div className="grid gap-4 md:gap-6 md:grid-cols-3 md:items-start">
-      <section className="min-w-0 rounded-xl border border-border-light bg-card-bg-light p-3 sm:p-4 md:col-span-2">
-        <h2 className="mb-2 text-base sm:text-lg font-semibold">Productos ({enriched.length})</h2>
-        {enriched.map((item) => (
-          <CartItemRow
-            key={item.productId}
-            item={item}
-            stock={item.product?.stockAvailable ?? 999}
-            onIncrement={() => handleIncrement(item.productId, item.product?.stockAvailable ?? 999)}
-            onDecrement={() => handleDecrement(item.productId, item.product?.stockAvailable ?? 999)}
-            onSetQuantity={(qty) => handleSetQuantity(item.productId, qty, item.product?.stockAvailable ?? 999)}
-            onToggleIncluded={(included) => handleToggleIncluded(item.productId, included)}
-            onRemove={() => handleRemove(item.productId)}
-          />
-        ))}
-      </section>
+        <section className="min-w-0 rounded-xl border border-border-light bg-card-bg-light p-3 sm:p-4 md:col-span-2">
+          <h2 className="mb-2 text-base sm:text-lg font-semibold">Productos ({enriched.length})</h2>
+          {enriched.map((item) => (
+            <CartItemRow
+              key={item.productId}
+              item={item}
+              stock={item.product?.stockAvailable ?? 999}
+              onIncrement={() => handleIncrement(item.productId, item.product?.stockAvailable ?? 999)}
+              onDecrement={() => handleDecrement(item.productId, item.product?.stockAvailable ?? 999)}
+              onSetQuantity={(qty) => handleSetQuantity(item.productId, qty, item.product?.stockAvailable ?? 999)}
+              onToggleIncluded={(included) => handleToggleIncluded(item.productId, included)}
+              onRemove={() => handleRemove(item.productId)}
+            />
+          ))}
+        </section>
 
-      <aside className="rounded-xl border border-border-light bg-card-bg-light p-3 sm:p-4 shadow-sm md:sticky md:top-4 md:h-fit md:col-span-1">
-        <details open={summaryOpen} onToggle={(event) => setSummaryOpen((event.currentTarget as HTMLDetailsElement).open)}>
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-lg outline-none">
-            <span className="flex items-center gap-2 text-base sm:text-lg font-semibold">
-              <ShoppingBag size={16} className="text-primary" />
-              Resumen de pago
-            </span>
-            <ChevronDown className={`h-5 w-5 shrink-0 transition-transform ${summaryOpen ? 'rotate-180' : ''}`} />
-          </summary>
+        <aside className="rounded-xl border border-border-light bg-card-bg-light p-3 sm:p-4 shadow-sm md:sticky md:top-4 md:h-fit md:col-span-1">
+          <details open={summaryOpen} onToggle={(event) => setSummaryOpen((event.currentTarget as HTMLDetailsElement).open)}>
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-lg outline-none">
+              <span className="flex items-center gap-2 text-base sm:text-lg font-semibold">
+                <ShoppingBag size={16} className="text-primary" />
+                Resumen de pago
+              </span>
+              <ChevronDown className={`h-5 w-5 shrink-0 transition-transform ${summaryOpen ? 'rotate-180' : ''}`} />
+            </summary>
 
-          <div className="mt-4 space-y-4">
-            <div className="space-y-3 rounded-xl border border-border-light bg-bg-light/60 p-4">
-              {includedItems.length > 0 ? (
-                includedItems.map((item) => {
-                  const price = item.product?.hasOffer && item.product?.offerPrice != null
-                    ? item.product.offerPrice
-                    : item.product?.price ?? 0;
-                  const lineTotal = Number((price * item.quantity).toFixed(2));
-                  const name = item.product?.name ?? item.productId;
+            <div className="mt-4 space-y-4">
+              <div className="space-y-3 rounded-xl border border-border-light bg-bg-light/60 p-4">
+                {includedItems.length > 0 ? (
+                  includedItems.map((item) => {
+                    const price = item.product?.hasOffer && item.product?.offerPrice != null
+                      ? item.product.offerPrice
+                      : item.product?.price ?? 0;
+                    const lineTotal = Number((price * item.quantity).toFixed(2));
+                    const name = item.product?.name ?? item.productId;
 
-                  return (
-                    <div key={item.productId} className="flex items-start justify-between gap-3 text-sm">
-                      <div>
-                        <p className="line-clamp-1 font-medium">{name}</p>
-                        <p className="text-xs text-text-light opacity-60">{item.quantity} x Bs {price.toFixed(2)}</p>
+                    return (
+                      <div key={item.productId} className="flex items-start justify-between gap-3 text-sm">
+                        <div>
+                          <p className="line-clamp-1 font-medium">{name}</p>
+                          <p className="text-xs text-text-light opacity-60">{item.quantity} x Bs {price.toFixed(2)}</p>
+                        </div>
+                        <AnimatedAmount value={lineTotal} className="font-semibold text-primary" />
                       </div>
-                      <AnimatedAmount value={lineTotal} className="font-semibold text-primary" />
-                    </div>
-                  );
-                })
-              ) : (
-                <p className="text-sm text-text-light opacity-70">
-                  No hay ítems incluidos.
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center justify-between gap-3 text-text-light opacity-80">
-                <span>Subtotal</span>
-                <AnimatedAmount value={subtotal} className="font-semibold" />
+                    );
+                  })
+                ) : (
+                  <p className="text-sm text-text-light opacity-70">
+                    No hay ítems incluidos.
+                  </p>
+                )}
               </div>
-              <div className="flex items-center justify-between gap-3 text-text-light opacity-80">
-                <span>Fee de envío</span>
-                <AnimatedAmount value={shippingFee} className="font-semibold" />
+
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center justify-between gap-3 text-text-light opacity-80">
+                  <span>Subtotal</span>
+                  <AnimatedAmount value={subtotal} className="font-semibold" />
+                </div>
+                <div className="flex items-center justify-between gap-3 text-text-light opacity-80">
+                  <span>Fee de envío</span>
+                  <AnimatedAmount value={shippingFee} className="font-semibold" />
+                </div>
               </div>
+
+              <div className="h-px bg-border-light" />
+
+              <div className="flex items-end justify-between gap-3">
+                <span className="text-xs uppercase tracking-wide text-text-light opacity-60">Total final</span>
+                <AnimatedAmount value={total} className="text-xl sm:text-2xl font-bold text-primary" />
+              </div>
+
+              <button
+                type="button"
+                disabled={includedItems.length === 0 || creatingOrder}
+                onClick={handleConfirmOrder}
+                className="flex w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {creatingOrder ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  'Confirmar pedido'
+                )}
+              </button>
             </div>
+          </details>
+        </aside>
 
-            <div className="h-px bg-border-light" />
-
-            <div className="flex items-end justify-between gap-3">
-              <span className="text-xs uppercase tracking-wide text-text-light opacity-60">Total final</span>
-              <AnimatedAmount value={total} className="text-xl sm:text-2xl font-bold text-primary" />
-            </div>
-
-            <button
-              type="button"
-              disabled={includedItems.length === 0 || creatingOrder}
-              onClick={handleConfirmOrder}
-              className="flex w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {creatingOrder ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : (
-                'Confirmar pedido'
-              )}
-            </button>
-          </div>
-        </details>
-      </aside>
-
-      <RemoveItemModal />
-      {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
-      {user && showLocationModal && (
-        <LocationSelectorModal
-          user={user}
-          onClose={() => setShowLocationModal(false)}
-          onConfirm={handleLocationSelected}
-        />
-      )}
-      {showSuccessModal && <OrderSuccessModal onClose={() => setShowSuccessModal(false)} />}
+        <RemoveItemModal />
+        {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
+        {user && showLocationModal && (
+          <LocationSelectorModal
+            user={user}
+            onClose={() => setShowLocationModal(false)}
+            onConfirm={handleLocationSelected}
+          />
+        )}
+        {showPaymentConfirmModal && selectedLocation && (
+          <PaymentConfirmModal
+            location={selectedLocation}
+            total={total}
+            onClose={() => setShowPaymentConfirmModal(false)}
+            onConfirm={handlePaymentConfirm}
+            loading={creatingOrder}
+          />
+        )}
+        {showSuccessModal && <OrderSuccessModal onClose={() => setShowSuccessModal(false)} />}
       </div>
     </div>
   );
