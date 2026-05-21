@@ -6,6 +6,8 @@ interface CollectionOrder {
   orderId: string;
   total: number;
   collectedAt: string | null;
+  buyerReceptionConfirmed: boolean;
+  buyerReceptionConfirmedAt: string | null;
 }
 
 const COLLECTED_STATUSES = new Set([
@@ -135,6 +137,10 @@ export const GET: APIRoute = async ({ request, url }) => {
       orderId: orderDoc.id,
       total: toAmount(data.total),
       collectedAt: collectedAt.toISOString(),
+      buyerReceptionConfirmed: Boolean(data.buyerReceptionConfirmed || data.customerConfirmed),
+      buyerReceptionConfirmedAt:
+        (toDate(data.buyerReceptionConfirmedAt) ?? toDate(data.customerConfirmedAt))?.toISOString() ??
+        null,
     });
   }
 
