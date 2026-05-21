@@ -1,5 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { collection, addDoc, getDocs, updateDoc } from 'firebase/firestore';
+import { 
+  collection, 
+  addDoc, 
+  getDocs, 
+  updateDoc, 
+  serverTimestamp,
+  doc,
+  setDoc 
+} from 'firebase/firestore'; 
 import {
   uploadBytesResumable,
   getDownloadURL,
@@ -138,20 +146,52 @@ export const useProductModal = () => {
           imageUrl = await uploadImage(imageFile);
           if (!imageUrl) return;
         }
-        const docRef = await addDoc(collection(db, 'products'), {
+
+        const slug = data.name
+          .toLowerCase()
+          .trim()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/[\s_-]+/g, '-')
+          .replace(/^-+|-+$/g, '');
+
+        const formData = data as any;
+
+        // DATOS PARA LA COLECCIÓN 'products'
+        const productData = {
           ...data,
+          slug,
           imageUrl,
+          active: true,
+          createdAt: serverTimestamp(),
           price: Number(data.price),
           offerPrice: data.hasOffer ? Number(data.offerPrice) : null,
           soldCount: Number(data.soldCount) || 0,
-        });
-        await updateDoc(docRef, { productId: docRef.id });
+          categoryId: data.categoryId
+        };
+
+        // DATOS PARA LA COLECCIÓN 'inventory' (Lo que faltaba)
+        const inventoryData = {
+          enabled: true,
+          minStock: Number(formData.minStock || 5),
+          productId: slug,
+          stockAvailable: Number(formData.stockTotal || 0),
+          stockReserved: 0,
+          stockTotal: Number(formData.stockTotal || 0),
+          updatedAt: serverTimestamp()
+        };
+
+        // Guardar en 'products'
+        await setDoc(doc(db, 'products', slug), productData);
+        
+        // Guardar en 'inventory' *
+        await setDoc(doc(db, 'inventory', slug), inventoryData);
+
         handleClose();
       } catch (err) {
         if (err instanceof Error && err.message === 'CANCELLED') return;
-        setUploadError(
-          `Error al guardar: ${err instanceof Error ? err.message : 'Error desconocido'}`
-        );
+        setUploadError(`Error: ${err instanceof Error ? err.message : 'Error desconocido'}`);
       }
     },
     [imageFile, handleClose, uploadImage]

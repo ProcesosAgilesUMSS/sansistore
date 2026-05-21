@@ -284,7 +284,7 @@ classDiagram
     +string userId
     +string productId
     +number quantity
-    +timestamp addedAt
+    +timestamp updatedAt
   }
 
   class favorites {

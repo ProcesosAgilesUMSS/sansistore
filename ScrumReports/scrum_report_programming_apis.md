@@ -165,3 +165,68 @@
 - **Yesterday:** Participé en el Sprint Retrospective y avancé en el análisis y planificación de las historias de usuario correspondientes al segundo sprint.
 - **Today:** Definiré y priorizaré las historias de usuario en las que trabajaré durante el Sprint 2, además de iniciar su desarrollo.
 - **Blockers:** None.
+
+***
+
+# Sprint 2
+
+## 14-05-2026
+
+### José Daniel Virreira Rufino
+
+- **Yesterday:** Participé en la elección de HU's de este segundo sprint, participé en el retrospective de todos los grupos en conjunto.
+- **Today:** Seleccionaré y empezaré a trabajar con una de las historias de usuario asignadas para este sprint.
+- **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+
+- **Yesterday:** Seleccione mi historia de usuario a trabajar y añadir la descripcion, criteros de aceptacion y tareas
+- **Today:** Empezare a trabajar en la HU que escogi
+- **Blockers:** None.
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday:** Cierre de Sprint 1 y participación en la retrospectiva grupal.
+- **Today:** Selección y auto-asignación de la HU #101 "[US] Como mensajero, quiero registrar que el cliente pagó". Se redactó la descripción técnica y los criterios de aceptación en el tablero para iniciar el desarrollo.
+- **Blockers:** None.
+
+### Efrain Peralta Felipe
+
+- **Yesterday:** Seleccion la historia de usuario que trabajare.
+- **Today:** Empezare a trabajar en la descripción, criterios de aceptación, tareas y desarrollo de la hu que escogi
+- **Blockers:** None.
+
+### Adrian Said Andrade Medina
+- **Yesterday:** Seleccione una historia de usuario.
+- **Today:** Definiré todo lo respecto a la historia de usuario
+- **Blockers:** None.
+
+## 19-05-2026
+
+### José Daniel Virreira Rufino
+
+- **Yesterday:** Estuve en contacto con el grupo de WebSpire para trabajar en las dependencias de nuestras historias de usuario.
+- **Today:** Trabajaré con el mapa ya implementado por el grupo de DivinityMinds para mi historia de usuario asignada.
+- **Blockers:** Entender la funcionalidad completa del mapa ya implementado.
+
+### Efrain Peralta Felipe
+
+- **Yesterday:** Estuve en contacto con el grupo de WebSpire para hablar sobre una hu que es igual a la que hicieron en el primer sprint.
+- **Today:** Trabajare en la hu de reasignar mensajero.
+- **Blockers:** None.
+
+### Adrian Said Andrade Medina
+- **Yesterday:** Investigué sobre el framework Leaflet para la implementación de mapas.
+- **Today:** Planeo practicar con el framework antes de comenzar la implementación.
+- **Blockers:** None.
+
+### Jhoel Gustavo Aiza Arce
+
+- **Yesterday:** Investigación y análisis de la arquitectura del módulo de pagos para la HU #101, planificando cómo estructurar el flujo de datos y la interfaz de confirmación de cobro.
+- **Today:** Inicio del desarrollo de la HU #101 para el registro de pago del cliente. Trabajando en el maquetado inicial del componente y en el planteamiento de la lógica para actualizar el estado del pedido, continuando con el proceso de implementación.
+- **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+
+- **Yesterday:** Tambien investigué sobre el framework Leaflet para la implementación de mapas para el uso de rutas.
+- **Today:** Continue con el desarrollo de la HU 108 para la visualizacion de rutas de entrega
+- **Blockers:** None.
