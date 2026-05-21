@@ -136,8 +136,8 @@ function CartViewInner() {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-      <section className="rounded-xl border border-border-light bg-card-bg-light p-4">
+    <div className="grid gap-6 md:grid-cols-3 md:items-start">
+      <section className="min-w-0 rounded-xl border border-border-light bg-card-bg-light p-4 md:col-span-2">
         <h2 className="mb-2 text-lg font-semibold">Productos ({enriched.length})</h2>
         {enriched.map((item) => (
           <CartItemRow
@@ -153,7 +153,7 @@ function CartViewInner() {
         ))}
       </section>
 
-      <aside className="sticky top-4 h-fit rounded-xl border border-border-light bg-card-bg-light p-4 shadow-sm">
+      <aside className="sticky top-4 h-fit rounded-xl border border-border-light bg-card-bg-light p-4 shadow-sm md:col-span-1">
         <details open={summaryOpen} onToggle={(event) => setSummaryOpen((event.currentTarget as HTMLDetailsElement).open)}>
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-lg outline-none">
             <span className="flex items-center gap-2 text-lg font-semibold">
