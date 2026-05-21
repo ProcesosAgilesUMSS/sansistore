@@ -1,0 +1,175 @@
+import React, { useState } from 'react';
+import { createOfferService } from '../services/offerService';
+// Importamos tu nueva etiqueta visual
+import DiscountBadge from './DiscountBadge';
+
+export default function OfferForm() {
+  const [productId, setProductId] = useState('');
+  const [discount, setDiscount] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+
+  // Datos de prueba para no depender de una base de datos vacía
+  const mockProducts = [
+    { id: 'prod-001', name: 'Polera Oversize Blanca' },
+    { id: 'prod-002', name: 'Pantalón Cargo Negro' },
+    { id: 'prod-003', name: 'Chamarra Denim Clásica' },
+    { id: 'prod-004', name: 'Zapatillas Urbanas' },
+  ];
+
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    setError('');
+    setSuccessMessage('');
+
+    if (!productId || !discount || !startDate || !endDate) {
+      setError('Por favor, completa todos los campos.');
+      return;
+    }
+
+    const discountNumber = Number(discount);
+    if (discountNumber <= 0 || discountNumber > 100) {
+      setError('El descuento debe ser un número entre 1 y 100.');
+      return;
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    if (end < start) {
+      setError('La fecha de finalización no puede ser anterior a la de inicio.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Guardamos en la base de datos local
+      const result = await createOfferService({
+        productId,
+        discount: discountNumber,
+        startDate,
+        endDate,
+        status: 'active'
+      });
+
+      if (result.success) {
+        setSuccessMessage('¡Oferta guardada exitosamente!');
+        setProductId('');
+        setDiscount('');
+        setStartDate('');
+        setEndDate('');
+      } else {
+        setError('Hubo un problema al guardar la oferta.');
+      }
+    } catch (err) {
+      setError('Error de conexión.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-md transition-colors duration-200">
+      <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
+        Crear Nueva Oferta
+      </h2>
+      
+      {error && (
+        <div className="mb-6 p-3 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <span className="block sm:inline">{error}</span>
+        </div>
+      )}
+
+      {successMessage && (
+        <div className="mb-6 p-3 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+          <span className="block sm:inline">{successMessage}</span>
+        </div>
+      )}
+
+      <form className="space-y-6">
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Producto a aplicar oferta
+          </label>
+          <select 
+            className="w-full p-2 border rounded-md dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300 focus:ring-2 focus:ring-[#88B04B] outline-none"
+            value={productId}
+            onChange={(e) => setProductId(e.target.value)}
+          >
+            <option value="">Selecciona un producto...</option>
+            {mockProducts.map((product) => (
+              <option key={product.id} value={product.id}>
+                {product.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Porcentaje de Descuento (%)
+          </label>
+          <input 
+            type="number" 
+            className="w-full p-2 border rounded-md dark:bg-gray-900 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-[#88B04B] outline-none"
+            placeholder="Ej: 20"
+            value={discount}
+            onChange={(e) => setDiscount(e.target.value)}
+          />
+          
+          {/* VISTA PREVIA DEL DESCUENTO */}
+          {discount && Number(discount) > 0 && Number(discount) <= 100 && (
+            <div className="mt-4">
+              <span className="text-xs text-gray-500 uppercase tracking-wide">Vista Previa para el Catálogo:</span>
+              <DiscountBadge 
+                originalPrice={150} 
+                discountPercentage={Number(discount)} 
+              />
+            </div>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Fecha de Inicio
+            </label>
+            <input 
+              type="date" 
+              className="w-full p-2 border rounded-md dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300 focus:ring-2 focus:ring-[#88B04B] outline-none color-scheme-dark"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Fecha de Finalización
+            </label>
+            <input 
+              type="date" 
+              className="w-full p-2 border rounded-md dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300 focus:ring-2 focus:ring-[#88B04B] outline-none color-scheme-dark"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <button 
+          type="button"
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+          className={`w-full text-white font-bold py-2 px-4 rounded transition-colors mt-4 ${
+            isSubmitting ? 'bg-gray-500 cursor-not-allowed' : 'bg-[#88B04B] hover:bg-[#769a40]'
+          }`}
+        >
+          {isSubmitting ? 'Guardando...' : 'Guardar Oferta'}
+        </button>
+      </form>
+    </div>
+  );
+}
