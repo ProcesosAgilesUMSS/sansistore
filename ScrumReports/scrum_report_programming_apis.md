@@ -242,3 +242,9 @@
 - **Yesterday:** Termine la hu que se me asigno.
 - **Today:** corregir posibles errores por la integración.
 - **Blockers:** None.
+
+### Jhoel Gustavo Aiza Arce
+
+- **Yesterday:** Implementación completa de la HU #101 "registrar pago como mensajero", separando la lógica de pago de la entrega. Se habilitó el botón "Registrar pago" en el dashboard del mensajero, con validaciones para no entregar sin pagar. Se creó el PR #326 para revisión del equipo.
+- **Today:** Esperar la aprobación del PR #326 y estar atento a cualquier feedback o corrección solicitada por el equipo para proceder con el merge.
+- **Blockers:** None.
