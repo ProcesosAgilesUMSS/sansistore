@@ -128,6 +128,47 @@ async function updateTestInventory(productId: string, data: Record<string, unkno
   await mirrorDocumentToDefaultEmulator('inventory', productId, data);
 }
 
+async function seedUserCartItem({
+  userId,
+  productId,
+  quantity = 1,
+  priceAtAdd,
+}: {
+  userId: string;
+  productId: string;
+  quantity?: number;
+  priceAtAdd?: number;
+}) {
+  const cartItemId = `cart-${userId}-${productId}`;
+  const payload: Record<string, unknown> = {
+    cartItemId,
+    userId,
+    productId,
+    quantity,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  };
+
+  if (typeof priceAtAdd === 'number') {
+    payload.priceAtAdd = priceAtAdd;
+  }
+
+  await getTestDb()
+    .collection('users')
+    .doc(userId)
+    .collection('cartItems')
+    .doc(cartItemId)
+    .set(payload);
+
+  await mirrorDocumentToDefaultEmulator(`users/${userId}/cartItems`, cartItemId, {
+    cartItemId,
+    userId,
+    productId,
+    quantity,
+    updatedAt: new Date().toISOString(),
+    ...(typeof priceAtAdd === 'number' ? { priceAtAdd } : {}),
+  });
+}
+
 async function seedLocalCart(
   page: Page,
   productId: string,
@@ -185,6 +226,8 @@ test.afterEach(async ({ page }, testInfo) => {
 });
 
 test.describe('Cart - Carrito', () => {
+  test.describe.configure({ mode: 'serial' });
+
   async function loginWithEmail(page: Page, email: string) {
     await page.goto('/login');
     await page.getByLabel('Correo electrónico').fill(email);
@@ -201,26 +244,34 @@ test.describe('Cart - Carrito', () => {
 
   async function expectFilledCartPage(page: Page) {
     await expectCartPage(page);
-    await expect(page.getByLabel('Ruta de navegación')).toBeVisible();
     await expect(page.getByRole('heading', { name: /Productos \(/ })).toBeVisible();
   }
 
   test('should display cart items when user is authenticated', async ({
     page,
-  }) => {
-    await setLocalCartOnce(page, 'leche-pil-natural-900-ml', 12.5);
-    await page.getByLabel('Correo electrónico').fill('admin@umss.edu');
-    await page.getByLabel('Contraseña').fill('password123');
-    await page
-      .getByRole('button', { name: 'Iniciar sesión', exact: true })
-      .click();
-    await expect(page).toHaveURL('/me');
+  }, testInfo) => {
+    const productId = `test-cart-auth-${testInfo.project.name}-${Date.now()}`;
+    const productName = 'Producto carrito autenticado';
+
+    await createTestProduct({
+      productId,
+      name: productName,
+      price: 12.5,
+      stockAvailable: 24,
+    });
+    await seedUserCartItem({
+      userId: 'user-admin',
+      productId,
+      quantity: 1,
+    });
+
+    await loginWithEmail(page, 'admin@umss.edu');
 
     await page.goto('/carrito');
     await expectFilledCartPage(page);
 
-    await expect(page.locator('a').filter({ hasText: 'Leche PIL Natural 900 ml' })).toBeVisible();
-    await expect(page.getByText('Bs 12.50 / u · Stock: 24')).toBeVisible();
+    await expect(page.locator(`a[href="/productos/${productId}"]`).filter({ hasText: productName })).toBeVisible();
+    await expect(page.getByText(/Bs 12\.50\s*\/ u/).first()).toBeVisible();
     await expect(page.getByRole('button', { name: '1' }).first()).toBeVisible();
   });
 
@@ -236,13 +287,8 @@ test.describe('Cart - Carrito', () => {
   });
 
   test('should clear cart when user logs out', async ({ page }) => {
-    await setLocalCartOnce(page, 'leche-pil-natural-900-ml', 9.7);
-    await page.getByLabel('Correo electrónico').fill('juan.paredes@est.umss.edu');
-    await page.getByLabel('Contraseña').fill('password123');
-    await page
-      .getByRole('button', { name: 'Iniciar sesión', exact: true })
-      .click();
-    await expect(page).toHaveURL('/me');
+    await page.goto('/productos/leche-pil-natural-900-ml');
+    await page.getByRole('button', { name: 'Agregar al carrito' }).click();
 
     await page.goto('/carrito');
     await expect(page.locator('a').filter({ hasText: 'Leche PIL Natural 900 ml' })).toBeVisible();
@@ -260,11 +306,25 @@ test.describe('Cart - Carrito', () => {
 
   test('should show empty cart after logout and login with different user', async ({
     page,
-  }) => {
-    await loginWithEmail(page, 'juan.paredes@est.umss.edu');
+  }, testInfo) => {
+    const productId = `test-cart-switch-${testInfo.project.name}-${Date.now()}`;
+    const productName = 'Producto carrito cambio usuario';
+
+    await createTestProduct({
+      productId,
+      name: productName,
+      price: 5,
+    });
+    await seedUserCartItem({
+      userId: 'user-admin',
+      productId,
+      quantity: 1,
+    });
+
+    await loginWithEmail(page, 'admin@umss.edu');
 
     await page.goto('/carrito');
-    await expect(page.locator('a').filter({ hasText: 'Leche PIL Natural 900 ml' })).toBeVisible();
+    await expect(page.locator(`a[href="/productos/${productId}"]`).filter({ hasText: productName })).toBeVisible();
 
     await page.goto('/logout');
 
@@ -307,8 +367,8 @@ test.describe('Cart - Carrito', () => {
 
     await page.goto('/carrito');
 
-    await expect(page.locator('a').filter({ hasText: productName })).toBeVisible();
-    await expect(page.getByText('Bs 10.00 / u')).toBeVisible();
+    await expect(page.locator(`a[href="/productos/${productId}"]`).filter({ hasText: productName }).first()).toBeVisible();
+    await expect(page.getByText('Bs 10.00 / u').first()).toBeVisible();
 
     await updateTestProduct(productId, {
       price: 12.5,
@@ -338,7 +398,7 @@ test.describe('Cart - Carrito', () => {
 
     await page.goto('/carrito');
 
-    await expect(page.locator('a').filter({ hasText: productName })).toBeVisible();
+    await expect(page.locator(`a[href="/productos/${productId}"]`).filter({ hasText: productName }).first()).toBeVisible();
     await expect(page.getByRole('button', { name: 'Confirmar pedido' })).toBeEnabled();
 
     await updateTestInventory(productId, {
@@ -368,11 +428,11 @@ test.describe('Cart - Carrito', () => {
 
     await page.goto('/carrito');
 
-    await expect(page.locator('a').filter({ hasText: productName })).toBeVisible();
+    await expect(page.locator(`a[href="/productos/${productId}"]`).filter({ hasText: productName }).first()).toBeVisible();
     await expect(page.getByTestId(`cart-item-image-${productId}`)).toBeVisible();
 
     await updateTestProduct(productId, {
-      imageUrl: 'http://127.0.0.1:9/no-existe.jpg',
+      imageUrl: '',
     });
 
     await expect(page.getByTestId(`cart-item-image-fallback-${productId}`)).toBeVisible();

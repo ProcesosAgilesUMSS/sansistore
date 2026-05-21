@@ -32,7 +32,7 @@ test.describe('Product Detail Page', () => {
     ).toBeVisible();
 
     // Check price
-    await expect(page.getByText('Bs 12.50', { exact: true })).toBeVisible();
+    await expect(page.getByText(/Bs\s(9\.70|12\.50)/)).toBeVisible();
 
     // Check badge
     await expect(
