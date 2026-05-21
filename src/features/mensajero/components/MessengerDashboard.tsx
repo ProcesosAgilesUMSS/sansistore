@@ -317,7 +317,7 @@ function PendingOrderCard({
             type="button"
           >
             <AlertTriangle size={17} />
-            No entregado
+            Reportar problema
           </button>
         )}
       </div>
@@ -520,7 +520,7 @@ function OrderDetailModal({
                 type="button"
               >
                 <AlertTriangle size={17} />
-                No entregado
+                Reportar problema
               </button>
             )}
           </aside>
@@ -785,6 +785,12 @@ export default function MessengerDashboard({
 
   const registerUndeliveredOrder = async (reason: string, notes: string) => {
     if (!undeliveredOrder) return;
+    if (!currentCourierId) {
+      setMessage(
+        'No se pudo identificar al mensajero para registrar el problema.'
+      );
+      return;
+    }
 
     const targetOrder = undeliveredOrder;
     setSavingUndelivered(true);
@@ -801,8 +807,9 @@ export default function MessengerDashboard({
         order: targetOrder,
         reason,
         notes,
+        courierId: currentCourierId,
       });
-      setMessage('Incidente registrado correctamente.');
+      setMessage('Problema registrado y pedido marcado como no entregado.');
       setUndeliveredOrder(null);
     } catch (error) {
       console.error(error);
