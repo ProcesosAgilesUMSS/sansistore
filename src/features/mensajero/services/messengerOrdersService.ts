@@ -25,6 +25,9 @@ const normalizeDeliveryStatus = (status: unknown): DeliveryStatus => {
   if (status === 'not_delivered' || status === 'NOT_DELIVERED') {
     return 'not_delivered';
   }
+  if (status === 'cancelled' || status === 'CANCELLED' || status === 'CANCELADO') {
+    return 'cancelled';
+  }
   if (status === 'in_transit' || status === 'delivered') return status;
   if (status === 'IN_TRANSIT') return 'in_transit';
   if (status === 'DELIVERED') return 'delivered';
@@ -37,6 +40,7 @@ const normalizeOrderDeliveryStatus = (status: DeliveryStatus) => {
   if (status === 'in_transit') return 'IN_TRANSIT';
   if (status === 'delivered') return 'DELIVERED';
   if (status === 'not_delivered') return 'NOT_DELIVERED';
+  if (status === 'cancelled') return 'CANCELLED';
   return 'ASSIGNED';
 };
 
@@ -184,13 +188,22 @@ export function subscribeToMessengerOrders(
 }
 const getStatusForORder = (status: DeliveryStatus) => {
   switch (status) {
-    case 'accepted': return 'ACEPTADO';
-    case 'pending_reassignment': return 'PENDIENTE REASIGNACION';
-    case 'in_transit': return 'EN CAMINO';
-    case 'delivered': return 'ENTREGADO';
-    case 'not_delivered': return 'CANCELADO';
+    case 'accepted':
+      return 'ACEPTADO';
+    case 'pending_reassignment':
+      return 'PENDIENTE REASIGNACION';
+    case 'in_transit':
+      return 'EN CAMINO';
+    case 'delivered':
+      return 'ENTREGADO';
+    case 'not_delivered':
+      return 'NO ENTREGADO';
+    case 'cancelled':
+      return 'CANCELADO';
+    default:
+      return 'ASIGNADO';
   }
-}
+};
 
 export async function setMessengerOrderStatus(
   order: MessengerOrder,
@@ -320,4 +333,79 @@ export async function markMessengerOrderAsNotDelivered({
     paymentMethod: 'Contra entrega', 
     createdAt: serverTimestamp(),
   });
+}
+export async function markMessengerOrderAsCancelledByNoPayment({
+  order,
+  notes,
+  courierId,
+}: {
+  order: MessengerOrder;
+  notes: string;
+  courierId: string | null;
+}) {
+  const cancelledAt = serverTimestamp();
+  const reason = 'Falta de pago del cliente';
+  const batch = writeBatch(db);
+
+  batch.update(doc(db, 'deliveries', order.deliveryId), {
+    status: 'cancelled',
+    cancellationReason: reason,
+    cancellationNotes: notes,
+    cancelledAt,
+    cancelledBy: courierId,
+    customerConfirmed: false,
+    amountCollected: 0,
+    updatedAt: cancelledAt,
+  });
+
+  if (order.id) {
+  batch.update(doc(db, 'orders', order.id), {
+    status: 'CANCELADO',
+    deliveryStatus: 'CANCELLED',
+    paymentStatus: 'CANCELADO',
+    paymentStatusLabel: 'Cancelado por falta de pago',
+    incidentReason: reason,
+    incidentNotes: notes,
+    cancelledAt,
+    cancelledBy: courierId,
+    updatedAt: cancelledAt,
+  });
+}
+
+  if (order.paymentId) {
+    batch.set(
+      doc(db, 'payments', order.paymentId),
+      {
+        status: 'CANCELADO',
+        statusLabel: 'Cancelado por falta de pago',
+        cancellationReason: reason,
+        cancellationNotes: notes,
+        cancelledAt,
+        cancelledBy: courierId,
+        updatedAt: cancelledAt,
+      },
+      { merge: true }
+    );
+  }
+
+  batch.set(doc(db, 'cancelled_orders', order.id || order.deliveryId), {
+    orderId: order.id,
+    orderCode: order.orderCode,
+    deliveryId: order.deliveryId,
+    buyerName: order.buyerName || order.customerName,
+    deliveryZone: order.city,
+    deliveryMethod: order.deliveryMethod,
+    address: order.address,
+    reason,
+    notes,
+    status: 'cancelled',
+    paymentStatus: 'CANCELADO',
+    total: order.cashToCollect,
+    paymentMethod: 'Contra entrega',
+    cancelledBy: courierId,
+    createdAt: cancelledAt,
+    updatedAt: cancelledAt,
+  });
+
+  await batch.commit();
 }
