@@ -3,7 +3,7 @@
 import React from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents, Polygon } from "react-leaflet";
 import { useMapPicker } from "../hooks/useMapPicker";
-import type { LocationType, Location } from "../types"; // NUEVO: importar Location
+import type { LocationType, Location } from "../types"; 
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -35,7 +35,7 @@ function MapEvents({ onLocationChange }: MapEventsProps) {
 
 interface MapPickerProps {
     onSave?: () => void;
-    editingLocation?: Location | null;  // NUEVO: ubicación a editar
+    editingLocation?: Location | null; 
 }
 
 export default function MapPicker({ onSave, editingLocation }: MapPickerProps) {
