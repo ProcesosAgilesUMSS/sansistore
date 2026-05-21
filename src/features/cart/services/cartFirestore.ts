@@ -13,26 +13,34 @@ export async function syncCartToFirestore(uid: string, items: LocalCartItem[]): 
   snap.docs.forEach((d) => batch.delete(d.ref));
   items.forEach((item) => {
     const ref = doc(colRef, item.productId);
-    batch.set(ref, {
+    const payload: Record<string, unknown> = {
       cartItemId: item.productId,
       userId: uid,
       productId: item.productId,
       quantity: item.quantity,
       updatedAt: serverTimestamp(),
-    });
+    };
+    if (typeof item.priceAtAdd === 'number') {
+      payload.priceAtAdd = item.priceAtAdd;
+    }
+    batch.set(ref, payload);
   });
   await batch.commit();
 }
 
-export async function upsertCartItem(uid: string, productId: string, quantity: number): Promise<void> {
+export async function upsertCartItem(uid: string, productId: string, quantity: number, priceAtAdd?: number): Promise<void> {
   const ref = doc(db, 'users', uid, 'cartItems', productId);
-  await setDoc(ref, {
+  const payload: Record<string, unknown> = {
     cartItemId: productId,
     userId: uid,
     productId,
     quantity,
     updatedAt: serverTimestamp(),
-  });
+  };
+  if (typeof priceAtAdd === 'number') {
+    payload.priceAtAdd = priceAtAdd;
+  }
+  await setDoc(ref, payload, { merge: true });
 }
 
 export async function deleteCartItem(uid: string, productId: string): Promise<void> {
