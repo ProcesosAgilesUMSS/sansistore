@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { layout, prepare } from '@chenglou/pretext';
+import { useCartContext, CartProvider } from '../features/cart';
 import {
   ArrowLeft,
   ChevronDown,
@@ -9,6 +10,7 @@ import {
   Package,
   Star,
 } from 'lucide-react';
+import { FaCartPlus } from 'react-icons/fa';
 import {
   Timestamp,
   collection,
@@ -107,19 +109,13 @@ function renderStars(rating: number, prefix: string = '') {
         className="relative inline-block"
         data-testid={testId}
       >
-        <Star
-          size={14}
-          className="text-text-light opacity-20"
-        />
+        <Star size={14} className="text-text-light opacity-20" />
         <div
           className={`absolute left-0 top-0 overflow-hidden ${
             isHalf ? 'w-1/2' : isFilled ? 'w-full' : 'w-0'
           }`}
         >
-          <Star
-            size={14}
-            className="fill-primary text-primary"
-          />
+          <Star size={14} className="fill-primary text-primary" />
         </div>
       </div>
     );
@@ -278,7 +274,7 @@ function areSetsEqual<T>(left: Set<T>, right: Set<T>) {
   return true;
 }
 
-export default function ProductDetail({
+function ProductDetailInner({
   productSlug,
   initialProduct,
 }: ProductDetailProps) {
@@ -288,24 +284,20 @@ export default function ProductDetail({
   const [error, setError] = useState<string | null>(null);
   const [imageFailed, setImageFailed] = useState(false);
   const [reviewSort, setReviewSort] = useState<ReviewSortKey>('recent');
-  const [visibleReviewsCount, setVisibleReviewsCount] =
-    useState(REVIEW_PAGE_SIZE);
+  const [visibleReviewsCount, setVisibleReviewsCount] = useState(REVIEW_PAGE_SIZE);
   const [nameExpanded, setNameExpanded] = useState(false);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [nameTruncated, setNameTruncated] = useState(false);
   const [descriptionTruncated, setDescriptionTruncated] = useState(false);
-  const [expandedReviews, setExpandedReviews] = useState<Set<string>>(
-    new Set()
-  );
-  const [truncatedReviews, setTruncatedReviews] = useState<Set<string>>(
-    new Set()
-  );
+  const [expandedReviews, setExpandedReviews] = useState<Set<string>>(new Set());
+  const [truncatedReviews, setTruncatedReviews] = useState<Set<string>>(new Set());
   const titleRef = useRef<HTMLElement | null>(null);
   const descriptionRef = useRef<HTMLParagraphElement | null>(null);
   const fullDescriptionRef = useRef<HTMLParagraphElement | null>(null);
   const reviewRefs = useRef<Map<string, HTMLParagraphElement>>(new Map());
   const nameExpandedRef = useRef(nameExpanded);
   const descriptionExpandedRef = useRef(descriptionExpanded);
+  const { addToCart } = useCartContext();
 
   useEffect(() => {
     nameExpandedRef.current = nameExpanded;
@@ -369,9 +361,7 @@ export default function ProductDetail({
             ? null
             : (inventorySnap.docs[0].data() as InventoryRecord);
           const productReviews = reviewsSnap.docs
-            .map(
-              (reviewDoc) => ({ id: reviewDoc.id, ...reviewDoc.data() }) as Review
-            )
+            .map((reviewDoc) => ({ id: reviewDoc.id, ...reviewDoc.data() }) as Review)
             .filter((review) => review.active !== false);
 
           if (!ignore) {
@@ -380,8 +370,7 @@ export default function ProductDetail({
               soldCount: getSoldCount(parsed),
               enabled: inventoryData?.enabled ?? true,
               stockAvailable: inventoryData?.stockAvailable ?? 0,
-              stockTotal:
-                inventoryData?.stockTotal ?? inventoryData?.stockAvailable ?? 0,
+              stockTotal: inventoryData?.stockTotal ?? inventoryData?.stockAvailable ?? 0,
             });
             setReviews(productReviews);
           }
@@ -406,10 +395,7 @@ export default function ProductDetail({
         }
 
         const productDoc = productSnap.docs[0];
-        const productData = {
-          id: productDoc.id,
-          ...productDoc.data(),
-        } as Product;
+        const productData = { id: productDoc.id, ...productDoc.data() } as Product;
         const inventoryQuery = query(
           collection(db, 'inventory'),
           where('productId', '==', productDoc.id),
@@ -428,9 +414,7 @@ export default function ProductDetail({
           ? null
           : (inventorySnap.docs[0].data() as InventoryRecord);
         const productReviews = reviewsSnap.docs
-          .map(
-            (reviewDoc) => ({ id: reviewDoc.id, ...reviewDoc.data() }) as Review
-          )
+          .map((reviewDoc) => ({ id: reviewDoc.id, ...reviewDoc.data() }) as Review)
           .filter((review) => review.active !== false);
 
         if (!ignore) {
@@ -439,8 +423,7 @@ export default function ProductDetail({
             soldCount: getSoldCount(productData),
             enabled: inventoryData?.enabled ?? true,
             stockAvailable: inventoryData?.stockAvailable ?? 0,
-            stockTotal:
-              inventoryData?.stockTotal ?? inventoryData?.stockAvailable ?? 0,
+            stockTotal: inventoryData?.stockTotal ?? inventoryData?.stockAvailable ?? 0,
           });
           setReviews(productReviews);
         }
@@ -472,10 +455,7 @@ export default function ProductDetail({
       let nextNameTruncated = trimmedLength > PRODUCT_NAME_EXPAND_LENGTH;
 
       if (!nextNameTruncated && titleRef.current) {
-        nextNameTruncated = hasHiddenText(
-          titleRef.current,
-          PRODUCT_NAME_MAX_LINES
-        );
+        nextNameTruncated = hasHiddenText(titleRef.current, PRODUCT_NAME_MAX_LINES);
       }
 
       setNameTruncated((previous) =>
@@ -484,9 +464,7 @@ export default function ProductDetail({
     };
 
     const frameId = window.requestAnimationFrame(checkTitleTruncation);
-    const resizeObserver = titleRef.current
-      ? new ResizeObserver(checkTitleTruncation)
-      : null;
+    const resizeObserver = titleRef.current ? new ResizeObserver(checkTitleTruncation) : null;
 
     if (titleRef.current) {
       resizeObserver?.observe(titleRef.current);
@@ -502,10 +480,7 @@ export default function ProductDetail({
     };
   }, [product?.name, loading]);
 
-  const sortedReviews = useMemo(
-    () => sortReviews(reviews, reviewSort),
-    [reviews, reviewSort]
-  );
+  const sortedReviews = useMemo(() => sortReviews(reviews, reviewSort), [reviews, reviewSort]);
   const visibleReviews = useMemo(
     () => sortedReviews.slice(0, visibleReviewsCount),
     [sortedReviews, visibleReviewsCount]
@@ -533,39 +508,28 @@ export default function ProductDetail({
   }, [visibleReviews]);
 
   const showOffer = hasValidOffer(product);
-  const currentPrice = showOffer
-    ? (product?.offerPrice ?? 0)
-    : (product?.price ?? 0);
+  const currentPrice = showOffer ? (product?.offerPrice ?? 0) : (product?.price ?? 0);
   const stockAvailable = product?.stockAvailable ?? 0;
   const isAvailable =
     stockAvailable > 0 &&
     product?.enabled !== false &&
     (product?.active ?? true) !== false;
   const normalizedDescription = product?.description?.trim();
-  const descriptionText = normalizedDescription
-    ? normalizedDescription
-    : 'Sin descripción';
+  const descriptionText = normalizedDescription ? normalizedDescription : 'Sin descripción';
 
   useEffect(() => {
     const checkDescriptionTruncation = () => {
       if (descriptionExpandedRef.current) return;
 
-      let nextDescriptionTruncated =
-        descriptionText.length > PRODUCT_DESCRIPTION_EXPAND_LENGTH;
+      let nextDescriptionTruncated = descriptionText.length > PRODUCT_DESCRIPTION_EXPAND_LENGTH;
 
       if (!nextDescriptionTruncated && descriptionRef.current) {
-        const measurementElement =
-          fullDescriptionRef.current ?? descriptionRef.current;
-        nextDescriptionTruncated = hasHiddenText(
-          measurementElement,
-          PRODUCT_DESCRIPTION_MAX_LINES
-        );
+        const measurementElement = fullDescriptionRef.current ?? descriptionRef.current;
+        nextDescriptionTruncated = hasHiddenText(measurementElement, PRODUCT_DESCRIPTION_MAX_LINES);
       }
 
       setDescriptionTruncated((previous) =>
-        previous === nextDescriptionTruncated
-          ? previous
-          : nextDescriptionTruncated
+        previous === nextDescriptionTruncated ? previous : nextDescriptionTruncated
       );
     };
 
@@ -595,9 +559,7 @@ export default function ProductDetail({
   const averageRating = reviewsCount
     ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviewsCount
     : 0;
-  const averageLabel = reviewsCount
-    ? `${averageRating.toFixed(1)} de 5`
-    : 'Sin calificaciones';
+  const averageLabel = reviewsCount ? `${averageRating.toFixed(1)} de 5` : 'Sin calificaciones';
   const reviewSortOptions: Array<{ value: ReviewSortKey; label: string }> = [
     { value: 'recent', label: 'Más recientes' },
     { value: 'oldest', label: 'Más antiguos' },
@@ -613,17 +575,11 @@ export default function ProductDetail({
             aria-label="Ruta de navegación"
             className="flex items-center gap-2 text-sm text-text-light"
           >
-            <a
-              href="/"
-              className="font-semibold opacity-70 transition-opacity hover:opacity-100"
-            >
+            <a href="/" className="font-semibold opacity-70 transition-opacity hover:opacity-100">
               Inicio
             </a>
             <ChevronRight size={14} className="opacity-35" aria-hidden="true" />
-            <a
-              href="/productos"
-              className="font-semibold opacity-70 transition-opacity hover:opacity-100"
-            >
+            <a href="/productos" className="font-semibold opacity-70 transition-opacity hover:opacity-100">
               Productos
             </a>
             <ChevronRight size={14} className="opacity-35" aria-hidden="true" />
@@ -687,10 +643,7 @@ export default function ProductDetail({
                       <div className="h-4 w-28 animate-pulse rounded bg-secondary-bg-light" />
                       <div className="flex items-center gap-1">
                         {Array.from({ length: 5 }).map((__, starIndex) => (
-                          <div
-                            key={starIndex}
-                            className="h-3.5 w-3.5 animate-pulse rounded-full bg-secondary-bg-light"
-                          />
+                          <div key={starIndex} className="h-3.5 w-3.5 animate-pulse rounded-full bg-secondary-bg-light" />
                         ))}
                       </div>
                     </div>
@@ -708,9 +661,7 @@ export default function ProductDetail({
         {!loading && error && (
           <div className="rounded-3xl border border-border-light bg-card-bg-light px-6 py-10 text-center">
             <MessageSquare size={36} className="mx-auto mb-4 text-primary" />
-            <h1 className="text-xl font-black text-text-light">
-              Error al cargar el detalle
-            </h1>
+            <h1 className="text-xl font-black text-text-light">Error al cargar el detalle</h1>
             <p className="mt-2 text-sm text-text-light opacity-70">{error}</p>
           </div>
         )}
@@ -731,9 +682,7 @@ export default function ProductDetail({
                     <div className="flex h-full items-center justify-center">
                       <div className="flex flex-col items-center gap-3 text-text-light opacity-50">
                         <Package size={56} className="opacity-70" />
-                        <span className="text-sm font-medium">
-                          Imagen no disponible
-                        </span>
+                        <span className="text-sm font-medium">Imagen no disponible</span>
                       </div>
                     </div>
                   )}
@@ -764,10 +713,7 @@ export default function ProductDetail({
                     ref={titleRef as React.RefObject<HTMLSpanElement>}
                     title={product.name}
                     className="leading-[1.12] pb-1"
-                    style={getAnimatedClampStyle(
-                      nameExpanded,
-                      PRODUCT_NAME_MAX_LINES
-                    )}
+                    style={getAnimatedClampStyle(nameExpanded, PRODUCT_NAME_MAX_LINES)}
                   >
                     {product.name}
                   </span>
@@ -777,9 +723,7 @@ export default function ProductDetail({
                     type="button"
                     onClick={() => setNameExpanded(!nameExpanded)}
                     className="mt-1 inline-flex h-7 w-7 items-center justify-center rounded-full text-primary transition-colors hover:bg-primary/10"
-                    aria-label={
-                      nameExpanded ? 'Mostrar menos nombre' : 'Mostrar más nombre'
-                    }
+                    aria-label={nameExpanded ? 'Mostrar menos nombre' : 'Mostrar más nombre'}
                     title={nameExpanded ? 'Mostrar menos' : 'Mostrar más'}
                   >
                     {nameExpanded ? (
@@ -817,6 +761,17 @@ export default function ProductDetail({
                   )}
                 </div>
 
+                {isAvailable && (
+                  <button
+                    type="button"
+                    onClick={() => addToCart(product.id, stockAvailable, currentPrice)}
+                    className="mt-4 inline-flex w-fit items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95"
+                  >
+                    <FaCartPlus size={16} />
+                    Agregar al carrito
+                  </button>
+                )}
+
                 <div className="relative mt-6">
                   <div style={getDescriptionWrapperStyle(descriptionExpanded)}>
                     <p
@@ -838,9 +793,7 @@ export default function ProductDetail({
                   {(descriptionTruncated || descriptionExpanded) && (
                     <button
                       type="button"
-                      onClick={() =>
-                        setDescriptionExpanded(!descriptionExpanded)
-                      }
+                      onClick={() => setDescriptionExpanded(!descriptionExpanded)}
                       className="mt-1 text-sm font-semibold text-primary hover:underline"
                     >
                       {descriptionExpanded ? 'mostrar menos' : 'mostrar más'}
@@ -854,9 +807,7 @@ export default function ProductDetail({
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center gap-3">
                   <MessageSquare size={18} className="text-primary" />
-                  <h2 className="text-xl font-black text-text-light">
-                    Comentarios del producto
-                  </h2>
+                  <h2 className="text-xl font-black text-text-light">Comentarios del producto</h2>
                 </div>
                 {reviewsCount > 0 && (
                   <label className="flex items-center gap-2 text-sm font-medium text-text-light">
@@ -881,9 +832,7 @@ export default function ProductDetail({
 
               {reviewsCount === 0 ? (
                 <div className="mt-6 rounded-3xl border border-dashed border-border-light px-5 py-8 text-center">
-                  <p className="text-base font-semibold text-text-light">
-                    Sin calificaciones
-                  </p>
+                  <p className="text-base font-semibold text-text-light">Sin calificaciones</p>
                   <p className="mt-2 text-sm text-text-light opacity-60">
                     Este producto aún no tiene comentarios registrados.
                   </p>
@@ -895,9 +844,7 @@ export default function ProductDetail({
                       {renderStars(averageRating, 'average')}
                     </div>
                     <div className="space-y-1">
-                      <p className="text-base font-bold text-text-light">
-                        {averageLabel}
-                      </p>
+                      <p className="text-base font-bold text-text-light">{averageLabel}</p>
                       <p className="text-sm text-text-light opacity-65">
                         {`${reviewsCount} calificación${reviewsCount === 1 ? '' : 'es'} registradas`}
                       </p>
@@ -939,16 +886,13 @@ export default function ProductDetail({
                         >
                           {review.comment}
                         </p>
-                        {(truncatedReviews.has(review.id) ||
-                          expandedReviews.has(review.id)) && (
+                        {(truncatedReviews.has(review.id) || expandedReviews.has(review.id)) && (
                           <button
                             type="button"
                             onClick={() => toggleReview(review.id)}
                             className="mt-1 cursor-pointer text-sm font-semibold text-primary hover:underline"
                           >
-                            {expandedReviews.has(review.id)
-                              ? 'mostrar menos'
-                              : 'mostrar más'}
+                            {expandedReviews.has(review.id) ? 'mostrar menos' : 'mostrar más'}
                           </button>
                         )}
                       </article>
@@ -957,11 +901,7 @@ export default function ProductDetail({
                     {hasMoreReviews && (
                       <button
                         type="button"
-                        onClick={() =>
-                          setVisibleReviewsCount(
-                            (count) => count + REVIEW_PAGE_SIZE
-                          )
-                        }
+                        onClick={() => setVisibleReviewsCount((count) => count + REVIEW_PAGE_SIZE)}
                         className="mt-2 inline-flex justify-center rounded-full border border-border-light bg-card-bg-light px-5 py-3 text-sm font-semibold text-text-light transition-colors hover:border-primary hover:text-primary"
                       >
                         Cargar más comentarios
@@ -975,5 +915,13 @@ export default function ProductDetail({
         )}
       </div>
     </section>
+  );
+}
+
+export default function ProductDetail(props: ProductDetailProps) {
+  return (
+    <CartProvider>
+      <ProductDetailInner {...props} />
+    </CartProvider>
   );
 }

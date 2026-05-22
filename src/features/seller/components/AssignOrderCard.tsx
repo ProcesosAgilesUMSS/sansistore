@@ -14,6 +14,7 @@ interface Props {
   onSelectCourier: (orderId: string, courierId: string) => void;
   onAssign: (orderId: string, deliveryId: string) => void;
   onUnassign?: (orderId: string, deliveryId: string) => void;
+  onReassign?: (orderId: string, deliveryId: string, newCourierId: string) => void;
   isAssigning: boolean;
   isSuccess: boolean;
 }
@@ -26,6 +27,7 @@ export function AssignOrderCard({
   onSelectCourier,
   onAssign,
   onUnassign,
+  onReassign,
   isAssigning,
   isSuccess,
 }: Props) {
@@ -62,11 +64,10 @@ export function AssignOrderCard({
 
   return (
     <div
-      className={`overflow-hidden rounded-[1.25rem] border bg-(--theme-card-bg) transition-all duration-200 hover:-translate-y-px hover:shadow-lg ${
-        isSuccess
-          ? 'border-emerald-400 shadow-[0_0_0_3px_rgba(136,176,75,0.25)]'
-          : 'border-(--theme-border)'
-      }`}
+      className={`overflow-hidden rounded-[1.25rem] bg-(--theme-card-bg) transition-all duration-200 hover:-translate-y-px hover:shadow-lg ${isSuccess
+        ? 'shadow-[0_0_0_3px_rgba(136,176,75,0.25)]'
+        : 'border-(--theme-border)'
+        }`}
     >
       <div className="p-4">
         <div className="flex items-start justify-between gap-4">
@@ -127,6 +128,73 @@ export function AssignOrderCard({
                 {isAssigning ? 'Cancelando…' : 'Cancelar'}
               </button>
             )}
+            <div className="ml-4 flex items-center gap-2">
+              <div className="relative">
+                <button
+                  ref={buttonRef}
+                  type="button"
+                  onClick={() => setOpen((prev) => !prev)}
+                  disabled={messengersLoading || isAssigning}
+                  className="flex items-center gap-2 rounded-xl border border-(--theme-border) bg-(--theme-card-bg) px-3 py-2.5 text-sm text-(--theme-text) transition hover:border-primary disabled:opacity-50"
+                >
+                  <span className={selectedMessenger ? '' : 'opacity-40'}>
+                    {messengersLoading
+                      ? 'Cargando mensajeros…'
+                      : (selectedMessenger?.displayName ?? 'Seleccionar mensajero')}
+                  </span>
+                  <ChevronDown
+                    size={15}
+                    className={`shrink-0 opacity-50 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+                  />
+                </button>
+
+                {open && typeof document !== 'undefined' && createPortal(
+                  <ul
+                    ref={dropdownRef}
+                    style={dropdownStyle}
+                    className="overflow-hidden rounded-2xl border border-(--theme-border) bg-(--theme-card-bg) shadow-xl"
+                  >
+                    {messengers.length === 0 ? (
+                      <li className="px-4 py-3 text-xs text-(--theme-text) opacity-50">
+                        No hay mensajeros disponibles.
+                      </li>
+                    ) : (
+                      messengers.map((m) => (
+                        <li key={m.uid}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              onSelectCourier(order.orderId, m.uid);
+                              setOpen(false);
+                            }}
+                            className={`w-full px-4 py-2.5 text-left text-sm font-600 transition-colors hover:text-primary ${selectedCourierId === m.uid
+                              ? 'bg-primary/10 text-primary'
+                              : 'text-(--theme-text)'
+                              }`}
+                          >
+                            {m.displayName}
+                            {m.institutionalId && (
+                              <span className="ml-1 opacity-40">— {m.institutionalId}</span>
+                            )}
+                          </button>
+                        </li>
+                      ))
+                    )}
+                  </ul>,
+                  document.body,
+                )}
+              </div>
+
+              {onReassign && (
+                <button
+                  onClick={() => onReassign(order.orderId, order.deliveryId ?? '', selectedCourierId ?? '')}
+                  disabled={!selectedCourierId || isAssigning || !order.deliveryId}
+                  className="flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-700 text-white transition hover:opacity-90 active:scale-95 disabled:opacity-50"
+                >
+                  {isAssigning ? 'Reasignando…' : 'Reasignar'}
+                </button>
+              )}
+            </div>
           </div>
         ) : (
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -168,11 +236,10 @@ export function AssignOrderCard({
                             onSelectCourier(order.orderId, m.uid);
                             setOpen(false);
                           }}
-                          className={`w-full px-4 py-2.5 text-left text-sm font-600 transition-colors hover:text-primary ${
-                            selectedCourierId === m.uid
-                              ? 'bg-primary/10 text-primary'
-                              : 'text-(--theme-text)'
-                          }`}
+                          className={`w-full px-4 py-2.5 text-left text-sm font-600 transition-colors hover:text-primary ${selectedCourierId === m.uid
+                            ? 'bg-primary/10 text-primary'
+                            : 'text-(--theme-text)'
+                            }`}
                         >
                           {m.displayName}
                           {m.institutionalId && (

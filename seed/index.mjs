@@ -9,9 +9,9 @@ import { deliveryList } from './data/deliveries.mjs';
 import { run as seedCartItems } from './data/cart.mjs';
 
 process.env.FIRESTORE_EMULATOR_HOST =
-  process.env.FIRESTORE_EMULATOR_HOST || 'localhost:8080';
+  process.env.FIRESTORE_EMULATOR_HOST || '127.0.0.1:8080';
 process.env.FIREBASE_AUTH_EMULATOR_HOST =
-  process.env.FIREBASE_AUTH_EMULATOR_HOST || 'localhost:9099';
+  process.env.FIREBASE_AUTH_EMULATOR_HOST || '127.0.0.1:9099';
 
 admin.initializeApp({
   projectId: process.env.PUBLIC_FIREBASE_PROJECT_ID || 'sansistore',
@@ -135,7 +135,7 @@ async function seedProducts() {
       description: p.description,
       price: p.price,
       imageUrl: p.imageUrl,
-      active: true,
+      active: p.active !== false,
       hasOffer: p.hasOffer || false,
       offerPrice: p.offerPrice || null,
       badge: p.badge || null,
@@ -145,13 +145,18 @@ async function seedProducts() {
       soldCount: p.soldCount || 0,
     });
 
+    const inventoryEnabled =
+      p.inventoryEnabled !== undefined
+        ? p.inventoryEnabled
+        : p.stockAvailable > 0;
+
     await setDoc('inventory', productId, {
       productId,
       stockTotal: p.stockTotal,
       stockAvailable: p.stockAvailable,
       stockReserved: 0,
       minStock: 5,
-      enabled: p.stockAvailable > 0,
+      enabled: inventoryEnabled,
       updatedAt: TS(),
     });
 

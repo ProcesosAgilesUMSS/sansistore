@@ -1,13 +1,13 @@
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { useEffect, useState } from 'react';
+import { Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 
 type Position = [number, number];
 
 const myIcon = L.icon({
-  iconUrl: 'public/mensajero.png',
+  iconUrl: '/mensajero.png',
   iconSize: [40, 40],
-  iconAnchor: [20, 40], 
+  iconAnchor: [20, 40],
   popupAnchor: [0, -40],
 });
 
@@ -18,13 +18,10 @@ function LocationMarker() {
   useEffect(() => {
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
-        const coords: Position = [pos.coords.latitude, pos.coords.longitude];
-        setPosition(coords);
-        //map.setView(coords, 17);
+        setPosition([pos.coords.latitude, pos.coords.longitude]);
       },
-      (err) => {
-        console.error(err);
-        alert('No se pudo obtener la ubicación');
+      (error) => {
+        console.error(error);
       },
       { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
     );
@@ -35,9 +32,10 @@ function LocationMarker() {
   if (!position) return null;
 
   return (
-    <Marker position={position} icon={myIcon}>
-      <Popup>Tu ubicación actual</Popup>
+    <Marker icon={myIcon} position={position}>
+      <Popup>Tu ubicacion actual</Popup>
     </Marker>
   );
 }
+
 export default LocationMarker;

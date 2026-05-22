@@ -1,0 +1,21 @@
+---
+// Simple logout page - handles client-side Firebase logout
+---
+
+<script>
+  import { signOut } from 'firebase/auth';
+  import { auth } from '../lib/firebase';
+
+  localStorage.removeItem('sansistore_cart');
+
+  signOut(auth)
+    .then(() => {
+      window.location.href = '/login';
+    })
+    .catch((error) => {
+      console.error('Logout error:', error);
+      window.location.href = '/login';
+    });
+</script>
+
+<p>Logging out...</p>

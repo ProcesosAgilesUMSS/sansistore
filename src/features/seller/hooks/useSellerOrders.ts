@@ -1,10 +1,9 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { db } from '../../../lib/firebase';
+import { useAuthUser } from '../../../hooks/useAuthUser';
 import { subscribeSellerOrders, fetchOrderItems, markOrderAsReady } from '../services/sellerServices'
 import type { Order, OrderItem } from '../types';
-
-const TEMP_SELLER_ID = 'user-vendedor-001';
 
 interface UseSellerOrdersReturn {
   reserved: Order[];
@@ -21,6 +20,7 @@ interface UseSellerOrdersReturn {
 }
 
 export function useSellerOrders(): UseSellerOrdersReturn {
+  const { user, authReady } = useAuthUser();
   const [reserved, setReserved] = useState<Order[]>([]);
   const [ready, setReady] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,11 +36,20 @@ export function useSellerOrders(): UseSellerOrdersReturn {
   const itemsCache = useRef<Record<string, OrderItem[]>>({});
 
   useEffect(() => {
+    if (!authReady) return;
+
+    if (!user?.uid) {
+      setReserved([]);
+      setReady([]);
+      setLoading(false);
+      return;
+    }
+
     const unsub = subscribeSellerOrders(
       db,
-      TEMP_SELLER_ID,
+      user.uid,
       (res, rdy) => {
-        setReserved(res);
+        setReserved(res.filter((order) => order.sellerId === user.uid));
         setReady(rdy);
         setLoading(false);
       },
@@ -50,7 +59,7 @@ export function useSellerOrders(): UseSellerOrdersReturn {
       },
     );
     return unsub;
-  }, []);
+  }, [authReady, user?.uid]);
 
   const toggleOrderDetail = useCallback(async (orderId: string) => {
     if (expandedOrderId === orderId) {
@@ -79,10 +88,12 @@ export function useSellerOrders(): UseSellerOrdersReturn {
   }, [expandedOrderId]);
 
   const markAsReady = useCallback(async (orderId: string) => {
+    if (!user?.uid) return;
+
     setMarkingOrderId(orderId);
     setError(null);
     try {
-      await markOrderAsReady(db, orderId, TEMP_SELLER_ID);
+      await markOrderAsReady(db, orderId, user.uid);
       setSuccessOrderId(orderId);
       if (expandedOrderId === orderId) {
         setExpandedOrderId(null);
@@ -94,7 +105,7 @@ export function useSellerOrders(): UseSellerOrdersReturn {
     } finally {
       setMarkingOrderId(null);
     }
-  }, [expandedOrderId]);
+  }, [expandedOrderId, user?.uid]);
 
   return {
     reserved,

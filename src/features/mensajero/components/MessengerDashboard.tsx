@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
+import { Truck } from 'lucide-react';
 import { onAuthStateChanged } from 'firebase/auth';
 import {
   AlertTriangle,
@@ -16,12 +17,16 @@ import {
 } from 'lucide-react';
 import { auth } from '../../../lib/firebase';
 import {
-  getMessengerOrders,
+  markMessengerOrderAsCancelledByNoPayment,
   markMessengerOrderAsNotDelivered,
+  registerMessengerCashPayment,
   setMessengerOrderStatus,
+  subscribeToMessengerOrders,
 } from '../services/messengerOrdersService';
 import type { MessengerOrder } from '../types';
 import UndeliveredModal from '../modals/UndeliveredModal';
+import CancelNoPaymentModal from '../modals/CancelNoPaymentModal';
+import './MessengerDashboard.css';
 
 const DEV_COURIER_ID = 'user-nadia';
 
@@ -33,14 +38,124 @@ const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']) => {
   if (status === 'pending_reassignment') return 'Pendiente de reasignacion';
   if (status === 'in_transit') return 'En camino';
   if (status === 'not_delivered') return 'No entregado';
+  if (status === 'cancelled') return 'Cancelado';
   return 'Entregado';
 };
-/*
-const buildMapsUrl = (order: MessengerOrder) => {
-  const query = encodeURIComponent(`${order.address}, ${order.city}, Bolivia`);
-  return `https://www.google.com/maps/search/?api=1&query=${query}`;
+const openDeliveryMap = (order: MessengerOrder) => {
+  localStorage.setItem(
+    'courier_map_order',
+    JSON.stringify({
+      id: order.id,
+      customerName: order.customerName,
+      phone: order.phone,
+      address: order.address,
+      city: order.city,
+      reference: order.reference || order.locationLabel,
+      deliveryZone: order.city,
+      deliveryLat: order.deliveryLat,
+      deliveryLng: order.deliveryLng,
+      cashToCollect: order.cashToCollect,
+      items: order.items,
+    })
+  );
+
+  window.open('/mapa', '_blank', 'noopener,noreferrer');
 };
-*/
+
+const canCancelByNoPayment = (order: MessengerOrder) => {
+  const paymentText = `${order.paymentStatus} ${order.paymentStatusLabel}`
+    .toLowerCase()
+    .trim();
+
+  return (
+    (order.deliveryStatus === 'accepted' || order.deliveryStatus === 'in_transit') &&
+    !paymentText.includes('cobrado') &&
+    !paymentText.includes('pagado') &&
+    !paymentText.includes('cancelado')
+  );
+};
+
+function MessageToast({ message, onDismiss }: { message: string; onDismiss: () => void }) {
+  useEffect(() => {
+    const timer = setTimeout(onDismiss, 3000);
+    return () => clearTimeout(timer);
+  }, [message, onDismiss]);
+
+  const isError =
+    message.toLowerCase().includes('error') ||
+    message.toLowerCase().includes('no se pudo');
+
+  return (
+    <div
+      className={`messenger-toast mt-6 mb-6 flex items-center gap-4 rounded-[20px] border-2 px-5 py-4 text-sm font-bold shadow-lg ${
+        isError ? 'messenger-toast--error' : 'messenger-toast--success'
+      }`}
+    >
+      <span className="messenger-toast-dot h-2.5 w-2.5 shrink-0 rounded-full" />
+      <span className="flex-1">{message}</span>
+      <button
+        className="messenger-toast-close ml-2 opacity-50 transition hover:opacity-100"
+        onClick={onDismiss}
+        type="button"
+      >
+        <X size={15} />
+      </button>
+    </div>
+  );
+}
+
+function NewOrderToast({
+  count,
+  onDismiss,
+}: {
+  count: number;
+  onDismiss: () => void;
+}) {
+  useEffect(() => {
+    const timer = setTimeout(onDismiss, 5000);
+    return () => clearTimeout(timer);
+  }, [count, onDismiss]);
+
+  const pedidoLabel = count === 1 ? 'pedido' : 'pedidos';
+
+  return (
+    <aside
+      aria-live="polite"
+      className="messenger-new-order-toast"
+      role="status"
+    >
+      <div className="flex items-start gap-4">
+        <span className="messenger-new-order-icon inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full">
+          <Package size={24} />
+        </span>
+
+        <div className="min-w-0 flex-1">
+          <h3 className="text-base font-black">Nuevo pedido disponible</h3>
+          <p className="messenger-copy mt-1 text-sm font-semibold">
+            Tienes {count} {pedidoLabel} por revisar.
+          </p>
+        </div>
+
+        <button
+          aria-label="Cerrar alerta de nuevo pedido"
+          className="messenger-new-order-close inline-flex h-8 w-8 items-center justify-center rounded-full transition"
+          onClick={onDismiss}
+          type="button"
+        >
+          <X size={17} />
+        </button>
+      </div>
+
+      <div className="messenger-new-order-progress mt-4" aria-hidden="true">
+        <span />
+      </div>
+
+      <p className="messenger-copy mt-2 text-xs font-semibold">
+        Se cerrará automáticamente en unos segundos.
+      </p>
+    </aside>
+  );
+}
 
 function SummaryCard({
   icon,
@@ -78,6 +193,7 @@ function PendingOrderCard({
   order,
   onAccept,
   onDelivered,
+  onCancelNoPayment,
   onDetail,
   onInTransit,
   onNotDelivered,
@@ -85,7 +201,8 @@ function PendingOrderCard({
 }: {
   order: MessengerOrder;
   onAccept: (orderId: string) => void;
-  onDelivered: (orderId: string) => void;
+  onDelivered: (order: MessengerOrder) => void;
+  onCancelNoPayment: (order: MessengerOrder) => void;
   onDetail: (order: MessengerOrder) => void;
   onInTransit: (orderId: string) => void;
   onNotDelivered: (order: MessengerOrder) => void;
@@ -101,7 +218,7 @@ function PendingOrderCard({
               {formatDeliveryStatus(order.deliveryStatus)}
             </span>
             <span className="messenger-charge-badge rounded-full px-3 py-1 text-xs font-bold">
-              COBRAR
+              {order.paymentStatusLabel.toUpperCase()}
             </span>
           </div>
 
@@ -162,82 +279,94 @@ function PendingOrderCard({
         </div>
       </div>
 
-      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-        <a
+      <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <button
           className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-          href="/mapa"
-          rel="noreferrer"
-          target="_blank"
+          onClick={() => openDeliveryMap(order)}
+          type="button"
         >
           <Send size={17} />
           Abrir en Maps
-        </a>
+        </button>
 
-        {order.deliveryStatus !== 'assigned' && (
-          <button
-            className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-            onClick={() => onDetail(order)}
-            type="button"
-          >
-            <Eye size={17} />
-            Ver detalle
-          </button>
-        )}
+  {order.deliveryStatus !== 'assigned' && (
+    <button
+      className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+      onClick={() => onDetail(order)}
+      type="button"
+    >
+      <Eye size={17} />
+      Ver detalle
+    </button>
+  )}
 
-        {order.deliveryStatus === 'assigned' && (
-          <>
-            <button
-              className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
-              onClick={() => onAccept(order.id)}
-              type="button"
-            >
-              <CheckCircle2 size={17} />
-              Aceptar pedido
-            </button>
-            <button
-              className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-              onClick={() => onReject(order.id)}
-              type="button"
-            >
-              <XCircle size={17} />
-              Rechazar
-            </button>
-          </>
-        )}
+  {/* ACEPTAR / RECHAZAR */}
+  {order.deliveryStatus === 'assigned' && (
+    <>
+      <button
+        className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
+        onClick={() => onAccept(order.id)}
+        type="button"
+      >
+        <CheckCircle2 size={17} />
+        Aceptar pedido
+      </button>
 
-        {order.deliveryStatus === 'accepted' && (
-          <button
-            className="messenger-transit-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 text-sm font-bold text-white transition hover:bg-blue-700"
-            onClick={() => onInTransit(order.id)}
-            type="button"
-          >
-            Iniciar entrega
-          </button>
-        )}
+      <button
+        className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+        onClick={() => onReject(order.id)}
+        type="button"
+      >
+        <XCircle size={17} />
+        Rechazar
+      </button>
+    </>
+  )}
 
-        {order.deliveryStatus === 'in_transit' && (
-          <button
-            className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
-            onClick={() => onDelivered(order.id)}
-            type="button"
-          >
-            <CheckCircle2 size={17} />
-            Marcar como Entregado
-          </button>
-        )}
+  {/* INICIAR ENTREGA */}
+  {order.deliveryStatus === 'accepted' && (
+    <button
+      className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 text-sm font-bold text-white shadow-lg transition hover:scale-[1.02] hover:bg-blue-700"
+      onClick={() => onInTransit(order.id)}
+      type="button"
+    >
+      <Truck size={17} />
+      Iniciar entrega
+    </button>
+  )}
 
-        {(order.deliveryStatus === 'accepted' ||
-          order.deliveryStatus === 'in_transit') && (
-          <button
-            className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-            onClick={() => onNotDelivered(order)}
-            type="button"
-          >
-            <AlertTriangle size={17} />
-            No entregado
-          </button>
-        )}
-      </div>
+  {/* CUANDO YA ESTA EN CAMINO */}
+  {order.deliveryStatus === 'in_transit' && (
+    <>
+      <button
+        className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
+        onClick={() => onDelivered(order)}
+        type="button"
+      >
+        <CheckCircle2 size={17} />
+        Registrar pago
+      </button>
+
+<button
+  className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 border-amber-500 bg-amber-950/40 px-6 text-sm font-bold text-amber-300 transition-all duration-300 hover:border-amber-400 hover:shadow-[0_0_12px_rgba(251,191,36,0.65)]"
+  onClick={() => onCancelNoPayment(order)}
+  type="button"
+>
+  <DollarSign size={17} />
+  Cancelar por falta de pago
+</button>
+
+<button
+  className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 border-red-500 bg-red-950/40 px-6 text-sm font-bold text-red-300 transition-all duration-300 hover:border-red-400 hover:shadow-[0_0_12px_rgba(248,113,113,0.65)]"
+  onClick={() => onNotDelivered(order)}
+  type="button"
+>
+  <AlertTriangle size={17} />
+  No entregado
+</button>
+    </>
+  )}
+</div>
     </article>
   );
 }
@@ -268,11 +397,13 @@ function OrderDetailModal({
   order,
   onClose,
   onDelivered,
+  onCancelNoPayment,
   onNotDelivered,
 }: {
   order: MessengerOrder;
   onClose: () => void;
-  onDelivered: (orderId: string) => void;
+  onDelivered: (order: MessengerOrder) => void;
+  onCancelNoPayment: (order: MessengerOrder) => void;
   onNotDelivered: (order: MessengerOrder) => void;
 }) {
   const subtotal = order.items.reduce(
@@ -317,7 +448,7 @@ function OrderDetailModal({
                   {formatDeliveryStatus(order.deliveryStatus)}
                 </span>
                 <span className="messenger-charge-badge rounded-full px-3 py-1 text-xs font-bold">
-                  COBRAR
+                  {order.paymentStatusLabel.toUpperCase()}
                 </span>
               </div>
               <p className="messenger-muted mt-5 text-xs font-bold uppercase">
@@ -372,15 +503,14 @@ function OrderDetailModal({
             </article>
 
             <div className="flex flex-col gap-3 sm:flex-row">
-              <a
+              <button
                 className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-                href={buildMapsUrl(order)}
-                rel="noreferrer"
-                target="_blank"
+                onClick={() => openDeliveryMap(order)}
+                type="button"
               >
                 <Send size={17} />
                 Abrir en Maps
-              </a>
+              </button>
             </div>
           </div>
 
@@ -416,30 +546,46 @@ function OrderDetailModal({
               <button
                 className="messenger-deliver-button mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
                 onClick={() => {
-                  onDelivered(order.id);
+                  onDelivered(order);
                   onClose();
                 }}
                 type="button"
               >
                 <CheckCircle2 size={17} />
-                Marcar como entregado
+                Registrar pago
               </button>
             )}
+             
+{canCancelByNoPayment(order) && (
+  <button
+    className=" mt-3 inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 border-amber-500 bg-amber-950/40 px-6 text-sm font-bold text-amber-300 transition-all duration-300 hover:border-amber-400 hover:shadow-[0_0_12px_rgba(251,191,36,0.65)]"
+    onClick={() => {
+      onClose();
+      onCancelNoPayment(order);
+    }}
+    type="button"
+  >
+    <DollarSign size={17} />
+    Cancelar por falta de pago
+  </button>
+)}
 
-            {(order.deliveryStatus === 'accepted' ||
-              order.deliveryStatus === 'in_transit') && (
-              <button
-                className="messenger-reject-button mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-                onClick={() => {
-                  onClose();
-                  onNotDelivered(order);
-                }}
-                type="button"
-              >
-                <AlertTriangle size={17} />
-                No entregado
-              </button>
-            )}
+{(order.deliveryStatus === 'accepted' ||
+  order.deliveryStatus === 'in_transit') && (
+  <button
+    className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-red-500 bg-red-950/40 px-6 text-sm font-bold text-red-300 transition-all duration-300 hover:border-red-400 hover:shadow-[0_0_12px_rgba(248,113,113,0.65)]"
+    onClick={() => {
+      onClose();
+      onNotDelivered(order);
+    }}
+    type="button"
+  >
+    <AlertTriangle size={17} />
+    No entregado
+  </button>
+)}
+
+            
           </aside>
         </div>
       </section>
@@ -463,57 +609,137 @@ export default function MessengerDashboard({
   const [undeliveredOrder, setUndeliveredOrder] =
     useState<MessengerOrder | null>(null);
   const [savingUndelivered, setSavingUndelivered] = useState(false);
+  const [cancelNoPaymentOrder, setCancelNoPaymentOrder] =
+    useState<MessengerOrder | null>(null);
+  const [savingCancelNoPayment, setSavingCancelNoPayment] = useState(false);
+  const [currentCourierId, setCurrentCourierId] = useState<string | null>(null);
+  const [newOrderCount, setNewOrderCount] = useState(0);
+  const notifiedOrderIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
-    const loadOrders = async (courierId: string, allowDevFallback = false) => {
+    let unsubscribeOrders: (() => void) | undefined;
+
+    const startOrdersSubscription = (
+      courierId: string,
+      allowDevFallback = false
+    ) => {
       setLoading(true);
       setMessage('');
 
-      try {
-        let data = await getMessengerOrders(courierId);
+      unsubscribeOrders?.();
 
-        if (
-          data.length === 0 &&
-          allowDevFallback &&
-          import.meta.env.PUBLIC_APP_ENV !== 'production' &&
-          courierId !== DEV_COURIER_ID
-        ) {
-          data = await getMessengerOrders(DEV_COURIER_ID);
+      unsubscribeOrders = subscribeToMessengerOrders(
+        courierId,
+        (data) => {
+          if (
+            data.length === 0 &&
+            allowDevFallback &&
+            import.meta.env.PUBLIC_APP_ENV !== 'production' &&
+            courierId !== DEV_COURIER_ID
+          ) {
+            startOrdersSubscription(DEV_COURIER_ID, false);
+            return;
+          }
+
+          setOrders(data);
+          setLoading(false);
+        },
+        (error) => {
+          console.error(error);
+          setOrders([]);
+          setLoading(false);
+          setMessage('No se pudieron cargar las entregas del emulador.');
         }
-
-        setOrders(data);
-      } catch (error) {
-        console.error(error);
-        setOrders([]);
-        setMessage('No se pudieron cargar las entregas del emulador.');
-      } finally {
-        setLoading(false);
-      }
+      );
     };
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       const devCourierId =
         import.meta.env.PUBLIC_APP_ENV !== 'production' ? DEV_COURIER_ID : null;
       const courierId = user?.uid || devCourierId;
       const allowDevFallback = !user;
 
+      setCurrentCourierId(courierId);
+
       if (!courierId) {
+        unsubscribeOrders?.();
         setOrders([]);
         setLoading(false);
         setMessage('Inicia sesion para ver tus entregas asignadas.');
         return;
       }
 
-      void loadOrders(courierId, allowDevFallback);
+      startOrdersSubscription(courierId, allowDevFallback);
     });
 
-    return unsubscribe;
+    return () => {
+      unsubscribeOrders?.();
+      unsubscribeAuth();
+    };
   }, []);
 
   const assignedOrders = useMemo(
     () => orders.filter((order) => order.deliveryStatus === 'assigned'),
     [orders]
   );
+
+  const assignedOrderIdsKey = useMemo(
+    () =>
+      assignedOrders
+        .map((order) => order.deliveryId || order.id)
+        .sort()
+        .join('|'),
+    [assignedOrders]
+  );
+
+  useEffect(() => {
+    if (loading || clientSection !== 'assigned') return;
+
+    const currentOrderIds = assignedOrderIdsKey
+      ? assignedOrderIdsKey.split('|')
+      : [];
+
+    if (currentOrderIds.length === 0) {
+      setNewOrderCount(0);
+      return;
+    }
+
+    const storageKey = 'sansistore:messenger:notified-order-ids';
+
+    let storedIds: string[] = [];
+
+    try {
+      storedIds = JSON.parse(
+        sessionStorage.getItem(storageKey) || '[]'
+      ) as string[];
+    } catch {
+      storedIds = [];
+    }
+
+    const alreadyNotifiedIds = new Set([
+      ...storedIds,
+      ...Array.from(notifiedOrderIdsRef.current),
+    ]);
+
+    const newIds = currentOrderIds.filter(
+      (orderId) => !alreadyNotifiedIds.has(orderId)
+    );
+
+    if (newIds.length === 0) return;
+
+    const updatedIds = Array.from(
+      new Set([...storedIds, ...currentOrderIds])
+    );
+
+    try {
+      sessionStorage.setItem(storageKey, JSON.stringify(updatedIds));
+    } catch {
+      
+    }
+    notifiedOrderIdsRef.current = new Set(updatedIds);
+    setNewOrderCount(newIds.length);
+  }, [assignedOrderIdsKey, clientSection, loading]);
+
   const acceptedOrders = useMemo(
     () =>
       orders.filter(
@@ -564,8 +790,51 @@ export default function MessengerDashboard({
     }
   };
 
-  const markAsDelivered = (orderId: string) => {
-    void updateOrderStatus(orderId, 'delivered');
+  const markAsDelivered = async (order: MessengerOrder) => {
+    if (!currentCourierId) {
+      setMessage('No se pudo identificar al mensajero para registrar el pago.');
+      return;
+    }
+
+    if (order.paymentStatusLabel === 'Cobrado') {
+      setMessage('Este pedido ya tiene el pago registrado.');
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Confirmar pago en efectivo de ${formatBolivianos(order.cashToCollect)} del pedido ${order.orderCode}.`
+    );
+
+    if (!confirmed) return;
+
+    const previousOrder = order;
+    setOrders((currentOrders) =>
+      currentOrders.map((currentOrder) =>
+        currentOrder.id === order.id
+          ? {
+              ...currentOrder,
+              deliveryStatus: 'delivered',
+              paymentStatus: 'COBRADO',
+              paymentStatusLabel: 'Cobrado',
+              collectedBy: currentCourierId,
+              paymentCollectedAt: new Date(),
+            }
+          : currentOrder
+      )
+    );
+
+    try {
+      await registerMessengerCashPayment(order, currentCourierId);
+      setMessage('Pago en efectivo registrado y venta cerrada correctamente.');
+    } catch (error) {
+      console.error(error);
+      setMessage('No se pudo registrar el pago en efectivo.');
+      setOrders((currentOrders) =>
+        currentOrders.map((currentOrder) =>
+          currentOrder.id === previousOrder.id ? previousOrder : currentOrder
+        )
+      );
+    }
   };
 
   const acceptOrder = (orderId: string) => {
@@ -582,6 +851,12 @@ export default function MessengerDashboard({
 
   const registerUndeliveredOrder = async (reason: string, notes: string) => {
     if (!undeliveredOrder) return;
+    if (!currentCourierId) {
+      setMessage(
+        'No se pudo identificar al mensajero para registrar el problema.'
+      );
+      return;
+    }
 
     const targetOrder = undeliveredOrder;
     setSavingUndelivered(true);
@@ -598,8 +873,9 @@ export default function MessengerDashboard({
         order: targetOrder,
         reason,
         notes,
+        courierId: currentCourierId,
       });
-      setMessage('Incidente registrado correctamente.');
+      setMessage('Problema registrado y pedido marcado como no entregado.');
       setUndeliveredOrder(null);
     } catch (error) {
       console.error(error);
@@ -613,6 +889,48 @@ export default function MessengerDashboard({
       setSavingUndelivered(false);
     }
   };
+
+  const registerCancelNoPayment = async (notes: string) => {
+  if (!cancelNoPaymentOrder) return;
+
+  const targetOrder = cancelNoPaymentOrder;
+  setSavingCancelNoPayment(true);
+
+  setOrders((currentOrders) =>
+    currentOrders.map((order) =>
+      order.id === targetOrder.id
+        ? {
+            ...order,
+            deliveryStatus: 'cancelled',
+            paymentStatus: 'CANCELADO',
+            paymentStatusLabel: 'Cancelado por falta de pago',
+          }
+        : order
+    )
+  );
+
+  try {
+    await markMessengerOrderAsCancelledByNoPayment({
+      order: targetOrder,
+      notes,
+      courierId: currentCourierId,
+    });
+
+    setMessage('Pedido cancelado por falta de pago.');
+    setCancelNoPaymentOrder(null);
+  } catch (error) {
+    console.error(error);
+    setMessage('No se pudo cancelar el pedido por falta de pago.');
+
+    setOrders((currentOrders) =>
+      currentOrders.map((order) =>
+        order.id === targetOrder.id ? targetOrder : order
+      )
+    );
+  } finally {
+    setSavingCancelNoPayment(false);
+  }
+};
 
   const activeOrders =
     clientSection === 'assigned'
@@ -640,209 +958,13 @@ export default function MessengerDashboard({
   return (
     <main
       className={`messenger-dashboard ${embedded ? 'messenger-dashboard--embedded' : 'min-h-screen'}`}
-    >
-      <style>{`
-        .messenger-dashboard {
-          background: var(--theme-bg);
-          color: var(--theme-text);
-          font-family:
-            Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-            "Segoe UI", sans-serif;
-          font-size: 16px;
-          line-height: 1.5;
-        }
-
-        .messenger-dashboard * {
-          box-sizing: border-box;
-        }
-
-        .messenger-dashboard a {
-          color: inherit;
-          text-decoration: none;
-        }
-
-        .messenger-dashboard--embedded {
-          min-height: auto;
-          background: transparent;
-        }
-
-        .messenger-header-inner {
-          width: min(100% - 32px, 1216px);
-          margin-inline: auto;
-        }
-
-        .messenger-container {
-          width: min(100% - 32px, 1280px);
-          margin-inline: auto;
-        }
-
-        .messenger-dashboard--embedded .messenger-container {
-          width: min(100% - 32px, 1280px);
-          padding-block: 8px 40px;
-        }
-
-        .messenger-header-inner {
-          min-height: 73px;
-        }
-
-        .messenger-container {
-          padding-block: 8px 40px;
-        }
-
-        .messenger-header,
-        .messenger-order-card,
-        .messenger-summary-card,
-        .messenger-delivered-row {
-          background: var(--theme-card-bg);
-          border-color: var(--theme-border);
-          color: var(--theme-text);
-        }
-
-        .messenger-header {
-          border-bottom-color: var(--theme-border);
-        }
-
-        .messenger-logo-accent {
-          color: #88b04b;
-        }
-
-        .messenger-buyer-link {
-          background: var(--theme-card-bg);
-          border-color: var(--theme-border);
-          color: var(--theme-text);
-        }
-
-        .messenger-courier-link {
-          background: #88b04b;
-          color: #0a0b0d;
-        }
-
-        .messenger-muted,
-        .messenger-copy {
-          color: color-mix(in srgb, var(--theme-text) 72%, transparent);
-        }
-
-        .messenger-icon,
-        .messenger-icon--featured {
-          background: color-mix(in srgb, #88b04b 16%, var(--theme-card-bg));
-          color: #6f9438;
-        }
-
-        .messenger-icon--featured {
-          background: var(--theme-card-bg);
-        }
-
-        .messenger-summary-card--featured,
-        .messenger-cash-box {
-          background: color-mix(in srgb, #88b04b 14%, var(--theme-card-bg));
-          border-color: color-mix(in srgb, #88b04b 58%, var(--theme-border));
-          color: #5f8330;
-        }
-
-        .messenger-charge-badge {
-          background: color-mix(in srgb, #facc15 22%, var(--theme-card-bg));
-          color: #8a6100;
-        }
-
-        .messenger-status-badge {
-          background: color-mix(in srgb, #3b82f6 14%, var(--theme-card-bg));
-          color: #1d4ed8;
-        }
-
-        .messenger-reference {
-          background: color-mix(in srgb, #facc15 18%, var(--theme-card-bg));
-          border-left-color: #ffb703;
-          color: #8a6100;
-        }
-
-        .messenger-map-button {
-          background: var(--theme-card-bg);
-          border-color: var(--theme-border);
-          color: var(--theme-text);
-        }
-
-        .messenger-map-button:hover {
-          border-color: #88b04b;
-          color: #6f9438;
-        }
-
-        .messenger-transit-button {
-          background: #2563eb;
-          color: #ffffff;
-        }
-
-        .messenger-transit-button:hover {
-          background: #1d4ed8;
-        }
-
-        .messenger-deliver-button {
-          background: #88b04b;
-          color: #0a0b0d;
-        }
-
-        .messenger-deliver-button:hover {
-          background: #9fc462;
-        }
-
-        .messenger-reject-button {
-          background: color-mix(in srgb, #ef4444 8%, var(--theme-card-bg));
-          border-color: color-mix(in srgb, #ef4444 46%, var(--theme-border));
-          color: #dc2626;
-        }
-
-        .messenger-reject-button:hover {
-          background: color-mix(in srgb, #ef4444 14%, var(--theme-card-bg));
-        }
-
-        .messenger-delivered-badge {
-          background: color-mix(in srgb, #88b04b 16%, var(--theme-card-bg));
-          color: #5f8330;
-        }
-
-        html[data-theme='dark'] .messenger-icon,
-        html[data-theme='dark'] .messenger-icon--featured {
-          color: #b7dc78;
-        }
-
-        html[data-theme='dark'] .messenger-summary-card--featured,
-        html[data-theme='dark'] .messenger-cash-box {
-          color: #c4e48a;
-        }
-
-        html[data-theme='dark'] .messenger-charge-badge,
-        html[data-theme='dark'] .messenger-reference {
-          color: #fde68a;
-        }
-
-        html[data-theme='dark'] .messenger-status-badge {
-          color: #93c5fd;
-        }
-
-        html[data-theme='dark'] .messenger-map-button:hover {
-          color: #b7dc78;
-        }
-
-        html[data-theme='dark'] .messenger-delivered-badge {
-          color: #b7dc78;
-        }
-
-        html[data-theme='dark'] .messenger-reject-button {
-          color: #fca5a5;
-        }
-
-        @media (min-width: 768px) {
-          .messenger-summary-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-          }
-        }
-
-        @media (min-width: 1024px) {
-          .messenger-order-grid {
-            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-          }
-        }
-      `}</style>
-
+    >      
+      {newOrderCount > 0 && clientSection === 'assigned' && (
+        <NewOrderToast
+          count={newOrderCount}
+          onDismiss={() => setNewOrderCount(0)}
+        />
+      )}
       {!embedded && (
         <header className="messenger-header border-b">
           <div className="messenger-header-inner flex items-center justify-between">
@@ -881,11 +1003,9 @@ export default function MessengerDashboard({
           </p>
         </section>
 
-        {message && (
-          <div className="messenger-order-card mt-6 rounded-[26px] border p-4 text-sm font-semibold">
-            {message}
-          </div>
-        )}
+          {message && (
+            <MessageToast message={message} onDismiss={() => setMessage('')} />
+          )}
 
         {loading && (
           <div className="messenger-order-card mt-6 rounded-[26px] border p-8 text-sm font-semibold">
@@ -932,6 +1052,7 @@ export default function MessengerDashboard({
                       key={order.id}
                       order={order}
                       onAccept={acceptOrder}
+                      onCancelNoPayment={setCancelNoPaymentOrder}
                       onDelivered={markAsDelivered}
                       onDetail={setDetailOrder}
                       onInTransit={markAsInTransit}
@@ -997,9 +1118,10 @@ export default function MessengerDashboard({
         <OrderDetailModal
           order={detailOrder}
           onClose={() => setDetailOrder(null)}
+          onCancelNoPayment={setCancelNoPaymentOrder}
           onDelivered={markAsDelivered}
           onNotDelivered={setUndeliveredOrder}
-        />
+      />
       )}
 
       {undeliveredOrder && (
@@ -1008,6 +1130,14 @@ export default function MessengerDashboard({
           order={undeliveredOrder}
           onClose={() => setUndeliveredOrder(null)}
           onConfirm={registerUndeliveredOrder}
+        />
+      )}
+      {cancelNoPaymentOrder && (
+        <CancelNoPaymentModal
+          isSaving={savingCancelNoPayment}
+          order={cancelNoPaymentOrder}
+          onClose={() => setCancelNoPaymentOrder(null)}
+          onConfirm={registerCancelNoPayment}
         />
       )}
     </main>
