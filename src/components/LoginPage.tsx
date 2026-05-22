@@ -15,8 +15,6 @@ export default function LoginPage() {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
 
-    const LOCATION = '/me';
-
     const performEmailLogin = async () => {
         if (loading) return;
         const emailValue = (document.getElementById('email') as HTMLInputElement | null)?.value || email;
@@ -29,7 +27,7 @@ export default function LoginPage() {
             await signInWithEmailAndPassword(auth, emailValue, passwordValue);
             console.log('[Login] success');
             setSuccess(true);
-            window.location.assign(LOCATION);
+            window.location.assign('/');
         } catch (err: unknown) {
             const firebaseError = err as FirebaseError;
             console.error('[Login] fail', firebaseError.code, firebaseError.message);
@@ -50,7 +48,7 @@ export default function LoginPage() {
 
     const handleGoogleSuccess = () => {
         setSuccess(true);
-        window.location.href = LOCATION;
+        window.location.href = '/me';
     };
 
     const handleGoogleError = (errorMsg: string) => {

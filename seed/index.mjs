@@ -75,7 +75,7 @@ async function seedAuthUsers() {
           if (result.failureCount > 0) {
             throw result.errors[0].error;
           }
-          
+
           await auth.updateUser(user.uid, { password: '12345678' });
         } else {
           await auth.createUser({
