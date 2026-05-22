@@ -27,6 +27,10 @@ import {
     subscribeToMessengerOrders,
 } from '../services/messengerOrdersService';
 import type { MessengerOrder } from '../types';
+import {
+    sortAcceptedOrdersByAge,
+    type AcceptedOrderSort,
+} from '../utils/acceptedOrderSorting';
 import UndeliveredModal from '../modals/UndeliveredModal';
 import CancelNoPaymentModal from '../modals/CancelNoPaymentModal';
 import './MessengerDashboard.css';
@@ -34,6 +38,17 @@ import './MessengerDashboard.css';
 const DEV_COURIER_ID = 'user-nadia';
 
 const formatBolivianos = (amount: number) => `Bs ${amount}`;
+
+const formatOrderAgeDate = (order: MessengerOrder) => {
+    const date = order.assignedAt ?? order.createdAt ?? order.updatedAt;
+
+    if (!date) return 'Fecha no disponible';
+
+    return new Intl.DateTimeFormat('es-BO', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+    }).format(date);
+};
 
 const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']) => {
     if (status === 'assigned') return 'Asignado';
@@ -247,6 +262,14 @@ function PendingOrderCard({
                     </div>
 
                     <div className="messenger-copy space-y-4 text-sm">
+                        {(order.deliveryStatus === 'accepted' ||
+                            order.deliveryStatus === 'in_transit') && (
+                            <div>
+                                <p className="messenger-muted mb-1 text-xs">Asignado</p>
+                                <p className="font-bold">{formatOrderAgeDate(order)}</p>
+                            </div>
+                        )}
+
                         <div>
                             <p className="messenger-muted mb-1 text-xs">Cliente</p>
                             <p className="font-bold">{order.customerName}</p>
@@ -730,6 +753,8 @@ export default function MessengerDashboard({
     const [savingCancelNoPayment, setSavingCancelNoPayment] = useState(false);
     const [currentCourierId, setCurrentCourierId] = useState<string | null>(null);
     const [newOrderCount, setNewOrderCount] = useState(0);
+    const [acceptedSortOrder, setAcceptedSortOrder] =
+        useState<AcceptedOrderSort>('oldest-first');
     const notifiedOrderIdsRef = useRef<Set<string>>(new Set());
 
     useEffect(() => {
@@ -864,6 +889,10 @@ export default function MessengerDashboard({
                     order.deliveryStatus === 'in_transit'
             ),
         [orders]
+    );
+    const sortedAcceptedOrders = useMemo(
+        () => sortAcceptedOrdersByAge(acceptedOrders, acceptedSortOrder),
+        [acceptedOrders, acceptedSortOrder]
     );
     const deliveredOrders = useMemo(
         () => orders.filter((order) => order.deliveryStatus === 'delivered'),
@@ -1053,7 +1082,7 @@ export default function MessengerDashboard({
             ? assignedOrders
             : clientSection === 'not_delivered'
                 ? notDeliveredOrders
-                : acceptedOrders;
+                : sortedAcceptedOrders;
     const activeTitle =
         clientSection === 'assigned'
             ? 'Gestión Entregas'
@@ -1153,13 +1182,37 @@ export default function MessengerDashboard({
                         </section>
 
                         <section className="mt-11">
-                            <h2 className="mb-6 text-2xl font-black tracking-[-0.04em]">
-                                {clientSection === 'assigned'
-                                    ? 'Pedidos asignados'
-                                    : clientSection === 'not_delivered'
-                                        ? 'Pedidos no entregados'
-                                        : 'Pedidos pendientes'}
-                            </h2>
+                            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                <h2 className="text-2xl font-black tracking-[-0.04em]">
+                                    {clientSection === 'assigned'
+                                        ? 'Pedidos asignados'
+                                        : clientSection === 'not_delivered'
+                                            ? 'Pedidos no entregados'
+                                            : 'Pedidos pendientes'}
+                                </h2>
+
+                                {clientSection === 'accepted' && activeOrders.length > 0 && (
+                                    <label className="flex w-full flex-col gap-2 text-sm font-bold text-text-light sm:w-auto sm:flex-row sm:items-center">
+                                        <span className="messenger-muted">Ordenar por</span>
+                                        <select
+                                            value={acceptedSortOrder}
+                                            onChange={(event) =>
+                                                setAcceptedSortOrder(
+                                                    event.target.value as AcceptedOrderSort
+                                                )
+                                            }
+                                            className="rounded-2xl border-2 border-border-light bg-card-bg-light px-4 py-3 text-sm font-bold text-text-light outline-none transition focus:border-primary"
+                                        >
+                                            <option value="oldest-first">
+                                                Mas antiguos primero
+                                            </option>
+                                            <option value="newest-first">
+                                                Mas recientes primero
+                                            </option>
+                                        </select>
+                                    </label>
+                                )}
+                            </div>
 
                             <div className="space-y-6">
                                 {activeOrders.length > 0 ? (

@@ -52,7 +52,7 @@ export default function SentOrdersList() {
     min-[960px]:grid-cols-[repeat(24,1fr)]"
       aria-labelledby="orders-title"
     >
-      <h2 className="col-span-full tracking-[-0.07em] text-[calc(4.48431vw+36.5112px)] mb-16 leading-[100%]">
+      <h2 className="col-start-1 min-[960px]:col-start-2   col-span-full tracking-[-0.07em] text-[calc(4.48431vw+32.5112px)] leading-[100%] mb-4">
         Pedidos enviados
         {!loading && (
           <sup
@@ -85,7 +85,7 @@ export default function SentOrdersList() {
       {loading ? (
         <div className="col-span-full flex justify-center items-center h-80 gap-x-5">
           <GridSpinner />
-          <LoadingMessage />
+          <LoadingMessage text={"Receiving shipped orders"} />
         </div>
       ) : selectedOrder ? (
         <OrderProductDetail
@@ -101,9 +101,10 @@ export default function SentOrdersList() {
             toggleStatus={toggleStatus}
             showFilters={showFilters}
             setShowFilters={setShowFilters}
+            availableStatuses={['in_transit', 'delivered']}
           />
 
-          <div className="grid grid-cols-subgrid col-span-full min-[960px]:col-start-8 min-[960px]:col-end-25 mb-10">
+          <div className="grid grid-cols-subgrid col-span-full min-[960px]:col-start-4 min-[960px]:col-end-22 mb-10">
             <OrderHeader />
             <ul className="col-span-full grid grid-cols-subgrid">
               {filteredOrders.map((order) => (
