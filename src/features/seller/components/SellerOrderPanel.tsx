@@ -197,8 +197,6 @@ export default function SellerOrdersPanel({ embedded = false }: { embedded?: boo
                       itemsLoading &&
                       expandedOrderId === order.orderId
                     }
-                    title="Asignar a mensajero"
-                    onClick={() => { window.location.href = '/seller/assign'; }}
                     onToggle={toggleOrderDetail}
                     isMarking={false}
                     isSuccess={false}
@@ -209,6 +207,14 @@ export default function SellerOrdersPanel({ embedded = false }: { embedded?: boo
           </section>
         </div>
       )}
+      <div className="mt-6 text-end mr-3">
+        <a
+          href="/seller/assign"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-700 text-white transition hover:opacity-90"
+        >
+          ir a asignar mensajero
+        </a>
+      </div>
     </div>
   );
 }
