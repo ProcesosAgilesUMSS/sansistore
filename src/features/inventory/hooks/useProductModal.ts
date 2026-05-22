@@ -35,6 +35,9 @@ export const useProductModal = () => {
   const [uploadError, setUploadError] = useState('');
   const [isUploading, setIsUploading] = useState(false);
 
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [successProductName, setSuccessProductName] = useState('');
+
   const uploadTaskRef = useRef<ReturnType<typeof uploadBytesResumable> | null>(
     null
   );
@@ -75,6 +78,8 @@ export const useProductModal = () => {
     setUploadProgress(0);
     setUploadError('');
     setIsUploading(false);
+    setIsSuccess(false); // Resetear estado de éxito
+    setSuccessProductName('');
   }, [form]);
 
   const handleCancelUpload = useCallback(() => {
@@ -156,7 +161,6 @@ export const useProductModal = () => {
 
         const formData = data as any;
 
-        // DATOS PARA LA COLECCIÓN 'products'
         const productData = {
           ...data,
           slug,
@@ -169,7 +173,6 @@ export const useProductModal = () => {
           categoryId: data.categoryId,
         };
 
-        // DATOS PARA LA COLECCIÓN 'inventory' (Lo que faltaba)
         const inventoryData = {
           enabled: true,
           minStock: Number(formData.minStock || 5),
@@ -180,13 +183,16 @@ export const useProductModal = () => {
           updatedAt: serverTimestamp(),
         };
 
-        // Guardar en 'products'
         await setDoc(doc(db, 'products', slug), productData);
-
-        // Guardar en 'inventory' *
         await setDoc(doc(db, 'inventory', slug), inventoryData);
 
-        handleClose();
+        setSuccessProductName(data.name);
+        setIsSuccess(true);
+
+        setTimeout(() => {
+          window.location.reload();
+        }, 2500);
+
       } catch (err) {
         if (err instanceof Error && err.message === 'CANCELLED') return;
         setUploadError(
@@ -194,7 +200,7 @@ export const useProductModal = () => {
         );
       }
     },
-    [imageFile, handleClose, uploadImage]
+    [imageFile, uploadImage]
   );
 
   return {
@@ -214,5 +220,7 @@ export const useProductModal = () => {
     handleClose,
     handleCancelUpload,
     onSubmit,
+    isSuccess,
+    successProductName
   };
 };
