@@ -322,6 +322,10 @@ export default function AdminLayout() {
           {activeSection === 'mas-vendidos' && (
             <TopSellingProducts />
           )}
+          {/*Parámetros del sistema*/}
+          {activeSection === 'parametros' && <ConfigPanel />}
+          {/*Reportes de ventas*/}
+          {activeSection === 'reportes' && <SalesReport />}
         </main>
 
       </div>
