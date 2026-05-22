@@ -73,14 +73,3 @@ export function getCurrentZone(lat: number, lng: number): string | null {
   }
   return null;
 }
-
-export function getAllowedZonesBounds(): [[number, number], [number, number]] {
-  const points = ALLOWED_ZONES.flatMap((zone) => zone.points);
-  const lats = points.map(([lat]) => lat);
-  const lngs = points.map(([, lng]) => lng);
-
-  return [
-    [Math.min(...lats), Math.min(...lngs)],
-    [Math.max(...lats), Math.max(...lngs)],
-  ];
-}

@@ -7,6 +7,7 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
+  Heart,
 } from 'lucide-react';
 import { FaCartPlus, FaFilter } from 'react-icons/fa';
 import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
@@ -19,6 +20,7 @@ import {
 } from '../lib/productPopularity';
 import CategoryFilter from './CategoryFilter';
 import { useCartContext, CartProvider } from '../features/cart';
+import { useFavorites } from '../features/favorites';
 
 interface Product {
   id: string;
@@ -51,7 +53,6 @@ const PRODUCT_PLACEHOLDER = '/product-placeholder.svg';
 const MAX_SEARCH_LENGTH = 100;
 const SEARCH_HISTORY_KEY = 'sansistore-search-history';
 const MAX_HISTORY_ITEMS = 5;
-
 
 function getSearchHistory(): string[] {
   try {
@@ -120,13 +121,13 @@ interface FeaturedProductsProps {
   initialOffersOnly?: boolean;
   initialSort?: string | null;
   initialPage?: number;
+  favoritesOnly?: boolean;
+  title?: string;
 }
 
-function isSortOption(value: string | null | undefined): value is
-  | 'best-sellers'
-  | 'recent'
-  | 'name-asc'
-  | 'name-desc' {
+function isSortOption(
+  value: string | null | undefined
+): value is 'best-sellers' | 'recent' | 'name-asc' | 'name-desc' {
   return (
     value === 'best-sellers' ||
     value === 'recent' ||
@@ -148,6 +149,8 @@ function FeaturedProductsInner({
   initialOffersOnly = false,
   initialSort = 'best-sellers',
   initialPage = 1,
+  favoritesOnly = false,
+  title = 'Productos disponibles',
 }: FeaturedProductsProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -156,6 +159,13 @@ function FeaturedProductsInner({
   const [appliedSearch, setAppliedSearch] = useState(initialSearch);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const { addToCart } = useCartContext();
+  const {
+    favoriteIds,
+    loading: favoritesLoading,
+    error: favoritesError,
+    isFavorite,
+    toggleFavorite,
+  } = useFavorites();
   const [searchHistory, setSearchHistory] = useState<string[]>(() =>
     getSearchHistory()
   );
@@ -331,6 +341,10 @@ function FeaturedProductsInner({
   const filteredProducts = useMemo(() => {
     let result = products;
 
+    if (favoritesOnly) {
+      result = result.filter((product) => favoriteIds.has(product.id));
+    }
+
     // Hide products without stock
     result = result.filter((product) => (product.stockAvailable ?? 0) > 0);
 
@@ -387,7 +401,15 @@ function FeaturedProductsInner({
     }
 
     return sorted;
-  }, [products, appliedSearch, selectedCategory, showOffersOnly, sortBy]);
+  }, [
+    products,
+    appliedSearch,
+    selectedCategory,
+    showOffersOnly,
+    sortBy,
+    favoritesOnly,
+    favoriteIds,
+  ]);
 
   const selectedSortLabel =
     SORT_OPTIONS.find((option) => option.value === sortBy)?.label ?? 'Popular';
@@ -408,14 +430,26 @@ function FeaturedProductsInner({
         removeAccents(term.toLowerCase()).includes(normalizedTerm)
       )
       .map((term) => ({ type: 'history' as const, term }));
-    const productSuggestions = products
+    const suggestionProducts = favoritesOnly
+      ? products.filter((product) => favoriteIds.has(product.id))
+      : products;
+    const productSuggestions = suggestionProducts
       .filter((p) =>
         removeAccents(p.name.toLowerCase()).includes(normalizedTerm)
       )
       .slice(0, 5)
       .map((p) => ({ type: 'product' as const, product: p }));
     return [...historySuggestions, ...productSuggestions];
-  }, [products, searchTerm, searchHistory, inputFocused]);
+  }, [
+    products,
+    searchTerm,
+    searchHistory,
+    inputFocused,
+    favoritesOnly,
+    favoriteIds,
+  ]);
+
+  const isLoading = loading || favoritesLoading;
 
   const highlightText = (
     text: string,
@@ -532,17 +566,36 @@ function FeaturedProductsInner({
   return (
     <section id="productos" className="bg-bg-light py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-10">
-          <h2
-            className="text-text-light"
-            style={{
-              fontSize: 'clamp(1.6rem, 3vw, 2.2rem)',
-              letterSpacing: '-0.03em',
-              fontWeight: 900,
-            }}
+        <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2
+              className="text-text-light"
+              style={{
+                fontSize: 'clamp(1.6rem, 3vw, 2.2rem)',
+                letterSpacing: '-0.03em',
+                fontWeight: 900,
+              }}
+            >
+              {title}
+            </h2>
+          </div>
+
+          <a
+            href={favoritesOnly ? '/productos' : '/favoritos'}
+            className={`inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-bold transition-all sm:w-auto ${
+              favoritesOnly
+                ? 'border border-border-light text-text-light hover:border-primary hover:text-primary'
+                : 'bg-primary text-bg-light shadow-lg shadow-primary/20 hover:-translate-y-0.5 hover:brightness-105'
+            }`}
           >
-            Productos disponibles
-          </h2>
+            {favoritesOnly ? <ChevronLeft size={18} /> : <Heart size={18} />}
+            {favoritesOnly ? 'Ver productos' : 'Ver favoritos'}
+            {!favoritesOnly && favoriteIds.size > 0 && (
+              <span className="rounded-full bg-bg-light/20 px-2 py-0.5 text-xs">
+                {favoriteIds.size}
+              </span>
+            )}
+          </a>
         </div>
 
         <div className="mb-8 flex flex-col gap-4">
@@ -605,7 +658,7 @@ function FeaturedProductsInner({
                 onChange={(e) => handleInputChange(e.target.value)}
                 onKeyDown={handleKeyDown}
                 maxLength={MAX_SEARCH_LENGTH}
-                disabled={loading}
+                disabled={isLoading}
                 onFocus={() => {
                   setInputFocused(true);
                   setShowSuggestions(true);
@@ -771,7 +824,7 @@ function FeaturedProductsInner({
           </div>
         </div>
 
-        {loading && (
+        {isLoading && (
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
             {Array.from({ length: 6 }).map((_, index) => (
               <div
@@ -788,13 +841,13 @@ function FeaturedProductsInner({
           </div>
         )}
 
-        {!loading && error && (
+        {!isLoading && (error || favoritesError) && (
           <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {error}
+            {error || favoritesError}
           </div>
         )}
 
-        {!loading &&
+        {!isLoading &&
           filteredProducts.length === 0 &&
           (appliedSearch || selectedCategory || showOffersOnly) && (
             <div className="py-20 text-center">
@@ -812,7 +865,30 @@ function FeaturedProductsInner({
             </div>
           )}
 
-        {!loading && error && products.length === 0 && (
+        {!isLoading &&
+          favoritesOnly &&
+          filteredProducts.length === 0 &&
+          !appliedSearch &&
+          !selectedCategory &&
+          !showOffersOnly && (
+            <div className="rounded-3xl border border-border-light bg-card-bg-light px-6 py-12 text-center">
+              <Heart size={40} className="mx-auto mb-3 text-primary" />
+              <p className="text-sm font-semibold text-text-light">
+                Aún no tienes productos favoritos.
+              </p>
+              <p className="mt-2 text-sm text-text-light opacity-70">
+                Guarda productos desde el catálogo para revisarlos después.
+              </p>
+              <a
+                href="/productos"
+                className="mt-4 inline-flex rounded-full bg-primary px-5 py-2 text-sm font-semibold text-bg-light transition-all hover:brightness-105"
+              >
+                Ver catálogo
+              </a>
+            </div>
+          )}
+
+        {!isLoading && error && products.length === 0 && (
           <div className="rounded-3xl border border-border-light bg-card-bg-light px-6 py-12 text-center">
             <Package size={40} className="mx-auto mb-3 text-primary" />
             <p className="text-sm font-semibold text-text-light">
@@ -824,7 +900,7 @@ function FeaturedProductsInner({
           </div>
         )}
 
-        {!loading && filteredProducts.length > 0 && !invalidPage && (
+        {!isLoading && filteredProducts.length > 0 && !invalidPage && (
           <>
             <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
               {filteredProducts
@@ -836,6 +912,7 @@ function FeaturedProductsInner({
                   const showOffer = hasValidOffer(product);
                   const badgeData = getBadgeData(product);
                   const showPopularBadge = isPopularProduct(product);
+                  const productIsFavorite = isFavorite(product.id);
                   const currentPrice = showOffer
                     ? product.offerPrice!
                     : product.price;
@@ -876,6 +953,36 @@ function FeaturedProductsInner({
                             </span>
                           )}
                         </div>
+                        <button
+                          type="button"
+                          aria-label={
+                            productIsFavorite
+                              ? `Quitar ${product.name} de favoritos`
+                              : `Agregar ${product.name} a favoritos`
+                          }
+                          aria-pressed={productIsFavorite}
+                          title={
+                            productIsFavorite
+                              ? 'Quitar de favoritos'
+                              : 'Agregar a favoritos'
+                          }
+                          data-testid={`favorite-button-${product.slug}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleFavorite(product.id);
+                          }}
+                          className={`absolute right-3 top-3 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-all active:scale-95 ${
+                            productIsFavorite
+                              ? 'border-primary bg-primary text-bg-light shadow-md shadow-primary/25'
+                              : 'border-border-light bg-card-bg-light/90 text-text-light hover:border-primary hover:text-primary'
+                          }`}
+                        >
+                          <Heart
+                            size={18}
+                            fill={productIsFavorite ? 'currentColor' : 'none'}
+                          />
+                        </button>
                       </div>
 
                       <div className="relative z-20 flex flex-1 flex-col p-3 sm:p-4">
@@ -896,35 +1003,37 @@ function FeaturedProductsInner({
                           )}
                         </span>
 
-                    <div className="mt-auto flex items-center justify-between gap-2 pt-2 sm:pt-3">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm sm:text-base font-bold text-text-light">
-                          {formatPrice(currentPrice)}
-                        </span>
-                        {showOffer && (
-                          <span className="text-xs sm:text-sm text-text-light opacity-40 line-through">
-                            {formatPrice(product.price)}
-                          </span>
-                        )}
+                        <div className="mt-auto flex items-center justify-between gap-2 pt-2 sm:pt-3">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-sm sm:text-base font-bold text-text-light">
+                              {formatPrice(currentPrice)}
+                            </span>
+                            {showOffer && (
+                              <span className="text-xs sm:text-sm text-text-light opacity-40 line-through">
+                                {formatPrice(product.price)}
+                              </span>
+                            )}
+                          </div>
+                          <button
+                            type="button"
+                            title="Agregar al carrito"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              addToCart(
+                                product.id,
+                                product.stockAvailable ?? 0,
+                                currentPrice
+                              );
+                            }}
+                            className="flex items-center justify-center rounded-full p-2.5 sm:p-3 transition-all active:scale-95 text-primary hover:scale-110 hover:drop-shadow-lg shrink-0 relative z-20"
+                          >
+                            <FaCartPlus className="text-lg sm:text-xl" />
+                          </button>
+                        </div>
                       </div>
-                      <button
-                          type="button"
-                          title="Agregar al carrito"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            addToCart(product.id, product.stockAvailable ?? 0, currentPrice);
-                          }}
-                          className="flex items-center justify-center rounded-full p-2.5 sm:p-3 transition-all active:scale-95 text-primary hover:scale-110 hover:drop-shadow-lg shrink-0 relative z-20"
-                        >
-                          <FaCartPlus className="text-lg sm:text-xl" />
-                        </button>
-                    </div>
-
-
-                  </div>
-                </article>
-              );
-            })}
+                    </article>
+                  );
+                })}
             </div>
 
             {Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) > 1 && (
@@ -1063,7 +1172,7 @@ function FeaturedProductsInner({
           </>
         )}
 
-        {!loading && invalidPage && (
+        {!isLoading && invalidPage && (
           <div className="flex h-96 items-center justify-center rounded-2xl border border-border-light bg-card-bg-light">
             <div className="text-center">
               <Package className="mx-auto h-12 w-12 text-text-light opacity-50 mb-4" />

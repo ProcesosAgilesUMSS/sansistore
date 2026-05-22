@@ -58,7 +58,7 @@ export async function updateLocation(
     const locationRef = doc(db, "locations", locationId);
     await updateDoc(locationRef, {
         ...data,
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(), 
     });
 }
 
@@ -73,6 +73,7 @@ export async function hasActiveOrders(locationId: string): Promise<boolean> {
     const snapshot = await getDocs(q);
     return !snapshot.empty;
 }
+
 export async function getSellerLocation(orderId: string): Promise<string | null> {
     const ordersQuery = query(
         collection(db, 'orders'),

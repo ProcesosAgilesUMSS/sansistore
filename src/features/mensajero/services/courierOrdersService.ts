@@ -55,8 +55,6 @@ const mapOrder = (
     paymentId: typeof data.paymentId === 'string' ? data.paymentId : null,
     createdAt,
     deliveredAt,
-    deliveryLat: typeof data.deliveryLat === 'number' ? data.deliveryLat : null,
-    deliveryLng: typeof data.deliveryLng === 'number' ? data.deliveryLng : null,
     items: Array.isArray(data.items)
       ? (data.items as CourierOrderItem[])
       : [],

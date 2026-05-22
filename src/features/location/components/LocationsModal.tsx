@@ -103,7 +103,18 @@ export default function LocationsModal({
                         Agregar nueva ubicación
                     </button>
 
-                    
+                    <button
+                        disabled={!selectedId}
+                        onClick={handleConfirm}
+                        className="
+                            flex w-full items-center justify-center rounded-full py-3
+                            font-outfit text-[11px] font-black uppercase tracking-[0.15em] text-white
+                            bg-[#88B04B] transition-all active:scale-95
+                            disabled:opacity-40 disabled:cursor-not-allowed
+                        "
+                    >
+                        Confirmar ubicación
+                    </button>
                 </div>
             </div>
 

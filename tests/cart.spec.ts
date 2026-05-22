@@ -229,15 +229,34 @@ test.describe('Cart - Carrito', () => {
 
   async function loginWithEmail(page: Page, email: string) {
     await page.goto('/login');
-    await expect(
-      page.locator('form').getByRole('button', {
-        name: 'Iniciar sesión',
-        exact: true,
-      })
-    ).toBeEnabled({ timeout: 15_000 });
+    const loginButton = page.locator('form').getByRole('button', {
+      name: 'Iniciar sesión',
+      exact: true,
+    });
+
+    await expect(loginButton).toBeEnabled({ timeout: 15_000 });
     await expect(page.getByLabel('Correo electrónico')).toBeEditable();
     await expect(page.locator('#password')).toBeEditable();
-    await page.waitForLoadState('networkidle');
+    await expect
+      .poll(
+        async () => {
+          try {
+            return await page.evaluate(() => {
+              const button = document
+                .querySelector('form')
+                ?.querySelector('button[type="button"]');
+              return Boolean(
+                button &&
+                  Object.keys(button).some((key) => key.startsWith('__reactProps'))
+              );
+            });
+          } catch (e) {
+            return false;
+          }
+        },
+        { timeout: 15_000 }
+      )
+      .toBe(true);
 
     const emailField = page.getByLabel('Correo electrónico');
     const passwordField = page.locator('#password');
