@@ -239,16 +239,21 @@ test.describe('Cart - Carrito', () => {
     await expect(page.locator('#password')).toBeEditable();
     await expect
       .poll(
-        async () =>
-          page.evaluate(() => {
-            const button = document
-              .querySelector('form')
-              ?.querySelector('button[type="button"]');
-            return Boolean(
-              button &&
-                Object.keys(button).some((key) => key.startsWith('__reactProps'))
-            );
-          }),
+        async () => {
+          try {
+            return await page.evaluate(() => {
+              const button = document
+                .querySelector('form')
+                ?.querySelector('button[type="button"]');
+              return Boolean(
+                button &&
+                  Object.keys(button).some((key) => key.startsWith('__reactProps'))
+              );
+            });
+          } catch (e) {
+            return false;
+          }
+        },
         { timeout: 15_000 }
       )
       .toBe(true);
@@ -258,19 +263,19 @@ test.describe('Cart - Carrito', () => {
 
     for (let attempt = 0; attempt < 3; attempt++) {
       await emailField.fill(email);
-      await passwordField.fill('password123');
+      await passwordField.fill('12345678');
       await page.waitForTimeout(250);
 
       if (
         (await emailField.inputValue()) === email &&
-        (await passwordField.inputValue()) === 'password123'
+        (await passwordField.inputValue()) === '12345678'
       ) {
         break;
       }
     }
 
     await expect(emailField).toHaveValue(email, { timeout: 10_000 });
-    await expect(passwordField).toHaveValue('password123', {
+    await expect(passwordField).toHaveValue('12345678', {
       timeout: 10_000,
     });
 

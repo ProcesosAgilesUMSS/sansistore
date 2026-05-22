@@ -26,7 +26,8 @@ test.describe('Favorite products', () => {
   }
 
   async function seedLocalFavorites(page: Page, productId: string) {
-    await page.addInitScript(
+    await page.goto('/productos');
+    await page.evaluate(
       ({ key, item }) => {
         window.localStorage.setItem(key, JSON.stringify([item]));
       },
