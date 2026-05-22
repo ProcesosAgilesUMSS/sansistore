@@ -75,6 +75,8 @@ async function seedAuthUsers() {
           if (result.failureCount > 0) {
             throw result.errors[0].error;
           }
+          
+          await auth.updateUser(user.uid, { password: '12345678' });
         } else {
           await auth.createUser({
             uid: user.uid,
@@ -82,7 +84,7 @@ async function seedAuthUsers() {
             displayName: user.displayName,
             photoURL: user.photoURL || '',
             emailVerified: false,
-            password: 'password123',
+            password: '12345678',
           });
         }
         console.log(`  ✓ Auth: ${user.email} (${user.authType})`);
@@ -135,7 +137,7 @@ async function seedProducts() {
       description: p.description,
       price: p.price,
       imageUrl: p.imageUrl,
-      active: true,
+      active: p.active !== false,
       hasOffer: p.hasOffer || false,
       offerPrice: p.offerPrice || null,
       badge: p.badge || null,
@@ -145,13 +147,18 @@ async function seedProducts() {
       soldCount: p.soldCount || 0,
     });
 
+    const inventoryEnabled =
+      p.inventoryEnabled !== undefined
+        ? p.inventoryEnabled
+        : p.stockAvailable > 0;
+
     await setDoc('inventory', productId, {
       productId,
       stockTotal: p.stockTotal,
       stockAvailable: p.stockAvailable,
       stockReserved: 0,
       minStock: 5,
-      enabled: p.stockAvailable > 0,
+      enabled: inventoryEnabled,
       updatedAt: TS(),
     });
 

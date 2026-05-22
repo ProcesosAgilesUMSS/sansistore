@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { ArrowLeft, MapPin, Package, Calendar, AlertCircle, CheckCircle } from 'lucide-react';
 import type { Order } from '../types';
-import { createReturnRequest } from '../services/ordersService';
+import { confirmOrderReception, createReturnRequest } from '../services/ordersService';
 
 interface OrderDetailsPanelProps {
   order: Order;
   onBack: () => void;
+  onOrderConfirmed?: (order: Order) => void;
 }
 
 const getStatusStyles = (status: string) => {
@@ -26,11 +27,35 @@ const getStatusLabel = (status: string) => {
   return labels[status] || status;
 };
 
-export default function OrderDetailsPanel({ order, onBack }: OrderDetailsPanelProps) {
+function formatDateTime(value: Order['buyerReceptionConfirmedAt']) {
+  if (!value) return null;
+
+  const date =
+    typeof value === 'string'
+      ? new Date(value)
+      : value instanceof Date
+        ? value
+        : value.toDate();
+
+  if (Number.isNaN(date.getTime())) return null;
+
+  return date.toLocaleString('es-BO', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: OrderDetailsPanelProps) {
   const [showReturnForm, setShowReturnForm] = useState(false);
+  const [showReceptionConfirm, setShowReceptionConfirm] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState<string>('');
   const [returnReason, setReturnReason] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isConfirmingReception, setIsConfirmingReception] = useState(false);
+  const [receptionError, setReceptionError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
   const orderDate = order.createdAt?.toDate ? order.createdAt.toDate() : new Date();
@@ -42,6 +67,35 @@ export default function OrderDetailsPanel({ order, onBack }: OrderDetailsPanelPr
   const hoursSinceOrder = (now.getTime() - orderDate.getTime()) / (1000 * 60 * 60);
   const isWithinTimeLimit = hoursSinceOrder <= 72;
   const canRequestReturn = order.status === 'delivered' && isWithinTimeLimit;
+  const receptionConfirmedAt = formatDateTime(order.buyerReceptionConfirmedAt);
+  const canConfirmReception = order.status === 'delivered' && !order.buyerReceptionConfirmed;
+
+  const handleConfirmReception = async () => {
+    if (!order.buyerId || order.buyerReceptionConfirmed) return;
+
+    setIsConfirmingReception(true);
+    setReceptionError(null);
+
+    try {
+      await confirmOrderReception(order.id, order.buyerId);
+      const updatedOrder = {
+        ...order,
+        status: 'delivered' as const,
+        buyerReceptionConfirmed: true,
+        buyerReceptionConfirmedAt: new Date(),
+      };
+      onOrderConfirmed?.(updatedOrder);
+      setShowReceptionConfirm(false);
+    } catch (error) {
+      setReceptionError(
+        error instanceof Error
+          ? error.message
+          : 'No se pudo confirmar la recepción del pedido.'
+      );
+    } finally {
+      setIsConfirmingReception(false);
+    }
+  };
 
   const handleSubmitReturn = async () => {
     if (!selectedProductId || !returnReason.trim()) return;
@@ -118,6 +172,75 @@ export default function OrderDetailsPanel({ order, onBack }: OrderDetailsPanelPr
       </div>
 
       <div className="border-t border-(--theme-border) pt-4">
+        <div className="mb-4 rounded-xl border border-(--theme-border) bg-(--theme-secondary-bg)/60 p-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h4 className="text-sm font-bold">Recepción del pedido</h4>
+              <p className="mt-1 text-xs opacity-70">
+                {order.buyerReceptionConfirmed
+                  ? `Confirmada${receptionConfirmedAt ? ` el ${receptionConfirmedAt}` : ''}.`
+                  : order.status === 'delivered'
+                    ? 'Valida que recibiste el pedido correctamente.'
+                    : 'Disponible cuando el mensajero marque el pedido como entregado.'}
+              </p>
+              {receptionError && (
+                <p className="mt-2 text-xs font-semibold text-red-600">
+                  {receptionError}
+                </p>
+              )}
+            </div>
+
+            {order.buyerReceptionConfirmed ? (
+              <span className="inline-flex items-center justify-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-bold text-primary">
+                <CheckCircle size={15} /> Recepción confirmada
+              </span>
+            ) : canConfirmReception ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setShowReceptionConfirm(true);
+                  setReceptionError(null);
+                }}
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-(--theme-bg) transition-all hover:brightness-105 active:scale-95"
+              >
+                <CheckCircle size={16} /> Confirmar recepción
+              </button>
+            ) : (
+              <span className="rounded-full border border-(--theme-border) px-4 py-2 text-xs font-bold uppercase tracking-wider opacity-55">
+                Pendiente de entrega
+              </span>
+            )}
+          </div>
+
+          {showReceptionConfirm && (
+            <div className="mt-4 rounded-xl border border-primary/30 bg-primary/10 p-4">
+              <p className="text-sm font-semibold">
+                ¿Confirmas que recibiste este pedido en buen estado?
+              </p>
+              <p className="mt-1 text-xs opacity-70">
+                Esta acción registrará la fecha y hora de confirmación y no podrá repetirse.
+              </p>
+              <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowReceptionConfirm(false)}
+                  disabled={isConfirmingReception}
+                  className="rounded-full border border-(--theme-border) px-4 py-2 text-sm font-bold transition hover:bg-(--theme-card-bg) disabled:opacity-50"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmReception}
+                  disabled={isConfirmingReception}
+                  className="rounded-full bg-primary px-5 py-2 text-sm font-bold text-(--theme-bg) transition hover:brightness-105 disabled:opacity-50"
+                >
+                  {isConfirmingReception ? 'Confirmando...' : 'Sí, recibí el pedido'}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
         
         {success ? (
           <div className="bg-green-500/10 text-green-600 p-4 rounded-xl flex flex-col items-center justify-center gap-2 text-center">

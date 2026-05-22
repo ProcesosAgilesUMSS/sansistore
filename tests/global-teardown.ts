@@ -17,7 +17,6 @@ function stopProcessesOnPorts(ports: number[]) {
           execSync(`taskkill /PID ${pid} /T /F`, { stdio: 'ignore' });
         }
       } catch {
-        // No process found on this port.
       }
     }
     return;
@@ -29,7 +28,6 @@ function stopProcessesOnPorts(ports: number[]) {
         stdio: 'ignore',
       });
     } catch {
-      // No process found on this port.
     }
   }
 }
@@ -46,7 +44,6 @@ export default async function globalTeardown() {
       } else {
         process.kill(parseInt(emulatorPid), 'SIGTERM');
       }
-      // Give it a moment to shut down
       await new Promise((resolve) => setTimeout(resolve, 2000));
       console.log('✓ Emulator stopped');
     } catch (err) {
@@ -54,11 +51,9 @@ export default async function globalTeardown() {
     }
   }
 
-  // Also try to kill any lingering firebase processes
   try {
     execSync('pkill -f "firebase emulators:start" || true', { stdio: 'ignore' });
   } catch {
-    // Silently ignore if no processes found
   }
 
   stopProcessesOnPorts([8180, 9199, 4100, 4502, 4600, 9151]);

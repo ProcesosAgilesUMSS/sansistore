@@ -25,7 +25,6 @@ function stopProcessesOnPorts(ports: number[]) {
           execSync(`taskkill /PID ${pid} /T /F`, { stdio: 'ignore' });
         }
       } catch {
-        // No process found on this port.
       }
     }
     return;
@@ -37,7 +36,6 @@ function stopProcessesOnPorts(ports: number[]) {
         stdio: 'ignore',
       });
     } catch {
-      // No process found on this port.
     }
   }
 }
@@ -59,7 +57,6 @@ async function waitForEmulator(
         return true;
       }
     } catch {
-      // Connection failed, retry
     }
     attempts++;
     await new Promise((resolve) => setTimeout(resolve, delayMs));

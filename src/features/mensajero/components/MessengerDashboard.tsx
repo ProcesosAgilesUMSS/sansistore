@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
+import { Truck } from 'lucide-react';
 import { onAuthStateChanged } from 'firebase/auth';
 import {
   AlertTriangle,
@@ -16,6 +17,7 @@ import {
 } from 'lucide-react';
 import { auth } from '../../../lib/firebase';
 import {
+  markMessengerOrderAsCancelledByNoPayment,
   markMessengerOrderAsNotDelivered,
   registerMessengerCashPayment,
   setMessengerOrderStatus,
@@ -23,6 +25,7 @@ import {
 } from '../services/messengerOrdersService';
 import type { MessengerOrder } from '../types';
 import UndeliveredModal from '../modals/UndeliveredModal';
+import CancelNoPaymentModal from '../modals/CancelNoPaymentModal';
 import './MessengerDashboard.css';
 
 const DEV_COURIER_ID = 'user-nadia';
@@ -35,12 +38,26 @@ const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']) => {
   if (status === 'pending_reassignment') return 'Pendiente de reasignacion';
   if (status === 'in_transit') return 'En camino';
   if (status === 'not_delivered') return 'No entregado';
+  if (status === 'cancelled') return 'Cancelado';
   return 'Entregado';
 };
 
 const buildMapsUrl = (order: MessengerOrder) => {
   const query = encodeURIComponent(`${order.address}, ${order.city}, Bolivia`);
   return `https://www.google.com/maps/search/?api=1&query=${query}`;
+};
+
+const canCancelByNoPayment = (order: MessengerOrder) => {
+  const paymentText = `${order.paymentStatus} ${order.paymentStatusLabel}`
+    .toLowerCase()
+    .trim();
+
+  return (
+    (order.deliveryStatus === 'accepted' || order.deliveryStatus === 'in_transit') &&
+    !paymentText.includes('cobrado') &&
+    !paymentText.includes('pagado') &&
+    !paymentText.includes('cancelado')
+  );
 };
 
 function MessageToast({ message, onDismiss }: { message: string; onDismiss: () => void }) {
@@ -161,6 +178,7 @@ function PendingOrderCard({
   order,
   onAccept,
   onDelivered,
+  onCancelNoPayment,
   onDetail,
   onInTransit,
   onNotDelivered,
@@ -169,6 +187,7 @@ function PendingOrderCard({
   order: MessengerOrder;
   onAccept: (orderId: string) => void;
   onDelivered: (order: MessengerOrder) => void;
+  onCancelNoPayment: (order: MessengerOrder) => void;
   onDetail: (order: MessengerOrder) => void;
   onInTransit: (orderId: string) => void;
   onNotDelivered: (order: MessengerOrder) => void;
@@ -245,82 +264,96 @@ function PendingOrderCard({
         </div>
       </div>
 
-      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-        <a
-          className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-          href={buildMapsUrl(order)}
-          rel="noreferrer"
-          target="_blank"
-        >
-          <Send size={17} />
-          Abrir en Maps
-        </a>
+      <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+  {/* SIEMPRE VISIBLES */}
+  <a
+    className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+    href={buildMapsUrl(order)}
+    rel="noreferrer"
+    target="_blank"
+  >
+    <Send size={17} />
+    Abrir Maps
+  </a>
 
-        {order.deliveryStatus !== 'assigned' && (
-          <button
-            className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-            onClick={() => onDetail(order)}
-            type="button"
-          >
-            <Eye size={17} />
-            Ver detalle
-          </button>
-        )}
+  {order.deliveryStatus !== 'assigned' && (
+    <button
+      className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+      onClick={() => onDetail(order)}
+      type="button"
+    >
+      <Eye size={17} />
+      Ver detalle
+    </button>
+  )}
 
-        {order.deliveryStatus === 'assigned' && (
-          <>
-            <button
-              className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
-              onClick={() => onAccept(order.id)}
-              type="button"
-            >
-              <CheckCircle2 size={17} />
-              Aceptar pedido
-            </button>
-            <button
-              className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-              onClick={() => onReject(order.id)}
-              type="button"
-            >
-              <XCircle size={17} />
-              Rechazar
-            </button>
-          </>
-        )}
+  {/* ACEPTAR / RECHAZAR */}
+  {order.deliveryStatus === 'assigned' && (
+    <>
+      <button
+        className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
+        onClick={() => onAccept(order.id)}
+        type="button"
+      >
+        <CheckCircle2 size={17} />
+        Aceptar pedido
+      </button>
 
-        {order.deliveryStatus === 'accepted' && (
-          <button
-            className="messenger-transit-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 text-sm font-bold text-white transition hover:bg-blue-700"
-            onClick={() => onInTransit(order.id)}
-            type="button"
-          >
-            Iniciar entrega
-          </button>
-        )}
+      <button
+        className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+        onClick={() => onReject(order.id)}
+        type="button"
+      >
+        <XCircle size={17} />
+        Rechazar
+      </button>
+    </>
+  )}
 
-        {order.deliveryStatus === 'in_transit' && (
-          <button
-            className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
-            onClick={() => onDelivered(order)}
-            type="button"
-          >
-            <CheckCircle2 size={17} />
-            Registrar pago
-          </button>
-        )}
+  {/* INICIAR ENTREGA */}
+  {order.deliveryStatus === 'accepted' && (
+    <button
+      className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 text-sm font-bold text-white shadow-lg transition hover:scale-[1.02] hover:bg-blue-700"
+      onClick={() => onInTransit(order.id)}
+      type="button"
+    >
+      <Truck size={17} />
+      Iniciar entrega
+    </button>
+  )}
 
-        {(order.deliveryStatus === 'accepted' ||
-          order.deliveryStatus === 'in_transit') && (
-          <button
-            className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-            onClick={() => onNotDelivered(order)}
-            type="button"
-          >
-            <AlertTriangle size={17} />
-            No entregado
-          </button>
-        )}
-      </div>
+  {/* CUANDO YA ESTA EN CAMINO */}
+  {order.deliveryStatus === 'in_transit' && (
+    <>
+      <button
+        className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
+        onClick={() => onDelivered(order)}
+        type="button"
+      >
+        <CheckCircle2 size={17} />
+        Registrar pago
+      </button>
+
+<button
+  className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 border-amber-500 bg-amber-950/40 px-6 text-sm font-bold text-amber-300 transition-all duration-300 hover:border-amber-400 hover:shadow-[0_0_12px_rgba(251,191,36,0.65)]"
+  onClick={() => onCancelNoPayment(order)}
+  type="button"
+>
+  <DollarSign size={17} />
+  Cancelar por falta de pago
+</button>
+
+<button
+  className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 border-red-500 bg-red-950/40 px-6 text-sm font-bold text-red-300 transition-all duration-300 hover:border-red-400 hover:shadow-[0_0_12px_rgba(248,113,113,0.65)]"
+  onClick={() => onNotDelivered(order)}
+  type="button"
+>
+  <AlertTriangle size={17} />
+  No entregado
+</button>
+    </>
+  )}
+</div>
     </article>
   );
 }
@@ -351,11 +384,13 @@ function OrderDetailModal({
   order,
   onClose,
   onDelivered,
+  onCancelNoPayment,
   onNotDelivered,
 }: {
   order: MessengerOrder;
   onClose: () => void;
   onDelivered: (order: MessengerOrder) => void;
+  onCancelNoPayment: (order: MessengerOrder) => void;
   onNotDelivered: (order: MessengerOrder) => void;
 }) {
   const subtotal = order.items.reduce(
@@ -508,21 +543,37 @@ function OrderDetailModal({
                 Registrar pago
               </button>
             )}
+             
+{canCancelByNoPayment(order) && (
+  <button
+    className=" mt-3 inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 border-amber-500 bg-amber-950/40 px-6 text-sm font-bold text-amber-300 transition-all duration-300 hover:border-amber-400 hover:shadow-[0_0_12px_rgba(251,191,36,0.65)]"
+    onClick={() => {
+      onClose();
+      onCancelNoPayment(order);
+    }}
+    type="button"
+  >
+    <DollarSign size={17} />
+    Cancelar por falta de pago
+  </button>
+)}
 
-            {(order.deliveryStatus === 'accepted' ||
-              order.deliveryStatus === 'in_transit') && (
-              <button
-                className="messenger-reject-button mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-                onClick={() => {
-                  onClose();
-                  onNotDelivered(order);
-                }}
-                type="button"
-              >
-                <AlertTriangle size={17} />
-                No entregado
-              </button>
-            )}
+{(order.deliveryStatus === 'accepted' ||
+  order.deliveryStatus === 'in_transit') && (
+  <button
+    className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-red-500 bg-red-950/40 px-6 text-sm font-bold text-red-300 transition-all duration-300 hover:border-red-400 hover:shadow-[0_0_12px_rgba(248,113,113,0.65)]"
+    onClick={() => {
+      onClose();
+      onNotDelivered(order);
+    }}
+    type="button"
+  >
+    <AlertTriangle size={17} />
+    No entregado
+  </button>
+)}
+
+            
           </aside>
         </div>
       </section>
@@ -546,6 +597,9 @@ export default function MessengerDashboard({
   const [undeliveredOrder, setUndeliveredOrder] =
     useState<MessengerOrder | null>(null);
   const [savingUndelivered, setSavingUndelivered] = useState(false);
+  const [cancelNoPaymentOrder, setCancelNoPaymentOrder] =
+    useState<MessengerOrder | null>(null);
+  const [savingCancelNoPayment, setSavingCancelNoPayment] = useState(false);
   const [currentCourierId, setCurrentCourierId] = useState<string | null>(null);
   const [newOrderCount, setNewOrderCount] = useState(0);
   const notifiedOrderIdsRef = useRef<Set<string>>(new Set());
@@ -785,6 +839,12 @@ export default function MessengerDashboard({
 
   const registerUndeliveredOrder = async (reason: string, notes: string) => {
     if (!undeliveredOrder) return;
+    if (!currentCourierId) {
+      setMessage(
+        'No se pudo identificar al mensajero para registrar el problema.'
+      );
+      return;
+    }
 
     const targetOrder = undeliveredOrder;
     setSavingUndelivered(true);
@@ -801,8 +861,9 @@ export default function MessengerDashboard({
         order: targetOrder,
         reason,
         notes,
+        courierId: currentCourierId,
       });
-      setMessage('Incidente registrado correctamente.');
+      setMessage('Problema registrado y pedido marcado como no entregado.');
       setUndeliveredOrder(null);
     } catch (error) {
       console.error(error);
@@ -816,6 +877,48 @@ export default function MessengerDashboard({
       setSavingUndelivered(false);
     }
   };
+
+  const registerCancelNoPayment = async (notes: string) => {
+  if (!cancelNoPaymentOrder) return;
+
+  const targetOrder = cancelNoPaymentOrder;
+  setSavingCancelNoPayment(true);
+
+  setOrders((currentOrders) =>
+    currentOrders.map((order) =>
+      order.id === targetOrder.id
+        ? {
+            ...order,
+            deliveryStatus: 'cancelled',
+            paymentStatus: 'CANCELADO',
+            paymentStatusLabel: 'Cancelado por falta de pago',
+          }
+        : order
+    )
+  );
+
+  try {
+    await markMessengerOrderAsCancelledByNoPayment({
+      order: targetOrder,
+      notes,
+      courierId: currentCourierId,
+    });
+
+    setMessage('Pedido cancelado por falta de pago.');
+    setCancelNoPaymentOrder(null);
+  } catch (error) {
+    console.error(error);
+    setMessage('No se pudo cancelar el pedido por falta de pago.');
+
+    setOrders((currentOrders) =>
+      currentOrders.map((order) =>
+        order.id === targetOrder.id ? targetOrder : order
+      )
+    );
+  } finally {
+    setSavingCancelNoPayment(false);
+  }
+};
 
   const activeOrders =
     clientSection === 'assigned'
@@ -937,6 +1040,7 @@ export default function MessengerDashboard({
                       key={order.id}
                       order={order}
                       onAccept={acceptOrder}
+                      onCancelNoPayment={setCancelNoPaymentOrder}
                       onDelivered={markAsDelivered}
                       onDetail={setDetailOrder}
                       onInTransit={markAsInTransit}
@@ -1002,9 +1106,10 @@ export default function MessengerDashboard({
         <OrderDetailModal
           order={detailOrder}
           onClose={() => setDetailOrder(null)}
+          onCancelNoPayment={setCancelNoPaymentOrder}
           onDelivered={markAsDelivered}
           onNotDelivered={setUndeliveredOrder}
-        />
+      />
       )}
 
       {undeliveredOrder && (
@@ -1013,6 +1118,14 @@ export default function MessengerDashboard({
           order={undeliveredOrder}
           onClose={() => setUndeliveredOrder(null)}
           onConfirm={registerUndeliveredOrder}
+        />
+      )}
+      {cancelNoPaymentOrder && (
+        <CancelNoPaymentModal
+          isSaving={savingCancelNoPayment}
+          order={cancelNoPaymentOrder}
+          onClose={() => setCancelNoPaymentOrder(null)}
+          onConfirm={registerCancelNoPayment}
         />
       )}
     </main>

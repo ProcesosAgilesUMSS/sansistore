@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Check, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { AlertTriangle, ArrowDownRight, ArrowUpRight, Check, Minus, Plus, Trash2 } from 'lucide-react';
 import { AnimatedAmount } from './AnimatedAmount';
 import type { CartItemWithProduct } from '../types';
 
@@ -24,12 +24,19 @@ export function CartItemRow({
 }: Props) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(String(item.quantity));
+  const [imageFailed, setImageFailed] = useState(false);
 
   const product = item.product;
-  const price = product?.hasOffer && product?.offerPrice != null ? product.offerPrice : product?.price ?? 0;
+  const price = item.unitPrice;
   const name = product?.name ?? item.productId;
   const imageUrl = product?.imageUrl ?? '';
   const productUrl = `/productos/${item.product?.slug ?? item.productId}`;
+  const isInvalid = !item.isValid;
+  const showPriceChange = item.priceChange !== 'none' && item.isValid;
+
+  useEffect(() => {
+    setImageFailed(false);
+  }, [imageUrl]);
 
   function commitQuantity() {
     setEditing(false);
@@ -52,20 +59,23 @@ export function CartItemRow({
   return (
     <div
       className={`flex gap-3 py-4 border-b border-border-light last:border-0 transition-opacity ${
-        item.included ? 'opacity-100' : 'opacity-65'
+        isInvalid ? 'opacity-70' : item.included ? 'opacity-100' : 'opacity-65'
       }`}
     >
-      <label className="inline-flex h-14 w-8 shrink-0 items-start justify-center pt-1">
+      <label className={`inline-flex h-14 w-8 shrink-0 items-start justify-center pt-1 ${isInvalid ? 'cursor-not-allowed' : ''}`}>
         <input
           type="checkbox"
-          checked={item.included}
+          checked={item.included && !isInvalid}
+          disabled={isInvalid}
           onChange={(event) => onToggleIncluded(event.target.checked)}
           className="sr-only"
           aria-label={`Incluir ${name} en el total`}
         />
         <span
           className={`flex h-5 w-5 items-center justify-center rounded border transition-colors ${
-            item.included
+            isInvalid
+              ? 'border-border-light bg-secondary-bg-light text-transparent'
+              : item.included
               ? 'border-primary bg-primary text-white'
               : 'border-primary/45 bg-card-bg-light text-transparent shadow-[inset_0_0_0_1px_rgba(136,176,75,0.18)]'
           }`}
@@ -76,10 +86,19 @@ export function CartItemRow({
       </label>
 
       <a href={productUrl} className="shrink-0">
-        {imageUrl ? (
-          <img src={imageUrl} alt={name} className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-lg" />
+        {imageUrl && !imageFailed ? (
+          <img
+            src={imageUrl}
+            alt={name}
+            data-testid={`cart-item-image-${item.productId}`}
+            className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-lg"
+            onError={() => setImageFailed(true)}
+          />
         ) : (
-          <div className="w-14 h-14 sm:w-16 sm:h-16 bg-secondary-bg-light rounded-lg flex items-center justify-center opacity-40">
+          <div
+            data-testid={`cart-item-image-fallback-${item.productId}`}
+            className="w-14 h-14 sm:w-16 sm:h-16 bg-secondary-bg-light rounded-lg flex items-center justify-center opacity-40"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <rect x="3" y="3" width="18" height="18" rx="2" />
               <circle cx="8.5" cy="8.5" r="1.5" />
@@ -94,17 +113,64 @@ export function CartItemRow({
           <a href={productUrl} className="block line-clamp-1 font-semibold text-sm sm:text-base hover:text-primary transition-colors">
             {name}
           </a>
-          <AnimatedAmount value={price * item.quantity} className="text-sm sm:text-base font-bold text-text-light shrink-0" />
+          <AnimatedAmount
+            value={isInvalid ? 0 : price * item.quantity}
+            className={`text-sm sm:text-base font-bold shrink-0 ${isInvalid ? 'text-text-light/40 line-through' : 'text-text-light'}`}
+          />
         </div>
-        <p className="text-xs sm:text-sm text-text-light opacity-50 mt-0.5">Bs {price.toFixed(2)} / u <span className="opacity-60">· Stock: {stock}</span></p>
+        <p className="text-xs sm:text-sm text-text-light opacity-50 mt-0.5">
+          {showPriceChange && item.priceAtAdd != null ? (
+            <>
+              <span className="line-through opacity-60">Bs {item.priceAtAdd.toFixed(2)}</span>{' '}
+              <span className={`font-semibold ${item.priceChange === 'increased' ? 'text-red-500' : 'text-primary'}`}>
+                Bs {price.toFixed(2)}
+              </span>
+            </>
+          ) : (
+            <>Bs {price.toFixed(2)}</>
+          )}
+          {' / u'}
+          <span className="opacity-60"> · Stock: {stock}</span>
+        </p>
+
+        {isInvalid && item.availabilityMessage && (
+          <div
+            role="alert"
+            className="mt-2 flex items-start gap-2 rounded-md border border-red-500/30 bg-red-500/10 px-2.5 py-1.5 text-xs text-red-600 dark:text-red-400"
+          >
+            <AlertTriangle size={14} className="mt-0.5 shrink-0" aria-hidden="true" />
+            <span>{item.availabilityMessage}</span>
+          </div>
+        )}
+
+        {showPriceChange && item.priceAtAdd != null && (
+          <div
+            role="status"
+            className={`mt-2 flex items-start gap-2 rounded-md border px-2.5 py-1.5 text-xs ${
+              item.priceChange === 'increased'
+                ? 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400'
+                : 'border-primary/30 bg-primary/10 text-primary'
+            }`}
+          >
+            {item.priceChange === 'increased' ? (
+              <ArrowUpRight size={14} className="mt-0.5 shrink-0" aria-hidden="true" />
+            ) : (
+              <ArrowDownRight size={14} className="mt-0.5 shrink-0" aria-hidden="true" />
+            )}
+            <span>
+              {item.priceChange === 'increased' ? 'El precio subió' : 'El precio bajó'} de Bs {item.priceAtAdd.toFixed(2)} a Bs {price.toFixed(2)}.
+            </span>
+          </div>
+        )}
         <div className="mt-2 flex items-center gap-3">
           <div className="flex items-center gap-1.5">
             <button
               onClick={onDecrement}
-              disabled={item.quantity <= 1}
-              className="w-7 h-7 rounded-full border border-border-light flex items-center justify-center text-sm hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              disabled={isInvalid || item.quantity <= 1}
+              className="w-8 h-8 rounded-full border border-primary/40 bg-primary/10 text-primary inline-flex items-center justify-center hover:border-primary hover:bg-primary/20 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              aria-label="Disminuir cantidad"
             >
-              −
+              <Minus size={14} strokeWidth={3} aria-hidden="true" />
             </button>
             {editing ? (
               <input
@@ -120,17 +186,18 @@ export function CartItemRow({
             ) : (
               <button
                 onClick={() => { setEditing(true); setDraft(String(item.quantity)); }}
-                className="w-7 text-center text-sm sm:text-base font-semibold hover:text-primary transition-colors"
+                className="w-8 text-center text-sm sm:text-base font-semibold hover:text-primary transition-colors"
               >
                 {item.quantity}
               </button>
             )}
             <button
               onClick={onIncrement}
-              disabled={item.quantity >= stock}
-              className="w-7 h-7 rounded-full border border-border-light flex items-center justify-center text-sm hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              disabled={isInvalid || item.quantity >= stock}
+              className="w-8 h-8 rounded-full border border-primary/40 bg-primary/10 text-primary inline-flex items-center justify-center hover:border-primary hover:bg-primary/20 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              aria-label="Aumentar cantidad"
             >
-              +
+              <Plus size={14} strokeWidth={3} aria-hidden="true" />
             </button>
           </div>
           <button

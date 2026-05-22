@@ -1,30 +1,78 @@
-import { collection, query, where, getDocs, doc, getDoc, type Query, type DocumentData, updateDoc, onSnapshot, type QuerySnapshot, orderBy, addDoc, serverTimestamp } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  getDoc,
+  type Query,
+  type DocumentData,
+  updateDoc,
+  onSnapshot,
+  type QuerySnapshot,
+  orderBy,
+  addDoc,
+  serverTimestamp,
+  runTransaction,
+} from "firebase/firestore";
 import { db, auth } from "../../../lib/firebase";
 import type { Order, OrderStatus, OrderItem, ReturnRequest } from "../types";
 
-interface FirestoreOrder {
-  locationId?: string;
-  deliveryStatus?: string;
-  status: string;
-  total?: number;
-  buyerId?: string;
-  createdAt?: any;
+// --- Normalization Helpers (from main) ---
+
+function normalizeStatusValue(value: unknown) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(/[_\s-]+/g, '_');
 }
 
-interface FirestoreLocation {
-  label?: string;
+function normalizeBuyerOrderStatus(data: Record<string, unknown>): OrderStatus {
+  const deliveryStatus = normalizeStatusValue(data.deliveryStatus);
+  const orderStatus = normalizeStatusValue(data.status);
+
+  if (
+    deliveryStatus === 'delivered' ||
+    deliveryStatus === 'entregado' ||
+    orderStatus === 'completado' ||
+    orderStatus === 'entregado'
+  ) {
+    return 'delivered';
+  }
+  if (deliveryStatus === 'in_transit' || orderStatus === 'en_camino') return 'in_transit';
+  if (
+    deliveryStatus === 'accepted' ||
+    deliveryStatus === 'assigned' ||
+    orderStatus === 'aceptado' ||
+    orderStatus === 'asignado' ||
+    orderStatus === 'listo'
+  ) {
+    return 'preparing';
+  }
+  if (orderStatus === 'cancelado' || orderStatus === 'cancelled') return 'cancelled';
+
+  return (data.status as OrderStatus) || 'pending';
 }
 
-interface FirestoreOrderItem {
-  itemId?: string;
-  productId: string;
-  productName: string;
-  unitPrice?: number;
-  price?: number;
-  quantity: number;
-  subtotal: number;
-  description?: string;
+function isDeliveredForReception(data: Record<string, unknown>) {
+  const deliveryStatus = normalizeStatusValue(data.deliveryStatus);
+  const orderStatus = normalizeStatusValue(data.status);
+
+  return (
+    deliveryStatus === 'delivered' ||
+    deliveryStatus === 'entregado' ||
+    orderStatus === 'entregado' ||
+    orderStatus === 'completado'
+  );
 }
+
+function isReceptionConfirmed(data: Record<string, unknown>) {
+  return Boolean(data.buyerReceptionConfirmed || data.customerConfirmed);
+}
+
+// --- Seller Actions (from user branch) ---
 
 export async function reserveOrder(orderId: string): Promise<void> {
   const user = auth.currentUser;
@@ -44,7 +92,7 @@ export async function getSentOrders(): Promise<Order[]> {
   const q = query(
     collection(db, "orders"),
     where("sellerId", "==", user.uid),
-    where("deliveryStatus", "in", ["in_transit", "delivered"])
+    where("deliveryStatus", "in", ["in_transit", "delivered", "IN_TRANSIT", "DELIVERED", "Entregado"])
   );
   return fetchOrdersByQuery(q);
 }
@@ -57,6 +105,8 @@ export async function getCreatedOrders(): Promise<Order[]> {
   );
   return fetchOrdersByQuery(q);
 }
+
+// --- Real-time Subscriptions (from user branch) ---
 
 export function subscribeToCreatedOrders(onUpdate: (orders: Order[]) => void) {
   const q = query(
@@ -71,6 +121,8 @@ export function subscribeToCreatedOrders(onUpdate: (orders: Order[]) => void) {
   });
 }
 
+// --- Internal Processing Logic (merged) ---
+
 async function fetchOrdersByQuery(q: Query<DocumentData>): Promise<Order[]> {
   const querySnapshot = await getDocs(q);
   return processQuerySnapshot(querySnapshot);
@@ -81,7 +133,7 @@ async function processQuerySnapshot(querySnapshot: QuerySnapshot<DocumentData>):
   const uniqueLocationIds = Array.from(
     new Set(
       querySnapshot.docs
-        .map((doc) => (doc.data() as FirestoreOrder).locationId)
+        .map((doc) => (doc.data() as any).locationId)
         .filter((id): id is string => !!id)
     )
   );
@@ -92,37 +144,36 @@ async function processQuerySnapshot(querySnapshot: QuerySnapshot<DocumentData>):
       uniqueLocationIds.map(async (id) => {
         const locSnap = await getDoc(doc(db, "locations", id));
         if (locSnap.exists()) {
-          locationMap.set(id, (locSnap.data() as FirestoreLocation).label || "Sin etiqueta");
+          locationMap.set(id, (locSnap.data() as any).label || "Sin etiqueta");
         }
       })
     );
   }
 
   const orders = await Promise.all(querySnapshot.docs.map(async (orderDoc) => {
-    const data = orderDoc.data() as FirestoreOrder;
+    const data = orderDoc.data() as Record<string, any>;
     const destination = (data.locationId && locationMap.get(data.locationId)) || "Ubicación no encontrada";
 
     const itemsSnapshot = await getDocs(collection(orderDoc.ref, "orderItems"));
     const items = itemsSnapshot.docs.map(itemDoc => {
-      const itemData = itemDoc.data() as FirestoreOrderItem;
+      const item = itemDoc.data();
       return {
-        itemId: itemData.itemId ?? itemDoc.id,
-        productId: itemData.productId,
-        productName: itemData.productName,
-        price: itemData.price ?? itemData.unitPrice ?? 0,
-        quantity: itemData.quantity,
-        subtotal: itemData.subtotal,
-        description: itemData.description
+        itemId: item.itemId ?? itemDoc.id,
+        productId: item.productId,
+        productName: item.productName,
+        price: item.price ?? item.unitPrice ?? 0,
+        quantity: item.quantity,
+        subtotal: item.subtotal,
+        description: item.description,
       };
     }) as OrderItem[];
-
-    // Si deliveryStatus existe y no es "created", lo usamos como el estado visible.
-    const orderStatus = (data.deliveryStatus ? data.deliveryStatus : data.status) as OrderStatus;
 
     return {
       id: orderDoc.id,
       buyerId: data.buyerId ?? '',
-      status: orderStatus,
+      status: normalizeBuyerOrderStatus(data),
+      buyerReceptionConfirmed: isReceptionConfirmed(data),
+      buyerReceptionConfirmedAt: data.buyerReceptionConfirmedAt ?? data.customerConfirmedAt ?? null,
       delivery: {
         destination
       },
@@ -135,6 +186,8 @@ async function processQuerySnapshot(querySnapshot: QuerySnapshot<DocumentData>):
   return orders.sort((a, b) => b.id.localeCompare(a.id));
 }
 
+// --- Buyer Actions (from main) ---
+
 export async function getMyOrders(userId: string): Promise<Order[]> {
   const q = query(
     collection(db, "orders"),
@@ -143,6 +196,42 @@ export async function getMyOrders(userId: string): Promise<Order[]> {
   );
   const querySnapshot = await getDocs(q);
   return processQuerySnapshot(querySnapshot);
+}
+
+export async function confirmOrderReception(orderId: string, buyerId: string) {
+  const orderRef = doc(db, "orders", orderId);
+
+  await runTransaction(db, async (transaction) => {
+    const orderSnap = await transaction.get(orderRef);
+
+    if (!orderSnap.exists()) {
+      throw new Error("El pedido no existe.");
+    }
+
+    const data = orderSnap.data();
+
+    if (data.buyerId !== buyerId) {
+      throw new Error("No puedes confirmar la recepción de este pedido.");
+    }
+
+    if (!isDeliveredForReception(data)) {
+      throw new Error("Solo puedes confirmar pedidos marcados como entregados.");
+    }
+
+    if (isReceptionConfirmed(data)) {
+      throw new Error("La recepción de este pedido ya fue confirmada.");
+    }
+
+    const confirmedAt = serverTimestamp();
+
+    transaction.update(orderRef, {
+      buyerReceptionConfirmed: true,
+      buyerReceptionConfirmedAt: confirmedAt,
+      receptionStatus: "CONFIRMADO_POR_COMPRADOR",
+      status: "COMPLETADO",
+      updatedAt: confirmedAt,
+    });
+  });
 }
 
 export async function createReturnRequest(requestData: Omit<ReturnRequest, 'id' | 'createdAt' | 'status'>) {
