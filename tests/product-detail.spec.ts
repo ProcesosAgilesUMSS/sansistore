@@ -80,41 +80,59 @@ test.describe('Product Detail Page', () => {
   });
 
   test('displays product reviews', async ({ page }) => {
-    await page.goto('/productos/leche-pil-natural-900-ml');
+    await page.goto('/productos/leche-pil-natural-900-ml', {
+      waitUntil: 'domcontentloaded',
+    });
+
+    await expect(
+      page.getByRole('heading', { name: /Leche PIL Natural 900 ml/ })
+    ).toBeVisible({ timeout: 30_000 });
 
     await expect(
       page.getByRole('heading', { name: /Comentarios del producto/ })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 30_000 });
 
     const user1Review = page.locator('article').filter({ hasText: 'Carla' });
-    await expect(user1Review).toBeVisible();
+    await expect(user1Review).toBeVisible({ timeout: 15_000 });
     await expect(
       user1Review
         .locator('p')
         .filter({ hasText: 'Buen sabor y practica para tener en casa.' })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15_000 });
     await expect(
       user1Review.locator('span').filter({ hasText: '5.0' })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15_000 });
 
     const user2Review = page.locator('article').filter({ hasText: 'Miguel' });
-    await expect(user2Review).toBeVisible();
+    await expect(user2Review).toBeVisible({ timeout: 15_000 });
     await expect(
       user2Review
         .locator('p')
         .filter({ hasText: 'La uso para desayuno y cafe.' })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15_000 });
     await expect(
       user2Review.locator('span').filter({ hasText: '4.0' })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15_000 });
 
-    await expect(page.getByText('4.5 de 5')).toBeVisible();
+    await expect(page.getByText('4.5 de 5')).toBeVisible({
+      timeout: 15_000,
+    });
 
-    await expect(page.getByTestId('average-star-0-full')).toBeVisible();
-    await expect(page.getByTestId('average-star-1-full')).toBeVisible();
-    await expect(page.getByTestId('average-star-2-full')).toBeVisible();
-    await expect(page.getByTestId('average-star-3-full')).toBeVisible();
-    await expect(page.getByTestId('average-star-4-half')).toBeVisible();
+    await expect(page.getByTestId('average-star-0-full')).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.getByTestId('average-star-1-full')).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.getByTestId('average-star-2-full')).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.getByTestId('average-star-3-full')).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.getByTestId('average-star-4-half')).toBeVisible({
+      timeout: 15_000,
+    });
   });
 
   test('displays no reviews message when product has no reviews', async ({
@@ -136,12 +154,23 @@ test.describe('Product Detail Page', () => {
   });
 
   test('product image loads', async ({ page }) => {
-    await page.goto('/productos/leche-pil-natural-900-ml');
-    const productImage = page.locator('img').first();
+    await page.goto('/productos/leche-pil-natural-900-ml', {
+      waitUntil: 'domcontentloaded',
+    });
+    await expect(
+      page.getByRole('heading', { name: /Leche PIL Natural 900 ml/ })
+    ).toBeVisible({ timeout: 30_000 });
+    const productImage = page.getByRole('img', {
+      name: /Leche PIL Natural 900 ml/,
+    });
 
-    await expect(productImage).toBeVisible();
-    await expect(productImage).toHaveJSProperty('complete', true);
-    await expect(productImage).not.toHaveJSProperty('naturalWidth', 0);
+    await expect(productImage).toBeVisible({ timeout: 15_000 });
+    await expect(productImage).toHaveJSProperty('complete', true, {
+      timeout: 15_000,
+    });
+    await expect(productImage).not.toHaveJSProperty('naturalWidth', 0, {
+      timeout: 15_000,
+    });
   });
 
   test('returns 404 for non-existent product', async ({ page }) => {

@@ -15,25 +15,35 @@ export default function LoginPage() {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
 
-    const handleEmailLogin = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const performEmailLogin = async () => {
+        if (loading) return;
+        const emailValue = (document.getElementById('email') as HTMLInputElement | null)?.value || email;
+        const passwordValue = (document.getElementById('password') as HTMLInputElement | null)?.value || password;
+        console.log('[Login] perform start', emailValue, passwordValue.length);
         setLoading(true);
         setError(null);
 
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            await signInWithEmailAndPassword(auth, emailValue, passwordValue);
+            console.log('[Login] success');
             setSuccess(true);
-            window.location.href = '/';
+            window.location.assign('/');
         } catch (err: unknown) {
             const firebaseError = err as FirebaseError;
+            console.error('[Login] fail', firebaseError.code, firebaseError.message);
             setError(
                 firebaseError.code === 'auth/invalid-credential'
                     ? 'Correo o contraseña incorrectos'
                     : 'Error al iniciar sesión. Intenta de nuevo.'
             );
-        } finally {
             setLoading(false);
         }
+    };
+
+    const handleEmailLogin = (e: React.FormEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        void performEmailLogin();
     };
 
     const handleGoogleSuccess = () => {
@@ -60,7 +70,7 @@ export default function LoginPage() {
                     </div>
 
                     <div className="rounded-[1.25rem] shadow-lg border border-border-light bg-(--theme-card-bg) p-6">
-                        <form onSubmit={handleEmailLogin} className="space-y-4">
+                        <form onSubmit={handleEmailLogin} noValidate className="space-y-4">
                             <div>
                                 <label
                                     htmlFor="email"
@@ -111,8 +121,9 @@ export default function LoginPage() {
                             </div>
 
                             <button
-                                type="submit"
+                                type="button"
                                 disabled={loading}
+                                onClick={() => { void performEmailLogin(); }}
                                 className="w-full py-2 px-4 rounded-full uppercase font-semibold text-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed bg-primary text-bg-light hover:bg-primary/90"
                             >
                                 {loading ? 'Ingresando...' : 'Iniciar sesión'}
