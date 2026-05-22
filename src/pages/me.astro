@@ -1,34 +1,24 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 ---
 
 <Layout title="Mi Cuenta | Sansistore">
-  <Navbar client:only="react" />
-  <main class="min-h-[calc(100vh-8rem)] bg-bg-light pt-28 pb-12 px-4 flex justify-center">
-    <div class="w-full max-w-lg rounded-[1.25rem] shadow-lg border border-border-light bg-[var(--theme-card-bg)] p-8">
-      <header class="flex flex-col items-center mb-8">
-        <div class="w-24 h-24 mb-4 rounded-full overflow-hidden bg-[var(--theme-secondary-bg)] border-4 border-border-light flex items-center justify-center">
-           <img id="user-avatar" src="" alt="" class="w-full h-full object-cover" hidden />
-           <span id="avatar-placeholder" class="text-text-light opacity-50 text-4xl">👤</span>
-        </div>
-        <h1 class="text-2xl font-black text-text-light">Mi Perfil</h1>
-      </header>
+  <main class="profile-container">
+    <header class="profile-header">
+      <img id="user-avatar" src="" alt="" class="profile-avatar" hidden />
+      <h1>Mi Perfil</h1>
+    </header>
 
-      <section class="flex flex-col gap-6" id="auth-status-container">
-        <div id="auth-status" class="text-center text-text-light opacity-60">Cargando...</div>
-      </section>
-    </div>
+    <section class="profile-details">
+      <div id="auth-status" class="loading">Cargando...</div>
+    </section>
   </main>
-  <Footer client:only="react" />
 
   <script>
     import { onAuthStateChanged } from 'firebase/auth';
     import { auth } from '../lib/firebase';
 
     const container = document.getElementById('auth-status');
-    const placeholder = document.getElementById('avatar-placeholder');
 
     onAuthStateChanged(auth, (user) => {
       if (!container) return;
@@ -41,28 +31,22 @@ import Footer from '../components/Footer';
           avatar.src = user.photoURL;
           avatar.alt = `Foto de perfil de ${escapeHtml(displayName)}`;
           avatar.hidden = false;
-          if (placeholder) placeholder.hidden = true;
         }
-        
         container.outerHTML = `
-          <div class="flex flex-col gap-4">
-            <dl class="p-4 rounded-lg bg-[var(--theme-secondary-bg)] border border-border-light">
-              <dt class="text-xs font-semibold text-primary uppercase tracking-wider">Nombre</dt>
-              <dd class="text-lg font-medium text-text-light mt-1">${escapeHtml(displayName)}</dd>
+          <section class="profile-details">
+            <dl class="profile-data">
+              <dt>Nombre</dt>
+              <dd>${escapeHtml(displayName)}</dd>
+              <dt>Correo</dt>
+              <dd>${escapeHtml(email)}</dd>
             </dl>
-            <dl class="p-4 rounded-lg bg-[var(--theme-secondary-bg)] border border-border-light">
-              <dt class="text-xs font-semibold text-primary uppercase tracking-wider">Correo</dt>
-              <dd class="text-lg font-medium text-text-light mt-1">${escapeHtml(email)}</dd>
-            </dl>
-          </div>
+          </section>
         `;
       } else {
         container.outerHTML = `
-          <div class="flex flex-col items-center text-center py-6">
-            <p class="text-lg font-medium text-text-light mb-6">No autenticado</p>
-            <a href="/login" class="w-full sm:w-auto py-2 px-8 rounded-full uppercase font-semibold text-sm transition-all active:scale-95 bg-primary text-bg-light hover:bg-primary/90 inline-block">
-              Iniciar sesión
-            </a>
+          <div class="error-message">
+            <p>No autenticado</p>
+            <a href="/login">Iniciar sesión</a>
           </div>
         `;
       }

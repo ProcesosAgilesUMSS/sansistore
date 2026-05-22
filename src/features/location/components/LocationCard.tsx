@@ -109,7 +109,7 @@ export default function LocationCard({
                 <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#88B04B]/10 text-[#88B04B] transition-colors duration-300">
                     {TYPE_ICONS[type]}
                 </div>
-                
+
                 <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                         <span className="font-outfit text-sm font-extrabold leading-none text-(--theme-text) transition-colors duration-300">
@@ -125,7 +125,6 @@ export default function LocationCard({
                         {lat.toFixed(4)}, {lng.toFixed(4)}
                     </p>
                 </div>
-            
 
                 <div className="flex items-center gap-1">
                     <button

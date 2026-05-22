@@ -33,19 +33,6 @@ function generateItemId(orderCode: string, idx: number) {
   return `${orderCode}-item-${idx + 1}`;
 }
 
-type ConfirmedOrderSummary = {
-  orderId: string;
-  locationLabel: string;
-  locationType: string;
-  total: number;
-  items: Array<{
-    productId: string;
-    productName: string;
-    quantity: number;
-    subtotal: number;
-  }>;
-};
-
 function LoginModal({ onClose }: { onClose: () => void }) {
   return (
     <div
@@ -369,157 +356,6 @@ function OrderSuccessModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-function OrderSuccessDetailsModal({
-  order,
-  onClose,
-}: {
-  order: ConfirmedOrderSummary | null;
-  onClose: () => void;
-}) {
-  const visibleItems = order?.items.slice(0, 3) ?? [];
-  const hiddenItemsCount = Math.max(
-    (order?.items.length ?? 0) - visibleItems.length,
-    0,
-  );
-  const totalUnits =
-    order?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="success-title"
-    >
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-      />
-
-      <div className="relative z-10 w-full max-w-md rounded-2xl border border-border-light bg-card-bg-light p-6 shadow-2xl">
-        <div className="flex flex-col items-center gap-3 text-center">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="28"
-              height="28"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-          </div>
-          <h2 id="success-title" className="text-lg font-bold text-text-light">
-            Pedido confirmado
-          </h2>
-          <p className="text-sm text-text-light opacity-70">
-            Tu pedido ha sido creado exitosamente. El pago queda pendiente para
-            la entrega.
-          </p>
-        </div>
-
-        {order && (
-          <div className="mt-6 space-y-4">
-            <div className="rounded-xl border border-border-light bg-bg-light/60 p-4">
-              <div className="flex items-start justify-between gap-3 text-sm">
-                <div className="min-w-0">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-text-light opacity-50">
-                    Pedido
-                  </p>
-                  <p className="mt-1 break-all font-bold text-text-light">
-                    {order.orderId}
-                  </p>
-                </div>
-                <div className="shrink-0 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
-                  Pendiente de cobro
-                </div>
-              </div>
-
-              <div className="mt-4 border-t border-border-light pt-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-text-light opacity-50">
-                  Ubicacion
-                </p>
-                <p className="mt-1 text-sm font-semibold text-text-light">
-                  {order.locationLabel}
-                </p>
-                <p className="text-xs capitalize text-text-light opacity-60">
-                  {order.locationType}
-                </p>
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-border-light p-4">
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <p className="text-sm font-bold text-text-light">Productos</p>
-                <p className="text-xs font-semibold text-text-light opacity-60">
-                  {totalUnits} {totalUnits === 1 ? 'unidad' : 'unidades'}
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                {visibleItems.map((item) => (
-                  <div
-                    key={item.productId}
-                    className="flex items-start justify-between gap-3 text-sm"
-                  >
-                    <div className="min-w-0">
-                      <p className="line-clamp-1 font-medium text-text-light">
-                        {item.productName}
-                      </p>
-                      <p className="text-xs text-text-light opacity-60">
-                        Cantidad: {item.quantity}
-                      </p>
-                    </div>
-                    <p className="shrink-0 font-semibold text-primary">
-                      Bs {item.subtotal.toFixed(2)}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              {hiddenItemsCount > 0 && (
-                <p className="mt-3 rounded-lg bg-secondary-bg-light px-3 py-2 text-xs font-semibold text-text-light opacity-70">
-                  + {hiddenItemsCount}{' '}
-                  {hiddenItemsCount === 1 ? 'producto mas' : 'productos mas'}
-                </p>
-              )}
-            </div>
-
-            <div className="flex items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4">
-              <span className="text-xs font-semibold uppercase tracking-wide text-text-light opacity-60">
-                Total a pagar
-              </span>
-              <span className="text-xl font-bold text-primary">
-                Bs {order.total.toFixed(2)}
-              </span>
-            </div>
-          </div>
-        )}
-
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex w-full items-center justify-center rounded-full border border-border-light bg-transparent px-4 py-3 text-sm font-semibold text-text-light transition hover:bg-secondary-bg-light active:scale-95"
-          >
-            Aceptar
-          </button>
-          <a
-            href="/mis-pedidos"
-            className="flex w-full items-center justify-center rounded-full bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90 active:scale-95"
-          >
-            Ver mis pedidos
-          </a>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function CartViewInner() {
   const { itemsWithProducts, loading, updateQuantity, setQuantity, removeItem, items } = useCartContext();
   const { user, authReady } = useAuthUser();
@@ -534,8 +370,6 @@ function CartViewInner() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [creatingOrder, setCreatingOrder] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
-  const [confirmedOrderSummary, setConfirmedOrderSummary] =
-    useState<ConfirmedOrderSummary | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -776,18 +610,6 @@ function CartViewInner() {
         await removeItem(item.productId);
       }
 
-      setConfirmedOrderSummary({
-        orderId: orderCode,
-        locationLabel: selectedLocation.label,
-        locationType: selectedLocation.type,
-        total,
-        items: orderItems.map((item) => ({
-          productId: item.productId,
-          productName: item.productName,
-          quantity: item.quantity,
-          subtotal: item.subtotal,
-        })),
-      });
       setShowSuccessModal(true);
     } catch (error) {
       console.error('Error creating order:', error);
@@ -1071,14 +893,7 @@ function CartViewInner() {
             loading={creatingOrder}
           />
         )}
-        {showSuccessModal && confirmedOrderSummary ? (
-          <OrderSuccessDetailsModal
-            order={confirmedOrderSummary}
-            onClose={() => setShowSuccessModal(false)}
-          />
-        ) : showSuccessModal ? (
-          <OrderSuccessModal onClose={() => setShowSuccessModal(false)} />
-        ) : null}
+        {showSuccessModal && <OrderSuccessModal onClose={() => setShowSuccessModal(false)} />}
       </div>
     </div>
   );

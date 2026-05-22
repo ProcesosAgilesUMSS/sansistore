@@ -75,8 +75,6 @@ async function seedAuthUsers() {
           if (result.failureCount > 0) {
             throw result.errors[0].error;
           }
-          
-          await auth.updateUser(user.uid, { password: '12345678' });
         } else {
           await auth.createUser({
             uid: user.uid,
@@ -84,7 +82,7 @@ async function seedAuthUsers() {
             displayName: user.displayName,
             photoURL: user.photoURL || '',
             emailVerified: false,
-            password: '12345678',
+            password: 'password123',
           });
         }
         console.log(`  ✓ Auth: ${user.email} (${user.authType})`);
@@ -231,9 +229,6 @@ async function seedOrders() {
       orderId: order.code,
       buyerId: order.buyer.uid,
       sellerId: order.seller.uid,
-      customerName: order.customerName,
-      customerPhone: order.customerPhone,
-      address: order.address,
       status: order.status,
       incidentReason: null,
       total,
