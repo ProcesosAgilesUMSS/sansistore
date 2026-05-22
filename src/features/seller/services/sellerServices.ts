@@ -139,7 +139,8 @@ export function subscribeSellerOrders(
 
   const qReserved = query(
     ordersRef,
-    where('status', '==', 'CONFIRMADO'),
+    where('sellerId', '==', sellerId),
+    where('status', '==', 'EMPAQUETADO'),
   );
 
   const qReady = query(
@@ -215,9 +216,9 @@ export async function markOrderAsReady(
 
     const current = orderSnap.data();
 
-    if (current.status !== 'CONFIRMADO') {
+    if (current.status !== 'EMPAQUETADO') {
       throw new Error(
-        `El pedido ya no está en CONFIRMADO (estado actual: ${current.status}).`,
+        `El pedido ya no está en EMPAQUETADO (estado actual: ${current.status}).`,
       );
     }
 
@@ -264,7 +265,7 @@ export function subscribeConfirmedOrders(
   const q = query(
     collection(db, 'orders'),
     where('sellerId', '==', sellerId),
-    where('status', '==', 'CONFIRMADO'),
+    where('status', '==', 'EMPAQUETADO'),
   );
 
   return onSnapshot(
@@ -317,9 +318,9 @@ export async function reserveConfirmedOrder(
 
     const current = orderSnap.data();
 
-    if (current.status !== 'CONFIRMADO') {
+    if (current.status !== 'EMPAQUETADO') {
       throw new Error(
-        `El pedido ya no está en CONFIRMADO (estado actual: ${current.status}).`,
+        `El pedido ya no está en EMPAQUETADO (estado actual: ${current.status}).`,
       );
     }
 

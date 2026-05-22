@@ -73,6 +73,12 @@ export function AssignOrderCard({
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <p
+              className="font-800 text-xs tracking-tight text-(--theme-text) pb-2"
+              style={{ fontFamily: 'Outfit, sans-serif' }}
+            >
+              # {order.orderId?.toUpperCase()}
+            </p>
+            <p
               className="font-800 text-lg tracking-tight text-(--theme-text)"
               style={{ fontFamily: 'Outfit, sans-serif' }}
             >

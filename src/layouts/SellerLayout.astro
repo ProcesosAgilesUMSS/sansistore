@@ -21,7 +21,7 @@ const { title = 'Sansistore | Vendedor' } = Astro.props;
           class="grid gap-4 lg:grid-cols-[300px_minmax(0,1fr)] lg:items-start"
         >
           <div class="lg:sticky lg:top-10 lg:self-start lg:pl-0 xl:pl-2">
-            <SideBarSeller />
+            <SideBarSeller client:load />
           </div>
           <slot />
         </div>
