@@ -229,29 +229,15 @@ test.describe('Cart - Carrito', () => {
 
   async function loginWithEmail(page: Page, email: string) {
     await page.goto('/login');
-    const loginButton = page.locator('form').getByRole('button', {
-      name: 'Iniciar sesión',
-      exact: true,
-    });
-
-    await expect(loginButton).toBeEnabled({ timeout: 15_000 });
+    await expect(
+      page.locator('form').getByRole('button', {
+        name: 'Iniciar sesión',
+        exact: true,
+      })
+    ).toBeEnabled({ timeout: 15_000 });
     await expect(page.getByLabel('Correo electrónico')).toBeEditable();
     await expect(page.locator('#password')).toBeEditable();
-    await expect
-      .poll(
-        async () =>
-          page.evaluate(() => {
-            const button = document
-              .querySelector('form')
-              ?.querySelector('button[type="button"]');
-            return Boolean(
-              button &&
-                Object.keys(button).some((key) => key.startsWith('__reactProps'))
-            );
-          }),
-        { timeout: 15_000 }
-      )
-      .toBe(true);
+    await page.waitForLoadState('networkidle');
 
     const emailField = page.getByLabel('Correo electrónico');
     const passwordField = page.locator('#password');
@@ -270,15 +256,11 @@ test.describe('Cart - Carrito', () => {
     }
 
     await expect(emailField).toHaveValue(email, { timeout: 10_000 });
-    await expect(passwordField).toHaveValue('password123', {
-      timeout: 10_000,
-    });
-
-    for (let attempt = 0; attempt < 3 && page.url().includes('/login'); attempt++) {
-      await loginButton.click();
-      await page.waitForTimeout(1000);
-    }
-
+    await expect(passwordField).toHaveValue('password123', { timeout: 10_000 });
+    await page
+      .locator('form')
+      .getByRole('button', { name: 'Iniciar sesión', exact: true })
+      .click();
     await expect(page).toHaveURL('/', { timeout: 30_000 });
   }
 
