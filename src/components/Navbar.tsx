@@ -155,6 +155,7 @@ export default function Navbar() {
   const showOperadorInvFeatures = user && roles.length > 0 && roles.some(r => ['operador_inv', 'admin'].includes(r));
   const showMensajeroFeatures = user && roles.length > 0 && roles.some(r => ['mensajero', 'admin'].includes(r));
   const showAdminFeatures = user && roles.length > 0 && roles.some(r => ['admin'].includes(r));
+  const showMisPedidos = user && roles.length > 0 && roles.some(r => ['comprador', 'admin'].includes(r));
 
   return (
     <>
@@ -263,16 +264,18 @@ export default function Navbar() {
                         role="menu"
                         className="absolute right-0 top-11 w-48 overflow-hidden rounded-lg border border-border-light bg-bg-light shadow-lg"
                       >
-                        <a
-                          role="menuitem"
-                          href="/mis-pedidos"
-                          className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
-                        >
-                          {/*
-                          <Package size={14} />
-                        */}
-                          Mis pedidos
-                        </a>
+                        {showMisPedidos && (
+                          <a
+                            role="menuitem"
+                            href="/mis-pedidos"
+                            className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
+                          >
+                            {/*
+                            <Package size={14} />
+                          */}
+                            Mis pedidos
+                          </a>
+                        )}
 
                         {canAccessCourier && (
                           <a
@@ -388,12 +391,14 @@ export default function Navbar() {
                     Mis direcciones
                   </a>
 
-                  <a
-                    href="/mis-pedidos"
-                    className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
-                  >
-                    Mis pedidos
-                  </a>
+                  {showMisPedidos && (
+                    <a
+                      href="/mis-pedidos"
+                      className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
+                    >
+                      Mis pedidos
+                    </a>
+                  )}
 
                   {canAccessCourier && (
                     <a
