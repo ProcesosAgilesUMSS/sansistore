@@ -17,6 +17,33 @@ import type { MessengerOrder, MessengerOrderItem } from '../types';
 
 type DeliveryStatus = MessengerOrder['deliveryStatus'];
 
+type OrderLocation = {
+  id: string;
+  label: string;
+  lat: number | null;
+  lng: number | null;
+};
+
+const readOrderLocation = async (
+  locationId: unknown
+): Promise<OrderLocation | null> => {
+  if (typeof locationId !== 'string' || !locationId) return null;
+
+  const locationSnap = await getDoc(doc(db, 'locations', locationId));
+  if (!locationSnap.exists()) return null;
+
+  const location = locationSnap.data();
+  const lat = Number(location.lat);
+  const lng = Number(location.lng);
+
+  return {
+    id: locationSnap.id,
+    label: String(location.label || 'Ubicacion sin referencia'),
+    lat: Number.isFinite(lat) ? lat : null,
+    lng: Number.isFinite(lng) ? lng : null,
+  };
+};
+
 const normalizeDeliveryStatus = (status: unknown): DeliveryStatus => {
   if (status === 'accepted' || status === 'ACCEPTED') return 'accepted';
   if (status === 'pending_reassignment' || status === 'PENDING_REASSIGNMENT') {
@@ -89,6 +116,7 @@ export async function getMessengerOrders(
         ? await getDoc(doc(db, 'orders', orderId))
         : null;
       const order = orderSnap?.exists() ? orderSnap.data() : {};
+      const location = await readOrderLocation(order.locationId);
       const items = orderId ? await readOrderItems(orderId) : [];
       const paymentStatus = String(order.paymentStatus || 'PENDIENTE');
 
@@ -100,8 +128,17 @@ export async function getMessengerOrders(
         customerName: String(order.customerName || 'Cliente no registrado'),
         buyerName: String(order.customerName || 'Comprador invitado'),       
         phone: String(order.customerPhone || 'Sin telefono'),
-        address: String(order.address || 'Direccion no registrada'),
+        address: String(
+          order.address || location?.label || 'Direccion no registrada'
+        ),
         city: String(order.deliveryZone || 'Cochabamba'),
+        reference: location?.label,
+        locationId: location?.id ?? null,
+        locationLabel: location?.label ?? 'Ubicacion no registrada',
+        deliveryLat: location?.lat ?? null,
+        deliveryLng: location?.lng ?? null,
+        lat: location?.lat ?? null,
+        lng: location?.lng ?? null,
         items,
         cashToCollect: Number(delivery.amountCollected || order.total || 0),
         paymentMethod: 'cash_on_delivery' as const,
@@ -147,6 +184,7 @@ export function subscribeToMessengerOrders(
               ? await getDoc(doc(db, 'orders', orderId))
               : null;
             const order = orderSnap?.exists() ? orderSnap.data() : {};
+            const location = await readOrderLocation(order.locationId);
             const items = orderId ? await readOrderItems(orderId) : [];
             const paymentStatus = String(order.paymentStatus || 'PENDIENTE');
 
@@ -161,8 +199,17 @@ export function subscribeToMessengerOrders(
               ),
               buyerName: String(order.customerName || 'Comprador invitado'),
               phone: String(order.customerPhone || 'Sin telefono'),
-              address: String(order.address || 'Direccion no registrada'),
+              address: String(
+                order.address || location?.label || 'Direccion no registrada'
+              ),
               city: String(order.deliveryZone || 'Cochabamba'),
+              reference: location?.label,
+              locationId: location?.id ?? null,
+              locationLabel: location?.label ?? 'Ubicacion no registrada',
+              deliveryLat: location?.lat ?? null,
+              deliveryLng: location?.lng ?? null,
+              lat: location?.lat ?? null,
+              lng: location?.lng ?? null,
               items,
               cashToCollect: Number(delivery.amountCollected || order.total || 0),
               paymentMethod: 'cash_on_delivery' as const,
