@@ -245,3 +245,9 @@ por las dudas que se tienen.
 * **Yesterday:** Terminé de implementar y ajustar mis HUs relacionadas con la confirmación de pedidos y validación de entrega por parte del comprador, revisando detalles pendientes.
 * **Today:** Continuaré apoyando en la revisión y validación del flujo del comprador, verificando posibles mejoras en las funcionalidades implementadas.
 * **Blockers:** None
+
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Terminé mis HUs del vendedor, implementando y ajustando el flujo de **cambio de estado a `RESERVADO`** al confirmar la reserva de producto, además de la vista para **consultar el historial de cobros por pedido** para auditoría.
+* **Today:** Realicé pruebas y correcciones sobre el flujo del vendedor, validando la visualización de pedidos reservados, el historial de pedidos pagados y ajustando conflictos y datos de seed para dejar el entorno listo para pruebas.
+* **Blockers:** None
