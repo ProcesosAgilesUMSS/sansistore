@@ -17,6 +17,33 @@ import type { MessengerOrder, MessengerOrderItem } from '../types';
 
 type DeliveryStatus = MessengerOrder['deliveryStatus'];
 
+type OrderLocation = {
+  id: string;
+  label: string;
+  lat: number | null;
+  lng: number | null;
+};
+
+const readOrderLocation = async (
+  locationId: unknown
+): Promise<OrderLocation | null> => {
+  if (typeof locationId !== 'string' || !locationId) return null;
+
+  const locationSnap = await getDoc(doc(db, 'locations', locationId));
+  if (!locationSnap.exists()) return null;
+
+  const location = locationSnap.data();
+  const lat = Number(location.lat);
+  const lng = Number(location.lng);
+
+  return {
+    id: locationSnap.id,
+    label: String(location.label || 'Ubicacion sin referencia'),
+    lat: Number.isFinite(lat) ? lat : null,
+    lng: Number.isFinite(lng) ? lng : null,
+  };
+};
+
 const normalizeDeliveryStatus = (status: unknown): DeliveryStatus => {
   if (status === 'accepted' || status === 'ACCEPTED') return 'accepted';
   if (status === 'pending_reassignment' || status === 'PENDING_REASSIGNMENT') {
@@ -24,6 +51,9 @@ const normalizeDeliveryStatus = (status: unknown): DeliveryStatus => {
   }
   if (status === 'not_delivered' || status === 'NOT_DELIVERED') {
     return 'not_delivered';
+  }
+  if (status === 'cancelled' || status === 'CANCELLED' || status === 'CANCELADO') {
+    return 'cancelled';
   }
   if (status === 'in_transit' || status === 'delivered') return status;
   if (status === 'IN_TRANSIT') return 'in_transit';
@@ -37,6 +67,7 @@ const normalizeOrderDeliveryStatus = (status: DeliveryStatus) => {
   if (status === 'in_transit') return 'IN_TRANSIT';
   if (status === 'delivered') return 'DELIVERED';
   if (status === 'not_delivered') return 'NOT_DELIVERED';
+  if (status === 'cancelled') return 'CANCELLED';
   return 'ASSIGNED';
 };
 
@@ -85,6 +116,7 @@ export async function getMessengerOrders(
         ? await getDoc(doc(db, 'orders', orderId))
         : null;
       const order = orderSnap?.exists() ? orderSnap.data() : {};
+      const location = await readOrderLocation(order.locationId);
       const items = orderId ? await readOrderItems(orderId) : [];
       const paymentStatus = String(order.paymentStatus || 'PENDIENTE');
 
@@ -96,8 +128,17 @@ export async function getMessengerOrders(
         customerName: String(order.customerName || 'Cliente no registrado'),
         buyerName: String(order.customerName || 'Comprador invitado'),       
         phone: String(order.customerPhone || 'Sin telefono'),
-        address: String(order.address || 'Direccion no registrada'),
+        address: String(
+          order.address || location?.label || 'Direccion no registrada'
+        ),
         city: String(order.deliveryZone || 'Cochabamba'),
+        reference: location?.label,
+        locationId: location?.id ?? null,
+        locationLabel: location?.label ?? 'Ubicacion no registrada',
+        deliveryLat: location?.lat ?? null,
+        deliveryLng: location?.lng ?? null,
+        lat: location?.lat ?? null,
+        lng: location?.lng ?? null,
         items,
         cashToCollect: Number(delivery.amountCollected || order.total || 0),
         paymentMethod: 'cash_on_delivery' as const,
@@ -143,6 +184,7 @@ export function subscribeToMessengerOrders(
               ? await getDoc(doc(db, 'orders', orderId))
               : null;
             const order = orderSnap?.exists() ? orderSnap.data() : {};
+            const location = await readOrderLocation(order.locationId);
             const items = orderId ? await readOrderItems(orderId) : [];
             const paymentStatus = String(order.paymentStatus || 'PENDIENTE');
 
@@ -157,8 +199,17 @@ export function subscribeToMessengerOrders(
               ),
               buyerName: String(order.customerName || 'Comprador invitado'),
               phone: String(order.customerPhone || 'Sin telefono'),
-              address: String(order.address || 'Direccion no registrada'),
+              address: String(
+                order.address || location?.label || 'Direccion no registrada'
+              ),
               city: String(order.deliveryZone || 'Cochabamba'),
+              reference: location?.label,
+              locationId: location?.id ?? null,
+              locationLabel: location?.label ?? 'Ubicacion no registrada',
+              deliveryLat: location?.lat ?? null,
+              deliveryLng: location?.lng ?? null,
+              lat: location?.lat ?? null,
+              lng: location?.lng ?? null,
               items,
               cashToCollect: Number(delivery.amountCollected || order.total || 0),
               paymentMethod: 'cash_on_delivery' as const,
@@ -199,13 +250,22 @@ export function subscribeToMessengerOrders(
 }
 const getStatusForORder = (status: DeliveryStatus) => {
   switch (status) {
-    case 'accepted': return 'ACEPTADO';
-    case 'pending_reassignment': return 'PENDIENTE REASIGNACION';
-    case 'in_transit': return 'EN CAMINO';
-    case 'delivered': return 'ENTREGADO';
-    case 'not_delivered': return 'CANCELADO';
+    case 'accepted':
+      return 'ACEPTADO';
+    case 'pending_reassignment':
+      return 'PENDIENTE REASIGNACION';
+    case 'in_transit':
+      return 'EN CAMINO';
+    case 'delivered':
+      return 'ENTREGADO';
+    case 'not_delivered':
+      return 'NO ENTREGADO';
+    case 'cancelled':
+      return 'CANCELADO';
+    default:
+      return 'ASIGNADO';
   }
-}
+};
 
 export async function setMessengerOrderStatus(
   order: MessengerOrder,
@@ -285,18 +345,24 @@ export async function markMessengerOrderAsNotDelivered({
   order,
   reason,
   notes,
+  courierId,
 }: {
   order: MessengerOrder;
   reason: string;
   notes: string;
+  courierId: string;
 }) {
   const deliveryRef = doc(db, 'deliveries', order.deliveryId);
   const failedAt = serverTimestamp();
 
   await updateDoc(deliveryRef, {
     status: 'not_delivered',
+    incidentType: 'delivery_problem',
     incidentReason: reason,
     incidentNotes: notes,
+    incidentStatus: 'reported',
+    reportedAt: failedAt,
+    reportedBy: courierId,
     failedAt,
     customerConfirmed: false,
     updatedAt: failedAt,
@@ -318,12 +384,90 @@ export async function markMessengerOrderAsNotDelivered({
     deliveryZone: order.city,
     deliveryMethod: order.deliveryMethod,
     address: order.address,
+    incidentType: 'delivery_problem',
+    incidentStatus: 'reported',
     reason,
     notes,
+    reportedBy: courierId,
+    reportedAt: serverTimestamp(),
     status: 'not_delivered',          
     total: order.cashToCollect,
     paymentMethod: 'Contra entrega', 
     createdAt: serverTimestamp(),
   });
 }
+export async function markMessengerOrderAsCancelledByNoPayment({
+  order,
+  notes,
+  courierId,
+}: {
+  order: MessengerOrder;
+  notes: string;
+  courierId: string | null;
+}) {
+  const cancelledAt = serverTimestamp();
+  const reason = 'Falta de pago del cliente';
+  const batch = writeBatch(db);
 
+  batch.update(doc(db, 'deliveries', order.deliveryId), {
+    status: 'cancelled',
+    cancellationReason: reason,
+    cancellationNotes: notes,
+    cancelledAt,
+    cancelledBy: courierId,
+    customerConfirmed: false,
+    amountCollected: 0,
+    updatedAt: cancelledAt,
+  });
+
+  if (order.id) {
+  batch.update(doc(db, 'orders', order.id), {
+    status: 'CANCELADO',
+    deliveryStatus: 'CANCELLED',
+    paymentStatus: 'CANCELADO',
+    paymentStatusLabel: 'Cancelado por falta de pago',
+    incidentReason: reason,
+    incidentNotes: notes,
+    cancelledAt,
+    cancelledBy: courierId,
+    updatedAt: cancelledAt,
+  });
+}
+
+  if (order.paymentId) {
+    batch.set(
+      doc(db, 'payments', order.paymentId),
+      {
+        status: 'CANCELADO',
+        statusLabel: 'Cancelado por falta de pago',
+        cancellationReason: reason,
+        cancellationNotes: notes,
+        cancelledAt,
+        cancelledBy: courierId,
+        updatedAt: cancelledAt,
+      },
+      { merge: true }
+    );
+  }
+
+  batch.set(doc(db, 'cancelled_orders', order.id || order.deliveryId), {
+    orderId: order.id,
+    orderCode: order.orderCode,
+    deliveryId: order.deliveryId,
+    buyerName: order.buyerName || order.customerName,
+    deliveryZone: order.city,
+    deliveryMethod: order.deliveryMethod,
+    address: order.address,
+    reason,
+    notes,
+    status: 'cancelled',
+    paymentStatus: 'CANCELADO',
+    total: order.cashToCollect,
+    paymentMethod: 'Contra entrega',
+    cancelledBy: courierId,
+    createdAt: cancelledAt,
+    updatedAt: cancelledAt,
+  });
+
+  await batch.commit();
+}

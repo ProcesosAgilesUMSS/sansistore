@@ -460,14 +460,14 @@ export default function CourierDashboard({ embedded = false }: { embedded?: bool
   };
 
   const handleOpenMaps = (order: CourierOrder) => {
-    const query = encodeURIComponent(
-      `${order.deliveryZone}, Cochabamba, Bolivia`
-    );
-    window.open(
-      `https://www.google.com/maps/search/?api=1&query=${query}`,
-      '_blank',
-      'noopener,noreferrer'
-    );
+    localStorage.setItem('courier_map_order', JSON.stringify({
+      buyerName: order.buyerName,
+      deliveryZone: order.deliveryZone,
+      deliveryLat: order.deliveryLat,
+      deliveryLng: order.deliveryLng,
+      total: order.total,
+    }));
+    window.location.href = "/mapa";
   };
 
   const selectedItemsCount = selectedOrder

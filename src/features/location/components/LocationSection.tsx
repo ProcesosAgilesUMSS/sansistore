@@ -18,7 +18,6 @@ export default function LocationSection() {
     const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
     const [toast, setToast] = useState(false);
     
-    // NUEVO: Estado para la ubicación que estamos editando
     const [editingLocation, setEditingLocation] = useState<Location | null>(null);
 
     useEffect(() => {

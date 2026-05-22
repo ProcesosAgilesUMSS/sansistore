@@ -25,11 +25,17 @@ export interface CartProduct {
 export interface CartItemWithProduct extends CartItem {
   product: CartProduct | null;
   included: boolean;
+  priceAtAdd?: number;
+  unitPrice: number;
+  isValid: boolean;
+  availabilityMessage: string;
+  priceChange: 'none' | 'increased' | 'decreased';
 }
 
 export interface LocalCartItem {
   productId: string;
   quantity: number;
   updatedAt: number;
+  priceAtAdd?: number;
 }
 

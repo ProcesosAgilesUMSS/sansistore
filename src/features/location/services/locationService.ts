@@ -58,6 +58,41 @@ export async function updateLocation(
     const locationRef = doc(db, "locations", locationId);
     await updateDoc(locationRef, {
         ...data,
-        updatedAt: new Date().toISOString(), 
+        updatedAt: new Date().toISOString(),
     });
+}
+
+//bloqueo edicion/eliminacion segun delivery status
+export async function hasActiveOrders(locationId: string): Promise<boolean> {
+    const activeStatuses = ['assigned', 'accepted', 'in_transit', 'pending_reassignment'];
+    const q = query(
+        collection(db, "orders"),
+        where("locationId", "==", locationId),
+        where("deliveryStatus", "in", activeStatuses)
+    );
+    const snapshot = await getDocs(q);
+    return !snapshot.empty;
+}
+export async function getSellerLocation(orderId: string): Promise<string | null> {
+    const ordersQuery = query(
+        collection(db, 'orders'),
+        where('orderId', '==', orderId)
+    );
+    const orderSnapshot = await getDocs(ordersQuery);
+
+    if (orderSnapshot.empty) return null;
+
+    const sellerId = orderSnapshot.docs[0].data().sellerId as string;
+
+    const locationQuery = query(
+        collection(db, 'locations'),
+        where('userId', '==', sellerId),
+        where('isDefault', '==', true)
+    );
+    const locationSnapshot = await getDocs(locationQuery);
+
+    if (locationSnapshot.empty) return null;
+
+    const { lat, lng } = locationSnapshot.docs[0].data();
+    return `https://www.google.com/maps?q=${lat},${lng}`;
 }

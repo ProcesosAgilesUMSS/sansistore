@@ -1,11 +1,15 @@
-export type OrderStatus = 'pending' | 'preparing' | 'in_transit' | 'delivered' | 'cancelled';
+export type OrderStatus = 'pending' | 'preparing' | 'in_transit' | 'delivered' | 'cancelled' | 'CREADO' | 'RESERVADO' | 'PENDIENTE' | 'EMPAQUETADO';
 
 export const STATUS_LABELS: Record<OrderStatus, string> = {
   pending: "Pendiente",
   preparing: "Preparando",
   in_transit: "En camino",
   delivered: "Entregado",
-  cancelled: "Cancelado"
+  cancelled: "Cancelado",
+  CREADO: "creado",
+  RESERVADO: "reservado",
+  PENDIENTE: "pendiente",
+  EMPAQUETADO: "empaquetado"
 };
 
 export const AVAILABLE_STATUSES = Object.keys(STATUS_LABELS) as OrderStatus[];
@@ -24,6 +28,8 @@ export interface Order {
   id: string;
   buyerId: string;
   status: OrderStatus;
+  buyerReceptionConfirmed?: boolean;
+  buyerReceptionConfirmedAt?: FirestoreDateLike;
   delivery: {
     destination: string;
   };
