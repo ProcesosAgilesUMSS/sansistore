@@ -8,6 +8,8 @@ export interface DailyCollectionsSummary {
     orderId: string;
     total: number;
     collectedAt: string | null;
+    buyerReceptionConfirmed: boolean;
+    buyerReceptionConfirmedAt: string | null;
   }>;
 }
 

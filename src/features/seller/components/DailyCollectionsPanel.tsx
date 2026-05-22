@@ -156,9 +156,22 @@ export default function DailyCollectionsPanel({
                   <p className="truncate text-base font-900 text-(--theme-text)">
                     {order.orderId}
                   </p>
-                  <p className="mt-1 text-xs font-700 uppercase tracking-[0.16em] text-primary">
-                    Entregado y cobrado
-                  </p>
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    <span className="text-xs font-700 uppercase tracking-[0.16em] text-primary">
+                      Entregado y cobrado
+                    </span>
+                    <span
+                      className={`rounded-full border px-2 py-0.5 text-[11px] font-800 uppercase tracking-[0.12em] ${
+                        order.buyerReceptionConfirmed
+                          ? 'border-primary/30 bg-primary/10 text-primary'
+                          : 'border-(--theme-border) text-(--theme-text) opacity-60'
+                      }`}
+                    >
+                      {order.buyerReceptionConfirmed
+                        ? 'Recibido por comprador'
+                        : 'Sin validacion comprador'}
+                    </span>
+                  </div>
                 </div>
                 <p className="text-sm font-700 text-(--theme-text) opacity-65">
                   {formatTime(order.collectedAt)}
