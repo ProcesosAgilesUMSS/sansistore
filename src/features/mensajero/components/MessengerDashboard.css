@@ -233,3 +233,77 @@ html[data-theme='dark'] .messenger-toast--error {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
 }
+
+/* New Order Toast */
+.messenger-new-order-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  left: auto;
+  top: auto;
+  z-index: 999;
+  width: 100%;
+  max-width: 360px;
+  background: var(--theme-card-bg);
+  border: 1.5px solid color-mix(in srgb, #88b04b 35%, var(--theme-border));
+  border-radius: 1.25rem;
+  padding: 20px;
+  box-shadow:
+    0 12px 40px color-mix(in srgb, #88b04b 12%, transparent),
+    0 4px 16px rgba(0, 0, 0, 0.08);
+  animation: toast-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.messenger-new-order-icon {
+  background: color-mix(in srgb, #88b04b 14%, var(--theme-card-bg));
+  color: #6f9438;
+}
+
+.messenger-new-order-close {
+  background: color-mix(in srgb, #88b04b 10%, var(--theme-card-bg));
+  color: #6f9438;
+  border: none;
+  cursor: pointer;
+}
+
+.messenger-new-order-close:hover {
+  background: color-mix(in srgb, #88b04b 20%, var(--theme-card-bg));
+}
+
+.messenger-new-order-progress {
+  height: 3px;
+  background: color-mix(in srgb, #88b04b 20%, var(--theme-card-bg));
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-top: 16px;
+}
+
+.messenger-new-order-progress span {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: #88b04b;
+  border-radius: 9999px;
+  animation: toast-progress 5s linear forwards;
+}
+
+@keyframes toast-progress {
+  from { width: 100%; }
+  to   { width: 0%; }
+}
+
+/* Dark mode */
+html[data-theme='dark'] .messenger-new-order-icon,
+html[data-theme='dark'] .messenger-new-order-close {
+  color: #b7dc78;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .messenger-new-order-toast {
+    bottom: 16px;
+    right: 16px;
+    left: 16px;
+    max-width: unset;
+  }
+}
