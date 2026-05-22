@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { onAuthStateChanged } from 'firebase/auth'; // <-- Importamos esto
-import { db, auth } from '../../lib/firebase'; // <-- Asegúrate de importar 'auth'
-import { CheckCircle2, AlertCircle } from 'lucide-react';
+import { onAuthStateChanged } from 'firebase/auth'; 
+import { db, auth } from '../../lib/firebase'; 
+import { CheckCircle, AlertCircle } from 'lucide-react';
 
-export default function PerfilForm() { // <-- Quitamos la interfaz y las props
+export default function PerfilForm() { 
   const [userId, setUserId] = useState<string | null>(null); // <-- Estado para el ID del usuario
   const [phone, setphone] = useState('');
   const [secondaryMail, setsecondaryMail] = useState('');
@@ -88,32 +88,32 @@ export default function PerfilForm() { // <-- Quitamos la interfaz y las props
   };
 
   if (loading) {
-    return <div className="text-center py-20 font-sans text-text-light opacity-60">Cargando datos de contacto...</div>;
+    return <div className="text-center py-20 font-sans text-text-light/60 font-medium">Cargando datos de contacto...</div>;
   }
 
   // Si no hay usuario y ya terminó de cargar, mostramos el aviso
   if (!userId && !loading) {
     return (
-      <div className="text-center py-20 font-sans text-red-500 font-semibold">
+      <div className="text-center py-20 font-sans text-error font-semibold">
         {error || "Por favor, inicia sesión para acceder a esta sección."}
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-md mx-auto font-sans mt-20 p-4">
-      <div className="rounded-[1.25rem] bg-[#FFFFFF] dark:bg-[#141518] border border-[#88B04B]/15 dark:border-white/10 p-6 shadow-sm">
+    <div className="w-full max-w-md mx-auto mt-20 p-4">
+      <div className="rounded-[1.25rem] bg-card-bg-light border border-border-light p-6 shadow-sm">
         
-        <h2 className="font-display font-extrabold text-[22px] text-[#1E1E1E] dark:text-[#F5F3EF] mb-1 tracking-tight">
+        <h2 className="font-black text-[clamp(1.25rem,3vw,1.75rem)] text-text-light tracking-[-0.04em] leading-none mb-2">
           Datos de Contacto
         </h2>
-        <p className="text-[13px] text-[#1E1E1E]/60 dark:text-[#F5F3EF]/60 mb-6">
+        <p className="text-sm text-text-light/60 mb-6">
           Registra tus datos para coordinar las entregas correctamente en el campus.
         </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="block text-[12px] font-bold uppercase tracking-wider text-[#1E1E1E]/70 dark:text-[#F5F3EF]/70 mb-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-text-light/50 mb-1.5">
               Teléfono Celular / Móvil *
             </label>
             <input
@@ -121,13 +121,13 @@ export default function PerfilForm() { // <-- Quitamos la interfaz y las props
               placeholder="Ej: 76543210"
               value={phone}
               onChange={(e) => setphone(e.target.value.replace(/\s/g, ''))}
-              className="w-full px-4 py-2.5 rounded-[0.75rem] border border-border-light bg-[#FFFBF4] dark:bg-[#1A1B1E] text-[#1E1E1E] dark:text-[#F5F3EF] text-[14px] focus:outline-none focus:border-[#88B04B] transition-all"
+              className="w-full px-4 py-2.5 rounded-[0.75rem] border border-border-light bg-bg-light text-text-light text-sm focus:outline-none focus:border-primary transition-all"
               required
             />
           </div>
 
           <div>
-            <label className="block text-[12px] font-bold uppercase tracking-wider text-[#1E1E1E]/70 dark:text-[#F5F3EF]/70 mb-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-text-light/50 mb-1.5">
               Correo Electrónico de Respaldo (Opcional)
             </label>
             <input
@@ -135,28 +135,28 @@ export default function PerfilForm() { // <-- Quitamos la interfaz y las props
               placeholder="ejemplo@gmail.com"
               value={secondaryMail}
               onChange={(e) => setsecondaryMail(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-[0.75rem] border border-border-light bg-[#FFFBF4] dark:bg-[#1A1B1E] text-[#1E1E1E] dark:text-[#F5F3EF] text-[14px] focus:outline-none focus:border-[#88B04B] transition-all"
+              className="w-full px-4 py-2.5 rounded-[0.75rem] border border-border-light bg-bg-light text-text-light text-sm focus:outline-none focus:border-primary transition-all"
             />
           </div>
 
           {error && (
-            <div className="flex items-start gap-2 p-3 rounded-[0.75rem] bg-red-500/10 border border-red-500/20 text-red-500 text-[13px] font-medium">
+            <div className="flex items-start gap-2 p-3 rounded-[0.75rem] bg-error-bg border border-error-border text-error text-[13px] font-medium">
               <AlertCircle size={16} className="shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
           )}
 
           {success && (
-            <div className="flex items-center gap-2 p-3 rounded-[0.75rem] bg-[#88B04B]/10 border border-[#88B04B]/20 text-[#88B04B] text-[13px] font-medium">
-              <CheckCircle2 size={16} className="shrink-0" />
-              <span>Datos de contacto actualizados correctamente</span>
+            <div className="flex items-center gap-2 p-3 rounded-[0.75rem] bg-success-bg border border-success-border text-success text-[13px] font-medium">
+              <CheckCircle size={16} className="shrink-0" />
+              <span>Datos actualizados correctamente</span>
             </div>
           )}
 
           <button
             type="submit"
             disabled={saving}
-            className="w-full mt-2 py-3 rounded-full bg-[#1E1E1E] dark:bg-[#F5F3EF] text-[#FFFFFF] dark:text-[#1E1E1E] uppercase font-bold text-[12px] tracking-wider transition-all hover:opacity-90 active:scale-95 disabled:opacity-50"
+            className="w-full mt-2 py-3 rounded-full bg-primary text-white uppercase font-bold text-[12px] tracking-wider transition-all duration-200 hover:opacity-90 hover:scale-[1.02] active:scale-95 hover:shadow-lg disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none"
           >
             {saving ? 'Guardando...' : 'Guardar Cambios'}
           </button>
