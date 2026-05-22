@@ -13,11 +13,28 @@ import {
   Menu,
   X,
   ChevronRight,
+  ArrowLeft,
 } from 'lucide-react';
 import UserManagement from '../users/components/UserManagement.tsx';
 import CategoryList from '../categories/components/CategoryList.tsx';
+import OrderReceptionPanel from '../orders/components/OrderReceptionPanel.tsx';
+import DailySales from '../ventas/components/DailySales.tsx';
+import TopSellingProducts from '../ventas/top-products/components/TopSellingProducts.tsx';
+// ── HU #152: Parámetros del sistema ──
+import ConfigPanel from '../settings/components/ConfigPanel.tsx';
+// ── HU #161: Reportes de ventas ──
+import SalesReport from '../analytics/components/SalesReport.tsx';
 
-type Section = 'dashboard' | 'usuarios' | 'categorias' | null;
+type Section =
+  | 'dashboard'
+  | 'pedidos'
+  | 'usuarios'
+  | 'categorias'
+  | 'ventas-diarias'
+  | 'mas-vendidos'
+  | 'parametros'     // ── HU #152 ──
+  | 'reportes'       // ── HU #161 ──
+  | null;
 
 interface NavItem {
   label: string;
@@ -35,6 +52,7 @@ interface NavSection {
 export default function AdminLayout() {
   const [activeSection, setActiveSection] = useState<Section>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [ventasOpen, setVentasOpen] = useState(true);
 
   const navSections: NavSection[] = [
     {
@@ -48,9 +66,7 @@ export default function AdminLayout() {
         {
           label: 'Pedidos',
           icon: <ShoppingBag size={15} />,
-          section: null,
-          badge: 8,
-          disabled: true,
+          section: 'pedidos',
         },
       ],
     },
@@ -68,38 +84,43 @@ export default function AdminLayout() {
           section: 'categorias',
         },
         {
+          // ── HU #152: habilitado ──
           label: 'Parámetros',
           icon: <Settings size={15} />,
-          section: null,
-          disabled: true,
+          section: 'parametros',
         },
       ],
     },
     {
       title: 'Analítica',
       items: [
-        { label: 'Ventas', icon: <BarChart2 size={15} />, section: null, disabled: true },
+        { label: 'Ventas', icon: <BarChart2 size={15} />, section: 'ventas-diarias' },
         { label: 'Inventario', icon: <Package size={15} />, section: null, disabled: true },
         { label: 'Mensajeros', icon: <Bike size={15} />, section: null, disabled: true },
-        { label: 'Reportes', icon: <FileText size={15} />, section: null, disabled: true },
+        {
+          // ── HU #161: habilitado ──
+          label: 'Reportes',
+          icon: <FileText size={15} />,
+          section: 'reportes',
+        },
       ],
     },
   ];
 
   const pageTitles: Record<string, { title: string; subtitle: string }> = {
     dashboard: { title: 'Dashboard', subtitle: 'Panel de administración' },
+    pedidos: { title: 'Pedidos', subtitle: 'Validación de recepción por comprador' },
     usuarios: { title: 'Gestión de usuarios', subtitle: 'Registra y administra usuarios' },
     categorias: { title: 'Categorías', subtitle: 'Gestiona las categorías de productos' },
+    'ventas-diarias': { title: 'Ventas diarias', subtitle: 'Monitorea el rendimiento diario de ventas' },
+    'mas-vendidos': { title: 'Más vendidos', subtitle: 'Productos con más unidades vendidas' },
+    // ── HU #152 ──
+    parametros: { title: 'Parámetros del sistema', subtitle: 'Configura los parámetros globales del sistema' },
+    // ── HU #161 ──
+    reportes: { title: 'Reportes de ventas', subtitle: 'Genera reportes de ventas por rango de fechas' },
   };
 
   const currentPage = pageTitles[activeSection ?? 'dashboard'];
-
-  const today = new Date().toLocaleDateString('es-BO', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
 
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--theme-bg)]">
@@ -140,6 +161,59 @@ export default function AdminLayout() {
                 {section.title}
               </p>
               {section.items.map((item) => {
+                if (item.label === 'Ventas') {
+                  return (
+                    <div key={item.label} className="mb-1">
+                      <button
+                        onClick={() => setVentasOpen(!ventasOpen)}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px]
+                        text-white/50 hover:text-white/80 hover:bg-white/5 transition-colors"
+                      >
+                        <span>{item.icon}</span>
+                        <span className="flex-1 text-left">Ventas</span>
+                        <ChevronRight
+                          size={12}
+                          className={`transition-transform ${ventasOpen ? 'rotate-90' : ''}`}
+                        />
+                      </button>
+
+                      {ventasOpen && (
+                        <div className="ml-7 mt-1 space-y-1">
+                          <button
+                            onClick={() => {
+                              setActiveSection('ventas-diarias');
+                              setSidebarOpen(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
+                            transition-colors ${
+                              activeSection === 'ventas-diarias'
+                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
+                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
+                            }`}
+                          >
+                            Ventas diarias
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              setActiveSection('mas-vendidos');
+                              setSidebarOpen(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
+                            transition-colors ${
+                              activeSection === 'mas-vendidos'
+                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
+                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
+                            }`}
+                          >
+                            Más vendidos
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+
                 const isActive = activeSection === item.section;
                 return (
                   <button
@@ -192,44 +266,66 @@ export default function AdminLayout() {
       </aside>
 
       {/* Main */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#fafafa]">
 
         {/* Topbar */}
-        <header className="flex items-center justify-between px-5 py-3.5 border-b border-[var(--theme-border)] bg-[var(--theme-card-bg)]">
-          <div className="flex items-center gap-3">
+        <header className="flex items-center justify-between px-6 py-5 md:px-10 md:py-6 bg-[#0a0a0a]">
+          <div className="flex items-center gap-4 md:gap-8">
             <button
-              className="md:hidden p-1 text-[var(--theme-text)]/50 hover:text-[var(--theme-text)] transition-colors"
+              className="md:hidden p-1 text-white/50 hover:text-white transition-colors"
               onClick={() => setSidebarOpen(!sidebarOpen)}
             >
-              {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
+              {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
-            <div>
-              <h1 className="text-[15px] font-semibold text-[var(--theme-text)]">
+
+            <div className="flex items-center gap-4 md:gap-8">
+              {activeSection !== 'dashboard' && (
+                <button
+                  onClick={() => setActiveSection('dashboard')}
+                  className="hidden md:flex items-center gap-2 text-white/50 hover:text-white transition-colors text-sm font-medium"
+                >
+                  <ArrowLeft size={16} /> Dashboard
+                </button>
+              )}
+              <h1 className="text-xl md:text-3xl font-bold text-white tracking-tight">
                 {currentPage.title}
               </h1>
-              <p className="text-[11px] text-[var(--theme-text)]/40">
-                {currentPage.subtitle}
-              </p>
             </div>
           </div>
-          <span className="text-[11px] text-[var(--theme-text)]/35 hidden sm:block capitalize">
-            {today}
-          </span>
+
+          <div className="flex items-center gap-4">
+            <div className="px-5 py-1.5 border border-[#88b04b] text-[#88b04b] rounded-full text-xs md:text-sm font-medium tracking-wide">
+              Área 7
+            </div>
+          </div>
         </header>
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto p-5">
+        <main className="flex-1 overflow-y-auto p-6 md:p-10">
           {activeSection === 'dashboard' && (
-            <div className="flex items-center justify-center h-full text-[var(--theme-text)]/30 text-sm">
-              Dashboard — próximamente
+            <div className="flex items-center justify-center h-full text-black/30 text-sm font-medium">
+              Dashboard principal — Próximamente
             </div>
           )}
           {activeSection === 'usuarios' && (
             <UserManagement />
           )}
+          {activeSection === 'pedidos' && (
+            <OrderReceptionPanel />
+          )}
           {activeSection === 'categorias' && (
             <CategoryList />
           )}
+          {activeSection === 'ventas-diarias' && (
+            <DailySales />
+          )}
+          {activeSection === 'mas-vendidos' && (
+            <TopSellingProducts />
+          )}
+          {/*Parámetros del sistema*/}
+          {activeSection === 'parametros' && <ConfigPanel />}
+          {/*Reportes de ventas*/}
+          {activeSection === 'reportes' && <SalesReport />}
         </main>
 
       </div>

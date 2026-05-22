@@ -1,14 +1,8 @@
 ---
-import Layout from '../../layouts/Layout.astro';
 import SellerOrdersPanel from '../../features/seller/components/SellerOrderPanel';
-import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import SellerLayout from '../../layouts/SellerLayout.astro';
 ---
 
-<Layout title="Pedidos">
-  <Navbar client:load />
-  <main class="pt-16 md:pt-20">
-    <SellerOrdersPanel client:load />
-  </main>
-  <Footer client:load />
-</Layout>
+<SellerLayout title="Pedidos">
+  <SellerOrdersPanel client:load embedded />
+</SellerLayout>

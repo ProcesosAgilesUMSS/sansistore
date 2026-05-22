@@ -10,10 +10,11 @@ interface Props {
   expandedItems: OrderItem[];
   itemsLoading: boolean;
   onToggle: (id: string) => void;
-  title: string;
+  title?: string;
   onClick?: (order: Order) => void;
   isMarking: boolean;
   isSuccess: boolean;
+  successLabel?: string;
 }
 
 export const OrderCard = ({
@@ -22,10 +23,11 @@ export const OrderCard = ({
   expandedItems,
   itemsLoading,
   onToggle,
-  title,
+  title = '',
   onClick,
   isMarking,
   isSuccess,
+  successLabel = 'Marcado como listo',
 }: Props) => {
   return (
     <div
@@ -37,8 +39,12 @@ export const OrderCard = ({
       <div className="p-4">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <p
-              className="font-800 text-lg tracking-tight text-(--theme-text)"
+            <p className="font-800 text-xs tracking-tight text-(--theme-text) pb-2"
+              style={{ fontFamily: 'Outfit, sans-serif' }}
+            >
+              # {order.orderId?.toUpperCase()}
+            </p>
+            <p className="font-800 text-lg tracking-tight text-(--theme-text)"
               style={{ fontFamily: 'Outfit, sans-serif' }}
             >
               {order.buyerName?.toUpperCase()}
@@ -164,7 +170,7 @@ export const OrderCard = ({
                 />
               </svg>
 
-              Marcado como listo
+              {successLabel}
             </span>
           ) : (
             <button

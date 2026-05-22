@@ -15,6 +15,7 @@ import {
 import {
   backfillCourierOrderCodes,
   markOrderAsDelivered,
+  registerPayment,
   subscribeToCourierOrders,
 } from '../services/courierOrdersService';
 import type { CourierDashboardStats, CourierOrder } from '../types';
@@ -38,7 +39,10 @@ const formatMoney = (value: number) =>
 const INVALID_AMOUNT_MESSAGE =
   'No se puede mostrar el monto a cobrar. Verifique el detalle del pedido.';
 
-const pageClass = 'min-h-screen bg-bg-light pt-24 pb-12 text-text-light';
+const getPageClass = (embedded = false) =>
+  embedded
+    ? 'bg-transparent py-2 text-text-light'
+    : 'min-h-screen bg-bg-light pt-24 pb-12 text-text-light';
 const cardBaseClass =
   'rounded-[28px] border border-border-light bg-card-bg-light px-7 py-8 shadow-[0_14px_30px_rgba(38,33,22,0.10)]';
 const sectionCardClass =
@@ -57,20 +61,26 @@ function OrderDetailView({
   selectedItemsCount,
   selectedOrderHasValidAmount,
   updatingOrderId,
+  updatingPaymentId,
+  pageClassName,
   onBack,
   onOpenMaps,
   onMarkDelivered,
+  onRegisterPayment,
 }: {
   selectedOrder: CourierOrder;
   selectedItemsCount: number;
   selectedOrderHasValidAmount: boolean;
   updatingOrderId: string;
+  updatingPaymentId: string;
+  pageClassName: string;
   onBack: () => void;
   onOpenMaps: (order: CourierOrder) => void;
   onMarkDelivered: (order: CourierOrder) => Promise<void>;
+  onRegisterPayment: (order: CourierOrder) => Promise<void>;
 }) {
   return (
-    <section className={pageClass}>
+    <section className={pageClassName}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <button
           type="button"
@@ -294,8 +304,20 @@ function OrderDetailView({
             </div>
 
             <div className="mt-4 space-y-3">
-              <button type="button" disabled className={`w-full ${ghostButtonClass}`}>
-                Registrar pago
+              <button
+                type="button"
+                onClick={() => onRegisterPayment(selectedOrder)}
+                disabled={
+                  selectedOrder.paymentStatus === 'Cobrado' ||
+                  updatingPaymentId === selectedOrder.id
+                }
+                className={`w-full ${ghostButtonClass}`}
+              >
+                {updatingPaymentId === selectedOrder.id ? (
+                  <LoaderCircle className="h-4 w-4 animate-spin" />
+                ) : (
+                  'Registrar pago'
+                )}
               </button>
               <p className="text-xs font-semibold text-text-light opacity-55">
                 El monto a cobrar es de solo lectura en esta vista.
@@ -304,7 +326,9 @@ function OrderDetailView({
                 type="button"
                 onClick={() => onMarkDelivered(selectedOrder)}
                 disabled={
-                  updatingOrderId === selectedOrder.id || !selectedOrderHasValidAmount
+                  updatingOrderId === selectedOrder.id || 
+                  !selectedOrderHasValidAmount ||
+                  selectedOrder.paymentStatus !== 'Cobrado'
                 }
                 className={`w-full ${primaryButtonClass}`}
               >
@@ -323,7 +347,7 @@ function OrderDetailView({
   );
 }
 
-export default function CourierDashboard() {
+export default function CourierDashboard({ embedded = false }: { embedded?: boolean }) {
   const [orders, setOrders] = useState<CourierOrder[]>([]);
   const [pendingOrders, setPendingOrders] = useState<CourierOrder[]>([]);
   const [stats, setStats] = useState<CourierDashboardStats>(emptyStats);
@@ -331,7 +355,9 @@ export default function CourierDashboard() {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [updatingOrderId, setUpdatingOrderId] = useState('');
+  const [updatingPaymentId, setUpdatingPaymentId] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     const unsubscribe = subscribeToCourierOrders((payload) => {
@@ -364,11 +390,65 @@ export default function CourierDashboard() {
     [orders]
   );
 
-  const handleMarkDelivered = async (order: CourierOrder) => {
+  const handleRegisterPayment = async (order: CourierOrder) => {
+    if (order.paymentStatus === 'Cobrado') {
+      setErrorMessage('Este pedido ya fue cobrado');
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Confirmar cobro de ${formatMoney(order.total)} del pedido ${order.orderCode}`
+    );
+
+    if (!confirmed) return;
+
     try {
       setErrorMessage('');
+      setSuccessMessage('');
+      setUpdatingPaymentId(order.id);
+      await registerPayment(order);
+      setSuccessMessage('Pago registrado correctamente');
+      
+      if (selectedOrder?.id === order.id) {
+        setSelectedOrder({
+          ...selectedOrder,
+          paymentStatus: 'Cobrado',
+          paymentStatusLabel: 'Cobrado',
+        });
+      }
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'No se pudo registrar el pago');
+    } finally {
+      setUpdatingPaymentId('');
+    }
+  };
+
+  const handleMarkDelivered = async (order: CourierOrder) => {
+    const blockedStatuses = ['Entregado', 'Cancelado', 'No entregado'];
+
+    if (blockedStatuses.includes(order.status)) {
+      setSuccessMessage('');
+      setErrorMessage('No se puede marcar como entregado un pedido con ese estado.');
+      return;
+    }
+
+    if (order.paymentStatus !== 'Cobrado') {
+      setErrorMessage('Debe registrar el pago antes de marcar como entregado.');
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Confirmar entrega de ${order.orderCode}. Monto a cobrar: ${formatMoney(order.total)}.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setErrorMessage('');
+      setSuccessMessage('');
       setUpdatingOrderId(order.id);
       await markOrderAsDelivered(order);
+      setSuccessMessage('Pedido marcado como entregado correctamente.');
       if (selectedOrder?.id === order.id) {
         setSelectedOrder(null);
       }
@@ -415,15 +495,18 @@ export default function CourierDashboard() {
         selectedItemsCount={selectedItemsCount}
         selectedOrderHasValidAmount={selectedOrderHasValidAmount}
         updatingOrderId={updatingOrderId}
+        updatingPaymentId={updatingPaymentId}
+        pageClassName={getPageClass(embedded)}
         onBack={() => setSelectedOrder(null)}
         onOpenMaps={handleOpenMaps}
         onMarkDelivered={handleMarkDelivered}
+        onRegisterPayment={handleRegisterPayment}
       />
     );
   }
 
   return (
-    <section className={pageClass}>
+    <section className={getPageClass(embedded)}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="mb-10 flex flex-col gap-3">
           <p className="text-sm font-bold uppercase tracking-[0.28em] text-primary">
@@ -433,7 +516,7 @@ export default function CourierDashboard() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h1 className="text-4xl font-black tracking-[-0.04em] sm:text-5xl">
-                Panel del Mensajero
+                Gestion de entregas
               </h1>
               <p className={`mt-2 max-w-2xl text-sm font-semibold ${mutedTextClass}`}>
                 Gestiona pedidos pendientes, revisa lo cobrado y registra las
@@ -518,6 +601,12 @@ export default function CourierDashboard() {
             </div>
           ) : null}
 
+          {successMessage ? (
+            <div className="border-b border-primary/20 bg-primary/10 px-8 py-4 text-sm font-semibold text-primary">
+              {successMessage}
+            </div>
+          ) : null}
+
           {loading ? (
             <div className="flex min-h-72 items-center justify-center px-8 py-12 text-text-light opacity-55">
               <LoaderCircle className="h-6 w-6 animate-spin" />
@@ -590,8 +679,24 @@ export default function CourierDashboard() {
                             </button>
                             <button
                               type="button"
+                              onClick={() => handleRegisterPayment(order)}
+                              disabled={order.paymentStatus === 'Cobrado' || updatingPaymentId === order.id}
+                              className={ghostButtonClass}
+                            >
+                              {updatingPaymentId === order.id ? (
+                                <LoaderCircle className="h-4 w-4 animate-spin" />
+                              ) : (
+                                'Registrar pago'
+                              )}
+                            </button>
+                            <button
+                              type="button"
                               onClick={() => handleMarkDelivered(order)}
-                              disabled={updatingOrderId === order.id || !hasValidAmount}
+                              disabled={
+                                updatingOrderId === order.id || 
+                                !hasValidAmount ||
+                                order.paymentStatus !== 'Cobrado'
+                              }
                               className={primaryButtonClass}
                             >
                               {updatingOrderId === order.id ? (

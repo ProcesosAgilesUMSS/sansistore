@@ -103,7 +103,7 @@
 - **Blockers:** n/a.
 
 
-# 07/05/2026
+# 05/07/2026
 
 # Daily Report - Team 1
 
@@ -111,13 +111,13 @@
 
 - **Yesterday:** Trabajé en la corrección de algunas HUs para los siguientes sprints, que por ahora no están asignadas a ningún sprint.
 - **Today:** Se realizará la definición correcta de todos los criterios de aceptación y tareas relacionadas, según las HUs, siguiendo tareas, estados y mensajes.
-- **Blockers:** n/a
+- **Blockers:** n/a.
 
 ## Gutierrez Hinojosa Jhon Deymar
 
 - **Yesterday:** Trabajé en las pruebas automatizadas de detalles de producto y en la automatización del workflow de GitHub para la ejecución y generación de reportes de pruebas.
 - **Today:** Planificaré y organizaré las pruebas correspondientes al Sprint 2, definiendo los escenarios y casos prioritarios a cubrir.
-- **Blockers:** n/a
+- **Blockers:** n/a.
 
 ## Merudia Calderon Dayeza
 
@@ -135,4 +135,117 @@
 
 - **Yesterday:** Corregí los controles de expansión del detalle de producto (título y descripción), estabilicé la detección de overflow, ajusté la visibilidad del botón expandir y el alto de clamp; además actualicé dependencias menores.
 - **Today:** Validar los cambios en `ProductDetail` y apoyar la integración/QA antes del merge.
+- **Blockers:** n/a.
+
+
+# 05/12/2026
+
+# Daily Report - Team 1
+
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** En base a la reunión grupal, fui el encargado de organizar y registrar todas las ideas en tarjetas sobre el Sprint Retrospective en el tablero del equipo en Trello (aspectos positivos, puntos de mejora, felicitaciones y acuerdos a seguir).
+- **Today:** Revisar y consolidar las tarjetas del retrospective junto al equipo para dejar acuerdos claros y accionables.
+- **Blockers:** n/a.
+
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Hice un refinamiento completo del backlog para nuestro equipo y elaboré un plan para mejorar las pruebas y los datos de seed para todos los equipos.
+- **Today:** Trabajaré en las pruebas y en los datos de seed, ademas de iniciar las nuevas historias del sprint 2.
+- **Blockers:** n/a.
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Cerramos el Sprint 1 con la sesión de retrospectiva. Identificamos puntos de mejora grupal y preparamos las Historias de Usuario (HUs) para el siguiente ciclo.    
+- **Today:** Revisar a detalle las HUs del Sprint 2 e iniciar con el desglose y asignación de tareas para arrancar formalmente las actividades.
+- **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Participé en la reunión de Sprint Retrospective aportando observaciones y mejoras del sprint. Además, trabajé en el ajuste y redacción de historias de usuario correspondientes al Sprint 2.
+- **Today:** Continuar con la revisión y organización de historias de usuario pendientes para el Sprint 2.
+- **Blockers:** n/a.
+
+## Marcos Velasquez Vela
+
+- **Yesterday:** Participé en la reunión de Sprint Retrospective junto al equipo y apoyé en la revisión y mejora de algunas historias de usuario del Sprint 2 para mantener claridad en tareas y criterios.
+- **Today:** Continuar apoyando en la validación de flujos y revisión de historias de usuario pendientes.
+- **Blockers:** n/a.
+
+# 05/14/2026
+
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Detalle la HU de "ver productos mas vendidos" y la deje lista con criterios de aceptacion, tareas y casos de prueba.
+- **Today:** Me asigne la HU de "ver productos mas vendidos" para su desarrollo.
+- **Blockers:** n/a.
+
+## Gutierrez Hinojosa Jhon Deymar
+
+ - **Yesterday:** Trabajé en el commit e8cec3d9f9972d46dccdf5cb92b9596191eb927f: reestructuración de los seeders, actualización del setup/teardown del emulador y mejoras en las pruebas automatizadas.
+ - **Today:** Definiré nuevas pruebas para la nueva HU y las tareas del Sprint 2.
+ - **Blockers:** n/a.
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Definí la HU "Gestión del carrito de compras" y seleccioné mis tareas asignadas.    
+- **Today:** Iniciaré el desarrollo de las tareas planificadas.
+- **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Se avanzó con la definición de la HU “Gestión del carrito de compras” y se organizaron las tareas asignadas para el desarrollo.
+- **Today:** Se iniciará la implementación de las tareas planificadas correspondientes a la HU.
+- **Blockers:** Ninguno.
+
+## Velasquez Vela Marcos
+
+- **Yesterday:** Participé en la Sprint Retrospective junto a mi grupo, apoyé en el desarrollo de la retrospective general y además revisé historias de usuario del Sprint 2 para identificar tareas y criterios pendientes.
+- **Today:** Dar seguimiento a los acuerdos obtenidos en la retrospectiva y continuar con la revisión de tareas e historias de usuario del Sprint 2.
+- **Blockers:** n/a.
+
+# 05/19/2026
+
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Complete el issue #34 ("Como comprador quiero ver los productos mas vendidos") en el PR #313, termine toda la seccion de preguntas y verifique que los tests pasen correctamente.
+- **Today:** Dar cierre a ajustes del PR #313 del issue #34 y dejarlo listo para merge.
+- **Blockers:** No avance una HU de la seccion de carrito porque otros integrantes debian hacer la base y hasta la fecha del reporte no terminaron, por lo que no pude continuar.
+
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Implemente un login simple y un /me para automatizar las pruebas que necesitan login de un usuario, agregar pruebas automatizada de login y carrito, agregar mas criterios de aceptacion de la HU #288 
+- **Today:** Revisar el codigo de los demas miembros, ademas de corregir las pruebas automatizadas.
+- **Blockers:** Tenia dudas con areas de otros equipos de la parte del vendedor para automatizar pruebas y reportar bugs a otros equipos pero no me respondieron, y se bloqueo la hu de reseñas por falta de analisis.
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Desarrollé la vista básica /cart para iniciar el flujo e implementé la sección del resumen del pedido.   
+- **Today:** Mejoraré el diseño de la vista del carrito por su simplicidad actual e implementé el cálculo del envío estimado.
+- **Blockers:** No estaba bien definido cómo calcular el envío estimado y la tarea de dejar reseñas de productos quedó suspendida.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Se coordinó el diseño del carrito de compras, alineando la estructura visual y los flujos de interacción con el equipo para asegurar coherencia con las demás funcionalidades del sprint.
+- **Today:** Se desarrollarán los componentes necesarios para añadir productos al carrito, incluyendo la lógica de interacción entre la card de producto y el estado del carrito.
+- **Blockers:** Ninguno.
+
+## Velasquez Vela Marcos
+
+- **Yesterday:** Trabajé en el carrito de compras. Primero completé las descripciones y criterios de las tasks pendientes. Luego implementé que el comprador pueda ver el total antes de confirmar, validar la disponibilidad de los productos y remover productos del carrito para modificar su selección. También agregué datos de prueba para poder revisar mejor el flujo.
+- **Today:** Revisar el funcionamiento del carrito con el equipo y corregir cualquier detalle que salga en QA.
+- **Blockers:** n/a.
+
+# 05/21/2026
+
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Completé los detalles del carrito de compras, corregí errores y reporté bugs detectados.
+- **Today:** Realizar revisiones finales en staging antes de la demo, preparar los datos de seed y alistar el script de despliegue a producción.
+- **Blockers:** n/a.
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Finalicé las tareas para mostrar el total del carrito y para eliminar un producto del mismo.
+- **Today:** Realizar pruebas y revisiones en busca de errores previos a la demo.
 - **Blockers:** n/a.

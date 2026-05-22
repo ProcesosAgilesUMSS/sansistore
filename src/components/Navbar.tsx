@@ -8,24 +8,27 @@ import {
   Moon,
   Sun,
   MapPin,
+  Settings,
+  User as UserIcon,
 } from 'lucide-react';
-import { FirebaseError } from 'firebase/app';
-import {
-  signInWithPopup,
-  signOut,
-  onAuthStateChanged,
-  setPersistence,
-  browserLocalPersistence,
-} from 'firebase/auth';
+import { signOut, onAuthStateChanged } from 'firebase/auth';
 import type { User } from 'firebase/auth';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { auth, googleProvider, db } from '../lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../lib/firebase';
 import ErrorCard from './ErrorCard';
+import { useStore } from '@nanostores/react';
+import {
+  cartTotalUnits,
+  cartAnimating,
+  initCartStore,
+} from '../features/cart/store/cartStore';
+import { clearLocalCart } from '../features/cart/utils/localCart';
+import { clearLocalFavorites } from '../features/favorites';
 
 type ThemeMode = 'light' | 'dark';
 
 const THEME_STORAGE_KEY = 'sansistore-theme';
-const INSTITUTIONAL_DOMAIN = '@est.umss.edu';
+const INSTITUTIONAL_DOMAIN = 'umss.edu';
 
 const applyTheme = (theme: ThemeMode) => {
   document.documentElement.dataset.theme = theme;
@@ -38,82 +41,107 @@ const applyTheme = (theme: ThemeMode) => {
   }
 };
 
+function CartButton() {
+  const totalUnits = useStore(cartTotalUnits);
+  const isAnimating = useStore(cartAnimating);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    initCartStore();
+    setMounted(true);
+  }, []);
+
+  return (
+    <a
+      href="/carrito"
+      aria-label={`Carrito, ${mounted ? totalUnits : 0} unidades`}
+      className="relative transition-all text-text-light opacity-[0.60] hover:text-primary hover:opacity-100"
+    >
+      <ShoppingBag
+        size={18}
+        className={`transition-all duration-300 ease-out ${
+          isAnimating ? 'text-primary opacity-100 scale-105' : ''
+        }`}
+      />
+      <span
+        key={totalUnits}
+        className={`absolute -top-1 -right-1 text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold border border-primary bg-primary text-bg-dark transition-transform duration-300 ease-out ${
+          isAnimating ? 'scale-110' : 'scale-100'
+        }`}
+      >
+        {mounted ? (totalUnits > 99 ? '99+' : totalUnits) : 0}
+      </span>
+    </a>
+  );
+}
+
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [userRoles, setUserRoles] = useState<string[]>([]);
   const [authError, setAuthError] = useState<string | null>(null);
   const [authReady, setAuthReady] = useState(false);
   const [theme, setTheme] = useState<ThemeMode>('light');
   const [themeReady, setThemeReady] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [loginMenuOpen, setLoginMenuOpen] = useState(false);
+  const [roles, setRoles] = useState<string[]>([]);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
+    const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
+      if (u) {
+        try {
+          const userSnap = await getDoc(doc(db, 'users', u.uid));
+          setRoles(userSnap.exists() ? (userSnap.data().roles ?? []) : []);
+        } catch {
+          setRoles([]);
+        }
+      } else {
+        setRoles([]);
+      }
       setAuthReady(true);
+
+      if (!u) {
+        setUserRoles([]);
+        return;
+      }
+
+      getDoc(doc(db, 'users', u.uid))
+        .then((userSnap) => {
+          const roles = userSnap.data()?.roles;
+          setUserRoles(Array.isArray(roles) ? roles : []);
+        })
+        .catch(() => setUserRoles([]));
     });
     return unsub;
   }, []);
 
+  const canAccessCourier = userRoles.includes('mensajero');
+
   useEffect(() => {
-    const savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode | null;
-    const currentTheme = savedTheme || (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
+    const savedTheme = window.localStorage.getItem(
+      THEME_STORAGE_KEY
+    ) as ThemeMode | null;
+    const currentTheme =
+      savedTheme ||
+      (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
     if (currentTheme !== theme) {
       setTheme(currentTheme);
     }
     setThemeReady(true);
   }, [theme]);
 
-  const handleLogin = async () => {
-    try {
-      googleProvider.setCustomParameters({
-        hd: INSTITUTIONAL_DOMAIN.replace('@', ''),
-      });
-      await setPersistence(auth, browserLocalPersistence);
-      const result = await signInWithPopup(auth, googleProvider);
-
-      if (
-        result.user.email &&
-        !result.user.email.endsWith(INSTITUTIONAL_DOMAIN)
-      ) {
-        await signOut(auth);
-        setAuthError(
-          'Solo se permiten cuentas institucionales para acceder a SansiStore.'
-        );
-        return;
-      }
-
-      const userRef = doc(db, 'users', result.user.uid);
-      const userSnap = await getDoc(userRef);
-
-      if (!userSnap.exists()) {
-        const institutionalId = result.user.email!.split('@')[0];
-        await setDoc(userRef, {
-          uid: result.user.uid,
-          email: result.user.email,
-          displayName: result.user.displayName || 'Usuario UMSS',
-          roles: ['comprador'],
-          institutionalId: institutionalId,
-          isActive: true,
-          createdBy: 'system',
-          createdAt: serverTimestamp(),
-        });
-      }
-    } catch (e: unknown) {
-      const ignored = [
-        'auth/popup-closed-by-user',
-        'auth/cancelled-popup-request',
-      ];
-
-      if (!(e instanceof FirebaseError) || !ignored.includes(e.code)) {
-        console.error(e);
-      }
-    }
-  };
-
   const handleLogout = () => {
     setProfileMenuOpen(false);
-    signOut(auth).catch(console.error);
+    setRoles([]);
+    clearLocalCart();
+    clearLocalFavorites();
+    signOut(auth)
+      .then(() => {
+        window.location.href = '/login';
+      })
+      .catch(console.error);
   };
 
   const toggleTheme = () => {
@@ -121,6 +149,13 @@ export default function Navbar() {
     applyTheme(nextTheme);
     setTheme(nextTheme);
   };
+
+  const showCompradorFeatures = !user || roles.length === 0 || roles.includes('comprador');
+  const showVendedorFeatures = user && roles.length > 0 && roles.some(r => ['vendedor', 'admin'].includes(r));
+  const showOperadorInvFeatures = user && roles.length > 0 && roles.some(r => ['operador_inv', 'admin'].includes(r));
+  const showMensajeroFeatures = user && roles.length > 0 && roles.some(r => ['mensajero', 'admin'].includes(r));
+  const showAdminFeatures = user && roles.length > 0 && roles.some(r => ['admin'].includes(r));
+  const showMisPedidos = user && roles.length > 0 && roles.some(r => ['comprador', 'admin'].includes(r));
 
   return (
     <>
@@ -138,10 +173,21 @@ export default function Navbar() {
             {/* LINKS */}
             <div className="hidden md:flex items-center gap-8">
               {[
-                { label: 'Productos', href: '/productos' },
-                { label: 'Pedidos', href: '/orders/sent' },
-                { label: 'Inventario', href: '/inventory' },
-              ].map((item) => (
+                { label: 'Productos', href: '/productos', reqComprador: true },
+                { label: 'Ordenes', href: '/seller/orders', reqVendedor: true },
+                { label: 'Inventario', href: '/inventory', reqOperadorInv: true },
+                { label: 'Entregas', href: '/courier', reqMensajero: true },
+                { label: 'Admin', href: '/admin', reqAdmin: true },
+              ]
+                .filter(item => {
+                  if (item.reqComprador && !showCompradorFeatures) return false;
+                  if (item.reqVendedor && !showVendedorFeatures) return false;
+                  if (item.reqOperadorInv && !showOperadorInvFeatures) return false;
+                  if (item.reqMensajero && !showMensajeroFeatures) return false;
+                  if (item.reqAdmin && !showAdminFeatures) return false;
+                  return true;
+                })
+                .map((item) => (
                 <a
                   key={item.label}
                   href={item.href}
@@ -152,30 +198,11 @@ export default function Navbar() {
               ))}
             </div>
 
-            <a
-              href="/admin"
-              className="text-[13px] text-primary font-semibold tracking-[0.02em] transition-all hover:opacity-70"
-            >
-              Admin
-            </a>
-
             {/* ACTIONS */}
-            <div className="flex items-center gap-3">   
+            <div className="flex items-center gap-3">
               {/* CART */}
-              <button className="relative transition-all text-text-light opacity-[0.60] hover:text-primary hover:opacity-100">
-                <ShoppingBag size={18} />
-                <span
-                  className={`absolute -top-1 -right-1 text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold border border-primary ${
-                    theme === 'dark'
-                      ? 'bg-primary text-bg-dark'
-                      : 'bg-primary text-bg-dark'
-                  }`}
-                >
-                  0
-                </span>
-              </button>
-
-              {authReady && user && (
+              {showCompradorFeatures && <CartButton />}
+              {authReady && user && showCompradorFeatures && (
                 <a
                   href="/location"
                   className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-primary/40 px-3 py-1.5 text-[12px] font-semibold text-primary transition-all hover:bg-primary hover:text-white hover:border-primary"
@@ -237,12 +264,36 @@ export default function Navbar() {
                         role="menu"
                         className="absolute right-0 top-11 w-48 overflow-hidden rounded-lg border border-border-light bg-bg-light shadow-lg"
                       >
+                        {showMisPedidos && (
+                          <a
+                            role="menuitem"
+                            href="/mis-pedidos"
+                            className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
+                          >
+                            {/*
+                            <Package size={14} />
+                          */}
+                            Mis pedidos
+                          </a>
+                        )}
+
+                        {canAccessCourier && (
+                          <a
+                            role="menuitem"
+                            href="/courier"
+                            className="block px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
+                          >
+                            Mensajero
+                          </a>
+                        )}
+
                         <a
                           role="menuitem"
-                          href="/courier"
-                          className="block px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
+                          href="/edit-profile"
+                          className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light opacity-70 transition-colors hover:bg-border-light/40 hover:text-primary hover:opacity-100"
                         >
-                          Courier
+                          <Settings size={14} />
+                          Editar Datos Personales
                         </a>
 
                         <button
@@ -256,36 +307,41 @@ export default function Navbar() {
                         </button>
                       </div>
                     )}
-                </div>
+                  </div>
                 ) : (
-                  <button
-                    onClick={handleLogin}
-                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border transition-all active:scale-95 text-[13px] font-semibold text-text-light border-border-light hover:border-primary hover:text-primary"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      viewBox="0 0 24 24"
-                      className="h-4 w-4 shrink-0"
+                  <div className="relative">
+                    <button
+                      type="button"
+                      aria-expanded={loginMenuOpen}
+                      aria-haspopup="menu"
+                      onClick={() => setLoginMenuOpen((open) => !open)}
+                      className="flex items-center gap-2 rounded-full px-2 py-1 transition-all hover:bg-border-light/40"
                     >
-                      <path
-                        fill="#EA4335"
-                        d="M12 9.5v5h7.06C18.4 17.57 15.7 19.5 12 19.5a7.5 7.5 0 1 1 0-15c1.85 0 3.52.68 4.82 1.8l3.53-3.53A12 12 0 1 0 24 12c0-.82-.07-1.61-.2-2.36H12Z"
+                      <UserIcon
+                        size={18}
+                        className="text-text-light opacity-60"
                       />
-                      <path
-                        fill="#4285F4"
-                        d="M23.8 9.64H12v4.72h6.67A7.02 7.02 0 0 1 12 19.5c-3.7 0-6.87-2.23-8.22-5.41L.16 16.22A11.97 11.97 0 0 0 12 24c6.63 0 12-5.37 12-12 0-.83-.08-1.63-.2-2.36Z"
+                      <ChevronDown
+                        size={14}
+                        className={`text-text-light opacity-50 transition-transform ${loginMenuOpen ? 'rotate-180' : ''}`}
                       />
-                      <path
-                        fill="#FBBC05"
-                        d="M3.78 14.09A7.49 7.49 0 0 1 3.5 12c0-.73.11-1.43.28-2.09L.16 6.78A12 12 0 0 0 0 12c0 1.92.45 3.73 1.24 5.34l2.54-1.96Z"
-                      />
-                      <path
-                        fill="#34A853"
-                        d="m3.78 14.09 2.54-1.96A7.49 7.49 0 0 1 4.5 12c0-.74.11-1.44.28-2.09L1.24 8.66A11.94 11.94 0 0 0 0 12c0 1.92.45 3.73 1.24 5.34l2.54-1.96Z"
-                      />
-                    </svg>
-                    Iniciar sesión
-                  </button>
+                    </button>
+
+                    {loginMenuOpen && (
+                      <div
+                        role="menu"
+                        className="absolute right-0 top-11 w-48 overflow-hidden rounded-lg border border-border-light bg-bg-light shadow-lg"
+                      >
+                        <a
+                          role="menuitem"
+                          href="/login"
+                          className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
+                        >
+                          Iniciar sesión
+                        </a>
+                      </div>
+                    )}
+                  </div>
                 ))}
 
               {/* MOBILE */}
@@ -295,7 +351,6 @@ export default function Navbar() {
               >
                 {menuOpen ? <X size={18} /> : <Menu size={18} />}
               </button>
-
             </div>
           </div>
 
@@ -303,9 +358,21 @@ export default function Navbar() {
           {menuOpen && (
             <div className="md:hidden py-3 flex flex-col gap-3 border-t border-border-light">
               {[
-                { label: 'Colecciones', href: '#' },
-                { label: 'Inventario', href: '/inventory' },
-              ].map((item) => (
+                { label: 'Productos', href: '/productos', reqComprador: true },
+                { label: 'Ordenes', href: '/seller/orders', reqVendedor: true },
+                { label: 'Inventario', href: '/inventory', reqOperadorInv: true },
+                { label: 'Entregas', href: '/courier', reqMensajero: true },
+                { label: 'Admin', href: '/admin', reqAdmin: true },
+              ]
+                .filter(item => {
+                  if (item.reqComprador && !showCompradorFeatures) return false;
+                  if (item.reqVendedor && !showVendedorFeatures) return false;
+                  if (item.reqOperadorInv && !showOperadorInvFeatures) return false;
+                  if (item.reqMensajero && !showMensajeroFeatures) return false;
+                  if (item.reqAdmin && !showAdminFeatures) return false;
+                  return true;
+                })
+                .map((item) => (
                 <a
                   key={item.label}
                   href={item.href}
@@ -315,7 +382,7 @@ export default function Navbar() {
                 </a>
               ))}
 
-              {user && (
+              {user && showCompradorFeatures && (
                 <>
                   <a
                     href="/location"
@@ -324,12 +391,23 @@ export default function Navbar() {
                     Mis direcciones
                   </a>
 
-                  <a
-                    href="/courier"
-                    className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
-                  >
-                    Courier
-                  </a>
+                  {showMisPedidos && (
+                    <a
+                      href="/mis-pedidos"
+                      className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
+                    >
+                      Mis pedidos
+                    </a>
+                  )}
+
+                  {canAccessCourier && (
+                    <a
+                      href="/courier"
+                      className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
+                    >
+                      Mensajero
+                    </a>
+                  )}
                 </>
               )}
             </div>
@@ -341,7 +419,7 @@ export default function Navbar() {
         <ErrorCard
           isOpen={authError !== null}
           onClose={() => setAuthError(null)}
-          message={`Para ingresar a Sansistore debes utilizar tu cuenta institucional terminada en ${INSTITUTIONAL_DOMAIN}.`}
+          message={`Para ingresar a Sansistore debes utilizar tu cuenta institucional que contenga ${INSTITUTIONAL_DOMAIN}.`}
           title="Acceso Denegado"
         />
       )}

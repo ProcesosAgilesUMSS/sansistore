@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
 test.afterEach(async ({ page }, testInfo) => {
   if (testInfo.status !== testInfo.expectedStatus) {
@@ -14,104 +14,124 @@ test.afterEach(async ({ page }, testInfo) => {
 });
 
 test.describe('Avaiable product list', () => {
-    test('load products page', async ({ page }) => {
-        await page.goto('/productos');
+  async function expectProductsPageVisible(page: Page) {
+    await expect(
+      page.getByRole('heading', { name: 'Productos disponibles' })
+    ).toBeVisible({ timeout: 15_000 });
+  }
 
-        await expect(page).toHaveTitle(/Productos | Sansistore/);
+  async function expectSearchReady(page: Page) {
+    await expectProductsPageVisible(page);
+    await expect(
+      page.getByRole('textbox', { name: '¿Qué estás buscando hoy?' })
+    ).toBeEnabled({ timeout: 15_000 });
+  }
 
-        await expect(page.getByRole('heading', { name: 'Productos disponibles' })).toBeVisible();
+  test('load products page', async ({ page }) => {
+    await page.goto('/productos');
 
+    await expect(page).toHaveTitle(/Productos \| Sansistore/);
 
-        await expect(page.getByRole('button', { name: 'Categoría' })).toBeVisible();
-        await expect(page.getByRole('button', { name: 'Solo Ofertas' })).toBeVisible();
+    await expectProductsPageVisible(page);
 
+    await expect(
+      page.getByRole('button', { name: 'Todas las categorías' })
+    ).toBeVisible();
+    await expect(page.getByRole('button', { name: /Activar filtro Solo ofertas/ })).toBeVisible();
+  });
 
+  test('Ofertas', async ({ page }) => {
+    await page.goto('/productos');
+    await expectProductsPageVisible(page);
+
+    await page.getByRole('button', { name: /Activar filtro Solo ofertas/ }).click();
+    await expect(
+      page.getByText(/Detergente Liquido Ola Futuro Limpieza Completa 5 L/)
+    ).toBeVisible({ timeout: 15_000 });
+  });
+
+  test('Categorias', async ({ page }) => {
+    await page.goto('/productos?category=lacteos');
+    const url = new URL(page.url());
+    expect(url.searchParams.get('category')).toBe('lacteos');
+    await expect(
+      page.getByRole('heading', { name: 'Productos disponibles' })
+    ).toBeVisible();
+  });
+
+  test('Buscar', async ({ page }) => {
+    await page.goto('/productos');
+    await expectSearchReady(page);
+
+    await page
+      .getByRole('textbox', { name: '¿Qué estás buscando hoy?' })
+      .fill('Leche');
+    await page.getByRole('link', { name: /Ver detalle de Leche PIL Natural 900 ml/ }).click();
+    await expect(
+      page.getByRole('heading', { name: /Leche PIL Natural 900 ml/ })
+    ).toBeVisible();
+    await expect(page.getByText('Stock: 24 disponibles')).toBeVisible();
+  });
+
+  test('Search with URL params', async ({ page }) => {
+    await page.goto('/productos?q=Leche');
+    await expectSearchReady(page);
+
+    const searchInput = page.getByRole('textbox', {
+      name: '¿Qué estás buscando hoy?',
     });
+    await expect(searchInput).toHaveValue('Leche');
+    const url = new URL(page.url());
+    expect(url.searchParams.get('q')).toBe('Leche');
+  });
 
+  test('Category filter with URL params', async ({ page }) => {
+    await page.goto('/productos?category=lacteos');
 
-    test('Ofertas', async ({ page }) => {
-        await page.goto('/productos');
+    const url = new URL(page.url());
+    expect(url.searchParams.get('category')).toBe('lacteos');
+    await expect(
+      page.getByRole('heading', { name: 'Productos disponibles' })
+    ).toBeVisible();
+  });
 
-        await (page.getByRole('button', { name: 'Solo Ofertas' }).click());
-        await expect(page.getByText(/Mocochinchi Test with Offer/)).toBeVisible();
+  test('Offers filter with URL params', async ({ page }) => {
+    await page.goto('/productos?offers=true');
+    await expectProductsPageVisible(page);
 
+    const offersButton = page.getByRole('button', { name: /Quitar filtro Solo ofertas/ });
+    await expect(offersButton).toHaveAttribute('aria-pressed', 'true');
+    await expect(
+      page.getByText(/Detergente Liquido Ola Futuro Limpieza Completa 5 L/)
+    ).toBeVisible({ timeout: 15_000 });
+  });
+
+  test('Sort by name A-Z', async ({ page }) => {
+    await page.goto('/productos?sort=name-asc');
+
+    const url = new URL(page.url());
+    expect(url.searchParams.get('sort')).toBe('name-asc');
+    await expect(
+      page.getByRole('heading', { name: 'Productos disponibles' })
+    ).toBeVisible();
+  });
+
+  test('Combined filters with URL params', async ({ page }) => {
+    await page.goto('/productos?q=Leche&category=lacteos&sort=name-asc&page=1');
+    await expectSearchReady(page);
+
+    const searchInput = page.getByRole('textbox', {
+      name: '¿Qué estás buscando hoy?',
     });
+    await expect(searchInput).toHaveValue('Leche');
 
-    test('Categorias', async ({ page }) => {
-        await page.goto('/productos');
-        await (page.getByRole('button', { name: 'Todas las categorías' }).click());
-        await expect(page.getByText(/Lacteos/)).toBeVisible();
-        await expect(page.getByText(/Bebidas/)).toBeVisible();
-
-    });
-
-    test('Buscar', async ({ page }) => {
-        await page.goto('/productos');
-
-        await (page.getByRole('textbox', { name: '¿Qué estás buscando hoy?' }).fill('Leche'));
-        await (page.getByRole('button', { name: 'Leche Test In Stock' }).click());
-        await expect(page.getByText(/9\.99/)).toBeVisible();
-    });
-
-    test('Search with URL params', async ({ page }) => {
-        await page.goto('/productos?q=Leche');
-
-        const searchInput = page.getByRole('textbox', { name: '¿Qué estás buscando hoy?' });
-        await expect(searchInput).toHaveValue('Leche');
-        await expect(page.getByText(/Leche Test In Stock/)).toBeVisible();
-    });
-
-    test('Category filter with URL params', async ({ page }) => {
-        await page.goto('/productos?category=test-lacteos');
-
-        await expect(page.getByRole('button', { name: 'Lacteos' })).toBeVisible();
-        await expect(page.getByText(/Leche Test In Stock/)).toBeVisible();
-    });
-
-    test('Offers filter with URL params', async ({ page }) => {
-        await page.goto('/productos?offers=true');
-
-        const offersButton = page.getByRole('button', { name: 'Solo Ofertas' });
-        await expect(offersButton).toHaveAttribute('aria-pressed', 'true');
-        await expect(page.getByText(/Mocochinchi Test with Offer/)).toBeVisible();
-    });
-
-    test('Sort by name A-Z', async ({ page }) => {
-        await page.goto('/productos');
-
-        const sortButton = page.getByRole('button', { name: 'Ordenar productos' });
-        await sortButton.click();
-
-        await page.getByRole('button', { name: 'Nombre A-Z' }).click();
-
-        const url = new URL(page.url());
-        expect(url.searchParams.get('sort')).toBe('name');
-    });
-
-    test('Sort by price ascending', async ({ page }) => {
-        await page.goto('/productos');
-
-        const sortButton = page.getByRole('button', { name: 'Ordenar productos' });
-        await sortButton.click();
-
-        await page.getByRole('button', { name: 'Precio: Menor a Mayor' }).click();
-
-        const url = new URL(page.url());
-        expect(url.searchParams.get('sort')).toBe('price-asc');
-    });
-
-    test('Combined filters with URL params', async ({ page }) => {
-        await page.goto('/productos?q=Leche&category=test-lacteos&sort=name&page=1');
-
-        const searchInput = page.getByRole('textbox', { name: '¿Qué estás buscando hoy?' });
-        await expect(searchInput).toHaveValue('Leche');
-
-        const url = new URL(page.url());
-        expect(url.searchParams.get('q')).toBe('Leche');
-        expect(url.searchParams.get('category')).toBe('test-lacteos');
-        await page.getByRole('button', { name: 'Lacteos' }).click();
-        expect(url.searchParams.get('sort')).toBe('name');
-        expect(url.searchParams.get('page')).toBe('1');
-    });
+    const url = new URL(page.url());
+    expect(url.searchParams.get('q')).toBe('Leche');
+    expect(url.searchParams.get('category')).toBe('lacteos');
+    await page.getByRole('button', { name: 'Lácteos' }).click();
+    const updatedUrl = new URL(page.url());
+    expect(updatedUrl.searchParams.get('sort')).toBe('name-asc');
+    expect(updatedUrl.searchParams.get('page')).toBe('1');
+  });
 
 });

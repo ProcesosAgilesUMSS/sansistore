@@ -118,3 +118,136 @@
 * **Yesterday:** Trabajé en algunos ajustes de frontend y en la integración de la funcionalidad de la HU-03: “Como mensajero quiero ver el monto exacto a cobrar”, enfocándome en la presentación del monto total antes de confirmar la entrega. 
 * **Today:** Crear pedidos mockeados para visualizar correctamente el flujo de la HU-03 mientras se completan otras funcionalidades relacionadas con la gestión de pedidos en este Sprint.*.
 * **Blockers:** Dependencia de funcionalidades relacionadas con el cálculo y registro de pedidos para completar las validaciones de la HU.
+
+# Daily Reports - Team 3 Webspire 12/05/26
+
+## Dayana Saleth Ortuño Guzman
+
+ * **Yesterday:** Realice el retrospective del sprint 1 con mi equipo.
+* **Today:** Analizar que HUs podriamos hacer para el segundo Sprint, considerando despendencias y demas.
+* **Blockers:** Dificultades a la hora de integrar, no nos dimos cuenta que esa parte tenia dependencia, lo cual nosotros creamos otro panel aparte, el problema fue que el grupo de Programing apis editaron nuestro codigo, para poner el sullo y no podiamos integrar.
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Apoyé en la integración del módulo de courier junto con el grupo de Programming API's, revisando que el flujo relacionado con la HU *“Como mensajero, quiero ver el monto exacto a cobrar para evitar errores”* y *“Como mensajero, quiero marcar un pedido como entregado para registrar que la entrega fue completada”*, pueda conectarse correctamente con las funcionalidades necesarias del proceso de entrega y cobro.Realice el retrospective del sprint 1 con mi equipo.
+* **Today:** Se estuvieron revisando las historias de usuario correspondientes para el segundo parcial, verificando su estado, dependencias y posibles ajustes necesarios para continuar con el desarrollo del proyecto.
+* **Blockers:** Se presentaron dificultades en la integración con el grupo de Programming API's debido a dependencias entre módulos y cambios realizados en archivos relacionados al flujo de entrega y cobro, lo cual generó retrasos.
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Participé en la retrospectiva del Sprint 1 y apoyé en la revisión del flujo y los criterios de aceptación de las historias de usuario.
+* **Today:** Analizar las historias de usuario planificadas para el segundo Sprint, considerando dependencias y posibles mejoras en el flujo de entrega.
+* **Blockers:** None
+
+## Jose Brandon Pinedo Gonzales
+
+- **Yesterday:** Apoyé en la revisión del avance realizado durante el Sprint 1, verificando las funcionalidades desarrolladas y analizando qué historias de usuario quedaron pendientes o requieren ajustes para continuar con el segundo Sprint.
+
+- **Today:** Revisar las historias de usuario disponibles para el Sprint 2, considerando dependencias entre módulos, prioridades del proyecto y funcionalidades que pueden ser asignadas al equipo para avanzar de manera ordenada.
+
+- ## Alejandro Torrico Quispe
+
+- **Yesterday:** Participé en la retrospectiva del Sprint 1 y apoyé en la revisión de los problemas encontrados, especialmente las dependencias entre módulos que afectaron el avance del área de pagos.
+
+- **Today:** Analizar las historias de usuario disponibles para el Sprint 2, revisando su prioridad, dependencias y viabilidad para elegir correctamente cuáles se trabajarán durante el sprint.
+
+- **Blockers:** None
+
+# Daily Reports - Team 3 Webspire 14/05/26
+
+## Dayana Saleth Ortuño Guzman
+
+ * **Yesterday:** Nos juntamos con el equipo para definir qué HUs entran en el Sprint 2.
+* **Today:** Escribir los criterios de aceptación de la Hu que me toco y revisar si tiene alguna dependencia con las tareas de los demás.
+* **Blockers:** none
+
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Reunion con equipo para definir qué HUs entran en el Sprint 2 y revisar las historias relacionadas al módulo de entrega y cobro.
+* **Today:** Escribir los criterios de aceptación de las HUs que me tocaron, relacionadas con entrega y cobro, y revisar si tienen dependencias con las tareas de los demás grupos.
+* **Blockers:** none
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Revisé junto al equipo las HUs propuestas para el Sprint 2 y las historias relacionadas con las funcionalidades que se trabajarán durante el sprint.
+* **Today:** Escribir los criterios de aceptación de las HUs que me tocaron y analizar posibles dependencias con las tareas de los demás integrantes del equipo.
+* **Blockers:** none
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Trabaje en el avance del mockup de la Hu que me toco para este sprint 
+* **Today:** Defini los criterios de aceptacion y analice el funcionamiento que debera tener para comunicarme con otras areas para la implementacion completa.
+* **Blockers:** none
+
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Me reuní con el equipo para revisar las HUs propuestas para el Sprint 2 y definir cuáles serán trabajadas durante este sprint.
+* **Today:** Elaborar los criterios de aceptación de la HU que me tocó y revisar si tiene alguna dependencia con las tareas de los demás integrantes del equipo.
+* **Blockers:** none
+
+# Daily Reports - Team 3 Webspire 19/05/26
+
+## Dayana Saleth Ortuño Guzman
+
+ * **Yesterday:** Implementar la Hu de "Como Mensajero, quiero marcar un pedido como “NO ENTREGADO” si no logro entrega"
+* **Today:** Conectar con la BD la parte del boton y comenzar a realizar mi otra HU.
+* **Blockers:** Modificaciones que se hicieron en cuanto al diseño del panel de mensajero.
+  
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Avancé con la HU *“Como Mensajero, quiero registrar el pago en efectivo del cliente para cerrar la venta”*, revisando el flujo para que el mensajero pueda registrar correctamente el pago en efectivo al finalizar la entrega. También verifiqué que la HU *“Como vendedor quiero ver el total de dinero cobrado en el día para rendir cuentas”* ya se encontraba avanzada.
+* **Today:** Continuar con los ajustes y pruebas de la HU de registrar el pago en efectivo, validando que el flujo funcione correctamente y que la información se registre de manera adecuada para cerrar la venta.
+* **Blockers:** none
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Revisé junto al equipo las HUs propuestas para el Sprint 2, analizando las funcionalidades que serán trabajadas durante el sprint y sus posibles dependencias.
+
+* **Today:** Continuar trabajando en la HU asignada, avanzando en sus criterios de aceptación y revisando si tiene relación o dependencia con las tareas de los demás integrantes del equipo.
+
+* **Blockers:** none
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Trabajé en el avance del mockup correspondiente a la HU asignada para este sprint, revisando el diseño y el flujo que deberá seguir la funcionalidad.
+
+* **Today:** Continuar trabajando en la HU asignada, definiendo sus criterios de aceptación y analizando su funcionamiento para coordinar con otras áreas si es necesario.
+
+* **Blockers:** none
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Me reuní con el equipo para revisar las HUs propuestas para el Sprint 2 y definir cuáles serán trabajadas durante este sprint.
+
+* **Today:** Continuar trabajando en la HU asignada, elaborando sus criterios de aceptación y revisando posibles dependencias con las tareas de los demás integrantes del equipo.
+
+* **Blockers:** none
+
+
+# Daily Reports - Team 3 Webspire 21/05/26
+
+## Dayana Saleth Ortuño Guzman
+
+ * **Yesterday:** Terminar de arrglar mis HUs
+* **Today:** Arreglar el flujo de comprador, integrando la parte de "Pagar contra entrega", comunicarme con los grupos
+por las dudas que se tienen.
+* **Blockers:** none
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Terminé de arreglar mis HUs, revisando detalles pendientes y realizando los ajustes necesarios para culminar con el avance del sprint.
+* **Today:** Apoyé en arreglar el flujo de comprador, integrando la parte de **“Pagar contra entrega”**, además de coordinar con los demás grupos para resolver las dudas que se presenten.
+* **Blockers:** None
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Terminé la funcionalidad de alertas de nuevos pedidos para el mensajero, asegurando que pueda identificar rápidamente cuando tiene una nueva entrega asignada.
+* **Today:** Termine la funcionalidad de cancelación de pedidos por falta de pago, agregando el flujo para que el mensajero pueda registrar la cancelación y guardar el motivo correspondiente.
+* **Blockers:** None
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Terminé de implementar y ajustar mis HUs relacionadas con la confirmación de pedidos y validación de entrega por parte del comprador, revisando detalles pendientes.
+* **Today:** Continuaré apoyando en la revisión y validación del flujo del comprador, verificando posibles mejoras en las funcionalidades implementadas.
+* **Blockers:** None
+
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Terminé mis HUs del vendedor, implementando y ajustando el flujo de **cambio de estado a `RESERVADO`** al confirmar la reserva de producto, además de la vista para **consultar el historial de cobros por pedido** para auditoría.
+* **Today:** Realicé pruebas y correcciones sobre el flujo del vendedor, validando la visualización de pedidos reservados, el historial de pedidos pagados y ajustando conflictos y datos de seed para dejar el entorno listo para pruebas.
+* **Blockers:** None

@@ -2,7 +2,7 @@ import { useAssignOrders } from '../hooks/useAssignOrders';
 import { AssignOrderCard } from './AssignOrderCard';
 import { SectionHeader } from './SectionHeader';
 
-export default function AssignOrdersPanel() {
+export default function AssignOrdersPanel({ embedded = false }: { embedded?: boolean }) {
   const {
     ready,
     assigned,
@@ -15,6 +15,7 @@ export default function AssignOrdersPanel() {
     assigningOrderId,
     assignOrder,
     unassignOrder,
+    reassignOrder,
   } = useAssignOrders();
 
   const skeletons = (
@@ -50,14 +51,8 @@ export default function AssignOrdersPanel() {
   );
 
   return (
-    <div className="min-h-screen bg-(--theme-bg) px-4 pb-10 pt-10 md:px-8 xl:px-10">
+    <div className={embedded ? 'min-w-0' : 'min-h-screen bg-(--theme-bg) px-4 pb-10 pt-10 md:px-8 xl:px-10'}>
       <header className="mb-8 rounded-[1.75rem] border border-(--theme-border) bg-(--theme-card-bg) px-6 py-6 shadow-sm backdrop-blur-sm">
-        <p
-          className="mb-3 text-xs font-800 uppercase tracking-[0.25em]"
-          style={{ color: 'var(--color-primary)' }}
-        >
-          Panel del vendedor
-        </p>
 
         <h1
           className="text-3xl font-900 leading-tight text-(--theme-text) md:text-4xl"
@@ -132,6 +127,7 @@ export default function AssignOrdersPanel() {
                     onSelectCourier={selectCourier}
                     onAssign={assignOrder}
                     onUnassign={unassignOrder}
+                    onReassign={reassignOrder}
                     isAssigning={assigningOrderId === order.orderId}
                     isSuccess={true}
                   />

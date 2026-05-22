@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
 
 interface Props {
   title?: string;
@@ -14,8 +15,10 @@ const { title = 'Sansistore' } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#88b04b" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <ClientRouter fallback="swap" />
     <script is:inline>
       const storageKey = 'sansistore-theme';
       const media = window.matchMedia('(prefers-color-scheme: dark)');
@@ -25,21 +28,38 @@ const { title = 'Sansistore' } = Astro.props;
         document.documentElement.style.colorScheme = theme;
       };
 
-      try {
-        const storedTheme = window.localStorage.getItem(storageKey);
-        applyTheme(
-          storedTheme === 'light' || storedTheme === 'dark'
+      const resolveTheme = () => {
+        try {
+          const storedTheme = window.localStorage.getItem(storageKey);
+
+          return storedTheme === 'light' || storedTheme === 'dark'
             ? storedTheme
             : media.matches
               ? 'dark'
-              : 'light',
-        );
-      } catch {
-        applyTheme(media.matches ? 'dark' : 'light');
-      }
+              : 'light';
+        } catch {
+          return media.matches ? 'dark' : 'light';
+        }
+      };
+
+      const syncTheme = () => {
+        const theme = resolveTheme();
+        applyTheme(theme);
+      };
+
+      document.addEventListener('astro:before-swap', (event) => {
+        const theme = resolveTheme();
+        event.newDocument.documentElement.dataset.theme = theme;
+        event.newDocument.documentElement.style.colorScheme = theme;
+      });
+
+      document.addEventListener('astro:after-swap', syncTheme);
+      document.addEventListener('astro:page-load', syncTheme);
+
+      syncTheme();
     </script>
   </head>
-  <body class="antialiased bg-bg-light text-text-light">
+  <body class="antialiased bg-bg-light text-text-light min-h-screen flex flex-col">
     <slot />
   </body>
 </html>
