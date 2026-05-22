@@ -111,8 +111,7 @@ export async function getCreatedOrders(): Promise<Order[]> {
 export function subscribeToCreatedOrders(onUpdate: (orders: Order[]) => void) {
   const q = query(
     collection(db, "orders"),
-    where("status", "in", ["CREADO", "RESERVADO", "EMPAQUETADO", "PENDIENTE"]),
-    where("deliveryStatus", "==", null)
+    where("status", "in", ["CREADO", "RESERVADO", "EMPAQUETADO", "PENDIENTE"])
   );
 
   return onSnapshot(q, async (querySnapshot) => {
