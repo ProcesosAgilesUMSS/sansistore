@@ -14,7 +14,7 @@ export default function OrderProductDetail({
 
   return (
     <section
-      className="col-span-full min-[960px]:col-start-4 min-[960px]:col-end-22 grid grid-cols-subgrid gap-y-10"
+      className="col-span-full min-[960px]:col-start-4 min-[960px]:col-end-22 grid grid-cols-subgrid gap-y-10 mt-16"
       aria-labelledby="order-detail-title"
     >
       <div className="col-span-full flex items-start justify-between pb-2">
@@ -45,7 +45,7 @@ export default function OrderProductDetail({
         <button
           type="button"
           onClick={onBack}
-          className="uppercase text-xs border border-[#1e1e1e44] p-[2px_5px_2.5px] border-dotted rounded cursor-pointer"
+          className="uppercase text-xs border border-[#1e1e1e44] p-[2px_5px_2.5px] border-dotted rounded"
         >
           Volver
         </button>

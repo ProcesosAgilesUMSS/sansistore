@@ -1,26 +1,33 @@
 import { useEffect, useState } from "react";
 
 const titles: string[] = [
-  "Receiving shipped orders",
-  "Receiving shipped orders  .",
-  "Receiving shipped orders  ..",
-  "Receiving shipped orders  ..."
+  "",
+  ".",
+  "..",
+  "..."
 ];
 
-export default function LoadingMessage() {
+export default function LoadingMessage({ text }: { text: string }) {
   const [index, setIndex] = useState<number>(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % titles.length);
-    }, 500);
+    }, 600);
 
     return () => clearInterval(timer);
   }, []);
 
   return (
-    <div className="w-[22ch] tracking-tighter">
-      <div>{titles[index]}</div>
+    <div className="tracking-tighter w-[20ch]">
+      <div className="flex gap-2">
+        {text}
+        <div>
+          {titles[index]}
+        </div>
+      </div>
     </div>
   );
 }
+
+
