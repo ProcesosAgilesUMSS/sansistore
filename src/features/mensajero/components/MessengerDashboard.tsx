@@ -42,24 +42,44 @@ const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']) => {
   return 'Entregado';
 };
 const openDeliveryMap = (order: MessengerOrder) => {
+  const mapOrder = {
+    buyerName: order.buyerName || order.customerName,
+    deliveryZone: order.city,
+    deliveryLat: order.deliveryLat ?? order.lat ?? null,
+    deliveryLng: order.deliveryLng ?? order.lng ?? null,
+    total: order.cashToCollect,
+  };
+
+  const panelOrder = {
+    customerName: order.customerName,
+    phone: order.phone,
+    address: order.address,
+    reference: order.reference || order.locationLabel,
+    items: order.items.map((item) => ({
+      name: item.name,
+      quantity: item.quantity,
+    })),
+    cashToCollect: order.cashToCollect,
+  };
+
   localStorage.setItem(
     'courier_map_order',
-    JSON.stringify({
-      id: order.id,
-      customerName: order.customerName,
-      phone: order.phone,
-      address: order.address,
-      city: order.city,
-      reference: order.reference || order.locationLabel,
-      deliveryZone: order.city,
-      deliveryLat: order.deliveryLat,
-      deliveryLng: order.deliveryLng,
-      cashToCollect: order.cashToCollect,
-      items: order.items,
-    })
+    JSON.stringify(mapOrder)
+  );
+  localStorage.setItem(
+    'courier_panel_order',
+    JSON.stringify(panelOrder)
   );
 
-  window.open('/mapa', '_blank', 'noopener,noreferrer');
+  const url = new URL('/mapa', window.location.origin);
+  if (mapOrder.deliveryLat != null && mapOrder.deliveryLng != null) {
+    url.searchParams.set('lat', String(mapOrder.deliveryLat));
+    url.searchParams.set('lng', String(mapOrder.deliveryLng));
+  } else {
+    url.searchParams.set('location', order.address);
+  }
+
+  window.location.href = url.toString();
 };
 
 const canCancelByNoPayment = (order: MessengerOrder) => {

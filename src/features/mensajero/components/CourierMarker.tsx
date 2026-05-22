@@ -4,14 +4,14 @@ import L from 'leaflet';
 
 type Position = [number, number];
 
-const myIcon = L.icon({
+const courierIcon = L.icon({
   iconUrl: '/mensajero.png',
   iconSize: [40, 40],
   iconAnchor: [20, 40],
   popupAnchor: [0, -40],
 });
 
-function LocationMarker() {
+export default function CourierMarker() {
   const [position, setPosition] = useState<Position | null>(null);
   const map = useMap();
 
@@ -32,10 +32,8 @@ function LocationMarker() {
   if (!position) return null;
 
   return (
-    <Marker icon={myIcon} position={position}>
+    <Marker icon={courierIcon} position={position}>
       <Popup>Tu ubicacion actual</Popup>
     </Marker>
   );
 }
-
-export default LocationMarker;
