@@ -254,3 +254,10 @@
 - **Yesterday:** Continue trabajando con la implementacion de la HU #108 y preveo terminarla para el final del día.
 - **Today:** Terminar la HU #108 e integrarla correctamente
 - **Blockers:** Leves retrasos por la dependencia de mi HU #108 con la HU #105
+
+
+### Adrian Said Andrade Medina
+
+- **Yesterday:** Avancé con la implementación del mapa para la visualización de la ubicación de entrega, revisando límites del área navegable y ajustes de coordenadas con Leaflet.
+- **Today:** Continuaré corrigiendo detalles de integración del mapa y validando que la funcionalidad funcione correctamente dentro del flujo del mensajero.
+- **Blockers:** Dudas puntuales sobre ajustes de Leaflet y manejo de coordenadas.
