@@ -137,7 +137,11 @@ export default function Navbar() {
     setRoles([]);
     clearLocalCart();
     clearLocalFavorites();
-    signOut(auth).catch(console.error);
+    signOut(auth)
+      .then(() => {
+        window.location.href = '/login';
+      })
+      .catch(console.error);
   };
 
   const toggleTheme = () => {

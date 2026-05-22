@@ -1,18 +1,24 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 ---
 
 <Layout title="Mi Cuenta | Sansistore">
-  <main class="profile-container">
-    <header class="profile-header">
-      <img id="user-avatar" src="" alt="" class="profile-avatar" hidden />
-      <h1>Mi Perfil</h1>
+  <Navbar client:load />
+  
+  <main class="flex-1 w-full max-w-xl mx-auto px-4 pt-32 pb-16">
+    <header class="flex flex-col items-center gap-4 mb-8 text-center">
+      <img id="user-avatar" src="" alt="" class="size-24 rounded-full object-cover border-4 border-card-bg-light shadow-sm" hidden />
+      <h1 class="text-[clamp(1.75rem,4vw,3rem)] font-black tracking-[-0.04em] leading-none text-text-light">Mi Perfil</h1>
     </header>
 
-    <section class="profile-details">
-      <div id="auth-status" class="loading">Cargando...</div>
+    <section id="auth-status" class="text-center text-text-light/60 font-medium py-8">
+      Cargando...
     </section>
   </main>
+
+  <Footer client:load />
 
   <script>
     import { onAuthStateChanged } from 'firebase/auth';
@@ -33,20 +39,23 @@ import Layout from '../layouts/Layout.astro';
           avatar.hidden = false;
         }
         container.outerHTML = `
-          <section class="profile-details">
-            <dl class="profile-data">
-              <dt>Nombre</dt>
-              <dd>${escapeHtml(displayName)}</dd>
-              <dt>Correo</dt>
-              <dd>${escapeHtml(email)}</dd>
+          <section class="bg-card-bg-light border border-border-light rounded-[1.25rem] p-6 shadow-sm mx-auto">
+            <dl class="flex flex-col m-0">
+              <dt class="text-[11px] font-bold uppercase tracking-wider text-text-light/50 mb-1">Nombre</dt>
+              <dd class="text-base font-bold text-text-light pb-4 mb-4 border-b border-dotted border-border-light ml-0">${escapeHtml(displayName)}</dd>
+              
+              <dt class="text-[11px] font-bold uppercase tracking-wider text-text-light/50 mb-1">Correo</dt>
+              <dd class="text-base font-bold text-text-light ml-0">${escapeHtml(email)}</dd>
             </dl>
           </section>
         `;
       } else {
         container.outerHTML = `
-          <div class="error-message">
-            <p>No autenticado</p>
-            <a href="/login">Iniciar sesión</a>
+          <div class="text-center flex flex-col items-center gap-6 py-6">
+            <p class="text-error font-semibold m-0">No autenticado</p>
+            <a href="/login" class="rounded-full bg-primary-action text-bg-light px-6 py-2.5 text-xs uppercase font-bold tracking-wider hover:opacity-90 hover:scale-105 active:scale-95 transition-all">
+              Iniciar sesión
+            </a>
           </div>
         `;
       }
