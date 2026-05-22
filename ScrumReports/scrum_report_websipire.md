@@ -228,3 +228,8 @@
 * **Today:** Arreglar el flujo de comprador, integrando la parte de "Pagar contra entrega", comunicarme con los grupos
 por las dudas que se tienen.
 * **Blockers:** none
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Terminé de arreglar mis HUs, revisando detalles pendientes y realizando los ajustes necesarios para culminar con el avance del sprint.
+* **Today:** Apoyé en arreglar el flujo de comprador, integrando la parte de **“Pagar contra entrega”**, además de coordinar con los demás grupos para resolver las dudas que se presenten.
+* **Blockers:** None
