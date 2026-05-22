@@ -281,3 +281,45 @@ También realice pruebas funcionales en entorno local sobre el flujo completo de
        3. Validación de Disponibilidad: Definir dónde se realizará la validación de stock (si en el frontend o como regla de
           seguridad/función en el backend) antes de confirmar la reserva.
 - **Blockers:** Ninguno.
+
+
+# 21/05/ 2026
+## Daily Reports - Team 6 SoftwareOne
+
+
+### Llanos Vega Juan Carlos
+
+
+- **Yesterday:** Actualice mi rama con lo último de main para evitar conflictos, se pulieron las especificidades requeridas de mi HU para con el desarrollo del requerimiento y conexión de los productos reservados con la base de datos.
+- **Today:** Se integró la parte correspondiente de reserva de productos en tiempo real de mi HU con el desarrollo de los demás integrantes del equipo.
+- **Blockers:** Ninguno
+
+
+### Rodriguez Torrico Arnold Guery
+
+
+- **Yesterday:** Revisé la HU #81 correspondiente al rol de mensajero, analizando sus criterios de aceptación, dependencias con otras historias de usuario implementadas por otros equipos y el flujo completo del proceso de delivery dentro del sistema.
+- **Today:** Revisé la arquitectura actual del proyecto SansiStore para identificar el módulo exacto donde debe implementarse la funcionalidad de marcar pedidos como entregados, analizando componentes, rutas y servicios relacionados con el rol de mensajero, además de preparar el entorno local para futuras pruebas e integración.
+- **Blockers:** Ninguno
+
+
+### Pereira Fiorilo Oliver Do Santos
+- **Yesterday:** Finalice por completo la User Story "Registrar una compra de producto". Esto incluyó el desarrollo del formulario en el frontend, el servicio backend para la validación y registro, y la integración para la actualización de stock. Ya realicé el merge correspondiente a la rama main. 
+- **Today:** Estaré enfocado en revisar los Pull Requests (PRs) de mis compañeros de equipo, analizando el código y las nuevas implementaciones para asegurar la calidad antes de su integración. 
+- **Blockers:** Hay errores en los tests ocasionados por implementaciones de otros equipos, lo cual está afectando el flujo. 
+
+
+### Paqui Rojas Aaron David
+
+
+- **Yesterday:** Finalicé el desarrollo frontend de la HU-079. Construí el formulario de creación de ofertas (con sus validaciones de fechas/porcentajes) y el componente visual de la Etiqueta de Descuento
+- **Today:** Realicé pruebas de integración en el entorno de staging (Vercel). Confirmé que las etiquetas de descuento ya se visualizan correctamente en el catálogo público y estuve validando el flujo de creación de productos de prueba para el buscador del formulario del vendedor.   
+- **Blockers:** Ninguno  
+
+
+### Gutiérrez Fuentes Alexander Raul
+
+
+- **Yesterday:** Refinación de HU #80
+- **Today:** Finalizar HU #80, hacer integración
+- **Blockers:** none

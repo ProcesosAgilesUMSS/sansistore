@@ -1,0 +1,21 @@
+---
+import SellerLayout from '../../layouts/SellerLayout.astro';
+import PurchaseForm from '../../features/seller/components/PurchaseForm';
+---
+
+<SellerLayout title="Sansistore | Registrar Compra">
+  <div class="py-6 lg:py-8">
+    <div class="mb-6">
+      <h1 class="font-['Outfit'] font-black text-2xl tracking-tight text-(--theme-text)">
+        Registrar <span class="text-primary">Compra</span>
+      </h1>
+      <p class="mt-1 text-sm text-(--theme-text) opacity-50">
+        Ingresa los datos de la compra para actualizar el inventario disponible.
+      </p>
+    </div>
+
+    <div class="max-w-2xl">
+      <PurchaseForm client:load />
+    </div>
+  </div>
+</SellerLayout>

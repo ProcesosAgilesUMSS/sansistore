@@ -104,7 +104,7 @@ export default async function globalSetup() {
   emulatorProcess = spawn(
     process.platform === 'win32' ? 'npx.cmd' : 'npx',
     [
-      'firebase',
+      'firebase-tools',
       'emulators:start',
       '--only',
       'firestore,auth',

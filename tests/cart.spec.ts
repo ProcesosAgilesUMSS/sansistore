@@ -261,40 +261,27 @@ test.describe('Cart - Carrito', () => {
     const emailField = page.getByLabel('Correo electrónico');
     const passwordField = page.locator('#password');
 
+    // Fill right before clicking to minimize autofill interference window
+    await emailField.fill(email);
+    await passwordField.fill('12345678');
+
+    // Retry if autofill overwrites the values
     for (let attempt = 0; attempt < 3; attempt++) {
+      const currentEmail = await emailField.inputValue();
+      const currentPass = await passwordField.inputValue();
+      if (currentEmail === email && currentPass === '12345678') break;
       await emailField.fill(email);
       await passwordField.fill('12345678');
-      await page.waitForTimeout(250);
-
-      if (
-        (await emailField.inputValue()) === email &&
-        (await passwordField.inputValue()) === '12345678'
-      ) {
-        break;
-      }
+      await page.waitForTimeout(150);
     }
 
-    await expect(emailField).toHaveValue(email, { timeout: 10_000 });
-    await expect(passwordField).toHaveValue('12345678', {
-      timeout: 10_000,
-    });
-
-    for (let attempt = 0; attempt < 3; attempt++) {
-      if (!page.url().includes('/login')) {
-        break;
-      }
-      try {
-        await loginButton.click({ noWaitAfter: true, timeout: 2000 });
-      } catch (error) {
-        if (!page.url().includes('/login')) {
-          break;
-        }
-      }
-      await page.waitForTimeout(1000);
-    }
-
-    await expect(page).toHaveURL('/', { timeout: 30_000 });
+    await page
+      .locator('form')
+      .getByRole('button', { name: 'Iniciar sesión', exact: true })
+      .click();
+    await expect(page).toHaveURL('/me', { timeout: 30_000 });
   }
+
 
   async function expectCartPage(page: Page) {
     await expect(page).toHaveTitle(/Mi Carrito \| SansiStore/);
