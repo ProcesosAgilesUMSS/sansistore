@@ -34,11 +34,12 @@ export const SideBarSeller = () => {
 
   const linkClass = (isActive: boolean) =>
     [
-      'flex items-center justify-between rounded-2xl border px-4 py-3 text-sm font-600 transition',
+      'relative flex items-center justify-between rounded-2xl border px-4 py-3 text-sm transition-all duration-150 overflow-hidden',
       isActive
-        ? 'border-primary bg-primary/10 text-primary shadow-[0_10px_24px_rgba(136,176,75,0.12)]'
-        : 'border-(--theme-border) text-(--theme-text) hover:border-primary hover:bg-(--theme-secondary-bg) hover:text-primary',
+        ? 'border-primary/40 bg-primary/10 text-primary font-700 shadow-[0_4px_16px_rgba(136,176,75,0.15)] pl-5'
+        : 'border-(--theme-border) text-(--theme-text) font-500 hover:border-primary/40 hover:bg-(--theme-secondary-bg) hover:text-primary',
     ].join(' ');
+
 
   return (
     <section className="flex w-full flex-col gap-4">
@@ -54,16 +55,25 @@ export const SideBarSeller = () => {
 
         {openMenu && (
           <div className="mt-3 space-y-2">
-            {sections.map((section) => (
-              <a
-                key={section.id}
-                href={section.route}
-                aria-current={isCurrentRoute(section.route) ? 'page' : undefined}
-                className={linkClass(isCurrentRoute(section.route))}
-              >
-                <span className="min-w-0 truncate">{section.label}</span>
-              </a>
-            ))}
+            {sections.map((section) => {
+              const isActive = isCurrentRoute(section.route);
+              return (
+                <a
+                  key={section.id}
+                  href={section.route}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={linkClass(isActive)}
+                >
+                  {isActive && (
+                    <span className="absolute left-0 top-0 bottom-0 w-1 rounded-l-2xl bg-primary" />
+                  )}
+                  <span className="min-w-0 truncate">{section.label}</span>
+                  {isActive && (
+                    <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
+                  )}
+                </a>
+              );
+            })}
           </div>
         )}
       </div>
@@ -77,16 +87,25 @@ export const SideBarSeller = () => {
         </p>
 
         <div className="space-y-2">
-          {sections.map((section) => (
-            <a
-              key={section.id}
-              href={section.route}
-              aria-current={isCurrentRoute(section.route) ? 'page' : undefined}
-              className={linkClass(isCurrentRoute(section.route))}
-            >
-              <span className="min-w-0 truncate">{section.label}</span>
-            </a>
-          ))}
+          {sections.map((section) => {
+            const isActive = isCurrentRoute(section.route);
+            return (
+              <a
+                key={section.id}
+                href={section.route}
+                aria-current={isActive ? 'page' : undefined}
+                className={linkClass(isActive)}
+              >
+                {isActive && (
+                  <span className="absolute left-0 top-0 bottom-0 w-1 rounded-l-2xl bg-primary" />
+                )}
+                <span className="min-w-0 truncate">{section.label}</span>
+                {isActive && (
+                  <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
+                )}
+              </a>
+            );
+          })}
         </div>
       </aside>
     </section>
