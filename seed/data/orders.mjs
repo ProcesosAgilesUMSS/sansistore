@@ -332,6 +332,39 @@ export const Orders = {
     createdAt: '2026-05-21T10:45:00.000Z',
     updatedAt: '2026-05-21T10:45:00.000Z',
   },
+  ORDER_014: {
+    code: 'order-014',
+    buyer: Users.ANA,
+    seller: Users.PEDRO,
+    location: Locations.LOC_ANA_AULA,
+    status: 'RESERVADO',
+    deliveryStatus: 'created',
+    customerName: 'Ana Mamani',
+    customerPhone: '70712345',
+    items: [
+      { product: Products.LECHE_PIL, quantity: 2 },
+      { product: Products.GALLETAS_VICTORIA, quantity: 1 },
+    ],
+    confirmedAt: null,
+    createdAt: '2026-04-25T06:00:00.000Z',
+    updatedAt: '2026-04-25T06:00:00.000Z',
+  },
+  ORDER_015: {
+    code: 'order-015',
+    buyer: Users.JUAN,
+    seller: Users.PEDRO,
+    location: Locations.LOC_JUAN,
+    status: 'RESERVADO',
+    deliveryStatus: 'created',
+    customerName: 'Juan Paredes',
+    customerPhone: '70000004',
+    items: [
+      { product: Products.ACEITE_FINO, quantity: 1 },
+    ],
+    confirmedAt: null,
+    createdAt: '2026-04-25T05:30:00.000Z',
+    updatedAt: '2026-04-25T05:30:00.000Z',
+  },
 };
 
 export const orderList = Object.values(Orders);

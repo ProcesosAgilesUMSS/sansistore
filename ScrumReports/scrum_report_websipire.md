@@ -218,3 +218,36 @@
 * **Today:** Continuar trabajando en la HU asignada, elaborando sus criterios de aceptación y revisando posibles dependencias con las tareas de los demás integrantes del equipo.
 
 * **Blockers:** none
+
+
+# Daily Reports - Team 3 Webspire 21/05/26
+
+## Dayana Saleth Ortuño Guzman
+
+ * **Yesterday:** Terminar de arrglar mis HUs
+* **Today:** Arreglar el flujo de comprador, integrando la parte de "Pagar contra entrega", comunicarme con los grupos
+por las dudas que se tienen.
+* **Blockers:** none
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Terminé de arreglar mis HUs, revisando detalles pendientes y realizando los ajustes necesarios para culminar con el avance del sprint.
+* **Today:** Apoyé en arreglar el flujo de comprador, integrando la parte de **“Pagar contra entrega”**, además de coordinar con los demás grupos para resolver las dudas que se presenten.
+* **Blockers:** None
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Terminé la funcionalidad de alertas de nuevos pedidos para el mensajero, asegurando que pueda identificar rápidamente cuando tiene una nueva entrega asignada.
+* **Today:** Termine la funcionalidad de cancelación de pedidos por falta de pago, agregando el flujo para que el mensajero pueda registrar la cancelación y guardar el motivo correspondiente.
+* **Blockers:** None
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Terminé de implementar y ajustar mis HUs relacionadas con la confirmación de pedidos y validación de entrega por parte del comprador, revisando detalles pendientes.
+* **Today:** Continuaré apoyando en la revisión y validación del flujo del comprador, verificando posibles mejoras en las funcionalidades implementadas.
+* **Blockers:** None
+
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Terminé mis HUs del vendedor, implementando y ajustando el flujo de **cambio de estado a `RESERVADO`** al confirmar la reserva de producto, además de la vista para **consultar el historial de cobros por pedido** para auditoría.
+* **Today:** Realicé pruebas y correcciones sobre el flujo del vendedor, validando la visualización de pedidos reservados, el historial de pedidos pagados y ajustando conflictos y datos de seed para dejar el entorno listo para pruebas.
+* **Blockers:** None
