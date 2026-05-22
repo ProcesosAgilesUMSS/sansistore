@@ -20,6 +20,9 @@ export const sections = [
     route: '/seller/assign',
   },
   {
+    id: 'compra', label: 'Registrar Compra', route: '/seller/purchase'
+  },
+  {
     id: 'rendicion',
     label: 'Rendicion del dia',
     route: '/seller/daily-collections',
