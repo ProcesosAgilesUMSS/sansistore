@@ -73,3 +73,27 @@ export async function hasActiveOrders(locationId: string): Promise<boolean> {
     const snapshot = await getDocs(q);
     return !snapshot.empty;
 }
+
+export async function getSellerLocation(orderId: string): Promise<string | null> {
+    const ordersQuery = query(
+        collection(db, 'orders'),
+        where('orderId', '==', orderId)
+    );
+    const orderSnapshot = await getDocs(ordersQuery);
+
+    if (orderSnapshot.empty) return null;
+
+    const sellerId = orderSnapshot.docs[0].data().sellerId as string;
+
+    const locationQuery = query(
+        collection(db, 'locations'),
+        where('userId', '==', sellerId),
+        where('isDefault', '==', true)
+    );
+    const locationSnapshot = await getDocs(locationQuery);
+
+    if (locationSnapshot.empty) return null;
+
+    const { lat, lng } = locationSnapshot.docs[0].data();
+    return `https://www.google.com/maps?q=${lat},${lng}`;
+}
