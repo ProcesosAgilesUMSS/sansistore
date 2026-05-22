@@ -354,6 +354,29 @@ export function subscribeAssignedOrders(
   );
 }
 
+export function subscribePaidOrders(
+  db: Firestore,
+  sellerId: string,
+  onData: (orders: Order[]) => void,
+  onError?: (err: Error) => void,
+): Unsubscribe {
+  const q = query(
+    collection(db, 'orders'),
+    where('sellerId', '==', sellerId),
+    where('status', '==', 'PAGADO'),
+  );
+
+  return onSnapshot(
+    q,
+    async (snap) => {
+      const orders = snap.docs.map((d) => docToOrder(d.id, d.data() as OrderDoc));
+      const enriched = await enrichOrdersWithData(db, orders);
+      onData(enriched);
+    },
+    (err) => onError?.(err),
+  );
+}
+
 export async function unassignCourierFromDelivery(
   db: Firestore,
   deliveryId: string,

@@ -193,10 +193,17 @@ export const Orders = {
     seller: Users.PEDRO,
     location: Locations.LOC_MARIA,
     status: 'CONFIRMADO',
+<<<<<<< HEAD
+    deliveryStatus: 'assigned',
+    customerName: 'Carlos Flores',
+    customerPhone: '76459821',
+    address: 'Av. Oquendo 1230, Cochabamba',
+=======
     deliveryStatus: null,
     customerName: 'María Álvarez',
     customerPhone: '70333444',
     address: 'Calle Jordán 89, Cochabamba',
+>>>>>>> origin/main
     items: [
       { product: Products.QUESO_CREMA, quantity: 2 },
     ],
