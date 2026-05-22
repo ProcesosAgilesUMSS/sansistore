@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Order, OrderStatus } from "../types";
-import { getCreatedOrders } from "../services/ordersService";
+import { subscribeToCreatedOrders } from "../services/ordersService";
 import OrderFilter from "./OrderFilter";
 import CreatedOrderItem from "./CreatedOrderItem";
 import GridSpinner from "./GridSpinner";
@@ -12,15 +12,13 @@ export default function CreatedOrdersList() {
   const [selectedStatuses, setSelectedStatuses] = useState<OrderStatus[]>([]);
   const [showFilters, setShowFilters] = useState<boolean>(false);
 
-  const loadOrders = () => {
-    getCreatedOrders().then((data) => {
+  useEffect(() => {
+    const unsubscribe = subscribeToCreatedOrders((data) => {
       setOrders(data);
       setLoading(false);
     });
-  };
 
-  useEffect(() => {
-    loadOrders();
+    return () => unsubscribe();
   }, []);
 
   const toggleStatus = (status: OrderStatus) => {
@@ -29,10 +27,6 @@ export default function CreatedOrdersList() {
         ? prev.filter((s) => s !== status)
         : [...prev, status]
     );
-  };
-
-  const handleOrderReverved = () => {
-    loadOrders();
   };
 
   const filteredOrders = selectedStatuses.length === 0
@@ -79,9 +73,9 @@ export default function CreatedOrdersList() {
             <ul className="col-span-full grid grid-cols-subgrid">
               {filteredOrders.map((order) => (
                 <CreatedOrderItem
-                  key={order.id}
+                  key={order.id + order.status}
                   order={order}
-                  onOrderReserved={handleOrderReverved}
+                  onOrderReserved={() => {}}
                 />
               ))}
             </ul>
@@ -99,11 +93,11 @@ function OrderHeader() {
         <span>/</span>
         orden
       </div>
-      <div className="uppercase col-start-3 col-end-9 text-xs flex gap-[4px]">
+      <div className="uppercase col-start-3 col-end-8 text-xs flex gap-[4px]">
         <span>/</span>
         dirección
       </div>
-      <div className="col-start-12 col-end-15 uppercase min-[960px]:col-start-15 min-[960px]:col-end-19 text-xs flex gap-[4px]">
+      <div className="col-start-8 col-end-15 uppercase min-[960px]:col-start-13 min-[960px]:col-end-19 text-xs flex gap-[4px]">
         <span>/</span>
         estado
       </div>

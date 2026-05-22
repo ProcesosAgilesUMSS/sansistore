@@ -1,21 +1,22 @@
-// 14B8A6
-
 import type { Order } from "../types";
-import { STATUS_LABELS } from "../types";
 import LoadingMessage from "./LoadingMessage";
+import GridSpinner from "./GridSpinner";
 import { reserveOrder } from "../services/ordersService";
 import { useState } from "react";
+import { BookMarkedIcon, Check, Package, Search } from "lucide-react";
 
 interface CreatedOrderItemProps {
   order: Order;
-  onOrderReserved: () => void; // Callback opcional para actualizar la lista
+  onOrderReserved: () => void;
 }
 
 export default function CreatedOrderItem({ order, onOrderReserved }: CreatedOrderItemProps) {
-  const isCreated = order.status.toUpperCase() === 'CREADO';
-  console.log(order.status);
-
   const [isReserving, setIsReserving] = useState(false);
+
+  const isCreated = order.status.toUpperCase() === 'CREADO';
+  const isReserved = order.status.toUpperCase() === 'RESERVADO';
+  const isPending = order.status.toUpperCase() === 'PENDIENTE';
+  const isPackaged = order.status.toUpperCase() === 'EMPAQUETADO';
 
   const handleReserve = async () => {
     if (!isCreated || isReserving) return;
@@ -23,14 +24,74 @@ export default function CreatedOrderItem({ order, onOrderReserved }: CreatedOrde
     setIsReserving(true);
     try {
       await reserveOrder(order.id);
-      // Notificar al componente padre que la orden fue confirmada
-      onOrderReserved?.();
+      // No reseteamos isReserving aquí.
+      // Esperamos a que el cambio de status en las props (vía Firebase)
+      // desmonte este componente gracias al cambio de 'key' en la lista.
     } catch (error) {
       console.error("Error confirming order:", error);
       alert("Error al confirmar el pedido. Por favor intenta de nuevo.");
-    } finally {
       setIsReserving(false);
     }
+  };
+
+  const renderStatusDisplay = () => {
+    if (isReserving) {
+      return (
+        <div className="flex items-center gap-2 text-black ml-2">
+          <GridSpinner size={5} />
+          <LoadingMessage text="Reservando" />
+        </div>
+      );
+    }
+
+    if (isReserved || isPending || isPackaged) {
+      return (
+        <div className="flex w-full items-center gap-6 ml-2">
+          <div className="flex gap-2 items-center">
+            <Check size={15} color="green" />
+            <span>Reservado</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {isPending ? (
+              <>
+                <GridSpinner size={4.5} />
+                <LoadingMessage text="Buscando productos" />
+              </>
+            ) : (
+              (isPackaged) && (
+                <div className="flex gap-2 w-[16ch]">
+                  <Search size={18} color="blue" />
+                  <span className="">Productos listos</span>
+                </div>
+              )
+            )}
+          </div>
+
+          {isPackaged && (
+            <div className="col-start-8  flex gap-2">
+              <Package size={18} color="#C28B25" />
+              <span>Empaquetado</span>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <>
+        {isCreated && (
+          <button
+            className="flex border gap-2 ml-2 px-2 py-0.5 rounded border-black/45 cursor-pointer"
+            onClick={handleReserve}
+            disabled={isReserving}
+          >
+            <BookMarkedIcon size={18} />
+            {isReserving ? "Reservando..." : "Reservar"}
+          </button>
+        )}
+      </>
+    );
   };
 
   return (
@@ -39,63 +100,20 @@ export default function CreatedOrderItem({ order, onOrderReserved }: CreatedOrde
         <div className="size-1.5 bg-[#1e1e1e]" />
         {order.id}
       </div>
-      <div className="col-start-1 col-end-9 min-[760px]:col-start-3 min-[760px]:col-end-12 text-[calc(.78125vw+14.5px)] truncate min-[960px]:col-end-14">
+      <div className="col-start-1 col-end-9 min-[760px]:col-start-3 min-[760px]:col-end-8 text-[calc(.78125vw+14.5px)] truncate
+      min-[960px]:col-end-13">
         {order.delivery.destination}
       </div>
 
-      {isCreated ? (
-        <>
-          <div
-            className="min-[960px]:col-start-15 min-[960px]:col-end-19 min-[760px]:col-start-12 min-[760px]:col-end-13 text-sm flex items-center"
-            aria-label={`Estado: ${STATUS_LABELS[order.status as keyof typeof STATUS_LABELS] || order.status}`}
-          >
-            <div
-              className="uppercase text-xs p-[2px_5px_2.5px] rounded flex items-center w-[11ch] justify-between"
-              style={{
-                backgroundImage: `repeating-linear-gradient(90deg, #1e1e1e44 0, #1e1e1e44 4px, transparent 4px, transparent 8px),
-                                repeating-linear-gradient(0deg, #1e1e1e44 0, #1e1e1e44 4px, transparent 4px, transparent 8px),
-                                repeating-linear-gradient(90deg, #1e1e1e44 0, #1e1e1e44 4px, transparent 4px, transparent 8px),
-                                repeating-linear-gradient(0deg, #1e1e1e44 0, #1e1e1e44 4px, transparent 4px, transparent 8px)`,
-                backgroundSize: `100% 1px, 1px 100%, 100% 1px, 1px 100%`,
-                backgroundPosition: `0 0, 100% 0, 0 100%, 0 0`,
-                backgroundRepeat: `no-repeat`
-              }}
-            >
-              <span className="truncate">{STATUS_LABELS[order.status as keyof typeof STATUS_LABELS] || 'creado'}</span>
-              <div className="size-2 rounded-full bg-[#f97316] shrink-0 ml-2" />
-            </div>
-          </div>
-          <button
-            onClick={handleReserve}
-            disabled={isReserving}
-            className="col-start-7 col-end-9 min-[760px]:col-start-14 min-[760px]:col-end-17 cursor-pointer text-sm min-[960px]:col-start-19 min-[960px]:col-end-23 border text-center w-fit px-2 border-black/33 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isReserving ? "Reservando..." : "Reservar"}
-          </button>
-        </>
-      ) : (
-        <div className="flex col-start-1 col-end-5 min-[760px]:col-start-12 min-[760px]:col-end-17 min-[960px]:col-start-15 min-[960px]:col-end-21 items-center gap-2">
-          <GridSpinner />
-          <LoadingMessage text={order.status} />
-        </div>
-      )}
+      <div className="min-[960px]:col-start-13 min-[960px]:col-end-23 min-[760px]:col-start-8 min-[760px]:col-end-16 text-sm flex
+      items-center col-span-full">
+        {renderStatusDisplay()}
+      </div>
     </li>
   );
 }
 
-function GridSpinner() {
-  return (
-    <div className="grid grid-cols-3 size-4">
-      {Array.from({ length: 9 }).map((_, i) => (
-        <div
-          key={i}
-          className="bg-black/90 animate-pulse"
-          style={{
-            animationDelay: `${(i * 137.5) % 600}ms`,
-            animationDuration: "800ms",
-          }}
-        />
-      ))}
-    </div>
-  );
-}
+
+//         className="col-start-7 col-end-9 min-[760px]:col-start-14 min-[760px]:col-end-17 cursor-pointer text-sm
+//   min-[960px]:col-start-20 min-[960px]:col-end-23 border text-center w-fit px-2 border-black/33 rounded disabled:opacity-50
+//   disabled:cursor-not-allowed"

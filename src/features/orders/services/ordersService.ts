@@ -1,5 +1,5 @@
-import { collection, query, where, getDocs, doc, getDoc, type Query, type DocumentData, updateDoc } from "firebase/firestore";
-import { db } from "../../../lib/firebase";
+import { collection, query, where, getDocs, doc, getDoc, type Query, type DocumentData, updateDoc, onSnapshot, type QuerySnapshot } from "firebase/firestore";
+import { db, auth } from "../../../lib/firebase";
 import type { Order, OrderStatus } from "../types";
 
 interface FirestoreOrder {
@@ -24,9 +24,13 @@ interface FirestoreOrderItem {
 }
 
 export async function reserveOrder(orderId: string): Promise<void> {
+  const user = auth.currentUser;
+  if (!user) throw new Error("Debe estar autenticado para reservar un pedido.");
+
   const orderRef = doc(db, "orders", orderId);
   await updateDoc(orderRef, {
-    status: "RESERVADO"
+    status: "RESERVADO",
+    sellerId: user.uid
   });
 }
 
@@ -47,9 +51,25 @@ export async function getCreatedOrders(): Promise<Order[]> {
   return fetchOrdersByQuery(q);
 }
 
+export function subscribeToCreatedOrders(onUpdate: (orders: Order[]) => void) {
+  const q = query(
+    collection(db, "orders"),
+    where("status", "in", ["CREADO", "RESERVADO", "EMPAQUETADO", "PENDIENTE"]),
+    where("deliveryStatus", "==", null)
+  );
+
+  return onSnapshot(q, async (querySnapshot) => {
+    const orders = await processQuerySnapshot(querySnapshot);
+    onUpdate(orders);
+  });
+}
+
 async function fetchOrdersByQuery(q: Query<DocumentData>): Promise<Order[]> {
   const querySnapshot = await getDocs(q);
+  return processQuerySnapshot(querySnapshot);
+}
 
+async function processQuerySnapshot(querySnapshot: QuerySnapshot<DocumentData>): Promise<Order[]> {
   // Optimización: Obtener todas las ubicaciones únicas primero para evitar N+1
   const uniqueLocationIds = Array.from(
     new Set(

@@ -19,8 +19,8 @@ export default function LoadingMessage({ text }: { text: string }) {
   }, []);
 
   return (
-    <div className="w-[22ch] tracking-tighter">
-      <div className="flex gap-4">
+    <div className="tracking-tighter w-[20ch]">
+      <div className="flex gap-2">
         {text}
         <div>
           {titles[index]}
