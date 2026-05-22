@@ -9,10 +9,13 @@ export default function OrderHeader() {
         <span>/</span>
         dirección
       </div>
-      <div className="uppercase col-start-15 col-end-18 text-xs flex gap-[4px]">
+      <div className="col-start-15 col-end-19  uppercase min-[960px]:col-start-16 min-[960px]:col-end-19 text-xs flex gap-[4px]">
         <span>/</span>
         estado
       </div>
     </header>
   );
 }
+
+// min-[760px]
+// min-[960px]

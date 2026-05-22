@@ -66,9 +66,10 @@ async function waitForEmulator(
 
 async function runSeed() {
   await new Promise<void>((resolve, reject) => {
-    const seedProcess = spawn('bun', ['run', 'seed'], {
+    const seedProcess = spawn(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['run', 'seed'], {
       stdio: 'inherit',
       detached: false,
+      shell: true,
       env: {
         ...process.env,
         FIRESTORE_EMULATOR_HOST: FIRESTORE_TEST_HOST,
@@ -77,6 +78,7 @@ async function runSeed() {
           process.env.PUBLIC_FIREBASE_PROJECT_ID || 'sansistore',
       },
     });
+
 
     seedProcess.on('error', reject);
     seedProcess.on('exit', (code) => {
@@ -100,8 +102,9 @@ export default async function globalSetup() {
     'Starting Firestore and Auth emulators on ports 8180 and 9199...'
   );
   emulatorProcess = spawn(
-    'firebase',
+    process.platform === 'win32' ? 'npx.cmd' : 'npx',
     [
+      'firebase',
       'emulators:start',
       '--only',
       'firestore,auth',
@@ -113,6 +116,7 @@ export default async function globalSetup() {
     {
       stdio: ['ignore', 'pipe', 'pipe'],
       detached: false,
+      shell: true,
     }
   );
 
