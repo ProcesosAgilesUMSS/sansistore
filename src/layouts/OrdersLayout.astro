@@ -6,7 +6,7 @@ import SellerRouteGuard from '../features/seller/components/SellerRouteGuard';
 
 interface Props {
   title: string;
-  activeTab: 'sent' | 'created' | 'reservations';
+  activeTab?: 'sent' | 'created' | 'reservations';
 }
 
 const { title, activeTab } = Astro.props;
@@ -56,7 +56,7 @@ const { title, activeTab } = Astro.props;
             Mis reservas
           </a>
           <a
-            href="/orders/sent" 
+            href="/orders" 
             class:list={[
               "col-start-6 col-end-9 min-[760px]:col-start-8 min-[760px]:col-end-12 min-[960px]:col-start-9 min-[960px]:col-end-14",
               activeTab === 'sent' 
@@ -64,7 +64,7 @@ const { title, activeTab } = Astro.props;
                 : "text-black/53"
             ]}
           >
-            Pedidos enviados
+            Pedidos
           </a>
         </div>
       </nav>

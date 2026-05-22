@@ -163,7 +163,7 @@ export default function Navbar() {
             <div className="hidden md:flex items-center gap-8">
               {[
                 { label: 'Productos', href: '/productos' },
-                { label: 'Pedidos', href: '/orders/sent' },
+                { label: 'Pedidos', href: '/orders' },
                 { label: 'Ordenes', href: '/seller/orders' },
                 { label: 'Inventario', href: '/inventory' },
               ].map((item) => (
