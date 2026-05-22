@@ -6,7 +6,6 @@ import {
   updateDoc,
   query,
   where,
-  orderBy,
   serverTimestamp,
 } from 'firebase/firestore';
 
@@ -32,23 +31,22 @@ export interface ProductOption {
 export const getProductsService = async (): Promise<ProductOption[]> => {
   try {
     const productsRef = collection(db, 'products');
-    const q = query(
-      productsRef,
-      where('active', '==', true),
-      orderBy('name', 'asc')
-    );
+    const q = query(productsRef, where('active', '==', true));
     const snapshot = await getDocs(q);
 
-    return snapshot.docs.map((d) => ({
-      id: d.id,
-      name: d.data().name as string,
-      price: d.data().price as number,
-    }));
+    return snapshot.docs
+      .map((d) => ({
+        id: d.id,
+        name: d.data().name as string,
+        price: d.data().price as number,
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name, 'es'));
   } catch (error) {
     console.error('Error al obtener productos:', error);
     return [];
   }
 };
+
 
 // Actualiza el documento del producto para que aparezca en el filtro de ofertas
 const updateProductWithOffer = async (
