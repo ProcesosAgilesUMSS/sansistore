@@ -233,7 +233,7 @@ async function seedOrders() {
       sellerId: order.seller.uid,
       customerName: order.customerName,
       customerPhone: order.customerPhone,
-      address: order.address,
+      address: order.address ?? null,
       status: order.status,
       incidentReason: null,
       total,

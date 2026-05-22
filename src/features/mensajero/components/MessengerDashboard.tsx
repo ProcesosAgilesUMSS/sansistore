@@ -60,39 +60,22 @@ const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']) => {
     return 'Entregado';
 };
 const openDeliveryMap = (order: MessengerOrder) => {
-  const mapOrder = {
-    buyerName: order.buyerName || order.customerName,
-    deliveryZone: order.city,
-    deliveryLat: order.deliveryLat ?? order.lat ?? null,
-    deliveryLng: order.deliveryLng ?? order.lng ?? null,
-    total: order.cashToCollect,
-  };
-
-  const panelOrder = {
+  localStorage.setItem('courier_panel_order', JSON.stringify({
     customerName: order.customerName,
     phone: order.phone,
     address: order.address,
     reference: order.reference || order.locationLabel,
-    items: order.items.map((item) => ({
-      name: item.name,
-      quantity: item.quantity,
-    })),
+    items: order.items.map((item) => ({ name: item.name, quantity: item.quantity })),
     cashToCollect: order.cashToCollect,
-  };
+  }));
 
-  localStorage.setItem(
-    'courier_map_order',
-    JSON.stringify(mapOrder)
-  );
-  localStorage.setItem(
-    'courier_panel_order',
-    JSON.stringify(panelOrder)
-  );
-
+  const lat = order.deliveryLat ?? order.lat ?? null;
+  const lng = order.deliveryLng ?? order.lng ?? null;
   const url = new URL('/mapa', window.location.origin);
-  if (mapOrder.deliveryLat != null && mapOrder.deliveryLng != null) {
-    url.searchParams.set('lat', String(mapOrder.deliveryLat));
-    url.searchParams.set('lng', String(mapOrder.deliveryLng));
+
+  if (lat != null && lng != null) {
+    url.searchParams.set('lat', String(lat));
+    url.searchParams.set('lng', String(lng));
   } else {
     url.searchParams.set('location', order.address);
   }
@@ -328,24 +311,16 @@ function PendingOrderCard({
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 {/* SIEMPRE VISIBLES */}
-                <a
-                    className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-                    href={sellerLocationUrl ?? '#'}
-                    rel="noreferrer"
-                    target="_blank"
-                >
-                    <Send size={17} />
-                    Ubi. Vendedor
-                </a>
-                <a
-                    className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-                    href={buildMapsUrl(order)}
-                    rel="noreferrer"
-                    target="_blank"
-                >
-                    <Send size={17} />
-                    Abrir Maps
-                </a>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                    <button
+                        className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+                        onClick={() => openDeliveryMap(order)}
+                        type="button"
+                    >
+                        <Send size={17} />
+                        Abrir en Maps
+                    </button>
+                </div>
 
                 {order.deliveryStatus !== 'assigned' && (
                     <button
