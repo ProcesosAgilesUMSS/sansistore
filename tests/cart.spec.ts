@@ -279,7 +279,7 @@ test.describe('Cart - Carrito', () => {
       .locator('form')
       .getByRole('button', { name: 'Iniciar sesión', exact: true })
       .click();
-    await expect(page).toHaveURL('/me', { timeout: 30_000 });
+    await expect(page).toHaveURL('/', { timeout: 30_000 });
   }
 
 
@@ -302,13 +302,15 @@ test.describe('Cart - Carrito', () => {
     page,
   }) => {
     await loginWithEmail(page, 'juan.paredes@est.umss.edu');
-    await setLocalCartOnce(page, 'leche-pil-natural-900-ml', 9.7);
 
     await page.goto('/carrito');
     await expectFilledCartPage(page);
 
-    await expect(page.locator('a[href="/productos/leche-pil-natural-900-ml"]').filter({ hasText: 'Leche PIL Natural 900 ml' }).first()).toBeVisible();
-    await expect(page.getByText(/Bs\s(9\.70|12\.50)\s*\/ u/).first()).toBeVisible();
+    await expect(page.locator('section').getByText('Leche PIL Natural 900 ml')).toBeVisible();
+    await expect(page.getByText('Bs 9.70 / u')).toBeVisible();
+
+    await expect(page.locator('section').getByText('Pan Integral Bimbo (precio rebajado)')).toBeVisible();
+    await expect(page.getByText('Bs 15.00 Bs 10.00 / u')).toBeVisible();
   });
 
   test('should show empty cart message when user has no items', async ({
@@ -336,7 +338,7 @@ test.describe('Cart - Carrito', () => {
     await page.goto('/logout');
 
     await expect(page).toHaveURL('/login');
-    await page.goto('/me');
+    await page.goto('/');
     await expect(page.getByText('No autenticado')).toBeVisible();
 
     await page.goto('/carrito');
