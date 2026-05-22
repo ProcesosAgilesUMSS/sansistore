@@ -186,6 +186,15 @@ export default function Navbar() {
               </a>
             )}
 
+            {roles.some((r) => ['vendedor', 'administrador'].includes(r)) && (
+              <a
+                href="/seller/orders"
+                className="text-[13px] text-primary font-semibold tracking-[0.02em] transition-all hover:opacity-70"
+              >
+                Panel Vendedor
+              </a>
+            )}
+
             {/* ACTIONS */}
             <div className="flex items-center gap-3">
               {/* CART */}
