@@ -161,15 +161,14 @@ function PendingOrderCard({
           className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
           type="button"
           onClick={() => {
-            localStorage.setItem('courier_panel_order', JSON.stringify({
-              customerName: order.customerName,
-              phone: order.phone,
-              address: order.address,
-              reference: order.reference,
-              items: order.items.map((i) => ({ name: i.name, quantity: i.quantity })),
-              cashToCollect: order.cashToCollect,
-            }));
-            window.location.href = `/mapa?address=${encodeURIComponent(`${order.address}`)}`;
+            const url = new URL('/mapa', window.location.origin);
+            if (order.lat != null && order.lng != null) {
+              url.searchParams.set('lat', String(order.lat));
+              url.searchParams.set('lng', String(order.lng));
+            } else {
+              url.searchParams.set('location', order.address);
+            }
+            window.location.href = url.toString();
           }}
         >
           <Send size={17} />
@@ -379,8 +378,14 @@ function OrderDetailModal({
                 className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
                 type="button"
                 onClick={() => {
-                  localStorage.setItem('courier_map_address', `${order.address}, ${order.city}`);
-                  window.location.href = '/mapa';
+                  const url = new URL('/mapa', window.location.origin);
+                  if (order.lat != null && order.lng != null) {
+                    url.searchParams.set('lat', String(order.lat));
+                    url.searchParams.set('lng', String(order.lng));
+                  } else {
+                    url.searchParams.set('location', order.address);
+                  }
+                  window.location.href = url.toString();
                 }}
               >
                 <Send size={17} />

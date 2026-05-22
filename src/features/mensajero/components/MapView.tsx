@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
+import { useEffect, useRef, useState } from 'react';
+import { MapContainer, TileLayer, ZoomControl, useMap } from 'react-leaflet';
 import { ArrowLeft } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import '../styles/style.css';
@@ -11,30 +11,53 @@ import { useMapOrders } from '../hooks/useMapOrders';
 
 export type { MapOrder } from '../hooks/useMapOrders';
 
+function CenterOnce({ position }: { position: [number, number] }) {
+  const map = useMap();
+  const centered = useRef(false);
+  useEffect(() => {
+    if (!centered.current) {
+      map.setView(position, 57);
+      centered.current = true;
+    }
+  }, [map, position]);
+  return null;
+}
+
+const umssBounds: [[number, number], [number, number]] = [
+  [-17.3965, -66.1550], // suroeste
+  [-17.3820, -66.1400],  // noreste más arriba
+];
+
 export default function MapView() {
   const [open, setOpen] = useState(true);
-  const { mapOrder, panelOrder } = useMapOrders();
+  const { panelOrder } = useMapOrders();
 
   const params = new URLSearchParams(window.location.search);
-  const addressParam = params.get('address');
+  const paramLat = params.get('lat');
+  const paramLng = params.get('lng');
+  const addressParam = params.get('location');
+
+  const resolvedLat = paramLat != null ? parseFloat(paramLat) : null;
+  const resolvedLng = paramLng != null ? parseFloat(paramLng) : null;
 
   const geocodedPosition = useAddress(
-    mapOrder?.deliveryLat == null ? addressParam : null
+    resolvedLat == null ? addressParam : null
   );
 
   const deliveryPosition =
-    mapOrder?.deliveryLat != null && mapOrder?.deliveryLng != null
-      ? ([mapOrder.deliveryLat, mapOrder.deliveryLng] as [number, number])
+    resolvedLat != null && resolvedLng != null && !isNaN(resolvedLat) && !isNaN(resolvedLng)
+      ? ([resolvedLat, resolvedLng] as [number, number])
       : geocodedPosition;
 
   return (
     <div className="relative h-screen w-screen overflow-hidden">
       <MapContainer
         center={[-17.3917, -66.1497]}
-        zoom={17}
+        zoom={15}
         maxBoundsViscosity={1.0}
         style={{ height: '100%', width: '100%' }}
         zoomControl={false}
+        maxBounds={umssBounds}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -43,7 +66,10 @@ export default function MapView() {
         <ZoomControl position="bottomleft" />
         <CourierMarker />
         {deliveryPosition && (
-          <OrderMarker position={deliveryPosition} />
+          <>
+            <CenterOnce position={deliveryPosition} />
+            <OrderMarker position={deliveryPosition} />
+          </>
         )}
       </MapContainer>
 

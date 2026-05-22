@@ -75,6 +75,18 @@ export async function getMessengerOrders(
       const order = orderSnap?.exists() ? orderSnap.data() : {};
       const items = orderId ? await readOrderItems(orderId) : [];
 
+      const locationId = String(order.locationId || '');
+      let lat: number | null = null;
+      let lng: number | null = null;
+      if (locationId) {
+        const locationSnap = await getDoc(doc(db, 'locations', locationId));
+        if (locationSnap.exists()) {
+          const locationData = locationSnap.data();
+          lat = typeof locationData.lat === 'number' ? locationData.lat : null;
+          lng = typeof locationData.lng === 'number' ? locationData.lng : null;
+        }
+      }
+
       return {
         id: orderId || deliveryDoc.id,
         deliveryId: deliveryDoc.id,
@@ -82,9 +94,11 @@ export async function getMessengerOrders(
         phone: String(order.customerPhone || 'Sin telefono'),
         address: String(order.address || 'Direccion no registrada'),
         city: 'Cochabamba',
+        lat,
+        lng,
         items,
         cashToCollect: Number(delivery.amountCollected || order.total || 0),
-        paymentMethod: 'cash_on_delivery',
+        paymentMethod: 'cash_on_delivery' as const,
         deliveryStatus: normalizeDeliveryStatus(delivery.status),
       };
     })

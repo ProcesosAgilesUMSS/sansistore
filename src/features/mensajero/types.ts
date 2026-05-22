@@ -47,6 +47,8 @@ export interface MessengerOrder {
   address: string;
   city: string;
   reference?: string;
+  lat?: number | null;
+  lng?: number | null;
   items: MessengerOrderItem[];
   cashToCollect: number;
   paymentMethod: 'cash' | 'cash_on_delivery';
