@@ -1,5 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, ChevronDown, ShoppingBag, Trash2, X, MapPin, Loader2, CreditCard } from 'lucide-react';
+import {
+  AlertCircle,
+  AlertTriangle,
+  ArrowLeft,
+  ChevronDown,
+  ChevronRight,
+  CreditCard,
+  Loader2,
+  MapPin,
+  ShoppingBag,
+  Trash2,
+  X,
+} from 'lucide-react';
 import { type User } from 'firebase/auth';
 import { doc, getDoc, serverTimestamp, writeBatch, increment, collection } from 'firebase/firestore';
 import { CartItemRow } from './CartItemRow';
@@ -10,7 +22,6 @@ import { db } from '../../../lib/firebase';
 import { useAuthUser } from '../../../hooks/useAuthUser';
 import { subscribeToUserLocations } from '../../location/services/locationService';
 import type { Location } from '../../location/types';
-import { AlertCircle } from 'lucide-react';
 
 function generateOrderCode() {
   const timestamp = Date.now().toString(36);
@@ -237,7 +248,6 @@ function PaymentConfirmModal({
         </div>
 
         <div className="mt-4 flex flex-col gap-3">
-  
           <div className="w-full rounded-xl border border-primary bg-primary/5 p-3 text-left">
             <p className="text-sm font-semibold text-text-light">{location.label}</p>
             <p className="mt-1 text-xs text-text-light opacity-60 capitalize">
@@ -251,21 +261,19 @@ function PaymentConfirmModal({
             <p className="mt-1 text-2xl font-bold text-primary">Bs {total.toFixed(2)}</p>
           </div>
 
-<div className="w-full rounded-xl border border-primary bg-primary/5 p-3 text-left">
-  <div className="flex items-start gap-3">
-    <AlertCircle className="mt-0.5 text-primary" size={20} />
+          <div className="w-full rounded-xl border border-primary bg-primary/5 p-3 text-left">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="mt-0.5 text-primary" size={20} />
 
-    <div>
-      <p className="text-sm font-semibold text-primary">
-        Importante
-      </p>
+              <div>
+                <p className="text-sm font-semibold text-primary">Importante</p>
 
-      <p className="text-sm text-text-light opacity-80">
-        Su pago se realizará contra entrega.
-      </p>
-    </div>
-  </div>
-</div>
+                <p className="text-sm text-text-light opacity-80">
+                  Su pago se realizará contra entrega.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="mt-6">
@@ -398,23 +406,30 @@ function CartViewInner() {
     () =>
       itemsWithProducts.map((item) => ({
         ...item,
-        included: includedById[item.productId] ?? true,
+        included: item.isValid && (includedById[item.productId] ?? true),
         error: errorsById[item.productId],
       })),
     [errorsById, includedById, itemsWithProducts],
   );
 
+  const invalidItems = useMemo(
+    () => enriched.filter((item) => !item.isValid),
+    [enriched],
+  );
+
+  const priceChangedItems = useMemo(
+    () => enriched.filter((item) => item.isValid && item.priceChange !== 'none'),
+    [enriched],
+  );
+
   const includedItems = useMemo(
-    () => enriched.filter((item) => item.included),
+    () => enriched.filter((item) => item.included && item.isValid),
     [enriched],
   );
 
   const subtotal = useMemo(
     () => includedItems.reduce((sum, item) => {
-      const price = item.product?.hasOffer && item.product?.offerPrice != null
-        ? item.product.offerPrice
-        : item.product?.price ?? 0;
-      return sum + Number((price * item.quantity).toFixed(2));
+      return sum + Number((item.unitPrice * item.quantity).toFixed(2));
     }, 0),
     [includedItems],
   );
@@ -516,12 +531,8 @@ function CartViewInner() {
     try {
       const orderCode = generateOrderCode();
       const paymentCode = orderCode.replace('order', 'payment');
-      const deliveryCode = orderCode.replace('order', 'delivery');
-
       const orderItems = includedItems.map((item, idx) => {
-        const unitPrice = item.product?.hasOffer && item.product?.offerPrice != null
-          ? item.product.offerPrice
-          : item.product?.price ?? 0;
+        const unitPrice = item.unitPrice;
         const lineSubtotal = Number((unitPrice * item.quantity).toFixed(2));
         return {
           itemId: generateItemId(orderCode, idx),
@@ -664,7 +675,7 @@ function CartViewInner() {
 
         <div className="relative z-10 w-full max-w-sm rounded-2xl border border-border-light bg-card-bg-light p-6 shadow-2xl">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-500/15 text-red-500 dark:text-red-400">
               <Trash2 size={18} />
             </div>
             <h2 id="remove-item-title" className="text-lg font-bold text-text-light">
@@ -683,17 +694,17 @@ function CartViewInner() {
             <button
               type="button"
               onClick={() => setItemToRemove(null)}
-              className="flex-1 rounded-full bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90 active:scale-95"
+              className="flex-1 rounded-full border border-border-light bg-transparent px-4 py-3 text-sm font-semibold text-text-light transition hover:bg-secondary-bg-light active:scale-95"
             >
-              No
+              Cancelar
             </button>
 
             <button
               type="button"
               onClick={confirmRemoveItem}
-              className="flex-1 rounded-full border border-primary bg-white px-4 py-3 text-sm font-semibold text-primary transition hover:bg-primary/5 active:scale-95"
+              className="flex-1 rounded-full bg-red-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-red-700 active:scale-95"
             >
-              Sí
+              Eliminar
             </button>
           </div>
 
@@ -712,12 +723,27 @@ function CartViewInner() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-lg sm:text-xl font-bold text-text-light">Mi Carrito</h1>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <nav
+          aria-label="Ruta de navegación"
+          className="flex items-center gap-2 text-sm text-text-light"
+        >
+          <a href="/" className="font-semibold opacity-70 transition-opacity hover:opacity-100">
+            Inicio
+          </a>
+          <ChevronRight size={14} className="opacity-35" aria-hidden="true" />
+          <a href="/productos" className="font-semibold opacity-70 transition-opacity hover:opacity-100">
+            Productos
+          </a>
+          <ChevronRight size={14} className="opacity-35" aria-hidden="true" />
+          <span className="font-bold text-primary" aria-current="page">
+            Carrito
+          </span>
+        </nav>
         <button
           type="button"
           onClick={() => window.history.back()}
-          className="inline-flex items-center gap-2 rounded-full border border-border-light bg-card-bg-light px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-text-light transition-colors hover:border-primary hover:text-primary"
+          className="inline-flex items-center gap-2 self-start rounded-full border border-border-light bg-card-bg-light px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-text-light transition-colors hover:border-primary hover:text-primary sm:self-auto"
         >
           <ArrowLeft size={16} />
           Atrás
@@ -751,32 +777,43 @@ function CartViewInner() {
               <ChevronDown className={`h-5 w-5 shrink-0 transition-transform ${summaryOpen ? 'rotate-180' : ''}`} />
             </summary>
 
-            <div className="mt-4 space-y-4">
-              <div className="space-y-3 rounded-xl border border-border-light bg-bg-light/60 p-4">
-                {includedItems.length > 0 ? (
-                  includedItems.map((item) => {
-                    const price = item.product?.hasOffer && item.product?.offerPrice != null
-                      ? item.product.offerPrice
-                      : item.product?.price ?? 0;
-                    const lineTotal = Number((price * item.quantity).toFixed(2));
-                    const name = item.product?.name ?? item.productId;
+          <div className="mt-4 space-y-4">
+            <div className="space-y-3 rounded-xl border border-border-light bg-bg-light/60 p-4">
+              {includedItems.length > 0 ? (
+                includedItems.map((item) => {
+                  const price = item.unitPrice;
+                  const lineTotal = Number((price * item.quantity).toFixed(2));
+                  const name = item.product?.name ?? item.productId;
+                  const showChange =
+                    item.priceChange !== 'none' && item.priceAtAdd != null;
 
-                    return (
-                      <div key={item.productId} className="flex items-start justify-between gap-3 text-sm">
-                        <div>
-                          <p className="line-clamp-1 font-medium">{name}</p>
-                          <p className="text-xs text-text-light opacity-60">{item.quantity} x Bs {price.toFixed(2)}</p>
-                        </div>
-                        <AnimatedAmount value={lineTotal} className="font-semibold text-primary" />
+                  return (
+                    <div key={item.productId} className="flex items-start justify-between gap-3 text-sm">
+                      <div className="min-w-0">
+                        <p className="line-clamp-1 font-medium">{name}</p>
+                        <p className="text-xs text-text-light opacity-60">
+                          {item.quantity} x {showChange ? (
+                            <>
+                              <span className="line-through opacity-70">Bs {item.priceAtAdd!.toFixed(2)}</span>{' '}
+                              <span className={item.priceChange === 'increased' ? 'text-red-500 font-semibold' : 'text-primary font-semibold'}>
+                                Bs {price.toFixed(2)}
+                              </span>
+                            </>
+                          ) : (
+                            <>Bs {price.toFixed(2)}</>
+                          )}
+                        </p>
                       </div>
-                    );
-                  })
-                ) : (
-                  <p className="text-sm text-text-light opacity-70">
-                    No hay ítems incluidos.
-                  </p>
-                )}
-              </div>
+                      <AnimatedAmount value={lineTotal} className="font-semibold text-primary" />
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="text-sm text-text-light opacity-70">
+                  No hay ítems incluidos.
+                </p>
+              )}
+            </div>
 
               <div className="space-y-2 text-sm">
                 <div className="flex items-center justify-between gap-3 text-text-light opacity-80">
@@ -791,26 +828,52 @@ function CartViewInner() {
 
               <div className="h-px bg-border-light" />
 
-              <div className="flex items-end justify-between gap-3">
-                <span className="text-xs uppercase tracking-wide text-text-light opacity-60">Total final</span>
-                <AnimatedAmount value={total} className="text-xl sm:text-2xl font-bold text-primary" />
-              </div>
-
-              <button
-                type="button"
-                disabled={includedItems.length === 0 || creatingOrder}
-                onClick={handleConfirmOrder}
-                className="flex w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {creatingOrder ? (
-                  <Loader2 size={16} className="animate-spin" />
-                ) : (
-                  'Confirmar pedido'
-                )}
-              </button>
+            <div className="flex items-end justify-between gap-3">
+              <span className="text-xs uppercase tracking-wide text-text-light opacity-60">Total final</span>
+              <AnimatedAmount value={total} className="text-xl sm:text-2xl font-bold text-primary" />
             </div>
-          </details>
-        </aside>
+
+            {invalidItems.length > 0 && (
+              <div
+                role="alert"
+                className="flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-600 dark:text-red-400"
+              >
+                <AlertTriangle size={14} className="mt-0.5 shrink-0" aria-hidden="true" />
+                <span>
+                  Hay {invalidItems.length} {invalidItems.length === 1 ? 'producto no disponible' : 'productos no disponibles'}. Quítalos para continuar.
+                </span>
+              </div>
+            )}
+
+            {priceChangedItems.length > 0 && (
+              <div
+                role="status"
+                className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-400"
+              >
+                <AlertTriangle size={14} className="mt-0.5 shrink-0" aria-hidden="true" />
+                <span>
+                  {priceChangedItems.length === 1
+                    ? '1 producto cambió de precio. Revisa el total antes de confirmar.'
+                    : `${priceChangedItems.length} productos cambiaron de precio. Revisa el total antes de confirmar.`}
+                </span>
+              </div>
+            )}
+
+            <button
+              type="button"
+              disabled={includedItems.length === 0 || invalidItems.length > 0 || creatingOrder}
+              onClick={handleConfirmOrder}
+              className="flex w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {creatingOrder ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                'Confirmar pedido'
+              )}
+            </button>
+          </div>
+        </details>
+      </aside>
 
         <RemoveItemModal />
         {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
