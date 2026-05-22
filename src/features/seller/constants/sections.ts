@@ -8,6 +8,11 @@ export const sections = [
     label: 'Pedidos Confirmados',
     route: '/seller/orders',
   },
+  {
+    id: 'historial',
+    label: 'Historial de pedidos',
+    route: '/seller/order-history',
+  },
  
   {
     id: 'asignar',

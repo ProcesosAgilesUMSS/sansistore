@@ -189,6 +189,7 @@ export const Orders = {
     deliveryStatus: 'assigned',
     customerName: 'Carlos Flores',
     customerPhone: '76459821',
+    address: 'Av. Oquendo 1230, Cochabamba',
     items: [
       { product: Products.DETERGENTE_OLA, quantity: 2 },
     ],
@@ -205,6 +206,7 @@ export const Orders = {
     deliveryStatus: 'assigned',
     customerName: 'Carlos Flores',
     customerPhone: '76459821',
+    address: 'Av. Oquendo 1230, Cochabamba',
     items: [
       { product: Products.DETERGENTE_OLA, quantity: 2 },
     ],
