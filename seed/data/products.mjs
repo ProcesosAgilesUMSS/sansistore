@@ -1,7 +1,5 @@
 import { Categories } from './categories.mjs';
 
-const PRODUCT_IMAGE = '/product-placeholder.svg';
-
 export const Products = {
   LECHE_PIL: {
     slug: 'leche-pil-natural-900-ml',
@@ -10,7 +8,8 @@ export const Products = {
     description:
       'Leche semidescremada UHT, rica en calcio y pensada para el consumo diario.',
     price: 9.7,
-    imageUrl: PRODUCT_IMAGE,
+    imageUrl:
+      'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=900&q=80',
     badge: 'Bolivia',
     hasOffer: false,
     stockTotal: 36,
@@ -37,7 +36,8 @@ export const Products = {
     name: 'Queso Crema Bonle PIL Andina 200 gr',
     description: 'Queso crema suave y facil de untar.',
     price: 32,
-    imageUrl: PRODUCT_IMAGE,
+    imageUrl:
+      'https://images.unsplash.com/photo-1623855244183-52fd8d3ce2f7?auto=format&fit=crop&w=900&q=80',
     badge: 'Oferta',
     hasOffer: true,
     offerPrice: 28,
@@ -80,7 +80,8 @@ export const Products = {
     name: 'Arroz Grano de Oro Caisy 1 kg',
     description: 'Arroz de primera calidad.',
     price: 13.5,
-    imageUrl: PRODUCT_IMAGE,
+    imageUrl:
+      'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=900&q=80',
     stockTotal: 55,
     stockAvailable: 8,
     sourceUrl:
@@ -105,7 +106,8 @@ export const Products = {
     name: 'Fideo Lazzaroni Spaguetto 52 400 gr',
     description: 'Pasta seca tipo spaguetto.',
     price: 6.5,
-    imageUrl: PRODUCT_IMAGE,
+    imageUrl:
+      'https://images.unsplash.com/photo-1551462147-37885acc36f1?auto=format&fit=crop&w=900&q=80',
     stockTotal: 27,
     stockAvailable: 0,
     sourceUrl:
@@ -130,7 +132,8 @@ export const Products = {
     name: 'Mocochinchi Soproma 100 gr',
     description: 'Mocochinchi deshidratado listo para preparar.',
     price: 10,
-    imageUrl: PRODUCT_IMAGE,
+    imageUrl:
+      'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=900&q=80',
     badge: 'Tradicional',
     stockTotal: 30,
     stockAvailable: 12,
@@ -156,7 +159,8 @@ export const Products = {
     name: 'Yogurt Test Sin Resenas',
     description: 'Producto de prueba sin inventario ni comentarios.',
     price: 21.5,
-    imageUrl: PRODUCT_IMAGE,
+    imageUrl:
+      'https://images.unsplash.com/photo-1571212515416-fca88c74cfe4?auto=format&fit=crop&w=900&q=80',
     hasOffer: false,
     offerPrice: null,
     stockTotal: 10,
@@ -171,7 +175,8 @@ export const Products = {
     name: 'Detergente Liquido Ola Futuro Limpieza Completa 5 L',
     description: 'Detergente liquido para lavado de ropa.',
     price: 123,
-    imageUrl: PRODUCT_IMAGE,
+    imageUrl:
+      'https://images.unsplash.com/photo-1583947582886-f40ec95dd752?auto=format&fit=crop&w=900&q=80',
     badge: 'Oferta',
     hasOffer: true,
     offerPrice: 109,
@@ -199,7 +204,8 @@ export const Products = {
     name: 'Galletas Agua Victoria 120 gr',
     description: 'Galletas ligeras y crocantes.',
     price: 8,
-    imageUrl: PRODUCT_IMAGE,
+    imageUrl:
+      'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=900&q=80',
     badge: 'Oferta',
     hasOffer: true,
     offerPrice: 8,
@@ -220,6 +226,85 @@ export const Products = {
       },
     ],
     soldCount: 60,
+  },
+  LECHE_DESCONTINUADA: {
+    slug: 'leche-pil-deslactosada-1-l-descontinuada',
+    category: Categories.LACTEOS,
+    name: 'Leche PIL Deslactosada 1 L (descontinuada)',
+    description: 'Producto descontinuado. Caso de prueba: producto inactivo.',
+    price: 12.5,
+    imageUrl:
+      'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=900&q=80',
+    hasOffer: false,
+    stockTotal: 10,
+    stockAvailable: 10,
+    active: false,
+    sourceUrl: 'https://example.test/discontinued',
+    reviews: [],
+    soldCount: 0,
+  },
+  CHOCOLATE_SIN_STOCK: {
+    slug: 'chocolate-para-taza-condor-sin-stock',
+    category: Categories.ABARROTES,
+    name: 'Chocolate para Taza Condor 200 gr (sin stock)',
+    description: 'Caso de prueba: stock agotado.',
+    price: 22,
+    imageUrl:
+      'https://images.unsplash.com/photo-1606312619070-d48b4c652a52?auto=format&fit=crop&w=900&q=80',
+    hasOffer: false,
+    stockTotal: 30,
+    stockAvailable: 0,
+    sourceUrl: 'https://example.test/out-of-stock',
+    reviews: [],
+    soldCount: 30,
+  },
+  AZUCAR_DESHABILITADO: {
+    slug: 'azucar-guabira-1-kg-deshabilitado',
+    category: Categories.ABARROTES,
+    name: 'Azúcar Guabirá 1 kg (deshabilitado)',
+    description: 'Caso de prueba: inventario deshabilitado para venta.',
+    price: 7.5,
+    imageUrl:
+      'https://images.unsplash.com/photo-1610483178571-a4a9d9c1c8d3?auto=format&fit=crop&w=900&q=80',
+    hasOffer: false,
+    stockTotal: 20,
+    stockAvailable: 15,
+    inventoryEnabled: false,
+    sourceUrl: 'https://example.test/disabled',
+    reviews: [],
+    soldCount: 5,
+  },
+  REFRESCO_PRECIO_SUBIO: {
+    slug: 'refresco-coca-cola-2-l-precio-subio',
+    category: Categories.BEBIDAS,
+    name: 'Coca-Cola 2 L (precio actualizado)',
+    description: 'Caso de prueba: producto cuyo precio subió desde que fue agregado al carrito.',
+    price: 18,
+    imageUrl:
+      'https://images.unsplash.com/photo-1554866585-cd94860890b7?auto=format&fit=crop&w=900&q=80',
+    hasOffer: false,
+    stockTotal: 50,
+    stockAvailable: 40,
+    sourceUrl: 'https://example.test/price-up',
+    reviews: [],
+    soldCount: 12,
+  },
+  PAN_PRECIO_BAJO: {
+    slug: 'pan-integral-bimbo-precio-bajo',
+    category: Categories.ABARROTES,
+    name: 'Pan Integral Bimbo (precio rebajado)',
+    description: 'Caso de prueba: producto cuyo precio bajó (oferta nueva).',
+    price: 15,
+    offerPrice: 10,
+    hasOffer: true,
+    badge: 'Oferta',
+    imageUrl:
+      'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=900&q=80',
+    stockTotal: 30,
+    stockAvailable: 20,
+    sourceUrl: 'https://example.test/price-down',
+    reviews: [],
+    soldCount: 8,
   },
 };
 

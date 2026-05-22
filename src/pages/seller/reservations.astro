@@ -1,0 +1,8 @@
+---
+import OrdersLayout from '../../layouts/OrdersLayout.astro';
+import ReservationsListPanel from '../../features/seller/components/ReservationsListPanel';
+---
+
+<OrdersLayout title="Mis Reservas" activeTab="reservations">
+  <ReservationsListPanel client:load />
+</OrdersLayout>

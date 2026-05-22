@@ -1,9 +1,26 @@
 import { useState } from 'react';
+import { DollarSign, ReceiptText } from 'lucide-react';
+import { useDailyCollections } from '../hooks/useDailyCollections';
 import { useSellerOrders } from '../hooks/useSellerOrders';
 import type { Order } from '../types';
 import { ConfirmModal } from './ConfirmModal';
 import { OrderCard } from './OrderCard';
 import { SectionHeader } from './SectionHeader';
+
+const currencyFormatter = new Intl.NumberFormat('es-BO', {
+  style: 'currency',
+  currency: 'BOB',
+  minimumFractionDigits: 2,
+});
+
+function formatDate(value?: string) {
+  if (!value) return 'Hoy';
+  return new Date(`${value}T00:00:00-04:00`).toLocaleDateString('es-BO', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  });
+}
 
 export default function SellerOrdersPanel({ embedded = false }: { embedded?: boolean }) {
   const {
@@ -19,6 +36,11 @@ export default function SellerOrdersPanel({ embedded = false }: { embedded?: boo
     markAsReady,
     successOrderId,
   } = useSellerOrders();
+  const {
+    summary: dailyCollections,
+    loading: collectionsLoading,
+    error: collectionsError,
+  } = useDailyCollections();
 
   const [pendingOrder, setPendingOrder] = useState<Order | null>(null);
 
@@ -58,6 +80,58 @@ export default function SellerOrdersPanel({ embedded = false }: { embedded?: boo
           antes de su asignación a mensajeros.
         </p>
       </header>
+
+      <section className="mb-8 grid gap-4 md:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+        <div className="rounded-3xl border border-(--theme-border) bg-(--theme-card-bg) px-6 py-5 shadow-sm">
+          <div className="flex items-start gap-4">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <DollarSign size={22} />
+            </div>
+
+            <div className="min-w-0">
+              <p className="text-xs font-800 uppercase tracking-[0.22em] text-(--theme-text) opacity-55">
+                Cobrado hoy
+              </p>
+              <p
+                className="mt-2 text-3xl font-900 leading-tight text-(--theme-text) md:text-4xl"
+                style={{ fontFamily: 'Outfit, sans-serif' }}
+              >
+                {collectionsLoading
+                  ? 'Calculando...'
+                  : currencyFormatter.format(dailyCollections?.totalCollected ?? 0)}
+              </p>
+              <p className="mt-2 text-sm font-600 text-(--theme-text) opacity-65">
+                {collectionsError
+                  ? collectionsError
+                  : `Rendicion del ${formatDate(dailyCollections?.date)}`}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-3xl border border-(--theme-border) bg-(--theme-card-bg) px-6 py-5 shadow-sm">
+          <div className="flex items-start gap-4">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-(--theme-secondary-bg) text-(--theme-text)">
+              <ReceiptText size={21} />
+            </div>
+
+            <div>
+              <p className="text-xs font-800 uppercase tracking-[0.22em] text-(--theme-text) opacity-55">
+                Pedidos cobrados
+              </p>
+              <p
+                className="mt-2 text-3xl font-900 leading-tight text-(--theme-text)"
+                style={{ fontFamily: 'Outfit, sans-serif' }}
+              >
+                {collectionsLoading ? '...' : dailyCollections?.orderCount ?? 0}
+              </p>
+              <p className="mt-2 text-sm font-600 text-(--theme-text) opacity-65">
+                Solo pedidos del vendedor actual.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {error && (
         <div className="mb-6 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-4 dark:border-red-800/40 dark:bg-red-900/20">

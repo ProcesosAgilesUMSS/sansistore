@@ -235,3 +235,17 @@
 - **Yesterday:** Trabajé en el carrito de compras. Primero completé las descripciones y criterios de las tasks pendientes. Luego implementé que el comprador pueda ver el total antes de confirmar, validar la disponibilidad de los productos y remover productos del carrito para modificar su selección. También agregué datos de prueba para poder revisar mejor el flujo.
 - **Today:** Revisar el funcionamiento del carrito con el equipo y corregir cualquier detalle que salga en QA.
 - **Blockers:** n/a.
+
+# 05/21/2026
+
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Completé los detalles del carrito de compras, corregí errores y reporté bugs detectados.
+- **Today:** Realizar revisiones finales en staging antes de la demo, preparar los datos de seed y alistar el script de despliegue a producción.
+- **Blockers:** n/a.
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Finalicé las tareas para mostrar el total del carrito y para eliminar un producto del mismo.
+- **Today:** Realizar pruebas y revisiones en busca de errores previos a la demo.
+- **Blockers:** n/a.

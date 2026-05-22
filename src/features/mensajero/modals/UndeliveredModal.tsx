@@ -5,6 +5,7 @@ import {
   MapPinOff,
   MoreHorizontal,
   PackageX,
+  ShieldAlert,
   UserX,
   X,
 } from 'lucide-react';
@@ -23,6 +24,11 @@ const reasons = [
     id: 'direccion_incorrecta',
     label: 'Direccion incorrecta',
     icon: MapPinOff,
+  },
+  {
+    id: 'acceso_restringido',
+    label: 'Acceso restringido',
+    icon: ShieldAlert,
   },
   { id: 'cliente_rechazo', label: 'Cliente rechazo pedido', icon: HandMetal },
   { id: 'otro', label: 'Otro motivo', icon: MoreHorizontal },
@@ -75,10 +81,10 @@ export default function UndeliveredModal({
             </span>
             <div>
               <h2 className="text-xl font-black tracking-normal">
-                Pedido no entregado
+                Problema de entrega
               </h2>
               <p className="text-sm font-medium opacity-70">
-                Registra el motivo del incidente
+                Registra el motivo por el que no se pudo entregar el pedido
               </p>
             </div>
           </div>
@@ -111,7 +117,7 @@ export default function UndeliveredModal({
 
           <div>
             <p className="mb-3 text-xs font-bold uppercase tracking-[0.12em] opacity-60">
-              Selecciona un motivo
+              Selecciona el problema
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
               {reasons.map((reason) => {
@@ -179,7 +185,7 @@ export default function UndeliveredModal({
             ) : (
               <PackageX size={16} />
             )}
-            Registrar incidente
+            Registrar como no entregado
           </button>
         </footer>
       </section>

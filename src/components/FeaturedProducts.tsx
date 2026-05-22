@@ -18,6 +18,7 @@ import {
   isPopularProduct,
 } from '../lib/productPopularity';
 import CategoryFilter from './CategoryFilter';
+import { useCartContext, CartProvider } from '../features/cart';
 
 interface Product {
   id: string;
@@ -50,6 +51,7 @@ const PRODUCT_PLACEHOLDER = '/product-placeholder.svg';
 const MAX_SEARCH_LENGTH = 100;
 const SEARCH_HISTORY_KEY = 'sansistore-search-history';
 const MAX_HISTORY_ITEMS = 5;
+
 
 function getSearchHistory(): string[] {
   try {
@@ -140,7 +142,7 @@ const SORT_OPTIONS = [
   { value: 'name-desc', label: 'Z-A' },
 ] as const;
 
-export default function FeaturedProducts({
+function FeaturedProductsInner({
   initialSearch = '',
   initialCategory = null,
   initialOffersOnly = false,
@@ -153,6 +155,7 @@ export default function FeaturedProducts({
   const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [appliedSearch, setAppliedSearch] = useState(initialSearch);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const { addToCart } = useCartContext();
   const [searchHistory, setSearchHistory] = useState<string[]>(() =>
     getSearchHistory()
   );
@@ -894,28 +897,34 @@ export default function FeaturedProducts({
                         </span>
 
                     <div className="mt-auto flex items-center justify-between gap-2 pt-2 sm:pt-3">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-sm sm:text-base font-bold text-text-light">
-                              {formatPrice(currentPrice)}
-                            </span>
-                            {showOffer && (
-                              <span className="text-xs sm:text-sm text-text-light opacity-40 line-through">
-                                {formatPrice(product.price)}
-                              </span>
-                            )}
-                          </div>
-                          <button
-                            type="button"
-                            title="Agregar al carrito"
-                            className="flex items-center justify-center rounded-full p-2.5 sm:p-3 transition-all active:scale-95 text-primary hover:scale-110 hover:drop-shadow-lg shrink-0"
-                          >
-                            <FaCartPlus className="text-lg sm:text-xl" />
-                          </button>
-                        </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-sm sm:text-base font-bold text-text-light">
+                          {formatPrice(currentPrice)}
+                        </span>
+                        {showOffer && (
+                          <span className="text-xs sm:text-sm text-text-light opacity-40 line-through">
+                            {formatPrice(product.price)}
+                          </span>
+                        )}
                       </div>
-                    </article>
-                  );
-                })}
+                      <button
+                          type="button"
+                          title="Agregar al carrito"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            addToCart(product.id, product.stockAvailable ?? 0, currentPrice);
+                          }}
+                          className="flex items-center justify-center rounded-full p-2.5 sm:p-3 transition-all active:scale-95 text-primary hover:scale-110 hover:drop-shadow-lg shrink-0 relative z-20"
+                        >
+                          <FaCartPlus className="text-lg sm:text-xl" />
+                        </button>
+                    </div>
+
+
+                  </div>
+                </article>
+              );
+            })}
             </div>
 
             {Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) > 1 && (
@@ -1069,5 +1078,12 @@ export default function FeaturedProducts({
         )}
       </div>
     </section>
+  );
+}
+export default function FeaturedProducts(props: FeaturedProductsProps) {
+  return (
+    <CartProvider>
+      <FeaturedProductsInner {...props} />
+    </CartProvider>
   );
 }
