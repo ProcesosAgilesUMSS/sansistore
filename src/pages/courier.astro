@@ -1,12 +1,15 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar';
-import CourierRouteGuard from '../features/mensajero/components/CourierRouteGuard';
+import RouteGuard from '../components/RouteGuard';
+import DeliveryActionsPanel from '../features/mensajero/components/DeliveryActionsPanel';
 ---
 
 <Layout title="Mensajero | SansiStore">
   <Navbar client:load />
   <main class="min-h-screen bg-bg-light pt-14 text-text-light">
-    <CourierRouteGuard client:load />
+    <RouteGuard client:load allowedRoles={['mensajero']} roleName="Mensajero">
+      <DeliveryActionsPanel client:load />
+    </RouteGuard>
   </main>
 </Layout>

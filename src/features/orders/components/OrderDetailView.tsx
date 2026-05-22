@@ -4,7 +4,7 @@ import { getOrderById, reserveOrder } from "../services/ordersService";
 import OrderProductDetail from "./OrderProductDetail";
 import GridSpinner from "./GridSpinner";
 import LoadingMessage from "./LoadingMessage";
-import SellerRouteGuard from "../../seller/components/SellerRouteGuard";
+import RouteGuard from "../../../components/RouteGuard";
 
 interface OrderDetailViewProps {
   orderId: string;
@@ -44,18 +44,18 @@ export default function OrderDetailView({ orderId }: OrderDetailViewProps) {
 
   if (loading) {
     return (
-      <SellerRouteGuard>
+      <RouteGuard allowedRoles={['vendedor']}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-32 min-h-screen flex justify-center items-center gap-x-5">
           <GridSpinner />
           <LoadingMessage text="Loading order" />
         </div>
-      </SellerRouteGuard>
+      </RouteGuard>
     );
   }
 
   if (error || !order) {
     return (
-      <SellerRouteGuard>
+      <RouteGuard allowedRoles={['vendedor']}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-32 min-h-screen">
           <div className="mt-8">
             <p className="text-sm text-text-light/80">Pedido no encontrado</p>
@@ -67,12 +67,12 @@ export default function OrderDetailView({ orderId }: OrderDetailViewProps) {
             </a>
           </div>
         </div>
-      </SellerRouteGuard>
+      </RouteGuard>
     );
   }
 
   return (
-    <SellerRouteGuard>
+    <RouteGuard allowedRoles={['vendedor']}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-32 min-h-screen">
         <OrderProductDetail
           order={order}
@@ -81,6 +81,6 @@ export default function OrderDetailView({ orderId }: OrderDetailViewProps) {
           isReserving={isReserving}
         />
       </div>
-    </SellerRouteGuard>
+    </RouteGuard>
   );
 }

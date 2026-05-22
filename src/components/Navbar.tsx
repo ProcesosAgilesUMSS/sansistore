@@ -150,6 +150,13 @@ export default function Navbar() {
     setTheme(nextTheme);
   };
 
+  const showCompradorFeatures = !user || roles.length === 0 || roles.includes('comprador');
+  const showVendedorFeatures = user && roles.length > 0 && roles.some(r => ['vendedor', 'admin'].includes(r));
+  const showOperadorInvFeatures = user && roles.length > 0 && roles.some(r => ['operador_inv', 'admin'].includes(r));
+  const showMensajeroFeatures = user && roles.length > 0 && roles.some(r => ['mensajero', 'admin'].includes(r));
+  const showAdminFeatures = user && roles.length > 0 && roles.some(r => ['admin'].includes(r));
+  const showMisPedidos = user && roles.length > 0 && roles.some(r => ['comprador', 'admin'].includes(r));
+
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-bg-light/85 border-b border-border-light font-sans">
@@ -166,11 +173,21 @@ export default function Navbar() {
             {/* LINKS */}
             <div className="hidden md:flex items-center gap-8">
               {[
-                { label: 'Productos', href: '/productos' },
-                { label: 'Pedidos', href: '/orders' },
-                { label: 'Ordenes', href: '/seller/orders' },
-                { label: 'Inventario', href: '/inventory' },
-              ].map((item) => (
+                { label: 'Productos', href: '/productos', reqComprador: true },
+                { label: 'Ordenes', href: '/seller/orders', reqVendedor: true },
+                { label: 'Inventario', href: '/inventory', reqOperadorInv: true },
+                { label: 'Entregas', href: '/courier', reqMensajero: true },
+                { label: 'Admin', href: '/admin', reqAdmin: true },
+              ]
+                .filter(item => {
+                  if (item.reqComprador && !showCompradorFeatures) return false;
+                  if (item.reqVendedor && !showVendedorFeatures) return false;
+                  if (item.reqOperadorInv && !showOperadorInvFeatures) return false;
+                  if (item.reqMensajero && !showMensajeroFeatures) return false;
+                  if (item.reqAdmin && !showAdminFeatures) return false;
+                  return true;
+                })
+                .map((item) => (
                 <a
                   key={item.label}
                   href={item.href}
@@ -181,29 +198,11 @@ export default function Navbar() {
               ))}
             </div>
 
-            {roles.includes('admin') && (
-              <a
-                href="/admin"
-                className="text-[13px] text-primary font-semibold tracking-[0.02em] transition-all hover:opacity-70"
-              >
-                Admin
-              </a>
-            )}
-
-            {roles.some((r) => ['vendedor', 'administrador'].includes(r)) && (
-              <a
-                href="/seller/orders"
-                className="text-[13px] text-primary font-semibold tracking-[0.02em] transition-all hover:opacity-70"
-              >
-                Panel Vendedor
-              </a>
-            )}
-
             {/* ACTIONS */}
             <div className="flex items-center gap-3">
               {/* CART */}
-              <CartButton />
-              {authReady && user && (
+              {showCompradorFeatures && <CartButton />}
+              {authReady && user && showCompradorFeatures && (
                 <a
                   href="/location"
                   className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-primary/40 px-3 py-1.5 text-[12px] font-semibold text-primary transition-all hover:bg-primary hover:text-white hover:border-primary"
@@ -265,16 +264,18 @@ export default function Navbar() {
                         role="menu"
                         className="absolute right-0 top-11 w-48 overflow-hidden rounded-lg border border-border-light bg-bg-light shadow-lg"
                       >
-                        <a
-                          role="menuitem"
-                          href="/mis-pedidos"
-                          className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
-                        >
-                          {/*
-                          <Package size={14} />
-                        */}
-                          Mis pedidos
-                        </a>
+                        {showMisPedidos && (
+                          <a
+                            role="menuitem"
+                            href="/mis-pedidos"
+                            className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
+                          >
+                            {/*
+                            <Package size={14} />
+                          */}
+                            Mis pedidos
+                          </a>
+                        )}
 
                         {canAccessCourier && (
                           <a
@@ -357,9 +358,21 @@ export default function Navbar() {
           {menuOpen && (
             <div className="md:hidden py-3 flex flex-col gap-3 border-t border-border-light">
               {[
-                { label: 'Productos', href: '/productos' },
-                { label: 'Inventario', href: '/inventory' },
-              ].map((item) => (
+                { label: 'Productos', href: '/productos', reqComprador: true },
+                { label: 'Ordenes', href: '/seller/orders', reqVendedor: true },
+                { label: 'Inventario', href: '/inventory', reqOperadorInv: true },
+                { label: 'Entregas', href: '/courier', reqMensajero: true },
+                { label: 'Admin', href: '/admin', reqAdmin: true },
+              ]
+                .filter(item => {
+                  if (item.reqComprador && !showCompradorFeatures) return false;
+                  if (item.reqVendedor && !showVendedorFeatures) return false;
+                  if (item.reqOperadorInv && !showOperadorInvFeatures) return false;
+                  if (item.reqMensajero && !showMensajeroFeatures) return false;
+                  if (item.reqAdmin && !showAdminFeatures) return false;
+                  return true;
+                })
+                .map((item) => (
                 <a
                   key={item.label}
                   href={item.href}
@@ -369,7 +382,7 @@ export default function Navbar() {
                 </a>
               ))}
 
-              {user && (
+              {user && showCompradorFeatures && (
                 <>
                   <a
                     href="/location"
@@ -378,12 +391,14 @@ export default function Navbar() {
                     Mis direcciones
                   </a>
 
-                  <a
-                    href="/mis-pedidos"
-                    className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
-                  >
-                    Mis pedidos
-                  </a>
+                  {showMisPedidos && (
+                    <a
+                      href="/mis-pedidos"
+                      className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
+                    >
+                      Mis pedidos
+                    </a>
+                  )}
 
                   {canAccessCourier && (
                     <a

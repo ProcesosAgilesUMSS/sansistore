@@ -5,14 +5,14 @@ import type { ProductOption } from '../services/offerService';
 import DiscountBadge from './DiscountBadge';
 
 const inputClass = (hasError = false) =>
-  `w-full bg-[var(--theme-secondary-bg)] border rounded-xl px-4 py-3 text-sm text-[var(--theme-text)] outline-none transition-colors duration-150 ${
+  `w-full bg-secondary-bg-light border rounded-xl px-4 py-3 text-sm text-text-light outline-none transition-colors duration-150 ${
     hasError
       ? 'border-red-500 focus:border-red-500'
-      : 'border-[var(--theme-border)] focus:border-primary'
+      : 'border-border-light focus:border-primary'
   }`;
 
 const labelClass =
-  'text-[0.68rem] font-bold tracking-widest uppercase text-[var(--theme-text)] opacity-50';
+  'text-[0.68rem] font-bold tracking-widest uppercase text-text-light/50';
 
 export default function OfferForm() {
   const [productId, setProductId] = useState('');
@@ -104,16 +104,16 @@ export default function OfferForm() {
   };
 
   return (
-    <div className="bg-[var(--theme-card-bg)] border border-[var(--theme-border)] rounded-2xl p-6">
+    <div className="bg-card-bg-light border border-border-light rounded-2xl p-6">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
           <Tag className="w-4 h-4 text-primary" />
         </div>
         <div>
-          <h2 className="font-['Outfit'] font-bold text-base text-[var(--theme-text)]">
+          <h2 className="font-['Outfit'] font-bold text-base text-text-light">
             Crear Nueva Oferta
           </h2>
-          <p className="text-[0.7rem] text-[var(--theme-text)] opacity-40">
+          <p className="text-[0.7rem] text-text-light/40">
             El catálogo se actualizará automáticamente
           </p>
         </div>
@@ -121,14 +121,13 @@ export default function OfferForm() {
 
       {successMessage && (
         <div
-          className={`fixed top-20 right-6 z-50 max-w-xs w-full shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 ${
+          className={`fixed top-20 right-6 z-50 max-w-xs w-full shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 bg-card-bg-light border border-primary/30 ${
             toastVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-3'
           }`}
-          style={{ background: 'var(--theme-card-bg)', border: '1px solid rgba(136,176,75,0.3)' }}
         >
           <div className="flex items-start gap-3 px-4 py-3.5">
-            <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
-            <p className="text-sm text-[var(--theme-text)] font-medium leading-snug">{successMessage}</p>
+            <CheckCircle className="w-4 h-4 text-success shrink-0 mt-0.5" />
+            <p className="text-sm text-text-light font-medium leading-snug">{successMessage}</p>
           </div>
           <div className="h-[3px] bg-green-500/15">
             <div
@@ -140,9 +139,9 @@ export default function OfferForm() {
       )}
 
       {error && (
-        <div className="mb-5 flex items-start gap-3 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3">
-          <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
-          <p className="text-sm text-red-600 dark:text-red-400 font-medium">{error}</p>
+        <div className="mb-5 flex items-start gap-3 rounded-xl bg-error-bg border border-error-border px-4 py-3">
+          <AlertCircle className="w-4 h-4 text-error shrink-0 mt-0.5" />
+          <p className="text-sm text-error font-medium">{error}</p>
         </div>
       )}
 
@@ -151,7 +150,7 @@ export default function OfferForm() {
         <div className="flex flex-col gap-1.5">
           <label className={labelClass}>Producto a aplicar oferta *</label>
           {loadingProducts ? (
-            <div className="flex items-center gap-2 px-4 py-3 rounded-xl border border-[var(--theme-border)] text-[var(--theme-text)] opacity-40 text-sm">
+            <div className="flex items-center gap-2 px-4 py-3 rounded-xl border border-border-light text-text-light/40 text-sm">
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
               Cargando productos...
             </div>

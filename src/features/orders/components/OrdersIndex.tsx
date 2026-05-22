@@ -3,7 +3,7 @@ import type { Order, OrderStatus } from "../types";
 import { STATUS_LABELS } from "../types";
 import { getSentOrders, subscribeToCreatedOrders } from "../services/ordersService";
 import { auth } from "../../../lib/firebase";
-import SellerRouteGuard from "../../seller/components/SellerRouteGuard";
+import RouteGuard from "../../../components/RouteGuard";
 import GridSpinner from "./GridSpinner";
 import LoadingMessage from "./LoadingMessage";
 import {
@@ -98,7 +98,7 @@ export default function OrdersIndex() {
   const deliveredTotal = deliveredOrders.reduce((t, o) => t + (o.total ?? 0), 0);
 
   return (
-    <SellerRouteGuard>
+    <RouteGuard allowedRoles={['vendedor']}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-32 min-h-screen">
         <div className="mb-8">
           <h1 className="text-[clamp(1.75rem,4vw,3rem)] font-black tracking-[-0.04em] leading-none text-text-light">
@@ -222,7 +222,7 @@ export default function OrdersIndex() {
           </div>
         )}
       </div>
-    </SellerRouteGuard>
+    </RouteGuard>
   );
 }
 

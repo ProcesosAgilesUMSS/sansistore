@@ -2,7 +2,7 @@
 import Layout from './Layout.astro';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import SellerRouteGuard from '../features/seller/components/SellerRouteGuard';
+import RouteGuard from '../components/RouteGuard';
 
 interface Props {
   title: string;
@@ -25,7 +25,7 @@ const { title, activeTab } = Astro.props;
 
   <Navbar client:load />
   
-  <SellerRouteGuard client:load>
+  <RouteGuard client:load allowedRoles={['vendedor']} roleName="Vendedor">
     <div class="pt-18 bg-bg-light">
       <nav class="px-3 mb-4" aria-label="Orders navigation">
         <div class="grid text-sm min-[760px]:text-base
@@ -73,7 +73,7 @@ const { title, activeTab } = Astro.props;
         <slot />
       </div>
     </div>
-  </SellerRouteGuard>
+  </RouteGuard>
 
   <Footer client:load />
 </Layout>
