@@ -1,45 +1,62 @@
 import React, { useState, useEffect } from 'react';
+import { Tag, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { createOfferService, getProductsService } from '../services/offerService';
 import type { ProductOption } from '../services/offerService';
 import DiscountBadge from './DiscountBadge';
+
+const inputClass = (hasError = false) =>
+  `w-full bg-[var(--theme-secondary-bg)] border rounded-xl px-4 py-3 text-sm text-[var(--theme-text)] outline-none transition-colors duration-150 ${
+    hasError
+      ? 'border-red-500 focus:border-red-500'
+      : 'border-[var(--theme-border)] focus:border-primary'
+  }`;
+
+const labelClass =
+  'text-[0.68rem] font-bold tracking-widest uppercase text-[var(--theme-text)] opacity-50';
 
 export default function OfferForm() {
   const [productId, setProductId] = useState('');
   const [discount, setDiscount] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [toastVisible, setToastVisible] = useState(false);
 
-  // Estado para los productos reales de la base de datos
+  useEffect(() => {
+    if (!successMessage) return;
+    const showTimer = setTimeout(() => setToastVisible(true), 0);
+    const timer = setTimeout(() => {
+      setToastVisible(false);
+      setTimeout(() => setSuccessMessage(''), 300);
+    }, 4000);
+    return () => {
+      clearTimeout(showTimer);
+      clearTimeout(timer);
+    };
+  }, [successMessage]);
+
   const [products, setProducts] = useState<ProductOption[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [productsError, setProductsError] = useState('');
 
-  // Carga los productos desde Firestore al montar el componente
   useEffect(() => {
-    const fetchProducts = async () => {
-      setLoadingProducts(true);
-      setProductsError('');
-      try {
-        const data = await getProductsService();
+    getProductsService()
+      .then((data) => {
         setProducts(data);
         if (data.length === 0) {
-          setProductsError('No hay productos disponibles en la base de datos.');
+          setProductsError('No hay productos disponibles.');
         }
-      } catch {
-        setProductsError('Error al cargar los productos.');
-      } finally {
-        setLoadingProducts(false);
-      }
-    };
-
-    fetchProducts();
+      })
+      .catch(() => setProductsError('Error al cargar los productos.'))
+      .finally(() => setLoadingProducts(false));
   }, []);
 
+  const selectedProduct = products.find((p) => p.id === productId);
+
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     setError('');
     setSuccessMessage('');
 
@@ -47,7 +64,6 @@ export default function OfferForm() {
       setError('Por favor, completa todos los campos.');
       return;
     }
-
     if (!selectedProduct) {
       setError('Producto no encontrado. Recarga la página e intenta de nuevo.');
       return;
@@ -58,28 +74,17 @@ export default function OfferForm() {
       setError('El descuento debe ser un número entre 1 y 100.');
       return;
     }
-
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    if (end < start) {
+    if (new Date(endDate) < new Date(startDate)) {
       setError('La fecha de finalización no puede ser anterior a la de inicio.');
       return;
     }
 
     setIsSubmitting(true);
-
     try {
       const result = await createOfferService(
-        {
-          productId,
-          discount: discountNumber,
-          startDate,
-          endDate,
-          status: 'active',
-        },
+        { productId, discount: discountNumber, startDate, endDate, status: 'active' },
         selectedProduct.price
       );
-
       if (result.success) {
         setSuccessMessage(
           `¡Oferta guardada! ${selectedProduct.name} ahora aparece con ${discountNumber}% de descuento en el catálogo.`
@@ -92,80 +97,101 @@ export default function OfferForm() {
         setError('Hubo un problema al guardar la oferta.');
       }
     } catch {
-      setError('Error de conexión.');
+      setError('Error de conexión. Intenta de nuevo.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Precio del producto seleccionado (para la vista previa del descuento)
-  const selectedProduct = products.find((p) => p.id === productId);
-
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-md transition-colors duration-200">
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
-        Crear Nueva Oferta
-      </h2>
-
-      {error && (
-        <div className="mb-6 p-3 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-          <span className="block sm:inline">{error}</span>
+    <div className="bg-[var(--theme-card-bg)] border border-[var(--theme-border)] rounded-2xl p-6">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+          <Tag className="w-4 h-4 text-primary" />
         </div>
-      )}
+        <div>
+          <h2 className="font-['Outfit'] font-bold text-base text-[var(--theme-text)]">
+            Crear Nueva Oferta
+          </h2>
+          <p className="text-[0.7rem] text-[var(--theme-text)] opacity-40">
+            El catálogo se actualizará automáticamente
+          </p>
+        </div>
+      </div>
 
       {successMessage && (
-        <div className="mb-6 p-3 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-          <span className="block sm:inline">{successMessage}</span>
+        <div
+          className={`fixed top-20 right-6 z-50 max-w-xs w-full shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 ${
+            toastVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-3'
+          }`}
+          style={{ background: 'var(--theme-card-bg)', border: '1px solid rgba(136,176,75,0.3)' }}
+        >
+          <div className="flex items-start gap-3 px-4 py-3.5">
+            <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
+            <p className="text-sm text-[var(--theme-text)] font-medium leading-snug">{successMessage}</p>
+          </div>
+          <div className="h-[3px] bg-green-500/15">
+            <div
+              className="h-full bg-green-500 origin-left"
+              style={{ animation: 'toastProgress 4s linear forwards' }}
+            />
+          </div>
         </div>
       )}
 
-      <form className="space-y-6">
+      {error && (
+        <div className="mb-5 flex items-start gap-3 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3">
+          <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+          <p className="text-sm text-red-600 dark:text-red-400 font-medium">{error}</p>
+        </div>
+      )}
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Producto a aplicar oferta
-          </label>
-
+      <form className="flex flex-col gap-5">
+        {/* Producto */}
+        <div className="flex flex-col gap-1.5">
+          <label className={labelClass}>Producto a aplicar oferta *</label>
           {loadingProducts ? (
-            <div className="w-full p-2 border rounded-md dark:bg-gray-900 dark:border-gray-600 text-gray-400 dark:text-gray-500 text-sm">
+            <div className="flex items-center gap-2 px-4 py-3 rounded-xl border border-[var(--theme-border)] text-[var(--theme-text)] opacity-40 text-sm">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
               Cargando productos...
             </div>
           ) : productsError ? (
-            <div className="w-full p-2 border border-red-300 rounded-md bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm">
+            <div className="px-4 py-3 rounded-xl border border-red-500/30 bg-red-500/10 text-red-500 text-sm">
               {productsError}
             </div>
           ) : (
             <select
-              className="w-full p-2 border rounded-md dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300 focus:ring-2 focus:ring-[#88B04B] outline-none"
               value={productId}
               onChange={(e) => setProductId(e.target.value)}
+              className={inputClass()}
             >
-              <option value="">Selecciona un producto...</option>
-              {products.map((product) => (
-                <option key={product.id} value={product.id}>
-                  {product.name} — Bs. {product.price.toFixed(2)}
+              <option value="">— Selecciona un producto —</option>
+              {products.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name} — Bs. {p.price.toFixed(2)}
                 </option>
               ))}
             </select>
           )}
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Porcentaje de Descuento (%)
-          </label>
+        {/* Descuento */}
+        <div className="flex flex-col gap-1.5">
+          <label className={labelClass}>Porcentaje de descuento (%) *</label>
           <input
             type="number"
-            className="w-full p-2 border rounded-md dark:bg-gray-900 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-[#88B04B] outline-none"
+            min={1}
+            max={100}
+            step={1}
             placeholder="Ej: 20"
             value={discount}
             onChange={(e) => setDiscount(e.target.value)}
+            className={inputClass()}
           />
 
-          {/* VISTA PREVIA DEL DESCUENTO con precio real del producto */}
           {discount && Number(discount) > 0 && Number(discount) <= 100 && (
-            <div className="mt-4">
-              <span className="text-xs text-gray-500 uppercase tracking-wide">Vista Previa para el Catálogo:</span>
+            <div className="mt-1">
+              <span className={`${labelClass} mb-1 block`}>Vista previa para el catálogo</span>
               <DiscountBadge
                 originalPrice={selectedProduct?.price ?? 100}
                 discountPercentage={Number(discount)}
@@ -174,44 +200,39 @@ export default function OfferForm() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Fecha de Inicio
-            </label>
+        {/* Fechas */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className={labelClass}>Fecha de inicio *</label>
             <input
               type="date"
-              className="w-full p-2 border rounded-md dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300 focus:ring-2 focus:ring-[#88B04B] outline-none color-scheme-dark"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
+              className={inputClass()}
             />
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Fecha de Finalización
-            </label>
+          <div className="flex flex-col gap-1.5">
+            <label className={labelClass}>Fecha de finalización *</label>
             <input
               type="date"
-              className="w-full p-2 border rounded-md dark:bg-gray-900 dark:border-gray-600 dark:text-gray-300 focus:ring-2 focus:ring-[#88B04B] outline-none color-scheme-dark"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
+              className={inputClass()}
             />
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={isSubmitting || loadingProducts || products.length === 0}
-          className={`w-full text-white font-bold py-2 px-4 rounded transition-colors mt-4 ${
-            isSubmitting || loadingProducts || products.length === 0
-              ? 'bg-gray-500 cursor-not-allowed'
-              : 'bg-[#88B04B] hover:bg-[#769a40]'
-          }`}
-        >
-          {isSubmitting ? 'Guardando...' : 'Guardar Oferta'}
-        </button>
+        <div className="pt-1">
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={isSubmitting || loadingProducts || products.length === 0}
+            className="px-6 py-2.5 rounded-full bg-primary text-white font-bold text-sm uppercase tracking-wide hover:brightness-110 disabled:opacity-50 transition-all flex items-center gap-2"
+          >
+            {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+            {isSubmitting ? 'Guardando...' : 'Guardar Oferta'}
+          </button>
+        </div>
       </form>
     </div>
   );
