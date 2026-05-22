@@ -46,6 +46,20 @@ export default function PurchaseForm() {
   const [values, setValues] = useState<FormValues>(defaultValues);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [feedback, setFeedback] = useState('');
+  const [toastVisible, setToastVisible] = useState(false);
+
+  useEffect(() => {
+    if (formState !== 'success' || !feedback) return;
+    const showTimer = setTimeout(() => setToastVisible(true), 0);
+    const timer = setTimeout(() => {
+      setToastVisible(false);
+      setTimeout(() => setFormState('idle'), 300);
+    }, 4000);
+    return () => {
+      clearTimeout(showTimer);
+      clearTimeout(timer);
+    };
+  }, [formState, feedback]);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
@@ -182,12 +196,26 @@ export default function PurchaseForm() {
         </div>
       </div>
 
-      {formState === 'success' && (
-        <div className="mb-5 flex items-start gap-3 rounded-xl bg-green-500/10 border border-green-500/20 px-4 py-3">
-          <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
-          <p className="text-sm text-green-600 dark:text-green-400 font-medium">{feedback}</p>
+      {formState === 'success' && feedback && (
+        <div
+          className={`fixed top-20 right-6 z-50 max-w-xs w-full shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 ${
+            toastVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-3'
+          }`}
+          style={{ background: 'var(--theme-card-bg)', border: '1px solid rgba(136,176,75,0.3)' }}
+        >
+          <div className="flex items-start gap-3 px-4 py-3.5">
+            <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
+            <p className="text-sm text-[var(--theme-text)] font-medium leading-snug">{feedback}</p>
+          </div>
+          <div className="h-[3px] bg-green-500/15">
+            <div
+              className="h-full bg-green-500 origin-left"
+              style={{ animation: 'toastProgress 4s linear forwards' }}
+            />
+          </div>
         </div>
       )}
+
 
       {formState === 'error' && sellerId && (
         <div className="mb-5 flex items-start gap-3 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3">
