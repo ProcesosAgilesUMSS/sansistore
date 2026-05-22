@@ -83,9 +83,6 @@ const openDeliveryMap = (order: MessengerOrder) => {
   }
 
   window.location.href = url.toString();
-const buildMapsUrl = (order: MessengerOrder) => {
-    const query = encodeURIComponent(`${order.address}, ${order.city}, Bolivia`);
-    return `https://www.google.com/maps/search/?api=1&query=${query}`;
 };
 
 const canCancelByNoPayment = (order: MessengerOrder) => {
@@ -623,15 +620,14 @@ function OrderDetailModal({
                         </article>
 
                         <div className="flex flex-col gap-3 sm:flex-row">
-                            <a
+                            <button
                                 className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-                                href={buildMapsUrl(order)}
-                                rel="noreferrer"
-                                target="_blank"
+                                onClick={() => openDeliveryMap(order)}
+                                type="button"
                             >
                                 <Send size={17} />
                                 Abrir en Maps
-                            </a>
+                            </button>
                         </div>
                     </div>
 
@@ -706,122 +702,9 @@ function OrderDetailModal({
                                 </button>
                             )}
 
-
                     </aside>
                 </div>
-              ) : (
-                <p className="rounded-2xl border border-primary/30 bg-primary/10 p-4 text-sm font-semibold">
-                  Este pedido no tiene items visibles en el documento.
-                </p>
-              )}
-            </article>
-
-            <article className="grid gap-4 rounded-[24px] border border-border-light bg-secondary-bg-light/40 p-5 sm:grid-cols-3">
-              <div>
-                <p className="messenger-muted text-xs font-bold uppercase">
-                  Metodo de pago
-                </p>
-                <p className="font-black">Contra entrega</p>
-              </div>
-              <div>
-                <p className="messenger-muted text-xs font-bold uppercase">
-                  Metodo de envio
-                </p>
-                <p className="font-black">Delivery</p>
-              </div>
-              <div>
-                <p className="messenger-muted text-xs font-bold uppercase">
-                  Condiciones especiales
-                </p>
-                <p className="font-black">{order.reference || 'Ninguna'}</p>
-              </div>
-            </article>
-
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <button
-                className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-                onClick={() => openDeliveryMap(order)}
-                type="button"
-              >
-                <Send size={17} />
-                Abrir en Maps
-              </button>
-            </div>
-          </div>
-
-          <aside className="messenger-cash-box h-fit rounded-[24px] border-2 p-5">
-            <p className="text-xs font-bold uppercase">Te llevas a cobrar</p>
-            <p className="mt-2 text-3xl font-black">
-              {formatBolivianos(order.cashToCollect)}
-            </p>
-            <p className="messenger-copy mt-1 text-xs">
-              {order.items.length} items en este pedido
-            </p>
-            <div className="my-5 border-t border-border-light" />
-            <div className="space-y-3 text-sm font-bold">
-              <p className="flex justify-between gap-3">
-                <span>Subtotal</span>
-                <span>{formatBolivianos(subtotal)}</span>
-              </p>
-              <p className="flex justify-between gap-3">
-                <span>Costo de entrega</span>
-                <span>{formatBolivianos(deliveryCost)}</span>
-              </p>
-              <p className="flex justify-between gap-3">
-                <span>Descuento</span>
-                <span>{formatBolivianos(0)}</span>
-              </p>
-              <p className="flex justify-between gap-3 pt-4 text-primary">
-                <span>Total final</span>
-                <span>{formatBolivianos(order.cashToCollect)}</span>
-              </p>
-            </div>
-
-            {order.deliveryStatus === 'in_transit' && (
-              <button
-                className="messenger-deliver-button mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
-                onClick={() => {
-                  onDelivered(order);
-                  onClose();
-                }}
-                type="button"
-              >
-                <CheckCircle2 size={17} />
-                Registrar pago
-              </button>
-            )}
-             
-{canCancelByNoPayment(order) && (
-  <button
-    className=" mt-3 inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 border-amber-500 bg-amber-950/40 px-6 text-sm font-bold text-amber-300 transition-all duration-300 hover:border-amber-400 hover:shadow-[0_0_12px_rgba(251,191,36,0.65)]"
-    onClick={() => {
-      onClose();
-      onCancelNoPayment(order);
-    }}
-    type="button"
-  >
-    <DollarSign size={17} />
-    Cancelar por falta de pago
-  </button>
-)}
-
-{(order.deliveryStatus === 'accepted' ||
-  order.deliveryStatus === 'in_transit') && (
-  <button
-    className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-red-500 bg-red-950/40 px-6 text-sm font-bold text-red-300 transition-all duration-300 hover:border-red-400 hover:shadow-[0_0_12px_rgba(248,113,113,0.65)]"
-    onClick={() => {
-      onClose();
-      onNotDelivered(order);
-    }}
-    type="button"
-  >
-    <AlertTriangle size={17} />
-    No entregado
-  </button>
-)}
-
-            
-          </aside>
+            </section>
         </div>
     );
 }
