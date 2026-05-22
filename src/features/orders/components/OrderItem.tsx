@@ -5,13 +5,12 @@ import { STATUS_LABELS } from "../types";
 
 interface OrderItemProps {
   order: Order;
-  onViewDetail: () => void;
 }
 
-export default function OrderItem({ order, onViewDetail }: OrderItemProps) {
+export default function OrderItem({ order }: OrderItemProps) {
   return (
     <li
-      onClick={onViewDetail}
+      onClick={() => { window.location.href = `/orders/${order.id}`; }}
       className="grid grid-cols-subgrid col-span-full border-b items-center py-[10px] min-[760px]:py-0 cursor-pointer hover:bg-[#dfdbd1]"
     >
       <div className="col-span-full min-[760px]:col-start-1 min-[760px]:col-end-3 text-sm flex items-center gap-[8px] text-xs">

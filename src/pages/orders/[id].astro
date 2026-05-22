@@ -1,0 +1,12 @@
+---
+import OrdersLayout from '../../layouts/OrdersLayout.astro';
+import OrderDetailView from '../../features/orders/components/OrderDetailView';
+
+export const prerender = false;
+
+const { id } = Astro.params;
+---
+
+<OrdersLayout title="Detalle de Pedido" activeTab="sent">
+  <OrderDetailView client:load orderId={id!} />
+</OrdersLayout>
