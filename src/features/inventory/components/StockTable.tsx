@@ -81,7 +81,7 @@ export const StockTable: React.FC = () => {
         setSelectedProduct({ ...selectedProduct, stockAvailable: quantity });
       }
 
-      alert('¡Stock inicializado con éxito!');
+      //alert('¡Stock inicializado con éxito!');
     } catch (err) {
       console.error("Error", err);
       alert('Error al inicializar stock.');
