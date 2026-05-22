@@ -7,20 +7,28 @@ export const SideBarSeller = () => {
   const [currentPath, setCurrentPath] = useState('');
 
   useEffect(() => {
-    const syncPath = () => setCurrentPath(window.location.pathname);
+    const syncPath = () => {
+      const pathname = window.location.pathname.replace(/\/$/, '');
+      setCurrentPath(pathname || '/');
+    };
 
     syncPath();
     document.addEventListener('astro:page-load', syncPath);
+    document.addEventListener('astro:after-swap', syncPath);
 
     return () => {
       document.removeEventListener('astro:page-load', syncPath);
+      document.removeEventListener('astro:after-swap', syncPath);
     };
   }, []);
 
   const activeSection = useMemo(
-    () => sections.find((section) => currentPath === section.route),
+    () => sections.find((section) => currentPath === section.route || currentPath.startsWith(`${section.route}/`)),
     [currentPath]
   );
+
+  const isCurrentRoute = (route: string) =>
+    currentPath === route || currentPath.startsWith(`${route}/`);
 
   const firstLabel = activeSection?.label ?? sections[0]?.label ?? 'Opciones';
 
@@ -50,16 +58,10 @@ export const SideBarSeller = () => {
               <a
                 key={section.id}
                 href={section.route}
-                aria-current={currentPath === section.route ? 'page' : undefined}
-                className={linkClass(currentPath === section.route)}
+                aria-current={isCurrentRoute(section.route) ? 'page' : undefined}
+                className={linkClass(isCurrentRoute(section.route))}
               >
                 <span className="min-w-0 truncate">{section.label}</span>
-                <span
-                  className={`text-xs font-700 uppercase tracking-[0.18em] ${currentPath === section.route ? 'opacity-100' : 'opacity-50'
-                    }`}
-                >
-                  {currentPath === section.route ? 'Activo' : 'Ir'}
-                </span>
               </a>
             ))}
           </div>
@@ -79,15 +81,10 @@ export const SideBarSeller = () => {
             <a
               key={section.id}
               href={section.route}
-              aria-current={currentPath === section.route ? 'page' : undefined}
-              className={linkClass(currentPath === section.route)}
+              aria-current={isCurrentRoute(section.route) ? 'page' : undefined}
+              className={linkClass(isCurrentRoute(section.route))}
             >
               <span className="min-w-0 truncate">{section.label}</span>
-              <span
-                className={`text-xs font-700 uppercase tracking-[0.18em] ${currentPath === section.route ? 'opacity-100' : 'opacity-50'
-                  }`}
-              >
-              </span>
             </a>
           ))}
         </div>
