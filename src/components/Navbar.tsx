@@ -148,7 +148,9 @@ export default function Navbar() {
         setProfileMenuOpen(false);
         setRoles([]);
         clearLocalCart();
-        signOut(auth).catch(console.error);
+        signOut(auth).then(() => {
+            window.location.href = '/';
+        }).catch(console.error);
     };
 
     const toggleTheme = () => {
@@ -264,6 +266,16 @@ export default function Navbar() {
                                             >
                                                 <a
                                                     role="menuitem"
+                                                    href="/me"
+                                                    data-astro-reload
+                                                    className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
+                                                >
+                                                    <UserIcon size={14} />
+                                                    Perfil
+                                                </a>
+
+                                                <a
+                                                    role="menuitem"
                                                     href="/mis-pedidos"
                                                     className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
                                                 >
@@ -365,6 +377,14 @@ export default function Navbar() {
 
                             {user && (
                                 <>
+                                    <a
+                                        href="/me"
+                                        data-astro-reload
+                                        className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
+                                    >
+                                        Perfil
+                                    </a>
+
                                     <a
                                         href="/location"
                                         className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
