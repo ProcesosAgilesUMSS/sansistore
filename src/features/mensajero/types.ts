@@ -52,6 +52,12 @@ export interface MessengerOrder {
   address: string;
   city: string;
   reference?: string;
+  locationId: string | null;
+  locationLabel: string;
+  deliveryLat: number | null;
+  deliveryLng: number | null;
+  lat?: number | null;
+  lng?: number | null;
   items: MessengerOrderItem[];
   cashToCollect: number;
   paymentMethod: 'cash_on_delivery';
