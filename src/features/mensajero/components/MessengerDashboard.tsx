@@ -371,7 +371,7 @@ function PendingOrderCard({
                             Registrar pago
                         </button>
                         <button
-                            className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 border-amber-500 bg-amber-950/40 px-6 text-sm font-bold text-amber-300 transition-all duration-300 hover:border-amber-400 hover:shadow-[0_0_12px_rgba(251,191,36,0.65)]"
+                            className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
                             onClick={() => onCancelNoPayment(order)}
                             type="button"
                         >
@@ -379,7 +379,7 @@ function PendingOrderCard({
                             Cancelar por falta de pago
                         </button>
                         <button
-                            className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 border-red-500 bg-red-950/40 px-6 text-sm font-bold text-red-300 transition-all duration-300 hover:border-red-400 hover:shadow-[0_0_12px_rgba(248,113,113,0.65)]"
+                            className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
                             onClick={() => onNotDelivered(order)}
                             type="button"
                         >
@@ -564,48 +564,50 @@ function OrderDetailModal({
                             </p>
                         </div>
 
-                        {order.deliveryStatus === 'in_transit' && (
-                            <button
-                                className="messenger-deliver-button mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
-                                onClick={() => {
-                                    onDelivered(order);
-                                    onClose();
-                                }}
-                                type="button"
-                            >
-                                <CheckCircle2 size={17} />
-                                Registrar pago
-                            </button>
-                        )}
+                       <div className="mt-6 flex flex-col gap-3">
+  {order.deliveryStatus === 'in_transit' && (
+    <button
+      className="messenger-deliver-button inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition active:scale-95"
+      onClick={() => {
+        onDelivered(order);
+        onClose();
+      }}
+      type="button"
+    >
+      <CheckCircle2 size={18} />
+      <span>Registrar pago</span>
+    </button>
+  )}
 
-                        {canCancelByNoPayment(order) && (
-                            <button
-                                className=" mt-3 inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 border-amber-500 bg-amber-950/40 px-6 text-sm font-bold text-amber-300 transition-all duration-300 hover:border-amber-400 hover:shadow-[0_0_12px_rgba(251,191,36,0.65)]"
-                                onClick={() => {
-                                    onClose();
-                                    onCancelNoPayment(order);
-                                }}
-                                type="button"
-                            >
-                                <DollarSign size={17} />
-                                Cancelar por falta de pago
-                            </button>
-                        )}
+  {canCancelByNoPayment(order) && (
+    <button
+      className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-red-500 bg-red-50 px-6 text-sm font-bold text-red-600 transition hover:bg-red-100 active:scale-95"
+      onClick={() => {
+        onClose();
+        onCancelNoPayment(order);
+      }}
+      type="button"
+    >
+      <DollarSign size={18} />
+      <span>Cancelar por falta de pago</span>
+    </button>
+  )}
 
-                        {(order.deliveryStatus === 'accepted' ||
-                            order.deliveryStatus === 'in_transit') && (
-                                <button
-                                    className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-red-500 bg-red-950/40 px-6 text-sm font-bold text-red-300 transition-all duration-300 hover:border-red-400 hover:shadow-[0_0_12px_rgba(248,113,113,0.65)]"
-                                    onClick={() => {
-                                        onClose();
-                                        onNotDelivered(order);
-                                    }}
-                                    type="button"
-                                >
-                                    <AlertTriangle size={17} />
-                                    No entregado
-                                </button>
-                            )}
+  {(order.deliveryStatus === 'accepted' ||
+    order.deliveryStatus === 'in_transit') && (
+    <button
+      className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-red-500 bg-red-50 px-6 text-sm font-bold text-red-600 transition hover:bg-red-100 active:scale-95"
+      onClick={() => {
+        onClose();
+        onNotDelivered(order);
+      }}
+      type="button"
+    >
+      <AlertTriangle size={18} />
+      <span>No entregado</span>
+    </button>
+  )}
+</div>
 
                     </aside>
                 </div>
@@ -638,6 +640,7 @@ export default function MessengerDashboard({
     const [acceptedSortOrder, setAcceptedSortOrder] =
         useState<AcceptedOrderSort>('oldest-first');
     const notifiedOrderIdsRef = useRef<Set<string>>(new Set());
+    const isFirstLoadRef = useRef(true);
 
     useEffect(() => {
         let unsubscribeOrders: (() => void) | undefined;
@@ -715,53 +718,60 @@ export default function MessengerDashboard({
         [assignedOrders]
     );
 
-    useEffect(() => {
-        if (loading || clientSection !== 'assigned') return;
+   useEffect(() => {
+    if (loading || clientSection !== 'assigned') return;
 
-        const currentOrderIds = assignedOrderIdsKey
-            ? assignedOrderIdsKey.split('|')
-            : [];
+    const currentOrderIds = assignedOrderIdsKey
+        ? assignedOrderIdsKey.split('|')
+        : [];
 
-        if (currentOrderIds.length === 0) {
-            setNewOrderCount(0);
-            return;
-        }
+    // Primera carga: mostrar toast si hay pedidos, sin filtrar por sesión previa
+    if (isFirstLoadRef.current) {
+        isFirstLoadRef.current = false;
 
+        if (currentOrderIds.length === 0) return;
+
+        // Marcar todos como notificados para futuras comparaciones
         const storageKey = 'sansistore:messenger:notified-order-ids';
-
-        let storedIds: string[] = [];
-
-        try {
-            storedIds = JSON.parse(
-                sessionStorage.getItem(storageKey) || '[]'
-            ) as string[];
-        } catch {
-            storedIds = [];
-        }
-
-        const alreadyNotifiedIds = new Set([
-            ...storedIds,
-            ...Array.from(notifiedOrderIdsRef.current),
-        ]);
-
-        const newIds = currentOrderIds.filter(
-            (orderId) => !alreadyNotifiedIds.has(orderId)
-        );
-
-        if (newIds.length === 0) return;
-
-        const updatedIds = Array.from(
-            new Set([...storedIds, ...currentOrderIds])
-        );
-
+        const updatedIds = Array.from(new Set(currentOrderIds));
         try {
             sessionStorage.setItem(storageKey, JSON.stringify(updatedIds));
-        } catch {
-
-        }
+        } catch { /* ignorar */ }
         notifiedOrderIdsRef.current = new Set(updatedIds);
-        setNewOrderCount(newIds.length);
-    }, [assignedOrderIdsKey, clientSection, loading]);
+
+        setNewOrderCount(currentOrderIds.length);
+        return;
+    }
+
+    // Cargas posteriores: solo nuevos pedidos que no se habían notificado
+    if (currentOrderIds.length === 0) {
+        setNewOrderCount(0);
+        return;
+    }
+
+    const storageKey = 'sansistore:messenger:notified-order-ids';
+    let storedIds: string[] = [];
+    try {
+        storedIds = JSON.parse(sessionStorage.getItem(storageKey) || '[]') as string[];
+    } catch {
+        storedIds = [];
+    }
+
+    const alreadyNotifiedIds = new Set([
+        ...storedIds,
+        ...Array.from(notifiedOrderIdsRef.current),
+    ]);
+
+    const newIds = currentOrderIds.filter((id) => !alreadyNotifiedIds.has(id));
+    if (newIds.length === 0) return;
+
+    const updatedIds = Array.from(new Set([...storedIds, ...currentOrderIds]));
+    try {
+        sessionStorage.setItem(storageKey, JSON.stringify(updatedIds));
+    } catch { /* ignorar */ }
+    notifiedOrderIdsRef.current = new Set(updatedIds);
+    setNewOrderCount(newIds.length);
+}, [assignedOrderIdsKey, clientSection, loading]);
 
     const acceptedOrders = useMemo(
         () =>
