@@ -275,7 +275,7 @@ test.describe('Cart - Carrito', () => {
     });
 
     for (let attempt = 0; attempt < 3 && page.url().includes('/login'); attempt++) {
-      await loginButton.click();
+      await loginButton.click({ noWaitAfter: true });
       await page.waitForTimeout(1000);
     }
 
