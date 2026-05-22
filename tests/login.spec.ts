@@ -71,8 +71,17 @@ test.describe('Auth - Login', () => {
       .locator('form')
       .getByRole('button', { name: 'Iniciar sesión', exact: true });
 
-    for (let attempt = 0; attempt < 3 && page.url().includes('/login'); attempt++) {
-      await loginButton.click({ noWaitAfter: true });
+    for (let attempt = 0; attempt < 3; attempt++) {
+      if (!page.url().includes('/login')) {
+        break;
+      }
+      try {
+        await loginButton.click({ noWaitAfter: true, timeout: 2000 });
+      } catch (error) {
+        if (!page.url().includes('/login')) {
+          break;
+        }
+      }
       await page.waitForTimeout(1000);
     }
 
