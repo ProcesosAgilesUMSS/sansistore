@@ -127,74 +127,12 @@ async function updateTestInventory(productId: string, data: Record<string, unkno
   await mirrorDocumentToDefaultEmulator('inventory', productId, data);
 }
 
-async function seedUserCartItem({
-  userId,
-  productId,
-  quantity = 1,
-  priceAtAdd,
-}: {
-  userId: string;
-  productId: string;
-  quantity?: number;
-  priceAtAdd?: number;
-}) {
-  const cartItemId = `cart-${userId}-${productId}`;
-  const payload: Record<string, unknown> = {
-    cartItemId,
-    userId,
-    productId,
-    quantity,
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-  };
-
-  if (typeof priceAtAdd === 'number') {
-    payload.priceAtAdd = priceAtAdd;
-  }
-
-  await getTestDb()
-    .collection('users')
-    .doc(userId)
-    .collection('cartItems')
-    .doc(cartItemId)
-    .set(payload);
-
-  await mirrorDocumentToDefaultEmulator(`users/${userId}/cartItems`, cartItemId, {
-    cartItemId,
-    userId,
-    productId,
-    quantity,
-    updatedAt: new Date().toISOString(),
-    ...(typeof priceAtAdd === 'number' ? { priceAtAdd } : {}),
-  });
-}
-
 async function seedLocalCart(
   page: Page,
   productId: string,
   priceAtAdd: number,
 ) {
   await page.addInitScript(
-    ({ cartKey, item }) => {
-      window.localStorage.setItem(cartKey, JSON.stringify([item]));
-    },
-    {
-      cartKey: CART_KEY,
-      item: {
-        productId,
-        quantity: 1,
-        updatedAt: Date.now(),
-        priceAtAdd,
-      },
-    },
-  );
-}
-
-async function setLocalCartOnce(
-  page: Page,
-  productId: string,
-  priceAtAdd: number,
-) {
-  await page.evaluate(
     ({ cartKey, item }) => {
       window.localStorage.setItem(cartKey, JSON.stringify([item]));
     },
@@ -224,7 +162,6 @@ test.afterEach(async ({ page }, testInfo) => {
 });
 
 test.describe('Cart - Carrito', () => {
-  test.describe.configure({ mode: 'serial' });
   test.setTimeout(90_000);
 
   async function loginWithEmail(page: Page, email: string) {
@@ -338,7 +275,7 @@ test.describe('Cart - Carrito', () => {
     await page.goto('/logout');
 
     await expect(page).toHaveURL('/login');
-    await page.goto('/');
+    await page.goto('/me');
     await expect(page.getByText('No autenticado')).toBeVisible();
 
     await page.goto('/carrito');
