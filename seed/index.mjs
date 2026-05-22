@@ -135,7 +135,7 @@ async function seedProducts() {
       description: p.description,
       price: p.price,
       imageUrl: p.imageUrl,
-      active: true,
+      active: p.active !== false,
       hasOffer: p.hasOffer || false,
       offerPrice: p.offerPrice || null,
       badge: p.badge || null,
@@ -145,13 +145,18 @@ async function seedProducts() {
       soldCount: p.soldCount || 0,
     });
 
+    const inventoryEnabled =
+      p.inventoryEnabled !== undefined
+        ? p.inventoryEnabled
+        : p.stockAvailable > 0;
+
     await setDoc('inventory', productId, {
       productId,
       stockTotal: p.stockTotal,
       stockAvailable: p.stockAvailable,
       stockReserved: 0,
       minStock: 5,
-      enabled: p.stockAvailable > 0,
+      enabled: inventoryEnabled,
       updatedAt: TS(),
     });
 

@@ -1,9 +1,14 @@
 export const sections = [
+
+   {
+    id: 'reservados', label: 'Pedidos Reservados', route: '/seller/reserved-orders'
+  },
   {
     id: 'entregados',
     label: 'Pedidos Confirmados',
     route: '/seller/orders',
   },
+ 
   {
     id: 'asignar',
     label: 'Pedidos Listos para Asignar',

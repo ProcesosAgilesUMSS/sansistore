@@ -61,3 +61,15 @@ export async function updateLocation(
         updatedAt: new Date().toISOString(), 
     });
 }
+
+//bloqueo edicion/eliminacion segun delivery status
+export async function hasActiveOrders(locationId: string): Promise<boolean> {
+    const activeStatuses = ['assigned', 'accepted', 'in_transit', 'pending_reassignment'];
+    const q = query(
+        collection(db, "orders"),
+        where("locationId", "==", locationId),
+        where("deliveryStatus", "in", activeStatuses)
+    );
+    const snapshot = await getDocs(q);
+    return !snapshot.empty;
+}

@@ -60,5 +60,5 @@ export interface MessengerOrder {
   paymentCollectedAt: Date | null;
   collectedBy: string | null;
   deliveryMethod: string;   
-  deliveryStatus: 'assigned' | 'accepted' | 'in_transit' | 'delivered' | 'not_delivered' | 'pending_reassignment';
+  deliveryStatus: 'assigned' | 'accepted' | 'in_transit' | 'delivered' | 'not_delivered' | 'pending_reassignment' | 'cancelled';
 }
