@@ -22,7 +22,8 @@ export function getTotalUnits(items: LocalCartItem[]): number {
 
 export function addToLocalCart(
   productId: string,
-  stock: number
+  stock: number,
+  priceAtAdd?: number
 ): { success: boolean; error?: string; items: LocalCartItem[] } {
   const items = getLocalCart();
   const totalUnits = getTotalUnits(items);
@@ -42,7 +43,10 @@ export function addToLocalCart(
         : i
     );
   } else {
-    updated = [...items, { productId, quantity: 1, updatedAt: Date.now() }];
+    updated = [
+      ...items,
+      { productId, quantity: 1, updatedAt: Date.now(), priceAtAdd },
+    ];
   }
   saveLocalCart(updated);
   return { success: true, items: updated };
