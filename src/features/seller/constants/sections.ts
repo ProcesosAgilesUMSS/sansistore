@@ -2,7 +2,7 @@ export const sections = [
   {
     id: 'reservados',
     label: 'Pedidos Reservados',
-    route: '/seller/reserved-orders'
+    route: '/seller/reserved-orders',
   },
   {
     id: 'entregados',
@@ -20,6 +20,9 @@ export const sections = [
     route: '/seller/purchase'
   },
   {
+    id: 'ofertas', label: 'Gestionar Ofertas', route: '/seller/offers'
+  },
+  {
     id: 'rendicion',
     label: 'Rendicion del dia',
     route: '/seller/daily-collections',
@@ -30,3 +33,4 @@ export const sections = [
     route: '/seller/order-history',
   },
 ];
+
