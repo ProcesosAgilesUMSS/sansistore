@@ -239,3 +239,9 @@ por las dudas que se tienen.
 * **Yesterday:** Terminé la funcionalidad de alertas de nuevos pedidos para el mensajero, asegurando que pueda identificar rápidamente cuando tiene una nueva entrega asignada.
 * **Today:** Termine la funcionalidad de cancelación de pedidos por falta de pago, agregando el flujo para que el mensajero pueda registrar la cancelación y guardar el motivo correspondiente.
 * **Blockers:** None
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Terminé de implementar y ajustar mis HUs relacionadas con la confirmación de pedidos y validación de entrega por parte del comprador, revisando detalles pendientes.
+* **Today:** Continuaré apoyando en la revisión y validación del flujo del comprador, verificando posibles mejoras en las funcionalidades implementadas.
+* **Blockers:** None
