@@ -199,3 +199,32 @@
 * **Yesterday:**  Empece con el desarollo del fronted de mi hus US-161(Reporte de ventas por fecha) y US-152(Tiempo reserva).
 * **Today:** revise si faltaba algun detalle en las hus para continuar luego con el backend. 
 * **Blockers:** none.
+
+# 21/05/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+* **Yesterday:** empece a revisar el flujo de las hu-146 para este segundo sprint
+* **Today:** estoy revisando si hay errores o bugs en la hu -146
+* **Blockers:** none.
+
+## Dylan Coca Beltran
+- **Yesterday:** termine de integrar el frontend y backend de la hu #147 de ver los productos mas vendidos. configurar la db para que corra el endpoint en el deploy
+- **Today:** revise que no hubieran bugs ademas de poner algunos datos en la db para la funcion de la hu #147 de mostrar los productos mas vendidos
+- **Blockers:** el acceso al deploy, era necesario hablar con un encargado para ayudarme a modificar lo necesario, al final asi se hizo
+
+## Fabricio Javier Cordova Caceres 
+* **Yesterday:**  revisision del flujo de las hu-146 para este segundo sprint
+* **Today:** resion.de errores o bugs en la hu -146
+* **Blockers:** none.
+
+## Jherlan Marcelo Calero Sardan
+* **Yesterday:**  Empece con el desarollo del backend de mi hus US-161(Reporte de ventas por fecha) y US-152(Tiempo reserva).
+* **Today:** revision de errores y flujo de mis HUs correspondientes. 
+* **Blockers:** none.
+
+## Camila Wara Fernandez Sandoval 
+* **Yesterday:**  Resolví algunos bugs qué tenía en el diseño de mi hu #147
+* **Today:** Finalice la revisión de los errores y con eso se concluye mi hu #147
+* **Blockers:** none.
