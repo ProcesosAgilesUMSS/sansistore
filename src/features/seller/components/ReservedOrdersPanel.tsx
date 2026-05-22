@@ -145,7 +145,7 @@ export default function ReservedOrdersPanel({ embedded = false }: { embedded?: b
           Reservar pedidos
         </h1>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-(--theme-text) opacity-70 md:text-base">
-          Revisa todos los pedidos, reserva los que correspondan y visualiza los ya reservados.
+          Revisa los pedidos en estado creado, reserva los que correspondan y visualiza los ya reservados.
         </p>
       </header>
 
@@ -236,7 +236,7 @@ export default function ReservedOrdersPanel({ embedded = false }: { embedded?: b
       ) : (
         <div className="grid gap-6 xl:grid-cols-2">
           <section className="rounded-3xl border border-(--theme-border) bg-(--theme-card-bg) p-5 shadow-sm">
-            <SectionHeader title="Todos los pedidos" count={confirmed.length} />
+            <SectionHeader title="Pedidos creados" count={confirmed.length} />
             {confirmed.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-(--theme-border) px-6 py-14 text-center">
                 <p className="text-sm text-(--theme-text) opacity-50">

@@ -156,7 +156,6 @@ export default function OrderHistoryPanel({
 
                   <div className="flex flex-wrap items-center gap-2">
                     <StatusBadge label={order.status} />
-                    <StatusBadge label={order.paymentStatus || 'COBRADO'} />
                   </div>
                 </div>
 
