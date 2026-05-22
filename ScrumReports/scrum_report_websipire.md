@@ -233,3 +233,9 @@ por las dudas que se tienen.
 * **Yesterday:** Terminé de arreglar mis HUs, revisando detalles pendientes y realizando los ajustes necesarios para culminar con el avance del sprint.
 * **Today:** Apoyé en arreglar el flujo de comprador, integrando la parte de **“Pagar contra entrega”**, además de coordinar con los demás grupos para resolver las dudas que se presenten.
 * **Blockers:** None
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Terminé la funcionalidad de alertas de nuevos pedidos para el mensajero, asegurando que pueda identificar rápidamente cuando tiene una nueva entrega asignada.
+* **Today:** Termine la funcionalidad de cancelación de pedidos por falta de pago, agregando el flujo para que el mensajero pueda registrar la cancelación y guardar el motivo correspondiente.
+* **Blockers:** None
