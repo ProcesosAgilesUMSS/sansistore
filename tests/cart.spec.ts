@@ -444,6 +444,4 @@ test.describe('Cart - Carrito', () => {
 
     await expect(page.getByTestId(`cart-item-image-fallback-${productId}`)).toBeVisible();
   });
-
-  
 });
