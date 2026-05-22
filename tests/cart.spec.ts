@@ -244,15 +244,15 @@ test.describe('Cart - Carrito', () => {
 
     // Fill right before clicking to minimize autofill interference window
     await emailField.fill(email);
-    await passwordField.fill('password123');
+    await passwordField.fill('12345678');
 
     // Retry if autofill overwrites the values
     for (let attempt = 0; attempt < 3; attempt++) {
       const currentEmail = await emailField.inputValue();
       const currentPass = await passwordField.inputValue();
-      if (currentEmail === email && currentPass === 'password123') break;
+      if (currentEmail === email && currentPass === '12345678') break;
       await emailField.fill(email);
-      await passwordField.fill('password123');
+      await passwordField.fill('12345678');
       await page.waitForTimeout(150);
     }
 
