@@ -874,16 +874,16 @@ function FeaturedProductsInner({
             <div className="rounded-3xl border border-border-light bg-card-bg-light px-6 py-12 text-center">
               <Heart size={40} className="mx-auto mb-3 text-primary" />
               <p className="text-sm font-semibold text-text-light">
-                Aun no tienes productos favoritos.
+                Aún no tienes productos favoritos.
               </p>
               <p className="mt-2 text-sm text-text-light opacity-70">
-                Guarda productos desde el catalogo para revisarlos despues.
+                Guarda productos desde el catálogo para revisarlos después.
               </p>
               <a
                 href="/productos"
                 className="mt-4 inline-flex rounded-full bg-primary px-5 py-2 text-sm font-semibold text-bg-light transition-all hover:brightness-105"
               >
-                Ver catalogo
+                Ver catálogo
               </a>
             </div>
           )}

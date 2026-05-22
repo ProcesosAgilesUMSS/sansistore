@@ -124,7 +124,7 @@ test.describe('Favorite products', () => {
       .toBe(0);
 
     await expect(
-      page.getByText('Aun no tienes productos favoritos.')
+      page.getByText('Aún no tienes productos favoritos.')
     ).toBeVisible();
   });
 });
