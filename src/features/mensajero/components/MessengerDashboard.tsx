@@ -44,10 +44,45 @@ const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']) => {
     if (status === 'cancelled') return 'Cancelado';
     return 'Entregado';
 };
+const openDeliveryMap = (order: MessengerOrder) => {
+  const mapOrder = {
+    buyerName: order.buyerName || order.customerName,
+    deliveryZone: order.city,
+    deliveryLat: order.deliveryLat ?? order.lat ?? null,
+    deliveryLng: order.deliveryLng ?? order.lng ?? null,
+    total: order.cashToCollect,
+  };
 
-const buildMapsUrl = (order: MessengerOrder) => {
-    const query = encodeURIComponent(`${order.address}, ${order.city}, Bolivia`);
-    return `https://www.google.com/maps/search/?api=1&query=${query}`;
+  const panelOrder = {
+    customerName: order.customerName,
+    phone: order.phone,
+    address: order.address,
+    reference: order.reference || order.locationLabel,
+    items: order.items.map((item) => ({
+      name: item.name,
+      quantity: item.quantity,
+    })),
+    cashToCollect: order.cashToCollect,
+  };
+
+  localStorage.setItem(
+    'courier_map_order',
+    JSON.stringify(mapOrder)
+  );
+  localStorage.setItem(
+    'courier_panel_order',
+    JSON.stringify(panelOrder)
+  );
+
+  const url = new URL('/mapa', window.location.origin);
+  if (mapOrder.deliveryLat != null && mapOrder.deliveryLng != null) {
+    url.searchParams.set('lat', String(mapOrder.deliveryLat));
+    url.searchParams.set('lng', String(mapOrder.deliveryLng));
+  } else {
+    url.searchParams.set('location', order.address);
+  }
+
+  window.location.href = url.toString();
 };
 
 const canCancelByNoPayment = (order: MessengerOrder) => {
@@ -335,40 +370,122 @@ function PendingOrderCard({
                     </button>
                 )}
 
-                {/* CUANDO YA ESTA EN CAMINO */}
-                {order.deliveryStatus === 'in_transit' && (
-                    <>
-                        <button
-                            className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
-                            onClick={() => onDelivered(order)}
-                            type="button"
-                        >
-                            <CheckCircle2 size={17} />
-                            Registrar pago
-                        </button>
+        <div>
+          <p className="messenger-muted mb-3 text-xs font-medium">Productos</p>
+          <div className="space-y-3">
+            {order.items.map((item) => (
+              <p
+                className="messenger-copy flex items-center gap-2 text-sm"
+                key={item.id}
+              >
+                <Package size={16} />
+                <span>
+                  {item.quantity}x {item.name} — {formatBolivianos(item.price)}
+                </span>
+              </p>
+            ))}
+          </div>
 
-                        <button
-                            className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 border-amber-500 bg-amber-950/40 px-6 text-sm font-bold text-amber-300 transition-all duration-300 hover:border-amber-400 hover:shadow-[0_0_12px_rgba(251,191,36,0.65)]"
-                            onClick={() => onCancelNoPayment(order)}
-                            type="button"
-                        >
-                            <DollarSign size={17} />
-                            Cancelar por falta de pago
-                        </button>
+          <div className="messenger-cash-box mt-5 rounded-2xl border-2 p-5">
+            <p className="text-xs font-medium uppercase">Monto a cobrar</p>
+            <p className="mt-2 text-3xl font-black">
+              {formatBolivianos(order.cashToCollect)}
+            </p>
+            <p className="messenger-copy mt-1 text-xs">en efectivo</p>
+          </div>
+        </div>
+      </div>
 
-                        <button
-                            className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 border-red-500 bg-red-950/40 px-6 text-sm font-bold text-red-300 transition-all duration-300 hover:border-red-400 hover:shadow-[0_0_12px_rgba(248,113,113,0.65)]"
-                            onClick={() => onNotDelivered(order)}
-                            type="button"
-                        >
-                            <AlertTriangle size={17} />
-                            No entregado
-                        </button>
-                    </>
-                )}
-            </div>
-        </article>
-    );
+      <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <button
+          className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+          onClick={() => openDeliveryMap(order)}
+          type="button"
+        >
+          <Send size={17} />
+          Abrir en Maps
+        </button>
+
+  {order.deliveryStatus !== 'assigned' && (
+    <button
+      className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+      onClick={() => onDetail(order)}
+      type="button"
+    >
+      <Eye size={17} />
+      Ver detalle
+    </button>
+  )}
+
+  {/* ACEPTAR / RECHAZAR */}
+  {order.deliveryStatus === 'assigned' && (
+    <>
+      <button
+        className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
+        onClick={() => onAccept(order.id)}
+        type="button"
+      >
+        <CheckCircle2 size={17} />
+        Aceptar pedido
+      </button>
+
+      <button
+        className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+        onClick={() => onReject(order.id)}
+        type="button"
+      >
+        <XCircle size={17} />
+        Rechazar
+      </button>
+    </>
+  )}
+
+  {/* INICIAR ENTREGA */}
+  {order.deliveryStatus === 'accepted' && (
+    <button
+      className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 text-sm font-bold text-white shadow-lg transition hover:scale-[1.02] hover:bg-blue-700"
+      onClick={() => onInTransit(order.id)}
+      type="button"
+    >
+      <Truck size={17} />
+      Iniciar entrega
+    </button>
+  )}
+
+  {/* CUANDO YA ESTA EN CAMINO */}
+  {order.deliveryStatus === 'in_transit' && (
+    <>
+      <button
+        className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
+        onClick={() => onDelivered(order)}
+        type="button"
+      >
+        <CheckCircle2 size={17} />
+        Registrar pago
+      </button>
+
+<button
+  className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 border-amber-500 bg-amber-950/40 px-6 text-sm font-bold text-amber-300 transition-all duration-300 hover:border-amber-400 hover:shadow-[0_0_12px_rgba(251,191,36,0.65)]"
+  onClick={() => onCancelNoPayment(order)}
+  type="button"
+>
+  <DollarSign size={17} />
+  Cancelar por falta de pago
+</button>
+
+<button
+  className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 border-red-500 bg-red-950/40 px-6 text-sm font-bold text-red-300 transition-all duration-300 hover:border-red-400 hover:shadow-[0_0_12px_rgba(248,113,113,0.65)]"
+  onClick={() => onNotDelivered(order)}
+  type="button"
+>
+  <AlertTriangle size={17} />
+  No entregado
+</button>
+    </>
+  )}
+</div>
+    </article>
+  );
 }
 
 function DeliveredOrderRow({ order }: { order: MessengerOrder }) {
@@ -503,15 +620,14 @@ function OrderDetailModal({
                         </article>
 
                         <div className="flex flex-col gap-3 sm:flex-row">
-                            <a
+                            <button
                                 className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-                                href={buildMapsUrl(order)}
-                                rel="noreferrer"
-                                target="_blank"
+                                onClick={() => openDeliveryMap(order)}
+                                type="button"
                             >
                                 <Send size={17} />
                                 Abrir en Maps
-                            </a>
+                            </button>
                         </div>
                     </div>
 
@@ -585,7 +701,6 @@ function OrderDetailModal({
                                     No entregado
                                 </button>
                             )}
-
 
                     </aside>
                 </div>
