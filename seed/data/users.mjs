@@ -83,7 +83,7 @@ export const Users = {
     photoURL:
       'https://ui-avatars.com/api/?name=Admin+SANSI&background=2C3E50&color=fff',
     authType: 'email',
-    roles: ['administrador'],
+    roles: ['admin'],
     institutionalId: 'ADM-2020-001',
     isActive: true,
   },
