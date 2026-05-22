@@ -1,16 +1,8 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import OrdersLayout from '../../layouts/OrdersLayout.astro';
 import ReservationsListPanel from '../../features/seller/components/ReservationsListPanel';
 ---
 
-<Layout title="Reservas">
-  <Navbar client:load />
-
-  <main class="pt-16 md:pt-20">
-    <ReservationsListPanel client:load />
-  </main>
-
-  <Footer client:load />
-</Layout>
+<OrdersLayout title="Mis Reservas" activeTab="reservations">
+  <ReservationsListPanel client:load />
+</OrdersLayout>

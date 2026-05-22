@@ -35,8 +35,12 @@ export async function reserveOrder(orderId: string): Promise<void> {
 }
 
 export async function getSentOrders(): Promise<Order[]> {
+  const user = auth.currentUser;
+  if (!user) return [];
+
   const q = query(
     collection(db, "orders"),
+    where("sellerId", "==", user.uid),
     where("deliveryStatus", "in", ["in_transit", "delivered"])
   );
   return fetchOrdersByQuery(q);

@@ -6,7 +6,7 @@ import SellerRouteGuard from '../features/seller/components/SellerRouteGuard';
 
 interface Props {
   title: string;
-  activeTab: 'sent' | 'created';
+  activeTab: 'sent' | 'created' | 'reservations';
 }
 
 const { title, activeTab } = Astro.props;
@@ -28,7 +28,7 @@ const { title, activeTab } = Astro.props;
   <SellerRouteGuard client:load>
     <div class="pt-18 bg-bg-light">
       <nav class="px-3 mb-4" aria-label="Orders navigation">
-        <div class="grid     
+        <div class="grid text-sm min-[760px]:text-base
         grid-cols-[repeat(8,1fr)]
         min-[760px]:grid-cols-[repeat(16,1fr)]
         min-[960px]:grid-cols-[repeat(24,1fr)]"
@@ -36,7 +36,7 @@ const { title, activeTab } = Astro.props;
           <a 
             href="/orders/created" 
             class:list={[
-              "col-start-1 col-end-4 min-[960px]:col-start-2 min-[960px]:col-end-6",
+              "col-start-1  col-end-4 min-[960px]:col-start-2 min-[960px]:col-end-5 min-[960px]:col-end-6",
               activeTab === 'created' 
                 ? "underline decoration-2 underline-offset-4" 
                 : "text-black/53"
@@ -45,9 +45,20 @@ const { title, activeTab } = Astro.props;
             Pedidos creados
           </a>
           <a
+            href="/seller/reservations" 
+            class:list={[
+              "col-start-4 col-end-6 min-[760px]:col-start-5 min-[760px]:col-end-8 min-[960px]:col-start-6 min-[960px]:col-end-9",
+              activeTab === 'reservations'
+                ? "underline decoration-2 underline-offset-4"
+                : "text-black/53"
+            ]}
+          >
+            Mis reservas
+          </a>
+          <a
             href="/orders/sent" 
             class:list={[
-              "col-start-4 col-end-8 min-[760px]:col-start-6 min-[760px]:col-end-10",
+              "col-start-6 col-end-9 min-[760px]:col-start-8 min-[760px]:col-end-12 min-[960px]:col-start-9 min-[960px]:col-end-14",
               activeTab === 'sent' 
                 ? "underline decoration-2 underline-offset-4"
                 : "text-black/53"
