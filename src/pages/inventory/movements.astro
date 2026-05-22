@@ -1,29 +1,34 @@
 ---
 // src/pages/inventory/movements.astro
 import InventoryLayout from '../../layouts/InventoryLayout.astro';
+import { OrderDispatch } from '../../features/inventory/components/OrderDispatch.tsx';
 import { StockMovementForm } from '../../features/inventory/components/StockMovementForm.tsx';
 import { MovementHistory } from '../../features/inventory/components/MovementHistory.tsx';
 ---
 
 <InventoryLayout title="Sansistore | Movimientos">
   <div class="flex items-center justify-between mb-8">
-    <h1
-      class="font-['Outfit'] font-black text-2xl tracking-tight text-(--theme-text)"
-    >
+    <h1 class="font-['Outfit'] font-black text-2xl tracking-tight text-(--theme-text)">
       Gestión de <span class="text-primary">Movimientos</span>
     </h1>
   </div>
 
-  {/* Contenedor Grid: 1 columna en móviles, 2 columnas asimétricas en PC */}
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+  <OrderDispatch client:load />
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mt-8 pt-8 border-t border-(--theme-border)/50">
     
-    {/* Columna Izquierda: Formulario de Acción (Ocupa 7 columnas) */}
     <div class="lg:col-span-7">
+      <div class="mb-4">
+        <h3 class="font-['Outfit'] font-bold text-lg text-(--theme-text)">Operaciones Manuales</h3>
+        <p class="text-xs opacity-60 text-(--theme-text)">Usa esto solo para abastecimiento de proveedores o ajustes de mermas.</p>
+      </div>
       <StockMovementForm client:load />
     </div>
 
-    {/* Columna Derecha: Historial en Tiempo Real (Ocupa 5 columnas) */}
     <div class="lg:col-span-5">
+      <div class="mb-4">
+        <h3 class="font-['Outfit'] font-bold text-lg text-(--theme-text) opacity-0 hidden lg:block">_</h3>
+      </div>
       <MovementHistory client:load />
     </div>
 
