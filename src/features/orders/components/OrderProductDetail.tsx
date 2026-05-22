@@ -1,14 +1,21 @@
+import { BookMarkedIcon } from "lucide-react";
 import { STATUS_LABELS } from "../types";
 import type { Order } from "../types";
+import GridSpinner from "./GridSpinner";
+import LoadingMessage from "./LoadingMessage";
 
 interface OrderProductDetailProps {
   order: Order;
   onBack: () => void;
+  onReserve?: () => void;
+  isReserving?: boolean;
 }
 
 export default function OrderProductDetail({
   order,
   onBack,
+  onReserve,
+  isReserving,
 }: OrderProductDetailProps) {
   const hasItems = order.items.length > 0;
 
@@ -33,22 +40,55 @@ export default function OrderProductDetail({
           </p>
           <div className="text-sm flex items-center gap-2 mt-1">
             <span>Estado:</span>
-            <div className="uppercase text-xs border p-[2px_5px_2.5px] border-dotted rounded   flex items-center w-[13.5ch] justify-between border-[#1e1e1e44]">
-              {STATUS_LABELS[order.status]}
+            <div className="uppercase text-xs border p-[2px_6px_2.5px] border-dotted rounded flex items-center gap-1.5 border-[#1e1e1e44] dark:border-[#f5f3ef44]">
               <div
-                className={`size-2 rounded-full ${order.status === "delivered" ? "bg-[#008000]" : "bg-[#0000FF]"}`}
+                className={`size-1.5 rounded-full ${
+                  order.status === "CREADO" ? "bg-orange-500" :
+                  order.status === "RESERVADO" ? "bg-blue-500" :
+                  order.status === "PENDIENTE" ? "bg-yellow-500" :
+                  order.status === "EMPAQUETADO" ? "bg-purple-500" :
+                  order.status === "in_transit" ? "bg-blue-500" :
+                  order.status === "delivered" ? "bg-green-500" :
+                  "bg-current"
+                }`}
               />
+              {STATUS_LABELS[order.status]}
             </div>
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={onBack}
-          className="uppercase text-xs border border-[#1e1e1e44] p-[2px_5px_2.5px] border-dotted rounded"
-        >
-          Volver
-        </button>
+        <div className="flex flex-col items-end gap-3">
+          <button
+            type="button"
+            onClick={onBack}
+            className="uppercase text-xs border border-[#1e1e1e44] dark:border-[#f5f3ef44] p-[4px_12px_4.5px] border-dotted rounded hover:bg-secondary-bg-light transition-colors"
+          >
+            Volver
+          </button>
+          {order.status === "CREADO" && onReserve && (
+            <button
+              onClick={onReserve}
+              disabled={isReserving}
+              className={`rounded-full bg-primary text-white px-5 py-2.5 text-sm uppercase font-bold tracking-wider transition-all duration-200 flex items-center gap-2 ${
+                isReserving
+                  ? "opacity-50 cursor-not-allowed"
+                  : "cursor-pointer hover:opacity-90 hover:scale-105 hover:-translate-y-0.5 active:scale-95 active:translate-y-0 hover:shadow-lg"
+              }`}
+            >
+              {isReserving ? (
+                <>
+                  <GridSpinner size={4} />
+                  <LoadingMessage text="Reservando" />
+                </>
+              ) : (
+                <>
+                  <BookMarkedIcon size={16} />
+                  Reservar Pedido
+                </>
+              )}
+            </button>
+          )}
+        </div>
       </div>
 
       {!hasItems ? (

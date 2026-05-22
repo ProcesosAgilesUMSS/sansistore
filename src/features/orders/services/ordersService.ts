@@ -170,6 +170,7 @@ async function processQuerySnapshot(querySnapshot: QuerySnapshot<DocumentData>):
     return {
       id: orderDoc.id,
       buyerId: data.buyerId ?? '',
+      sellerId: data.sellerId,
       status: normalizeBuyerOrderStatus(data),
       buyerReceptionConfirmed: isReceptionConfirmed(data),
       buyerReceptionConfirmedAt: data.buyerReceptionConfirmedAt ?? data.customerConfirmedAt ?? null,
@@ -186,6 +187,50 @@ async function processQuerySnapshot(querySnapshot: QuerySnapshot<DocumentData>):
 }
 
 // --- Buyer Actions (from main) ---
+
+export async function getOrderById(orderId: string): Promise<Order | null> {
+  const orderRef = doc(db, "orders", orderId);
+  const orderSnap = await getDoc(orderRef);
+  if (!orderSnap.exists()) return null;
+
+  const data = orderSnap.data() as Record<string, any>;
+
+  let destination = "Ubicación no encontrada";
+  if (data.locationId) {
+    const locSnap = await getDoc(doc(db, "locations", data.locationId));
+    if (locSnap.exists()) {
+      destination = (locSnap.data() as any).label || "Sin etiqueta";
+    }
+  }
+
+  const itemsSnapshot = await getDocs(collection(orderRef, "orderItems"));
+  const items = itemsSnapshot.docs.map((itemDoc) => {
+    const item = itemDoc.data();
+    return {
+      itemId: item.itemId ?? itemDoc.id,
+      productId: item.productId,
+      productName: item.productName,
+      price: item.price ?? item.unitPrice ?? 0,
+      quantity: item.quantity,
+      subtotal: item.subtotal,
+      description: item.description,
+    };
+  }) as OrderItem[];
+
+  return {
+    id: orderSnap.id,
+    buyerId: data.buyerId ?? "",
+    sellerId: data.sellerId,
+    status: normalizeBuyerOrderStatus(data),
+    buyerReceptionConfirmed: isReceptionConfirmed(data),
+    buyerReceptionConfirmedAt:
+      data.buyerReceptionConfirmedAt ?? data.customerConfirmedAt ?? null,
+    delivery: { destination },
+    items,
+    total: data.total,
+    createdAt: data.createdAt,
+  };
+}
 
 export async function getMyOrders(userId: string): Promise<Order[]> {
   const q = query(
