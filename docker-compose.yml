@@ -7,6 +7,7 @@ services:
     volumes:
       - ./src:/app/src
       - ./tests:/app/tests
+      - ./seed:/app/seed
       - ./playwright.config.ts:/app/playwright.config.ts
 
       - ./playwright-report:/app/playwright-report
