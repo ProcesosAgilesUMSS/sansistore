@@ -93,8 +93,6 @@ export const liberarReservas = onSchedule(
           if (!productId || !quantity) return;
 
           const inventoryRef = db
-            .collection('products')
-            .doc(productId)
             .collection('inventory')
             .doc(productId);
 

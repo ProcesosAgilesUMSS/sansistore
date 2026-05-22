@@ -13,7 +13,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "emu": "firebase emulators:start --only firestore,auth,functions",
+    "emu": "firebase emulators:start --only firestore,auth,functions,pubsub",
     "seed": "node ./seed/index.mjs"
   },
   "seeds": {
