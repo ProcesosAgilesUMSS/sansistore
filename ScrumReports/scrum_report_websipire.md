@@ -218,3 +218,13 @@
 * **Today:** Continuar trabajando en la HU asignada, elaborando sus criterios de aceptación y revisando posibles dependencias con las tareas de los demás integrantes del equipo.
 
 * **Blockers:** none
+
+
+# Daily Reports - Team 3 Webspire 21/05/26
+
+## Dayana Saleth Ortuño Guzman
+
+ * **Yesterday:** Terminar de arrglar mis HUs
+* **Today:** Arreglar el flujo de comprador, integrando la parte de "Pagar contra entrega", comunicarme con los grupos
+por las dudas que se tienen.
+* **Blockers:** none
