@@ -171,6 +171,7 @@ export default function Navbar() {
                 { label: 'Productos', href: '/productos' },
                 { label: 'Pedidos', href: '/orders/sent' },
                 { label: 'Ordenes', href: '/seller/orders' },
+                { label: 'Reservas', href: '/seller/reservations' },
                 { label: 'Inventario', href: '/inventory' },
               ].map((item) => (
                 <a
