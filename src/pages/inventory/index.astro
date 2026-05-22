@@ -2,7 +2,7 @@
 // src/pages/inventory/index.astro
 import InventoryLayout from '../../layouts/InventoryLayout.astro';
 // 1. Cambiamos el import para traer el tablero operativo en tiempo real
-import { InventoryDashboardTable } from '../../features/inventory/components/InventoryDashboardTable.tsx';
+import { InventoryDashboard } from '../../features/inventory/components/InventoryDashboard';
 ---
 
 <InventoryLayout title="Sansistore | Inventario">
@@ -14,8 +14,10 @@ import { InventoryDashboardTable } from '../../features/inventory/components/Inv
     </h1>
   </div>
 
-  {/* 2. Inyectamos el nuevo componente interactivo con control de stock operativo */}
+  {
+    /* 2. Inyectamos el nuevo componente interactivo con control de stock operativo */
+  }
   <div class="mt-4">
-    <InventoryDashboardTable client:load />
+    <InventoryDashboard client:load />
   </div>
 </InventoryLayout>
