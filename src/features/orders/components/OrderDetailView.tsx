@@ -4,6 +4,7 @@ import { getOrderById, reserveOrder } from "../services/ordersService";
 import OrderProductDetail from "./OrderProductDetail";
 import GridSpinner from "./GridSpinner";
 import LoadingMessage from "./LoadingMessage";
+import SellerRouteGuard from "../../seller/components/SellerRouteGuard";
 
 interface OrderDetailViewProps {
   orderId: string;
@@ -43,37 +44,43 @@ export default function OrderDetailView({ orderId }: OrderDetailViewProps) {
 
   if (loading) {
     return (
-      <div className="col-span-full flex justify-center items-center h-80 gap-x-5">
-        <GridSpinner />
-        <LoadingMessage text="Loading order" />
-      </div>
+      <SellerRouteGuard>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-32 min-h-screen flex justify-center items-center gap-x-5">
+          <GridSpinner />
+          <LoadingMessage text="Loading order" />
+        </div>
+      </SellerRouteGuard>
     );
   }
 
   if (error || !order) {
     return (
-      <section className="px-3 grid bg-bg-light grid-cols-[repeat(8,1fr)] min-[760px]:grid-cols-[repeat(16,1fr)] min-[960px]:grid-cols-[repeat(24,1fr)]">
-        <div className="col-span-full min-[960px]:col-start-4 min-[960px]:col-end-22 mt-16">
-          <p className="text-sm">Pedido no encontrado</p>
-          <a
-            href="/orders"
-            className="text-xs underline mt-4 inline-block"
-          >
-            Volver a pedidos
-          </a>
+      <SellerRouteGuard>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-32 min-h-screen">
+          <div className="mt-8">
+            <p className="text-sm text-text-light/80">Pedido no encontrado</p>
+            <a
+              href="/orders"
+              className="text-xs uppercase font-bold tracking-wider text-text-light/50 hover:text-text-light underline mt-4 inline-block transition-colors"
+            >
+              Volver a pedidos
+            </a>
+          </div>
         </div>
-      </section>
+      </SellerRouteGuard>
     );
   }
 
   return (
-    <section className="px-3 grid bg-bg-light grid-cols-[repeat(8,1fr)] min-[760px]:grid-cols-[repeat(16,1fr)] min-[960px]:grid-cols-[repeat(24,1fr)] pb-24">
-      <OrderProductDetail
-        order={order}
-        onBack={() => window.history.back()}
-        onReserve={handleReserve}
-        isReserving={isReserving}
-      />
-    </section>
+    <SellerRouteGuard>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-32 min-h-screen">
+        <OrderProductDetail
+          order={order}
+          onBack={() => window.history.back()}
+          onReserve={handleReserve}
+          isReserving={isReserving}
+        />
+      </div>
+    </SellerRouteGuard>
   );
 }
