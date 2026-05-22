@@ -54,18 +54,20 @@ function CartButton() {
   }, []);
 
   return (
-      <a href="/cart"
+      <a href="/carrito"
       aria-label={`Carrito, ${mounted ? totalUnits : 0} unidades`}
       className="relative transition-all text-text-light opacity-[0.60] hover:text-primary hover:opacity-100"
     >
       <ShoppingBag
         size={18}
-        className={isAnimating ? 'animate-bounce text-primary opacity-100' : ''}
+        className={`transition-all duration-300 ease-out ${
+          isAnimating ? 'text-primary opacity-100 scale-105' : ''
+        }`}
       />
       <span
         key={totalUnits}
-        className={`absolute -top-1 -right-1 text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold border border-primary bg-primary text-bg-dark transition-transform ${
-          isAnimating ? 'scale-125' : 'scale-100'
+        className={`absolute -top-1 -right-1 text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold border border-primary bg-primary text-bg-dark transition-transform duration-300 ease-out ${
+          isAnimating ? 'scale-110' : 'scale-100'
         }`}
       >
         {mounted ? (totalUnits > 99 ? '99+' : totalUnits) : 0}
@@ -90,8 +92,12 @@ export default function Navbar() {
         const unsub = onAuthStateChanged(auth, async (u) => {
             setUser(u);
             if (u) {
-                const userSnap = await getDoc(doc(db, 'users', u.uid));
-                setRoles(userSnap.exists() ? (userSnap.data().roles ?? []) : []);
+                try {
+                    const userSnap = await getDoc(doc(db, 'users', u.uid));
+                    setRoles(userSnap.exists() ? (userSnap.data().roles ?? []) : []);
+                } catch {
+                    setRoles([]);
+                }
             } else {
                 setRoles([]);
             }

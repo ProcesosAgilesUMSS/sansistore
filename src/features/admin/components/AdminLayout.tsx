@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import UserManagement from '../users/components/UserManagement.tsx';
 import CategoryList from '../categories/components/CategoryList.tsx';
+import OrderReceptionPanel from '../orders/components/OrderReceptionPanel.tsx';
 import DailySales from '../ventas/components/DailySales.tsx';
 import TopSellingProducts from '../ventas/top-products/components/TopSellingProducts.tsx';
 // ── HU #152: Parámetros del sistema ──
@@ -26,6 +27,7 @@ import SalesReport from '../analytics/components/SalesReport.tsx';
 
 type Section =
   | 'dashboard'
+  | 'pedidos'
   | 'usuarios'
   | 'categorias'
   | 'ventas-diarias'
@@ -64,9 +66,7 @@ export default function AdminLayout() {
         {
           label: 'Pedidos',
           icon: <ShoppingBag size={15} />,
-          section: null,
-          badge: 8,
-          disabled: true,
+          section: 'pedidos',
         },
       ],
     },
@@ -109,6 +109,7 @@ export default function AdminLayout() {
 
   const pageTitles: Record<string, { title: string; subtitle: string }> = {
     dashboard: { title: 'Dashboard', subtitle: 'Panel de administración' },
+    pedidos: { title: 'Pedidos', subtitle: 'Validación de recepción por comprador' },
     usuarios: { title: 'Gestión de usuarios', subtitle: 'Registra y administra usuarios' },
     categorias: { title: 'Categorías', subtitle: 'Gestiona las categorías de productos' },
     'ventas-diarias': { title: 'Ventas diarias', subtitle: 'Monitorea el rendimiento diario de ventas' },
@@ -306,14 +307,21 @@ export default function AdminLayout() {
               Dashboard principal — Próximamente
             </div>
           )}
-          {activeSection === 'usuarios' && <UserManagement />}
-          {activeSection === 'categorias' && <CategoryList />}
-          {activeSection === 'ventas-diarias' && <DailySales />}
-          {activeSection === 'mas-vendidos' && <TopSellingProducts />}
-          {/* ── HU #152: Parámetros del sistema ── */}
-          {activeSection === 'parametros' && <ConfigPanel />}
-          {/* ── HU #161: Reportes de ventas ── */}
-          {activeSection === 'reportes' && <SalesReport />}
+          {activeSection === 'usuarios' && (
+            <UserManagement />
+          )}
+          {activeSection === 'pedidos' && (
+            <OrderReceptionPanel />
+          )}
+          {activeSection === 'categorias' && (
+            <CategoryList />
+          )}
+          {activeSection === 'ventas-diarias' && (
+            <DailySales />
+          )}
+          {activeSection === 'mas-vendidos' && (
+            <TopSellingProducts />
+          )}
         </main>
 
       </div>

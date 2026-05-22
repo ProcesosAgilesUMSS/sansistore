@@ -14,6 +14,15 @@ export default function MyOrdersDashboard() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null); // Estado para la vista de detalle
   const [loading, setLoading] = useState(true);
 
+  const handleOrderConfirmed = (updatedOrder: Order) => {
+    setSelectedOrder(updatedOrder);
+    setOrders((currentOrders) =>
+      currentOrders.map((order) =>
+        order.id === updatedOrder.id ? updatedOrder : order
+      )
+    );
+  };
+
 useEffect(() => {
     if (authReady) {
       if (user) {
@@ -84,6 +93,7 @@ useEffect(() => {
           <OrderDetailsPanel 
             order={selectedOrder} 
             onBack={() => setSelectedOrder(null)} 
+            onOrderConfirmed={handleOrderConfirmed}
           />
         )
       ) : (

@@ -24,6 +24,8 @@ export interface Order {
   id: string;
   buyerId: string;
   status: OrderStatus;
+  buyerReceptionConfirmed?: boolean;
+  buyerReceptionConfirmedAt?: FirestoreDateLike;
   delivery: {
     destination: string;
   };

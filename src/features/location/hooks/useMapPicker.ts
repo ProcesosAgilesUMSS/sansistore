@@ -7,10 +7,9 @@ import { useSaveLocation } from "./useSaveLocation";
 import { useEditLocation } from "./useEditLocation"; 
 import type { Location } from "../types";
 
-// NUEVA PROPS: editingLocation (si viene, estamos editando)
 interface UseMapPickerProps {
     editingLocation?: Location | null;
-    onSuccess?: () => void; // para refrescar la lista después de editar
+    onSuccess?: () => void; 
 }
 
 export function useMapPicker({ editingLocation, onSuccess }: UseMapPickerProps = {}) {
@@ -45,7 +44,7 @@ export function useMapPicker({ editingLocation, onSuccess }: UseMapPickerProps =
             setType(editingLocation.type);
             validateLocation(editingLocation.lat, editingLocation.lng);
         }
-    }, [editingLocation]); // Solo se ejecuta cuando cambia editingLocation
+    }, [editingLocation]); 
 
     const handleLocationChange = (newLat: number, newLng: number) => {
         setLat(newLat);

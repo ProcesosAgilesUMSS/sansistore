@@ -912,7 +912,7 @@ function FeaturedProductsInner({
                           title="Agregar al carrito"
                           onClick={(e) => {
                             e.preventDefault();
-                            addToCart(product.id, product.stockAvailable ?? 0);
+                            addToCart(product.id, product.stockAvailable ?? 0, currentPrice);
                           }}
                           className="flex items-center justify-center rounded-full p-2.5 sm:p-3 transition-all active:scale-95 text-primary hover:scale-110 hover:drop-shadow-lg shrink-0 relative z-20"
                         >

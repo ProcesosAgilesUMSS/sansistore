@@ -16,6 +16,33 @@ const cartItemsData = [
         producto: Products.GALLETAS_VICTORIA,
         quantity: 1,
       },
+      {
+        cartItemId: 'cart-user-ana-3',
+        producto: Products.LECHE_DESCONTINUADA,
+        quantity: 1,
+      },
+      {
+        cartItemId: 'cart-user-ana-4',
+        producto: Products.CHOCOLATE_SIN_STOCK,
+        quantity: 2,
+      },
+      {
+        cartItemId: 'cart-user-ana-5',
+        producto: Products.AZUCAR_DESHABILITADO,
+        quantity: 3,
+      },
+      {
+        cartItemId: 'cart-user-ana-6',
+        producto: Products.REFRESCO_PRECIO_SUBIO,
+        quantity: 2,
+        priceAtAdd: 12,
+      },
+      {
+        cartItemId: 'cart-user-ana-7',
+        producto: Products.PAN_PRECIO_BAJO,
+        quantity: 1,
+        priceAtAdd: 15,
+      },
     ],
   },
   {
@@ -46,6 +73,33 @@ const cartItemsData = [
         producto: Products.GALLETAS_VICTORIA,
         quantity: 1,
       },
+      {
+        cartItemId: 'cart-user-juan-3',
+        producto: Products.LECHE_DESCONTINUADA,
+        quantity: 1,
+      },
+      {
+        cartItemId: 'cart-user-juan-4',
+        producto: Products.CHOCOLATE_SIN_STOCK,
+        quantity: 2,
+      },
+      {
+        cartItemId: 'cart-user-juan-5',
+        producto: Products.AZUCAR_DESHABILITADO,
+        quantity: 3,
+      },
+      {
+        cartItemId: 'cart-user-juan-6',
+        producto: Products.REFRESCO_PRECIO_SUBIO,
+        quantity: 2,
+        priceAtAdd: 12,
+      },
+      {
+        cartItemId: 'cart-user-juan-7',
+        producto: Products.PAN_PRECIO_BAJO,
+        quantity: 1,
+        priceAtAdd: 15,
+      },
     ],
   },
 ];
@@ -72,18 +126,23 @@ export async function run({ db }) {
 
   for (const entry of cartItemsData) {
     for (const item of entry.items) {
+      const payload = {
+        cartItemId: item.cartItemId,
+        userId: entry.user.uid,
+        productId: item.producto.slug,
+        quantity: item.quantity,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      };
+      if (typeof item.priceAtAdd === 'number') {
+        payload.priceAtAdd = item.priceAtAdd;
+      }
+
       await firestore
         .collection('users')
         .doc(entry.user.uid)
         .collection('cartItems')
         .doc(item.cartItemId)
-        .set({
-          cartItemId: item.cartItemId,
-          userId: entry.user.uid,
-          productId: item.producto.slug,
-          quantity: item.quantity,
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
+        .set(payload);
 
       console.log(`  ✓ users/${entry.user.uid}/cartItems/${item.cartItemId}`);
     }
