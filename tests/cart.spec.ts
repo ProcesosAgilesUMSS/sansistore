@@ -242,27 +242,27 @@ test.describe('Cart - Carrito', () => {
     const emailField = page.getByLabel('Correo electrónico');
     const passwordField = page.locator('#password');
 
+    // Fill right before clicking to minimize autofill interference window
+    await emailField.fill(email);
+    await passwordField.fill('password123');
+
+    // Retry if autofill overwrites the values
     for (let attempt = 0; attempt < 3; attempt++) {
+      const currentEmail = await emailField.inputValue();
+      const currentPass = await passwordField.inputValue();
+      if (currentEmail === email && currentPass === 'password123') break;
       await emailField.fill(email);
       await passwordField.fill('password123');
-      await page.waitForTimeout(250);
-
-      if (
-        (await emailField.inputValue()) === email &&
-        (await passwordField.inputValue()) === 'password123'
-      ) {
-        break;
-      }
+      await page.waitForTimeout(150);
     }
 
-    await expect(emailField).toHaveValue(email, { timeout: 10_000 });
-    await expect(passwordField).toHaveValue('password123', { timeout: 10_000 });
     await page
       .locator('form')
       .getByRole('button', { name: 'Iniciar sesión', exact: true })
       .click();
     await expect(page).toHaveURL('/me', { timeout: 30_000 });
   }
+
 
   async function expectCartPage(page: Page) {
     await expect(page).toHaveTitle(/Mi Carrito \| SansiStore/);
