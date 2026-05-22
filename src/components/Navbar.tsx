@@ -276,7 +276,7 @@ export default function Navbar() {
                         <a
                           role="menuitem"
                           href="/edit-profile"
-                          className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light dark:text-[#F5F3EF] opacity-70 transition-colors hover:bg-border-light/40 hover:text-primary hover:opacity-100"
+                          className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light opacity-70 transition-colors hover:bg-border-light/40 hover:text-primary hover:opacity-100"
                         >
                           <Settings size={14} />
                           Editar Datos Personales
