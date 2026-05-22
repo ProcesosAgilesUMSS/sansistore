@@ -2,35 +2,43 @@
 // src/pages/inventory/movements.astro
 import InventoryLayout from '../../layouts/InventoryLayout.astro';
 import { OrderDispatch } from '../../features/inventory/components/OrderDispatch.tsx';
+import { WarehouseHandover } from '../../features/inventory/components/WarehouseHandover.tsx';
 import { StockMovementForm } from '../../features/inventory/components/StockMovementForm.tsx';
 import { MovementHistory } from '../../features/inventory/components/MovementHistory.tsx';
 ---
 
 <InventoryLayout title="Sansistore | Movimientos">
-  <div class="flex items-center justify-between mb-8">
-    <h1 class="font-['Outfit'] font-black text-2xl tracking-tight text-(--theme-text)">
-      Gestión de <span class="text-primary">Movimientos</span>
-    </h1>
-  </div>
+  
 
-  <OrderDispatch client:load />
-
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mt-8 pt-8 border-t border-(--theme-border)/50">
+  <section class="mb-8">
+    <div class="mb-4">
     
-    <div class="lg:col-span-7">
-      <div class="mb-4">
-        <h3 class="font-['Outfit'] font-bold text-lg text-(--theme-text)">Operaciones Manuales</h3>
-        <p class="text-xs opacity-60 text-(--theme-text)">Usa esto solo para abastecimiento de proveedores o ajustes de mermas.</p>
-      </div>
-      <StockMovementForm client:load />
+      <h2 class="font-['Outfit'] font-black text-2xl tracking-tight text-(--theme-text)">
+      Gestión de <span class="text-primary">Despachos</span>
+      </h2>
+      <p class="text-xs opacity-60 text-(--theme-text)">Preparación de paquetes y entrega física a mostrador.</p>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+      <OrderDispatch client:load />
+      <WarehouseHandover client:load />
+    </div>
+  </section>
+
+  <hr class="border-(--theme-border)/50 my-10" />
+
+  <section>
+    <div class="mb-4">
+      
+      <h2 class="font-['Outfit'] font-black text-2xl tracking-tight text-(--theme-text)">
+      Control de <span class="text-primary">Inventario</span>
+      </h2>
+      <p class="text-xs opacity-60 text-(--theme-text)">Usa esto solo para abastecimiento de proveedores o ajustes de mermas.</p>
     </div>
 
-    <div class="lg:col-span-5">
-      <div class="mb-4">
-        <h3 class="font-['Outfit'] font-bold text-lg text-(--theme-text) opacity-0 hidden lg:block">_</h3>
-      </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+      <StockMovementForm client:load />
       <MovementHistory client:load />
     </div>
-
-  </div>
+  </section>
 </InventoryLayout>

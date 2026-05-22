@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { collection, query, where, onSnapshot, getDocs, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
-import { PackageSearch, PackageCheck, AlertCircle, CheckCircle2, Play, X, ListFilter } from 'lucide-react';
+import { SendToBack, CheckCircle2, AlertCircle, X, ListFilter, User } from 'lucide-react';
 
 interface OrderItem {
   productId: string;
-  productName: string; // Mapeado exactamente como está en tu Firestore
+  productName: string;
   quantity: number;
 }
 
@@ -17,31 +17,31 @@ interface Order {
   date?: any;
 }
 
-export const OrderDispatch: React.FC = () => {
+export const WarehouseHandover: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   
-  // Estado para el control del modal de empaque
+  // Estado para controlar el modal de entrega en mostrador
   const [activeOrderForModal, setActiveOrderForModal] = useState<Order | null>(null);
 
   useEffect(() => {
-    // Escuchar pedidos con estado RESERVADO y PENDIENTE
-    const q = query(collection(db, 'orders'), where('status', 'in', ['RESERVADO', 'PENDIENTE']));
+    // Escuchar únicamente los pedidos en estado EMPAQUETADO
+    const q = query(collection(db, 'orders'), where('status', '==', 'EMPAQUETADO'));
     
     const unsubscribe = onSnapshot(q, async (snapshot) => {
       const fetchedOrders = await Promise.all(snapshot.docs.map(async (orderDoc) => {
         const orderData = orderDoc.data();
         
-        // Consultar la subcolección orderItems
+        // Consultar la subcolección orderItems del pedido
         const itemsSnap = await getDocs(collection(db, 'orders', orderDoc.id, 'orderItems'));
         const items = itemsSnap.docs.map(itemDoc => {
           const itemData = itemDoc.data();
           return {
             productId: itemData.productId || itemDoc.id, 
-            productName: itemData.productName || 'Producto sin nombre', // Corregido a productName
+            productName: itemData.productName || 'Producto sin nombre',
             quantity: itemData.quantity || 1
           };
         });
@@ -53,59 +53,31 @@ export const OrderDispatch: React.FC = () => {
         } as Order;
       }));
 
-      // Ordenar para que los PENDIENTE salgan primero en la lista
-      const sortedOrders = fetchedOrders.sort((a, b) => {
-        if (a.status === 'PENDIENTE' && b.status === 'RESERVADO') return -1;
-        if (a.status === 'RESERVADO' && b.status === 'PENDIENTE') return 1;
-        return 0;
-      });
-
-      setOrders(sortedOrders);
+      setOrders(fetchedOrders);
       setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
 
-  // Función para cambiar de RESERVADO -> PENDIENTE y abrir el modal inmediatamente
-  const handleStartPicking = async (order: Order) => {
-    setProcessingId(order.id);
-    setError('');
-    try {
-      const orderRef = doc(db, 'orders', order.id);
-      await updateDoc(orderRef, { 
-        status: 'PENDIENTE',
-        warehouseStartedAt: serverTimestamp() 
-      });
-      
-      // Abre el modal automáticamente cambiando el estado local de forma síncrona
-      setActiveOrderForModal({
-        ...order,
-        status: 'PENDIENTE'
-      });
-    } catch (err: any) {
-      setError('Error al iniciar la preparación del pedido.');
-    } finally {
-      setProcessingId(null);
-    }
-  };
-
-  // Función para cambiar de PENDIENTE -> EMPAQUETADO y cerrar el modal
-  const handleFinishPacking = async (orderId: string) => {
+  // Función para pasar de EMPAQUETADO -> LISTO (Despacho físico en mostrador)
+  const handleHandover = async (orderId: string) => {
     setProcessingId(orderId);
     setError('');
     try {
       const orderRef = doc(db, 'orders', orderId);
-      await updateDoc(orderRef, { 
-        status: 'EMPAQUETADO',
-        warehouseFinishedAt: serverTimestamp()
-      });
       
-      setActiveOrderForModal(null); // Cierra el modal tras el éxito
-      setSuccess(`Pedido #${orderId.slice(-5).toUpperCase()} empaquetado y listo para el vendedor.`);
+      // CORRECCIÓN: No creamos campos redundantes, solo actualizamos el estado y guardamos la hora exacta
+      await updateDoc(orderRef, { 
+        status: 'LISTO',
+        horaDespacho: serverTimestamp() // Registra el momento exacto del recojo físico
+      });
+
+      setActiveOrderForModal(null);
+      setSuccess(`Pedido #${orderId.slice(-5).toUpperCase()} entregado físicamente con éxito.`);
       setTimeout(() => setSuccess(''), 4000);
     } catch (err: any) {
-      setError('Error al marcar el pedido como empaquetado.');
+      setError('Error al registrar la entrega del pedido.');
     } finally {
       setProcessingId(null);
     }
@@ -117,12 +89,12 @@ export const OrderDispatch: React.FC = () => {
     <>
       <div className="bg-(--theme-card-bg) border border-(--theme-border) rounded-3xl p-6 shadow-sm h-full flex flex-col">
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-primary/10 rounded-xl text-primary">
-            <PackageSearch className="w-6 h-6" />
+          <div className="p-2 bg-purple-500/10 rounded-xl text-purple-500">
+            <SendToBack className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="font-['Outfit'] font-bold text-lg text-(--theme-text)">Pedidos a Empacar</h2>
-            <p className="text-xs opacity-60 text-(--theme-text)">Busca, empaca y prepara los pedidos reservados</p>
+            <h2 className="font-['Outfit'] font-bold text-lg text-(--theme-text)">Pedidos a Entregar</h2>
+            <p className="text-xs opacity-60 text-(--theme-text)">Registra la entrega física de los paquetes listos a sus respectivos vendedores</p>
           </div>
         </div>
 
@@ -142,8 +114,8 @@ export const OrderDispatch: React.FC = () => {
 
         {orders.length === 0 ? (
           <div className="text-center py-12 flex-grow flex flex-col justify-center border-2 border-dashed border-(--theme-border) rounded-2xl opacity-50">
-            <p className="font-bold text-(--theme-text)">No hay tareas pendientes en almacén</p>
-            <p className="text-sm text-(--theme-text) opacity-60">No hay pedidos reservados ni en proceso de empaque.</p>
+            <p className="font-bold text-(--theme-text)">No hay empaques esperando recojo</p>
+            <p className="text-sm text-(--theme-text) opacity-60">Todos los pedidos empaquetados ya fueron entregados.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 overflow-y-auto pr-2">
@@ -154,49 +126,38 @@ export const OrderDispatch: React.FC = () => {
                     <span className="text-xs font-mono bg-blue-500/20 text-blue-500 px-2 py-1 rounded-md font-bold">
                       #{order.id.slice(-6).toUpperCase()}
                     </span>
-                    <span className={`text-xs font-bold px-2 py-1 rounded-md ${
-                      order.status === 'PENDIENTE' ? 'bg-amber-500/20 text-amber-500' : 'bg-zinc-500/20 text-zinc-500'
-                    }`}>
-                      {order.status}
+                    <span className="text-xs font-bold px-2 py-1 rounded-md bg-purple-500/20 text-purple-500">
+                      EMPAQUETADO
                     </span>
                   </div>
-                  <h3 className="font-bold text-sm text-(--theme-text)">Vendedor: {order.sellerId || 'Desconocido'}</h3>
-                  <p className="text-xs text-(--theme-text) opacity-50 mt-1">
-                    Contiene {order.items.reduce((acc, item) => acc + item.quantity, 0)} unidades de productos.
+                  <div className="flex items-center gap-2 text-sm text-(--theme-text)">
+                    <User className="w-4 h-4 opacity-50" />
+                    <span className="font-bold">Asignado a: {order.sellerId || 'Sin vendedor'}</span>
+                  </div>
+                  <p className="text-xs text-(--theme-text) opacity-50 mt-1 pl-6">
+                    Total productos: {order.items.reduce((acc, item) => acc + item.quantity, 0)} unidades.
                   </p>
                 </div>
-                
-                {/* BOTONES DE ACCIÓN PRINCIPAL */}
-                {order.status === 'RESERVADO' ? (
-                  <button
-                    onClick={() => handleStartPicking(order)}
-                    disabled={processingId === order.id}
-                    className="w-full bg-(--theme-border) hover:bg-primary/20 text-(--theme-text) py-2.5 rounded-xl text-sm font-bold transition-all duration-200 active:scale-[0.98] flex justify-center items-center gap-2 disabled:opacity-50 border border-(--theme-border)"
-                  >
-                    <Play className="w-4 h-4 text-primary" />
-                    {processingId === order.id ? 'Iniciando...' : 'EMPEZAR A BUSCAR'}
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => setActiveOrderForModal(order)}
-                    className="w-full bg-primary text-(--theme-bg) py-2.5 rounded-xl text-sm font-bold transition-all duration-200 hover:brightness-110 active:scale-[0.98] flex justify-center items-center gap-2"
-                  >
-                    <ListFilter className="w-4 h-4" />
-                    VER LISTA / EMPACAR
-                  </button>
-                )}
+
+                <button
+                  onClick={() => setActiveOrderForModal(order)}
+                  className="w-full bg-purple-500 text-white py-2.5 rounded-xl text-sm font-bold transition-all duration-200 hover:bg-purple-600 active:scale-[0.98] flex justify-center items-center gap-2"
+                >
+                  <ListFilter className="w-4 h-4" />
+                  REVISAR Y ENTREGAR
+                </button>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* MODAL DE CONTEO Y EMPAQUE (Estilo exacto de tu ProductModal) */}
+      {/* MODAL DE DESPACHO / TRASPASO EN MOSTRADOR */}
       {activeOrderForModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-center items-center p-4">
           <div className="bg-(--theme-card-bg) border border-(--theme-border) rounded-3xl shadow-2xl max-w-md w-full p-7 relative animate-in fade-in zoom-in duration-200 max-h-[90vh] flex flex-col">
             
-            {/* Botón X de cerrar */}
+            {/* Botón X para Cancelar / Cerrar */}
             <button
               onClick={() => setActiveOrderForModal(null)}
               className="absolute top-4 right-4 w-9 h-9 rounded-full bg-(--theme-secondary-bg) border border-(--theme-border) flex items-center justify-center text-(--theme-text) opacity-60 hover:opacity-100 transition"
@@ -209,16 +170,16 @@ export const OrderDispatch: React.FC = () => {
                 #{activeOrderForModal.id.slice(-6).toUpperCase()}
               </span>
               <h2 className="font-['Outfit'] font-black text-xl text-(--theme-text) mt-2 mb-1">
-                Recolección de Pedido
+                Verificación de Despacho
               </h2>
               <p className="text-xs text-(--theme-text) opacity-50">
-                Verifica físicamente los productos listados antes de empaquetar la caja.
+                Confirma los artículos dentro del paquete antes de entregárselo a **{activeOrderForModal.sellerId || 'su vendedor'}**.
               </p>
             </div>
 
-            {/* Lista escaneable de productos con scroll interno */}
+            {/* Lista interna con scroll para evitar desborde de UI si el pedido es enorme */}
             <div className="flex-grow overflow-y-auto my-2 pr-1 space-y-2 max-h-[45vh]">
-              <p className="text-[10px] text-(--theme-text) opacity-50 font-bold uppercase tracking-wider mb-1">Lista de verificación</p>
+              <p className="text-[10px] text-(--theme-text) opacity-50 font-bold uppercase tracking-wider mb-1">Contenido de la Caja</p>
               
               {activeOrderForModal.items.map((item, idx) => (
                 <div 
@@ -227,14 +188,14 @@ export const OrderDispatch: React.FC = () => {
                 >
                   <div className="flex-1 pr-3">
                     <p className="font-['Outfit'] font-bold text-sm text-(--theme-text) line-clamp-2">
-                      {item.productName} {/* Campo corregido según tu db */}
+                      {item.productName}
                     </p>
                     <p className="text-[11px] font-mono text-(--theme-text) opacity-40 mt-0.5">
                       ID: {item.productId}
                     </p>
                   </div>
                   <div className="text-right shrink-0">
-                    <span className="font-['Outfit'] font-black bg-primary/10 text-primary px-3 py-1.5 rounded-xl text-sm">
+                    <span className="font-['Outfit'] font-black bg-purple-500/10 text-purple-500 px-3 py-1.5 rounded-xl text-sm">
                       x{item.quantity}
                     </span>
                   </div>
@@ -242,7 +203,18 @@ export const OrderDispatch: React.FC = () => {
               ))}
             </div>
 
-            {/* Botonera de control inferior idéntica a tu estándar */}
+            {/* Información del Receptor */}
+            <div className="mt-2 p-3 bg-purple-500/5 border border-purple-500/10 rounded-2xl flex items-center gap-3">
+              <div className="p-2 bg-purple-500/10 rounded-xl text-purple-500">
+                <User className="w-4 h-4" />
+              </div>
+              <div>
+                <p className="text-[10px] uppercase font-bold tracking-wider opacity-50 text-(--theme-text)">Vendedor de Destino</p>
+                <p className="text-sm font-bold text-(--theme-text)">{activeOrderForModal.sellerId || 'No especificado'}</p>
+              </div>
+            </div>
+
+            {/* Botonera de Control Inferior */}
             <div className="pt-4 flex gap-3 border-t border-(--theme-border)/50 mt-4">
               <button
                 type="button"
@@ -254,11 +226,11 @@ export const OrderDispatch: React.FC = () => {
               <button
                 type="button"
                 disabled={processingId === activeOrderForModal.id}
-                onClick={() => handleFinishPacking(activeOrderForModal.id)}
-                className="flex-[1.3] px-4 py-3 rounded-2xl bg-primary text-(--theme-bg) font-['Outfit'] font-bold text-sm shadow-lg shadow-primary/20 hover:brightness-110 disabled:opacity-50 transition-all flex justify-center items-center gap-1"
+                onClick={() => handleHandover(activeOrderForModal.id)}
+                className="flex-[1.3] px-4 py-3 rounded-2xl bg-purple-500 text-white font-['Outfit'] font-bold text-sm shadow-lg shadow-purple-500/20 hover:brightness-110 disabled:opacity-50 transition-all flex justify-center items-center gap-1"
               >
-                <PackageCheck className="w-4 h-4" />
-                {processingId === activeOrderForModal.id ? 'Guardando...' : 'EMPAQUETADO'}
+                <CheckCircle2 className="w-4 h-4" />
+                {processingId === activeOrderForModal.id ? 'Despachando...' : 'ENTREGAR A VENDEDOR'}
               </button>
             </div>
 
