@@ -41,21 +41,7 @@ export default function LocationCard({
                 {TYPE_ICONS[type]}
             </div>
 
-            <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                    <span className="font-outfit text-sm font-extrabold leading-none text-(--theme-text) transition-colors duration-300">
-                        {type}
-                    </span>
-                </div>
-
-                <p className="mt-1 font-inter text-[10px] font-bold uppercase tracking-widest text-[#88B04B]">
-                    {label}
-                </p>
-
-                <p className="mt-0.5 font-mono text-[11px] tabular-nums text-(--theme-text)/60 transition-colors duration-300">
-                    {lat.toFixed(4)}, {lng.toFixed(4)}
-                </p>
-            </div>
+            
 
             <div className="flex items-center gap-1">
                 <button
