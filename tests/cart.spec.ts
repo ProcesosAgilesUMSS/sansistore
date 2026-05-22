@@ -261,7 +261,7 @@ test.describe('Cart - Carrito', () => {
       .locator('form')
       .getByRole('button', { name: 'Iniciar sesión', exact: true })
       .click();
-    await expect(page).toHaveURL('/', { timeout: 30_000 });
+    await expect(page).toHaveURL('/me', { timeout: 30_000 });
   }
 
   async function expectCartPage(page: Page) {
