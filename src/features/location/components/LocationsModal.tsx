@@ -13,6 +13,7 @@ interface LocationsModalProps {
     onClose: () => void;
     onConfirm: (location: Location) => void;
     onAddNew: () => void;
+    onEdit: (location: Location) => void; 
 }
 
 export default function LocationsModal({
@@ -22,7 +23,8 @@ export default function LocationsModal({
     initialSelectedId,
     onClose,
     onConfirm,
-    onAddNew
+    onAddNew,
+    onEdit
 }: LocationsModalProps) {
     const [selectedId, setSelectedId] = useState<string | null>(initialSelectedId ?? null);
 
@@ -81,6 +83,7 @@ export default function LocationsModal({
                                 onSelect={setSelectedId}
                                 onDelete={handleDelete}
                                 onSetDefault={(id) => handleSetDefault(userId, id)}
+                                onEdit={onEdit}
                             />
                         ))
                     )}

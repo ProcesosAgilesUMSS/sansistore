@@ -15,6 +15,7 @@ import {
 import {
   backfillCourierOrderCodes,
   markOrderAsDelivered,
+  registerPayment,
   subscribeToCourierOrders,
 } from '../services/courierOrdersService';
 import type { CourierDashboardStats, CourierOrder } from '../types';
@@ -60,19 +61,23 @@ function OrderDetailView({
   selectedItemsCount,
   selectedOrderHasValidAmount,
   updatingOrderId,
+  updatingPaymentId,
   pageClassName,
   onBack,
   onOpenMaps,
   onMarkDelivered,
+  onRegisterPayment,
 }: {
   selectedOrder: CourierOrder;
   selectedItemsCount: number;
   selectedOrderHasValidAmount: boolean;
   updatingOrderId: string;
+  updatingPaymentId: string;
   pageClassName: string;
   onBack: () => void;
   onOpenMaps: (order: CourierOrder) => void;
   onMarkDelivered: (order: CourierOrder) => Promise<void>;
+  onRegisterPayment: (order: CourierOrder) => Promise<void>;
 }) {
   return (
     <section className={pageClassName}>
@@ -299,8 +304,20 @@ function OrderDetailView({
             </div>
 
             <div className="mt-4 space-y-3">
-              <button type="button" disabled className={`w-full ${ghostButtonClass}`}>
-                Registrar pago
+              <button
+                type="button"
+                onClick={() => onRegisterPayment(selectedOrder)}
+                disabled={
+                  selectedOrder.paymentStatus === 'Cobrado' ||
+                  updatingPaymentId === selectedOrder.id
+                }
+                className={`w-full ${ghostButtonClass}`}
+              >
+                {updatingPaymentId === selectedOrder.id ? (
+                  <LoaderCircle className="h-4 w-4 animate-spin" />
+                ) : (
+                  'Registrar pago'
+                )}
               </button>
               <p className="text-xs font-semibold text-text-light opacity-55">
                 El monto a cobrar es de solo lectura en esta vista.
@@ -309,7 +326,9 @@ function OrderDetailView({
                 type="button"
                 onClick={() => onMarkDelivered(selectedOrder)}
                 disabled={
-                  updatingOrderId === selectedOrder.id || !selectedOrderHasValidAmount
+                  updatingOrderId === selectedOrder.id || 
+                  !selectedOrderHasValidAmount ||
+                  selectedOrder.paymentStatus !== 'Cobrado'
                 }
                 className={`w-full ${primaryButtonClass}`}
               >
@@ -336,6 +355,7 @@ export default function CourierDashboard({ embedded = false }: { embedded?: bool
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [updatingOrderId, setUpdatingOrderId] = useState('');
+  const [updatingPaymentId, setUpdatingPaymentId] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -370,12 +390,50 @@ export default function CourierDashboard({ embedded = false }: { embedded?: bool
     [orders]
   );
 
+  const handleRegisterPayment = async (order: CourierOrder) => {
+    if (order.paymentStatus === 'Cobrado') {
+      setErrorMessage('Este pedido ya fue cobrado');
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Confirmar cobro de ${formatMoney(order.total)} del pedido ${order.orderCode}`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setErrorMessage('');
+      setSuccessMessage('');
+      setUpdatingPaymentId(order.id);
+      await registerPayment(order);
+      setSuccessMessage('Pago registrado correctamente');
+      
+      if (selectedOrder?.id === order.id) {
+        setSelectedOrder({
+          ...selectedOrder,
+          paymentStatus: 'Cobrado',
+          paymentStatusLabel: 'Cobrado',
+        });
+      }
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'No se pudo registrar el pago');
+    } finally {
+      setUpdatingPaymentId('');
+    }
+  };
+
   const handleMarkDelivered = async (order: CourierOrder) => {
     const blockedStatuses = ['Entregado', 'Cancelado', 'No entregado'];
 
     if (blockedStatuses.includes(order.status)) {
       setSuccessMessage('');
       setErrorMessage('No se puede marcar como entregado un pedido con ese estado.');
+      return;
+    }
+
+    if (order.paymentStatus !== 'Cobrado') {
+      setErrorMessage('Debe registrar el pago antes de marcar como entregado.');
       return;
     }
 
@@ -437,10 +495,12 @@ export default function CourierDashboard({ embedded = false }: { embedded?: bool
         selectedItemsCount={selectedItemsCount}
         selectedOrderHasValidAmount={selectedOrderHasValidAmount}
         updatingOrderId={updatingOrderId}
+        updatingPaymentId={updatingPaymentId}
         pageClassName={getPageClass(embedded)}
         onBack={() => setSelectedOrder(null)}
         onOpenMaps={handleOpenMaps}
         onMarkDelivered={handleMarkDelivered}
+        onRegisterPayment={handleRegisterPayment}
       />
     );
   }
@@ -619,8 +679,24 @@ export default function CourierDashboard({ embedded = false }: { embedded?: bool
                             </button>
                             <button
                               type="button"
+                              onClick={() => handleRegisterPayment(order)}
+                              disabled={order.paymentStatus === 'Cobrado' || updatingPaymentId === order.id}
+                              className={ghostButtonClass}
+                            >
+                              {updatingPaymentId === order.id ? (
+                                <LoaderCircle className="h-4 w-4 animate-spin" />
+                              ) : (
+                                'Registrar pago'
+                              )}
+                            </button>
+                            <button
+                              type="button"
                               onClick={() => handleMarkDelivered(order)}
-                              disabled={updatingOrderId === order.id || !hasValidAmount}
+                              disabled={
+                                updatingOrderId === order.id || 
+                                !hasValidAmount ||
+                                order.paymentStatus !== 'Cobrado'
+                              }
                               className={primaryButtonClass}
                             >
                               {updatingOrderId === order.id ? (

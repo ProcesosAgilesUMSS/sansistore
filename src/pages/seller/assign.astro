@@ -1,14 +1,8 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+import SellerLayout from '../../layouts/SellerLayout.astro';
 import AssignOrdersPanel from '../../features/seller/components/AssignOrdersPanel';
-import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
 ---
 
-<Layout title="Asignar mensajeros">
-  <Navbar client:load />
-  <main class="pt-16 md:pt-20">
-    <AssignOrdersPanel client:load />
-  </main>
-  <Footer client:load />
-</Layout>
+<SellerLayout title="Asignar mensajeros">
+  <AssignOrdersPanel client:load embedded />
+</SellerLayout>

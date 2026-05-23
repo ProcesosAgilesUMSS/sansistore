@@ -199,3 +199,61 @@
 - **Yesterday:** Seleccione una historia de usuario.
 - **Today:** Definiré todo lo respecto a la historia de usuario
 - **Blockers:** None.
+
+## 19-05-2026
+
+### José Daniel Virreira Rufino
+
+- **Yesterday:** Estuve en contacto con el grupo de WebSpire para trabajar en las dependencias de nuestras historias de usuario.
+- **Today:** Trabajaré con el mapa ya implementado por el grupo de DivinityMinds para mi historia de usuario asignada.
+- **Blockers:** Entender la funcionalidad completa del mapa ya implementado.
+
+### Efrain Peralta Felipe
+
+- **Yesterday:** Estuve en contacto con el grupo de WebSpire para hablar sobre una hu que es igual a la que hicieron en el primer sprint.
+- **Today:** Trabajare en la hu de reasignar mensajero.
+- **Blockers:** None.
+
+### Adrian Said Andrade Medina
+- **Yesterday:** Investigué sobre el framework Leaflet para la implementación de mapas.
+- **Today:** Planeo practicar con el framework antes de comenzar la implementación.
+- **Blockers:** None.
+
+### Jhoel Gustavo Aiza Arce
+
+- **Yesterday:** Investigación y análisis de la arquitectura del módulo de pagos para la HU #101, planificando cómo estructurar el flujo de datos y la interfaz de confirmación de cobro.
+- **Today:** Inicio del desarrollo de la HU #101 para el registro de pago del cliente. Trabajando en el maquetado inicial del componente y en el planteamiento de la lógica para actualizar el estado del pedido, continuando con el proceso de implementación.
+- **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+
+- **Yesterday:** Tambien investigué sobre el framework Leaflet para la implementación de mapas para el uso de rutas.
+- **Today:** Continue con el desarrollo de la HU 108 para la visualizacion de rutas de entrega
+- **Blockers:** None.
+
+## 21-05-2026
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Mantuve contacto con miembros de los equipos SoftwareOne, Flow y WebSpire, con el fin de tratar las historias de usuario en las que tenemos dependencias mutuas. Mantuvimos contacto para aclarar dudas sobre cómo debemos trabajar.
+- **Today:** Terminar la funcionalidad de las historias de usuario asignadas a mi persona para este segundo sprint (la funcionalidad del mensajero ubicando pedido en el mapa).
+- **Blockers:** None.
+
+### Efrain Peralta Felipe
+- **Yesterday:** Termine la hu que se me asigno.
+- **Today:** corregir posibles errores por la integración.
+- **Blockers:** None.
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday:** Implementación completa de la HU #101 "registrar pago como mensajero", separando la lógica de pago de la entrega. Se habilitó el botón "Registrar pago" en el dashboard del mensajero, con validaciones para no entregar sin pagar. Se creó el PR #326 para revisión del equipo.
+- **Today:** Esperar la aprobación del PR #326 y estar atento a cualquier feedback o corrección solicitada por el equipo para proceder con el merge.
+- **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+- **Yesterday:** Continue trabajando con la implementacion de la HU #108 y preveo terminarla para el final del día.
+- **Today:** Terminar la HU #108 e integrarla correctamente
+- **Blockers:** Leves retrasos por la dependencia de mi HU #108 con la HU #105
+
+### Adrian Said Andrade Medina
+- **Yesterday:** Avancé con la implementación del mapa para la visualización de la ubicación de entrega, revisando límites del área navegable y ajustes de coordenadas con Leaflet.
+- **Today:** Continuaré corrigiendo detalles de integración del mapa y validando que la funcionalidad funcione correctamente dentro del flujo del mensajero.
+- **Blockers:** Dudas puntuales sobre ajustes de Leaflet y manejo de coordenadas.

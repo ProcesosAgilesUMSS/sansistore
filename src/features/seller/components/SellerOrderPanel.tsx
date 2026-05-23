@@ -5,7 +5,7 @@ import { ConfirmModal } from './ConfirmModal';
 import { OrderCard } from './OrderCard';
 import { SectionHeader } from './SectionHeader';
 
-export default function SellerOrdersPanel() {
+export default function SellerOrdersPanel({ embedded = false }: { embedded?: boolean }) {
   const {
     reserved,
     ready,
@@ -35,11 +35,8 @@ export default function SellerOrdersPanel() {
 
   const handleCancel = () => setPendingOrder(null);
 
-  console.log('Reserved Orders:', reserved);
-  console.log('Ready Orders:', ready);
-
   return (
-    <div className="min-h-screen bg-(--theme-bg) px-4 pb-10 pt-10 md:px-8 xl:px-10">
+    <div className={embedded ? 'min-w-0' : 'min-h-screen bg-(--theme-bg) px-4 pb-10 pt-10 md:px-8 xl:px-10'}>
       {pendingOrder && (
         <ConfirmModal
           onConfirm={handleConfirm}
@@ -49,22 +46,15 @@ export default function SellerOrdersPanel() {
       )}
 
       <header className="mb-8 rounded-[1.75rem] border border-(--theme-border) bg-(--theme-card-bg) px-6 py-6 shadow-sm backdrop-blur-sm">
-        <p
-          className="mb-3 text-xs font-800 uppercase tracking-[0.25em]"
-          style={{ color: 'var(--color-primary)' }}
-        >
-          Panel del vendedor
-        </p>
-
         <h1
           className="text-3xl font-900 leading-tight text-(--theme-text) md:text-4xl"
           style={{ fontFamily: 'Outfit, sans-serif' }}
         >
-          Pedidos para entrega
+          Pedidos Empaquetados
         </h1>
 
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-(--theme-text) opacity-70 md:text-base">
-          Revisa y prepara los pedidos confirmados
+          Revisa y prepara los pedidos empaquetados
           antes de su asignación a mensajeros.
         </p>
       </header>
@@ -110,7 +100,7 @@ export default function SellerOrdersPanel() {
         <div className="grid gap-6 xl:grid-cols-2">
           <section className="rounded-3xl border border-(--theme-border) bg-(--theme-card-bg) p-5 shadow-sm">
             <SectionHeader
-              title="Reservados"
+              title="Empaquetados"
               count={reserved.length}
             />
 
@@ -165,7 +155,7 @@ export default function SellerOrdersPanel() {
 
           <section className="rounded-3xl border border-(--theme-border) bg-(--theme-card-bg) p-5 shadow-sm">
             <SectionHeader
-              title="Listos para entrega"
+              title="Listos para asignar a mensajero"
               count={ready.length}
             />
 
@@ -207,8 +197,6 @@ export default function SellerOrdersPanel() {
                       itemsLoading &&
                       expandedOrderId === order.orderId
                     }
-                    title="Asignar a mensajero"
-                    onClick={() => { window.location.href = '/seller/assign'; }}
                     onToggle={toggleOrderDetail}
                     isMarking={false}
                     isSuccess={false}
@@ -219,6 +207,14 @@ export default function SellerOrdersPanel() {
           </section>
         </div>
       )}
+      <div className="mt-6 text-end mr-3">
+        <a
+          href="/seller/assign"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-700 text-white transition hover:opacity-90"
+        >
+          ir a asignar mensajero
+        </a>
+      </div>
     </div>
   );
 }

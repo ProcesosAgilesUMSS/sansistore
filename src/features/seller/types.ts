@@ -1,6 +1,8 @@
 export type OrderStatus =
   | 'CREADO'
   | 'RESERVADO'
+  | 'PENDIENTE'
+  | 'EMPAQUETADO'
   | 'LISTO'
   | 'ASIGNADO'
   | 'EN CAMINO'

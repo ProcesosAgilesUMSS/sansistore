@@ -45,7 +45,7 @@ export const Users = {
   },
   PEDRO: {
     uid: 'user-pedro',
-    email: 'pedro.vendedor@fcyt.umss.edu.bo',
+    email: 'pedro.vendedor@est.umss.edu',
     displayName: 'Pedro Quiroga',
     photoURL:
       'https://ui-avatars.com/api/?name=Pedro+Quiroga&background=FFA07A&color=fff',
@@ -76,6 +76,17 @@ export const Users = {
     institutionalId: 'SRV-2023-011',
     isActive: true,
   },
+  ROBERTO: {
+    uid: 'user-roberto',
+    email: 'roberto.operador@fcyt.umss.edu',
+    displayName: 'Roberto Sánchez',
+    photoURL:
+      'https://ui-avatars.com/api/?name=Roberto+Sanchez&background=8A2BE2&color=fff',
+    authType: 'email',
+    roles: ['operador_inv'],
+    institutionalId: 'OPR-2021-003',
+    isActive: true,
+  },
   ADMIN: {
     uid: 'user-admin',
     email: 'admin@umss.edu',
@@ -83,7 +94,7 @@ export const Users = {
     photoURL:
       'https://ui-avatars.com/api/?name=Admin+SANSI&background=2C3E50&color=fff',
     authType: 'email',
-    roles: ['administrador'],
+    roles: ['admin'],
     institutionalId: 'ADM-2020-001',
     isActive: true,
   },
