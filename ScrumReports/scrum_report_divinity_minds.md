@@ -214,13 +214,13 @@
 
 ## Gutierrez Hinojosa Jhon Deymar
 
-- **Yesterday:** Implemente un login simple y un /me para automatizar las pruebas que necesitan login de un usuario, agregar pruebas automatizada de login y carrito, agregar mas criterios de aceptacion de la HU #288 
+- **Yesterday:** Implemente un login simple y un /me para automatizar las pruebas que necesitan login de un usuario, agregar pruebas automatizada de login y carrito, agregar mas criterios de aceptacion de la HU #288
 - **Today:** Revisar el codigo de los demas miembros, ademas de corregir las pruebas automatizadas.
 - **Blockers:** Tenia dudas con areas de otros equipos de la parte del vendedor para automatizar pruebas y reportar bugs a otros equipos pero no me respondieron, y se bloqueo la hu de reseñas por falta de analisis.
 
 ## Merudia Calderon Dayeza
 
-- **Yesterday:** Desarrollé la vista básica /cart para iniciar el flujo e implementé la sección del resumen del pedido.   
+- **Yesterday:** Desarrollé la vista básica /cart para iniciar el flujo e implementé la sección del resumen del pedido.
 - **Today:** Mejoraré el diseño de la vista del carrito por su simplicidad actual e implementé el cálculo del envío estimado.
 - **Blockers:** No estaba bien definido cómo calcular el envío estimado y la tarea de dejar reseñas de productos quedó suspendida.
 
@@ -238,14 +238,34 @@
 
 # 05/21/2026
 
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Complete las issues #48 y #345 (favoritos y pruebas Playwright) y deje lista la rama `feature/favorite-products`.
+- **Today:** Verifique que pase todo el set de pruebas correctamente y hice el merge a `main` desde `feature/favorite-products`.
+- **Blockers:** n/a.
+
 ## Gutierrez Hinojosa Jhon Deymar
 
 - **Yesterday:** Completé los detalles del carrito de compras, corregí errores y reporté bugs detectados.
 - **Today:** Realizar revisiones finales en staging antes de la demo, preparar los datos de seed y alistar el script de despliegue a producción.
 - **Blockers:** n/a.
 
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Desarrollé el panel del carrito de compras, implementando la funcionalidad para añadir productos al carrito, modificar sus cantidades y persistir el estado mediante localStorage.
+- **Today:** Realizar pruebas y revisiones finales del carrito antes de la demo, validando el flujo completo de interacción.
+- **Blockers:** Ninguno.
+
 ## Merudia Calderon Dayeza
 
 - **Yesterday:** Finalicé las tareas para mostrar el total del carrito y para eliminar un producto del mismo.
 - **Today:** Realizar pruebas y revisiones en busca de errores previos a la demo.
 - **Blockers:** n/a.
+
+
+## Velasquez Vela Marcos
+
+- **Yesterday:** Continué trabajando en la HU del carrito de compras, mejorando validaciones, flujo de actualización y corrigiendo detalles encontrados en pruebas. También apoyé en la estabilización de pruebas automatizadas, revisé y definí algunas historias de usuario y tasks pendientes del sprint, y ayudé en el despliegue de Cloud Functions de otros grupos en Firebase.
+- **Today:** Revisar los últimos ajustes integrados, dar seguimiento a los despliegues y continuar apoyando en la organización de tareas y validación de funcionalidades del equipo.
+- **Blockers:** n/a.
+
