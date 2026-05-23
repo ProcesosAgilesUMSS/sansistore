@@ -249,3 +249,5 @@
 - **Yesterday:** Finalicé las tareas para mostrar el total del carrito y para eliminar un producto del mismo.
 - **Today:** Realizar pruebas y revisiones en busca de errores previos a la demo.
 - **Blockers:** n/a.
+
+
