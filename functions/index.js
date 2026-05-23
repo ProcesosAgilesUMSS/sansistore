@@ -10,8 +10,9 @@
 // El proyecto usa ES modules (type: "module") por eso usamos import
 // en lugar de require()
 import {onSchedule} from "firebase-functions/v2/scheduler";
+import {onDocumentUpdated} from "firebase-functions/v2/firestore";
 import {initializeApp} from "firebase-admin/app";
-import {getFirestore, FieldValue} from "firebase-admin/firestore";
+import {getFirestore, FieldValue, Timestamp} from "firebase-admin/firestore";
 
 // Inicializar Firebase Admin SDK
 // Esto da acceso a Firestore con permisos de administrador
@@ -19,6 +20,30 @@ import {getFirestore, FieldValue} from "firebase-admin/firestore";
 initializeApp();
 
 const db = getFirestore();
+
+export const marcarTiempoReserva = onDocumentUpdated(
+    {
+      document: "orders/{orderId}",
+      region: "southamerica-east1",
+    },
+    async (event) => {
+      const before = event.data.before.data();
+      const after = event.data.after.data();
+
+      if (before.status === "RESERVADO" || after.status !== "RESERVADO") {
+        return;
+      }
+
+      if (after.reservedAt) {
+        return;
+      }
+
+      await event.data.after.ref.update({
+        reservedAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+    },
+);
 
 // ── FUNCIÓN: liberarReservas ────────────────────────────────────
 // Se ejecuta automáticamente cada 5 minutos
@@ -42,6 +67,7 @@ export const liberarReservas = onSchedule(
 
         const limitMs = reservationTimeLimit * 60 * 1000;
         const cutoffTime = new Date(Date.now() - limitMs);
+        const cutoffTimestamp = Timestamp.fromDate(cutoffTime);
 
         const cutoffIso = cutoffTime.toISOString();
         console.log(
@@ -53,7 +79,7 @@ export const liberarReservas = onSchedule(
         const ordersSnap = await db
             .collection("orders")
             .where("status", "==", "RESERVADO")
-            .where("createdAt", "<", cutoffTime)
+            .where("reservedAt", "<", cutoffTimestamp)
             .get();
 
         if (ordersSnap.empty) {

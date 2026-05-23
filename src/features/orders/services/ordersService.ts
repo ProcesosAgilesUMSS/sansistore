@@ -81,7 +81,9 @@ export async function reserveOrder(orderId: string): Promise<void> {
   const orderRef = doc(db, "orders", orderId);
   await updateDoc(orderRef, {
     status: "RESERVADO",
-    sellerId: user.uid
+    sellerId: user.uid,
+    reservedAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
   });
 }
 
