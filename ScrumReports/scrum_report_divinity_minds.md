@@ -238,11 +238,23 @@
 
 # 05/21/2026
 
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Complete las issues #48 y #345 (favoritos y pruebas Playwright) y deje lista la rama `feature/favorite-products`.
+- **Today:** Verifique que pase todo el set de pruebas correctamente y hice el merge a `main` desde `feature/favorite-products`.
+- **Blockers:** n/a.
+
 ## Gutierrez Hinojosa Jhon Deymar
 
 - **Yesterday:** Completé los detalles del carrito de compras, corregí errores y reporté bugs detectados.
 - **Today:** Realizar revisiones finales en staging antes de la demo, preparar los datos de seed y alistar el script de despliegue a producción.
 - **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Desarrollé el panel del carrito de compras, implementando la funcionalidad para añadir productos al carrito, modificar sus cantidades y persistir el estado mediante localStorage.
+- **Today:** Realizar pruebas y revisiones finales del carrito antes de la demo, validando el flujo completo de interacción.
+- **Blockers:** Ninguno.
 
 ## Merudia Calderon Dayeza
 
@@ -257,9 +269,3 @@
 - **Today:** Revisar los últimos ajustes integrados, dar seguimiento a los despliegues y continuar apoyando en la organización de tareas y validación de funcionalidades del equipo.
 - **Blockers:** n/a.
 
-
-## Merino Vidal Mateo Alejandro
-
-- **Yesterday:** Desarrollé el panel del carrito de compras, implementando la funcionalidad para añadir productos al carrito, modificar sus cantidades y persistir el estado mediante localStorage.
-- **Today:** Realizar pruebas y revisiones finales del carrito antes de la demo, validando el flujo completo de interacción.
-- **Blockers:** Ninguno.
