@@ -1,4 +1,14 @@
 
+export interface CartInventory {
+  enabled: boolean;
+  stockTotal: number;
+  stockAvailable: number;
+  stockReserved: number;
+  minStock: number;
+  productId: string;
+  updatedAt?: Date;
+}
+
 export interface CartItem {
   cartItemId: string;
   userId: string;
@@ -19,6 +29,7 @@ export interface CartProduct {
   active: boolean;
   slug?: string;
   stockAvailable?: number;
+  stockReserved?: number;
   stockTotal?: number;
 }
 

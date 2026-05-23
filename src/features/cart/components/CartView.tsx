@@ -13,7 +13,14 @@ import {
   X,
 } from 'lucide-react';
 import { type User } from 'firebase/auth';
-import { doc, getDoc, serverTimestamp, writeBatch, increment, collection } from 'firebase/firestore';
+import {
+  doc,
+  getDoc,
+  serverTimestamp,
+  writeBatch,
+  increment,
+  collection,
+} from 'firebase/firestore';
 import { CartItemRow } from './CartItemRow';
 import { AnimatedAmount } from './AnimatedAmount';
 import type { CartItemWithProduct } from '../types';
@@ -178,7 +185,9 @@ function LocationSelectorModal({
                     : 'border-border-light hover:border-primary/50'
                 }`}
               >
-                <p className="text-sm font-semibold text-text-light">{loc.label}</p>
+                <p className="text-sm font-semibold text-text-light">
+                  {loc.label}
+                </p>
                 <p className="mt-1 text-xs text-text-light opacity-60 capitalize">
                   {loc.type}
                   {loc.isDefault && ' (Predeterminada)'}
@@ -249,7 +258,9 @@ function PaymentConfirmModal({
 
         <div className="mt-4 flex flex-col gap-3">
           <div className="w-full rounded-xl border border-primary bg-primary/5 p-3 text-left">
-            <p className="text-sm font-semibold text-text-light">{location.label}</p>
+            <p className="text-sm font-semibold text-text-light">
+              {location.label}
+            </p>
             <p className="mt-1 text-xs text-text-light opacity-60 capitalize">
               {location.type}
               {location.isDefault && ' (Predeterminada)'}
@@ -258,7 +269,9 @@ function PaymentConfirmModal({
 
           <div className="w-full rounded-xl border border-border-light p-3 text-left">
             <p className="text-xs text-text-light opacity-60">Total a pagar</p>
-            <p className="mt-1 text-2xl font-bold text-primary">Bs {total.toFixed(2)}</p>
+            <p className="mt-1 text-2xl font-bold text-primary">
+              Bs {total.toFixed(2)}
+            </p>
           </div>
 
           <div className="w-full rounded-xl border border-primary bg-primary/5 p-3 text-left">
@@ -357,19 +370,32 @@ function OrderSuccessModal({ onClose }: { onClose: () => void }) {
 }
 
 function CartViewInner() {
-  const { itemsWithProducts, loading, updateQuantity, setQuantity, removeItem, items } = useCartContext();
+  const {
+    itemsWithProducts,
+    loading,
+    updateQuantity,
+    setQuantity,
+    removeItem,
+    items,
+  } = useCartContext();
   const { user, authReady } = useAuthUser();
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [includedById, setIncludedById] = useState<Record<string, boolean>>({});
-  const [errorsById, setErrorsById] = useState<Record<string, string | undefined>>({});
+  const [errorsById, setErrorsById] = useState<
+    Record<string, string | undefined>
+  >({});
   const [summaryOpen, setSummaryOpen] = useState(true);
-  const [itemToRemove, setItemToRemove] = useState<CartItemWithProduct | null>(null);
+  const [itemToRemove, setItemToRemove] = useState<CartItemWithProduct | null>(
+    null
+  );
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [showPaymentConfirmModal, setShowPaymentConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [creatingOrder, setCreatingOrder] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(
+    null
+  );
 
   useEffect(() => {
     if (!user) {
@@ -409,29 +435,31 @@ function CartViewInner() {
         included: item.isValid && (includedById[item.productId] ?? true),
         error: errorsById[item.productId],
       })),
-    [errorsById, includedById, itemsWithProducts],
+    [errorsById, includedById, itemsWithProducts]
   );
 
   const invalidItems = useMemo(
     () => enriched.filter((item) => !item.isValid),
-    [enriched],
+    [enriched]
   );
 
   const priceChangedItems = useMemo(
-    () => enriched.filter((item) => item.isValid && item.priceChange !== 'none'),
-    [enriched],
+    () =>
+      enriched.filter((item) => item.isValid && item.priceChange !== 'none'),
+    [enriched]
   );
 
   const includedItems = useMemo(
     () => enriched.filter((item) => item.included && item.isValid),
-    [enriched],
+    [enriched]
   );
 
   const subtotal = useMemo(
-    () => includedItems.reduce((sum, item) => {
-      return sum + Number((item.unitPrice * item.quantity).toFixed(2));
-    }, 0),
-    [includedItems],
+    () =>
+      includedItems.reduce((sum, item) => {
+        return sum + Number((item.unitPrice * item.quantity).toFixed(2));
+      }, 0),
+    [includedItems]
   );
 
   const shippingFee = includedItems.length > 0 ? 0 : 0;
@@ -457,19 +485,26 @@ function CartViewInner() {
     await updateQuantity(productId, -1, stock);
   }
 
-  async function handleSetQuantity(productId: string, quantity: number, stock: number) {
+  async function handleSetQuantity(
+    productId: string,
+    quantity: number,
+    stock: number
+  ) {
     const clamped = Math.max(1, Math.min(quantity, stock));
     const ok = await setQuantity(productId, clamped, stock);
     if (!ok) {
       setErrorsById((prev) => ({
         ...prev,
-        [productId]: errorsById[productId] || 'No se pudo actualizar la cantidad.',
+        [productId]:
+          errorsById[productId] || 'No se pudo actualizar la cantidad.',
       }));
     }
   }
 
   async function handleRemove(productId: string) {
-    const item = itemsWithProducts.find((current) => current.productId === productId) ?? null;
+    const item =
+      itemsWithProducts.find((current) => current.productId === productId) ??
+      null;
     setItemToRemove(item);
   }
 
@@ -556,37 +591,29 @@ function CartViewInner() {
         total,
         locationId: selectedLocation.id,
         paymentStatus: 'PENDIENTE',
-        deliveryStatus: 'created',
+        deliveryStatus: null,
         deliveryId: null,
         paymentId: paymentCode,
-        confirmedAt: serverTimestamp(),
+        confirmedAt: null,
         cancelledAt: null,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
 
       for (const orderItem of orderItems) {
-        const orderItemRef = doc(db, `orders/${orderCode}/orderItems`, orderItem.itemId);
+        const orderItemRef = doc(
+          db,
+          `orders/${orderCode}/orderItems`,
+          orderItem.itemId
+        );
         batch.set(orderItemRef, orderItem);
       }
 
       for (const orderItem of orderItems) {
         const inventoryRef = doc(db, 'inventory', orderItem.productId);
         batch.update(inventoryRef, {
-          stockAvailable: increment(-orderItem.quantity),
           stockReserved: increment(orderItem.quantity),
           updatedAt: serverTimestamp(),
-        });
-
-        const movementRef = doc(collection(db, 'inventoryMovements'));
-        batch.set(movementRef, {
-          movementId: movementRef.id,
-          productId: orderItem.productId,
-          operatorId: user.uid,
-          type: 'salida_venta',
-          quantity: orderItem.quantity,
-          orderId: orderCode,
-          createdAt: serverTimestamp(),
         });
       }
 
@@ -678,7 +705,10 @@ function CartViewInner() {
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-500/15 text-red-500 dark:text-red-400">
               <Trash2 size={18} />
             </div>
-            <h2 id="remove-item-title" className="text-lg font-bold text-text-light">
+            <h2
+              id="remove-item-title"
+              className="text-lg font-bold text-text-light"
+            >
               Eliminar producto
             </h2>
           </div>
@@ -728,11 +758,17 @@ function CartViewInner() {
           aria-label="Ruta de navegación"
           className="flex items-center gap-2 text-sm text-text-light"
         >
-          <a href="/" className="font-semibold opacity-70 transition-opacity hover:opacity-100">
+          <a
+            href="/"
+            className="font-semibold opacity-70 transition-opacity hover:opacity-100"
+          >
             Inicio
           </a>
           <ChevronRight size={14} className="opacity-35" aria-hidden="true" />
-          <a href="/productos" className="font-semibold opacity-70 transition-opacity hover:opacity-100">
+          <a
+            href="/productos"
+            className="font-semibold opacity-70 transition-opacity hover:opacity-100"
+          >
             Productos
           </a>
           <ChevronRight size={14} className="opacity-35" aria-hidden="true" />
@@ -752,68 +788,109 @@ function CartViewInner() {
 
       <div className="grid gap-4 md:gap-6 md:grid-cols-3 md:items-start">
         <section className="min-w-0 rounded-xl border border-border-light bg-card-bg-light p-3 sm:p-4 md:col-span-2">
-          <h2 className="mb-2 text-base sm:text-lg font-semibold">Productos ({enriched.length})</h2>
-          {enriched.map((item) => (
-            <CartItemRow
-              key={item.productId}
-              item={item}
-              stock={item.product?.stockAvailable ?? 999}
-              onIncrement={() => handleIncrement(item.productId, item.product?.stockAvailable ?? 999)}
-              onDecrement={() => handleDecrement(item.productId, item.product?.stockAvailable ?? 999)}
-              onSetQuantity={(qty) => handleSetQuantity(item.productId, qty, item.product?.stockAvailable ?? 999)}
-              onToggleIncluded={(included) => handleToggleIncluded(item.productId, included)}
-              onRemove={() => handleRemove(item.productId)}
-            />
-          ))}
+          <h2 className="mb-2 text-base sm:text-lg font-semibold">
+            Productos ({enriched.length})
+          </h2>
+          {enriched.map((item) => {
+            const effectiveStock = Math.max(
+              0,
+              (item.product?.stockAvailable ?? 0) -
+                (item.product?.stockReserved ?? 0)
+            );
+            return (
+              <CartItemRow
+                key={item.productId}
+                item={item}
+                stock={effectiveStock}
+                onIncrement={() =>
+                  handleIncrement(item.productId, effectiveStock)
+                }
+                onDecrement={() =>
+                  handleDecrement(item.productId, effectiveStock)
+                }
+                onSetQuantity={(qty) =>
+                  handleSetQuantity(item.productId, qty, effectiveStock)
+                }
+                onToggleIncluded={(included) =>
+                  handleToggleIncluded(item.productId, included)
+                }
+                onRemove={() => handleRemove(item.productId)}
+              />
+            );
+          })}
         </section>
 
         <aside className="rounded-xl border border-border-light bg-card-bg-light p-3 sm:p-4 shadow-sm md:sticky md:top-4 md:h-fit md:col-span-1">
-          <details open={summaryOpen} onToggle={(event) => setSummaryOpen((event.currentTarget as HTMLDetailsElement).open)}>
+          <details
+            open={summaryOpen}
+            onToggle={(event) =>
+              setSummaryOpen((event.currentTarget as HTMLDetailsElement).open)
+            }
+          >
             <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-lg outline-none">
               <span className="flex items-center gap-2 text-base sm:text-lg font-semibold">
                 <ShoppingBag size={16} className="text-primary" />
                 Resumen de pago
               </span>
-              <ChevronDown className={`h-5 w-5 shrink-0 transition-transform ${summaryOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown
+                className={`h-5 w-5 shrink-0 transition-transform ${summaryOpen ? 'rotate-180' : ''}`}
+              />
             </summary>
 
-          <div className="mt-4 space-y-4">
-            <div className="space-y-3 rounded-xl border border-border-light bg-bg-light/60 p-4">
-              {includedItems.length > 0 ? (
-                includedItems.map((item) => {
-                  const price = item.unitPrice;
-                  const lineTotal = Number((price * item.quantity).toFixed(2));
-                  const name = item.product?.name ?? item.productId;
-                  const showChange =
-                    item.priceChange !== 'none' && item.priceAtAdd != null;
+            <div className="mt-4 space-y-4">
+              <div className="space-y-3 rounded-xl border border-border-light bg-bg-light/60 p-4">
+                {includedItems.length > 0 ? (
+                  includedItems.map((item) => {
+                    const price = item.unitPrice;
+                    const lineTotal = Number(
+                      (price * item.quantity).toFixed(2)
+                    );
+                    const name = item.product?.name ?? item.productId;
+                    const showChange =
+                      item.priceChange !== 'none' && item.priceAtAdd != null;
 
-                  return (
-                    <div key={item.productId} className="flex items-start justify-between gap-3 text-sm">
-                      <div className="min-w-0">
-                        <p className="line-clamp-1 font-medium">{name}</p>
-                        <p className="text-xs text-text-light opacity-60">
-                          {item.quantity} x {showChange ? (
-                            <>
-                              <span className="line-through opacity-70">Bs {item.priceAtAdd!.toFixed(2)}</span>{' '}
-                              <span className={item.priceChange === 'increased' ? 'text-red-500 font-semibold' : 'text-primary font-semibold'}>
-                                Bs {price.toFixed(2)}
-                              </span>
-                            </>
-                          ) : (
-                            <>Bs {price.toFixed(2)}</>
-                          )}
-                        </p>
+                    return (
+                      <div
+                        key={item.productId}
+                        className="flex items-start justify-between gap-3 text-sm"
+                      >
+                        <div className="min-w-0">
+                          <p className="line-clamp-1 font-medium">{name}</p>
+                          <p className="text-xs text-text-light opacity-60">
+                            {item.quantity} x{' '}
+                            {showChange ? (
+                              <>
+                                <span className="line-through opacity-70">
+                                  Bs {item.priceAtAdd!.toFixed(2)}
+                                </span>{' '}
+                                <span
+                                  className={
+                                    item.priceChange === 'increased'
+                                      ? 'text-red-500 font-semibold'
+                                      : 'text-primary font-semibold'
+                                  }
+                                >
+                                  Bs {price.toFixed(2)}
+                                </span>
+                              </>
+                            ) : (
+                              <>Bs {price.toFixed(2)}</>
+                            )}
+                          </p>
+                        </div>
+                        <AnimatedAmount
+                          value={lineTotal}
+                          className="font-semibold text-primary"
+                        />
                       </div>
-                      <AnimatedAmount value={lineTotal} className="font-semibold text-primary" />
-                    </div>
-                  );
-                })
-              ) : (
-                <p className="text-sm text-text-light opacity-70">
-                  No hay ítems incluidos.
-                </p>
-              )}
-            </div>
+                    );
+                  })
+                ) : (
+                  <p className="text-sm text-text-light opacity-70">
+                    No hay ítems incluidos.
+                  </p>
+                )}
+              </div>
 
               <div className="space-y-2 text-sm">
                 <div className="flex items-center justify-between gap-3 text-text-light opacity-80">
@@ -822,61 +899,87 @@ function CartViewInner() {
                 </div>
                 <div className="flex items-center justify-between gap-3 text-text-light opacity-80">
                   <span>Fee de envío</span>
-                  <AnimatedAmount value={shippingFee} className="font-semibold" />
+                  <AnimatedAmount
+                    value={shippingFee}
+                    className="font-semibold"
+                  />
                 </div>
               </div>
 
               <div className="h-px bg-border-light" />
 
-            <div className="flex items-end justify-between gap-3">
-              <span className="text-xs uppercase tracking-wide text-text-light opacity-60">Total final</span>
-              <AnimatedAmount value={total} className="text-xl sm:text-2xl font-bold text-primary" />
-            </div>
-
-            {invalidItems.length > 0 && (
-              <div
-                role="alert"
-                className="flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-600 dark:text-red-400"
-              >
-                <AlertTriangle size={14} className="mt-0.5 shrink-0" aria-hidden="true" />
-                <span>
-                  Hay {invalidItems.length} {invalidItems.length === 1 ? 'producto no disponible' : 'productos no disponibles'}. Quítalos para continuar.
+              <div className="flex items-end justify-between gap-3">
+                <span className="text-xs uppercase tracking-wide text-text-light opacity-60">
+                  Total final
                 </span>
+                <AnimatedAmount
+                  value={total}
+                  className="text-xl sm:text-2xl font-bold text-primary"
+                />
               </div>
-            )}
 
-            {priceChangedItems.length > 0 && (
-              <div
-                role="status"
-                className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-400"
-              >
-                <AlertTriangle size={14} className="mt-0.5 shrink-0" aria-hidden="true" />
-                <span>
-                  {priceChangedItems.length === 1
-                    ? '1 producto cambió de precio. Revisa el total antes de confirmar.'
-                    : `${priceChangedItems.length} productos cambiaron de precio. Revisa el total antes de confirmar.`}
-                </span>
-              </div>
-            )}
-
-            <button
-              type="button"
-              disabled={includedItems.length === 0 || invalidItems.length > 0 || creatingOrder}
-              onClick={handleConfirmOrder}
-              className="flex w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {creatingOrder ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : (
-                'Confirmar pedido'
+              {invalidItems.length > 0 && (
+                <div
+                  role="alert"
+                  className="flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-600 dark:text-red-400"
+                >
+                  <AlertTriangle
+                    size={14}
+                    className="mt-0.5 shrink-0"
+                    aria-hidden="true"
+                  />
+                  <span>
+                    Hay {invalidItems.length}{' '}
+                    {invalidItems.length === 1
+                      ? 'producto no disponible'
+                      : 'productos no disponibles'}
+                    . Quítalos para continuar.
+                  </span>
+                </div>
               )}
-            </button>
-          </div>
-        </details>
-      </aside>
+
+              {priceChangedItems.length > 0 && (
+                <div
+                  role="status"
+                  className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-400"
+                >
+                  <AlertTriangle
+                    size={14}
+                    className="mt-0.5 shrink-0"
+                    aria-hidden="true"
+                  />
+                  <span>
+                    {priceChangedItems.length === 1
+                      ? '1 producto cambió de precio. Revisa el total antes de confirmar.'
+                      : `${priceChangedItems.length} productos cambiaron de precio. Revisa el total antes de confirmar.`}
+                  </span>
+                </div>
+              )}
+
+              <button
+                type="button"
+                disabled={
+                  includedItems.length === 0 ||
+                  invalidItems.length > 0 ||
+                  creatingOrder
+                }
+                onClick={handleConfirmOrder}
+                className="flex w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {creatingOrder ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  'Confirmar pedido'
+                )}
+              </button>
+            </div>
+          </details>
+        </aside>
 
         <RemoveItemModal />
-        {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
+        {showLoginModal && (
+          <LoginModal onClose={() => setShowLoginModal(false)} />
+        )}
         {user && showLocationModal && (
           <LocationSelectorModal
             user={user}
@@ -893,7 +996,9 @@ function CartViewInner() {
             loading={creatingOrder}
           />
         )}
-        {showSuccessModal && <OrderSuccessModal onClose={() => setShowSuccessModal(false)} />}
+        {showSuccessModal && (
+          <OrderSuccessModal onClose={() => setShowSuccessModal(false)} />
+        )}
       </div>
     </div>
   );
