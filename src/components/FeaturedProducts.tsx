@@ -1,10 +1,26 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
-import { Package, Search, X, History, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Package,
+  Search,
+  X,
+  History,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  Heart,
+} from 'lucide-react';
 import { FaCartPlus, FaFilter } from 'react-icons/fa';
 import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { getOfferBadgeData, hasValidOffer } from '../lib/productOffers';
+import {
+  getCreatedAtTimestamp,
+  getSoldCount,
+  isPopularProduct,
+} from '../lib/productPopularity';
 import CategoryFilter from './CategoryFilter';
+import { useCartContext, CartProvider } from '../features/cart';
+import { useFavorites } from '../features/favorites';
 
 interface Product {
   id: string;
@@ -22,6 +38,7 @@ interface Product {
   enabled?: boolean;
   categoryId?: string;
   createdAt?: any;
+  soldCount?: number;
 }
 
 interface Inventory {
@@ -79,6 +96,10 @@ function formatPrice(amount: number) {
 function getBadgeData(product: Product) {
   const badgeData = getOfferBadgeData(product);
 
+  if (badgeData?.label.trim().toLowerCase() === 'popular') {
+    return null;
+  }
+
   if (badgeData?.isDiscount) {
     return {
       label: badgeData.label,
@@ -96,10 +117,40 @@ function getBadgeData(product: Product) {
 
 interface FeaturedProductsProps {
   initialSearch?: string;
+  initialCategory?: string | null;
+  initialOffersOnly?: boolean;
+  initialSort?: string | null;
+  initialPage?: number;
+  favoritesOnly?: boolean;
+  title?: string;
 }
 
-export default function FeaturedProducts({
+function isSortOption(
+  value: string | null | undefined
+): value is 'best-sellers' | 'recent' | 'name-asc' | 'name-desc' {
+  return (
+    value === 'best-sellers' ||
+    value === 'recent' ||
+    value === 'name-asc' ||
+    value === 'name-desc'
+  );
+}
+
+const SORT_OPTIONS = [
+  { value: 'best-sellers', label: 'Popular' },
+  { value: 'recent', label: 'Recientes' },
+  { value: 'name-asc', label: 'A-Z' },
+  { value: 'name-desc', label: 'Z-A' },
+] as const;
+
+function FeaturedProductsInner({
   initialSearch = '',
+  initialCategory = null,
+  initialOffersOnly = false,
+  initialSort = 'best-sellers',
+  initialPage = 1,
+  favoritesOnly = false,
+  title = 'Productos disponibles',
 }: FeaturedProductsProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -107,15 +158,29 @@ export default function FeaturedProducts({
   const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [appliedSearch, setAppliedSearch] = useState(initialSearch);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const { addToCart } = useCartContext();
+  const {
+    favoriteIds,
+    loading: favoritesLoading,
+    error: favoritesError,
+    isFavorite,
+    toggleFavorite,
+  } = useFavorites();
   const [searchHistory, setSearchHistory] = useState<string[]>(() =>
     getSearchHistory()
   );
   const [inputFocused, setInputFocused] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [showOffersOnly, setShowOffersOnly] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    initialCategory
+  );
+  const [showOffersOnly, setShowOffersOnly] = useState(initialOffersOnly);
+  const [currentPage, setCurrentPage] = useState(
+    Number.isFinite(initialPage) && initialPage > 0 ? initialPage : 1
+  );
   const [invalidPage, setInvalidPage] = useState(false);
-  const [sortBy, setSortBy] = useState<'price-asc' | 'price-desc' | 'name' | 'recent'>('recent');
+  const [sortBy, setSortBy] = useState<
+    'best-sellers' | 'recent' | 'name-asc' | 'name-desc'
+  >(isSortOption(initialSort) ? initialSort : 'best-sellers');
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const ITEMS_PER_PAGE = 12;
   const searchRef = useRef<HTMLDivElement>(null);
@@ -128,18 +193,23 @@ export default function FeaturedProducts({
       const pageParamStr = url.searchParams.get('page');
       const categoryParam = url.searchParams.get('category');
       const offersParam = url.searchParams.get('offers') === 'true';
-      const sortParam = url.searchParams.get('sort') as 'price-asc' | 'price-desc' | 'name' | 'recent' | null;
-      
+      const sortParam = url.searchParams.get('sort') as
+        | 'best-sellers'
+        | 'recent'
+        | 'name-asc'
+        | 'name-desc'
+        | null;
+
       // Validate page is numeric
       const pageNum = pageParamStr ? parseInt(pageParamStr, 10) : 1;
       const isValidPageNumber = !isNaN(pageNum) && pageNum > 0;
-      
+
       // Remove invalid page param from URL
       if (pageParamStr && !isValidPageNumber) {
         url.searchParams.delete('page');
         window.history.replaceState({}, '', url.toString());
       }
-      
+
       if (categoryParam !== selectedCategory) {
         setSelectedCategory(categoryParam);
       }
@@ -148,6 +218,9 @@ export default function FeaturedProducts({
       }
       if (sortParam && sortParam !== sortBy) {
         setSortBy(sortParam);
+      }
+      if (isValidPageNumber && pageNum !== currentPage) {
+        setCurrentPage(pageNum);
       }
     }
   }, []);
@@ -160,28 +233,28 @@ export default function FeaturedProducts({
       const pageNum = pageParamStr ? parseInt(pageParamStr, 10) : 1;
       const isValidPageNumber = !isNaN(pageNum) && pageNum > 0;
       const pageParam = isValidPageNumber ? Math.max(1, pageNum) : 1;
-      
+
       // Calculate totalPages - estimate based on products and filters
       const filtered = products.filter((p) => {
         if (showOffersOnly && !hasValidOffer(p)) return false;
         if (selectedCategory && p.categoryId !== selectedCategory) return false;
         return true;
       });
-      
+
       const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
       const validPage = Math.max(1, Math.min(pageParam, totalPages || 1));
       const isOutOfRange = pageParam > validPage;
-      
+
       // Remove invalid page param and update URL if needed
       if (pageParamStr && !isValidPageNumber) {
         url.searchParams.delete('page');
         window.history.replaceState({}, '', url.toString());
       }
-      
+
       if (validPage !== currentPage || isOutOfRange) {
         setCurrentPage(validPage);
         setInvalidPage(isOutOfRange);
-        
+
         // Remove page param if out of range
         if (isOutOfRange) {
           url.searchParams.delete('page');
@@ -199,10 +272,7 @@ export default function FeaturedProducts({
       ) {
         setShowSuggestions(false);
       }
-      if (
-        sortRef.current &&
-        !sortRef.current.contains(event.target as Node)
-      ) {
+      if (sortRef.current && !sortRef.current.contains(event.target as Node)) {
         setShowSortDropdown(false);
       }
     };
@@ -237,25 +307,24 @@ export default function FeaturedProducts({
         );
 
         setProducts(
-          productsSnap.docs
-            .map((productDoc) => {
-              const product = {
-                id: productDoc.id,
-                ...productDoc.data(),
-              } as Product;
-              const inventory = inventoryByProductId.get(productDoc.id);
+          productsSnap.docs.map((productDoc) => {
+            const product = {
+              id: productDoc.id,
+              ...productDoc.data(),
+            } as Product;
+            const inventory = inventoryByProductId.get(productDoc.id);
 
-              return {
-                ...product,
-                stockAvailable: inventory?.stockAvailable ?? 0,
-                stockTotal: inventory?.stockTotal ?? 0,
-                enabled: inventory?.enabled ?? false,
-              };
-            })
+            return {
+              ...product,
+              soldCount: getSoldCount(product),
+              stockAvailable: inventory?.stockAvailable ?? 0,
+              stockTotal: inventory?.stockTotal ?? 0,
+              enabled: inventory?.enabled ?? false,
+            };
+          })
         );
       } catch (error) {
         console.error('Error loading products:', error);
-        setProducts([]);
         setError('No se pudo cargar el catálogo en este momento.');
       } finally {
         setLoading(false);
@@ -271,6 +340,10 @@ export default function FeaturedProducts({
 
   const filteredProducts = useMemo(() => {
     let result = products;
+
+    if (favoritesOnly) {
+      result = result.filter((product) => favoriteIds.has(product.id));
+    }
 
     // Hide products without stock
     result = result.filter((product) => (product.stockAvailable ?? 0) > 0);
@@ -297,26 +370,49 @@ export default function FeaturedProducts({
       result = [...byName, ...byDescription];
     }
 
+    const allSoldCountsAreZero = result.every(
+      (product) => getSoldCount(product) === 0
+    );
+    const effectiveSortBy =
+      sortBy === 'best-sellers' && allSoldCountsAreZero ? 'recent' : sortBy;
+
     // Apply sorting
     const sorted = [...result];
-    switch (sortBy) {
-      case 'price-asc':
-        sorted.sort((a, b) => a.price - b.price);
+    switch (effectiveSortBy) {
+      case 'best-sellers':
+        sorted.sort(
+          (a, b) =>
+            getSoldCount(b) - getSoldCount(a) ||
+            getCreatedAtTimestamp(b) - getCreatedAtTimestamp(a)
+        );
         break;
-      case 'price-desc':
-        sorted.sort((a, b) => b.price - a.price);
-        break;
-      case 'name':
+      case 'name-asc':
         sorted.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'name-desc':
+        sorted.sort((a, b) => b.name.localeCompare(a.name));
         break;
       case 'recent':
       default:
-        // Already sorted by createdAt desc from Firebase query
+        sorted.sort(
+          (a, b) => getCreatedAtTimestamp(b) - getCreatedAtTimestamp(a)
+        );
         break;
     }
 
     return sorted;
-  }, [products, appliedSearch, selectedCategory, showOffersOnly, sortBy]);
+  }, [
+    products,
+    appliedSearch,
+    selectedCategory,
+    showOffersOnly,
+    sortBy,
+    favoritesOnly,
+    favoriteIds,
+  ]);
+
+  const selectedSortLabel =
+    SORT_OPTIONS.find((option) => option.value === sortBy)?.label ?? 'Popular';
 
   const searchSuggestions = useMemo(() => {
     if (!searchTerm || searchTerm.length < 1) {
@@ -334,14 +430,26 @@ export default function FeaturedProducts({
         removeAccents(term.toLowerCase()).includes(normalizedTerm)
       )
       .map((term) => ({ type: 'history' as const, term }));
-    const productSuggestions = products
+    const suggestionProducts = favoritesOnly
+      ? products.filter((product) => favoriteIds.has(product.id))
+      : products;
+    const productSuggestions = suggestionProducts
       .filter((p) =>
         removeAccents(p.name.toLowerCase()).includes(normalizedTerm)
       )
       .slice(0, 5)
       .map((p) => ({ type: 'product' as const, product: p }));
     return [...historySuggestions, ...productSuggestions];
-  }, [products, searchTerm, searchHistory, inputFocused]);
+  }, [
+    products,
+    searchTerm,
+    searchHistory,
+    inputFocused,
+    favoritesOnly,
+    favoriteIds,
+  ]);
+
+  const isLoading = loading || favoritesLoading;
 
   const highlightText = (
     text: string,
@@ -419,7 +527,13 @@ export default function FeaturedProducts({
     }
   };
 
-  const updateUrl = (term: string = '', offers: boolean = showOffersOnly, category: string | null = selectedCategory, page: number = currentPage, sort: typeof sortBy = sortBy) => {
+  const updateUrl = (
+    term: string = '',
+    offers: boolean = showOffersOnly,
+    category: string | null = selectedCategory,
+    page: number = currentPage,
+    sort: typeof sortBy = sortBy
+  ) => {
     const url = new URL(window.location.href);
     if (term.trim()) {
       url.searchParams.set('q', term.trim());
@@ -436,7 +550,7 @@ export default function FeaturedProducts({
     } else {
       url.searchParams.delete('category');
     }
-    if (sort !== 'recent') {
+    if (sort !== 'best-sellers') {
       url.searchParams.set('sort', sort);
     } else {
       url.searchParams.delete('sort');
@@ -452,17 +566,36 @@ export default function FeaturedProducts({
   return (
     <section id="productos" className="bg-bg-light py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-10">
-          <h2
-            className="text-text-light"
-            style={{
-              fontSize: 'clamp(1.6rem, 3vw, 2.2rem)',
-              letterSpacing: '-0.03em',
-              fontWeight: 900,
-            }}
+        <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2
+              className="text-text-light"
+              style={{
+                fontSize: 'clamp(1.6rem, 3vw, 2.2rem)',
+                letterSpacing: '-0.03em',
+                fontWeight: 900,
+              }}
+            >
+              {title}
+            </h2>
+          </div>
+
+          <a
+            href={favoritesOnly ? '/productos' : '/favoritos'}
+            className={`inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-bold transition-all sm:w-auto ${
+              favoritesOnly
+                ? 'border border-border-light text-text-light hover:border-primary hover:text-primary'
+                : 'bg-primary text-bg-light shadow-lg shadow-primary/20 hover:-translate-y-0.5 hover:brightness-105'
+            }`}
           >
-            Productos disponibles
-          </h2>
+            {favoritesOnly ? <ChevronLeft size={18} /> : <Heart size={18} />}
+            {favoritesOnly ? 'Ver productos' : 'Ver favoritos'}
+            {!favoritesOnly && favoriteIds.size > 0 && (
+              <span className="rounded-full bg-bg-light/20 px-2 py-0.5 text-xs">
+                {favoriteIds.size}
+              </span>
+            )}
+          </a>
         </div>
 
         <div className="mb-8 flex flex-col gap-4">
@@ -473,7 +606,13 @@ export default function FeaturedProducts({
                 onCategoryChange={(newCategory) => {
                   setSelectedCategory(newCategory);
                   setCurrentPage(1);
-                  updateUrl(appliedSearch, showOffersOnly, newCategory, 1, sortBy);
+                  updateUrl(
+                    appliedSearch,
+                    showOffersOnly,
+                    newCategory,
+                    1,
+                    sortBy
+                  );
                 }}
               />
             </div>
@@ -483,7 +622,13 @@ export default function FeaturedProducts({
                 const newOffersState = !showOffersOnly;
                 setShowOffersOnly(newOffersState);
                 setCurrentPage(1);
-                updateUrl(appliedSearch, newOffersState, selectedCategory, 1, sortBy);
+                updateUrl(
+                  appliedSearch,
+                  newOffersState,
+                  selectedCategory,
+                  1,
+                  sortBy
+                );
               }}
               aria-pressed={showOffersOnly}
               aria-label={
@@ -513,7 +658,7 @@ export default function FeaturedProducts({
                 onChange={(e) => handleInputChange(e.target.value)}
                 onKeyDown={handleKeyDown}
                 maxLength={MAX_SEARCH_LENGTH}
-                disabled={loading}
+                disabled={isLoading}
                 onFocus={() => {
                   setInputFocused(true);
                   setShowSuggestions(true);
@@ -560,7 +705,13 @@ export default function FeaturedProducts({
                             }
                             setSearchTerm(term);
                             setAppliedSearch(term);
-                            updateUrl(term, showOffersOnly, selectedCategory, 1, sortBy);
+                            updateUrl(
+                              term,
+                              showOffersOnly,
+                              selectedCategory,
+                              1,
+                              sortBy
+                            );
                             setShowSuggestions(false);
                           }}
                           className="flex flex-1 items-center gap-2 hover:bg-secondary-bg-light rounded py-1 -my-1 cursor-pointer"
@@ -612,7 +763,13 @@ export default function FeaturedProducts({
                           saveSearchTerm(searchTerm);
                           setSearchHistory(getSearchHistory());
                           setAppliedSearch(searchTerm);
-                          updateUrl(searchTerm, showOffersOnly, selectedCategory, 1, sortBy);
+                          updateUrl(
+                            searchTerm,
+                            showOffersOnly,
+                            selectedCategory,
+                            1,
+                            sortBy
+                          );
                           setShowSuggestions(false);
                         }}
                         className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm text-text-light hover:bg-secondary-bg-light"
@@ -627,27 +784,29 @@ export default function FeaturedProducts({
               <button
                 type="button"
                 onClick={() => setShowSortDropdown(!showSortDropdown)}
-                className="flex items-center justify-center rounded-full p-2.5 text-text-light transition-all hover:text-primary hover:bg-primary/10"
+                className="flex items-center gap-2 rounded-full border border-border-light bg-card-bg-light px-4 py-2.5 text-sm font-semibold text-text-light transition-all hover:border-primary hover:text-primary"
                 title="Ordenar productos"
                 aria-label="Ordenar productos"
               >
                 <FaFilter size={16} />
+                <span className="hidden sm:inline">{selectedSortLabel}</span>
               </button>
               {showSortDropdown && (
                 <div className="absolute right-0 top-full mt-1 min-w-56 rounded-lg border border-border-light bg-card-bg-light py-1 shadow-lg z-20">
-                  {[
-                    { value: 'recent' as const, label: 'Recientes' },
-                    { value: 'name' as const, label: 'Nombre A-Z' },
-                    { value: 'price-asc' as const, label: 'Precio: Menor a Mayor' },
-                    { value: 'price-desc' as const, label: 'Precio: Mayor a Menor' },
-                  ].map((option) => (
+                  {SORT_OPTIONS.map((option) => (
                     <button
                       key={option.value}
                       type="button"
                       onClick={() => {
                         setSortBy(option.value);
                         setCurrentPage(1);
-                        updateUrl(appliedSearch, showOffersOnly, selectedCategory, 1, option.value);
+                        updateUrl(
+                          appliedSearch,
+                          showOffersOnly,
+                          selectedCategory,
+                          1,
+                          option.value
+                        );
                         setShowSortDropdown(false);
                       }}
                       className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-colors ${
@@ -665,7 +824,7 @@ export default function FeaturedProducts({
           </div>
         </div>
 
-        {loading && (
+        {isLoading && (
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
             {Array.from({ length: 6 }).map((_, index) => (
               <div
@@ -682,13 +841,13 @@ export default function FeaturedProducts({
           </div>
         )}
 
-        {!loading && error && (
+        {!isLoading && (error || favoritesError) && (
           <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {error}
+            {error || favoritesError}
           </div>
         )}
 
-        {!loading &&
+        {!isLoading &&
           filteredProducts.length === 0 &&
           (appliedSearch || selectedCategory || showOffersOnly) && (
             <div className="py-20 text-center">
@@ -706,7 +865,30 @@ export default function FeaturedProducts({
             </div>
           )}
 
-        {!loading && error && products.length === 0 && (
+        {!isLoading &&
+          favoritesOnly &&
+          filteredProducts.length === 0 &&
+          !appliedSearch &&
+          !selectedCategory &&
+          !showOffersOnly && (
+            <div className="rounded-3xl border border-border-light bg-card-bg-light px-6 py-12 text-center">
+              <Heart size={40} className="mx-auto mb-3 text-primary" />
+              <p className="text-sm font-semibold text-text-light">
+                Aún no tienes productos favoritos.
+              </p>
+              <p className="mt-2 text-sm text-text-light opacity-70">
+                Guarda productos desde el catálogo para revisarlos después.
+              </p>
+              <a
+                href="/productos"
+                className="mt-4 inline-flex rounded-full bg-primary px-5 py-2 text-sm font-semibold text-bg-light transition-all hover:brightness-105"
+              >
+                Ver catálogo
+              </a>
+            </div>
+          )}
+
+        {!isLoading && error && products.length === 0 && (
           <div className="rounded-3xl border border-border-light bg-card-bg-light px-6 py-12 text-center">
             <Package size={40} className="mx-auto mb-3 text-primary" />
             <p className="text-sm font-semibold text-text-light">
@@ -718,92 +900,140 @@ export default function FeaturedProducts({
           </div>
         )}
 
-        {!loading && filteredProducts.length > 0 && !invalidPage && (
+        {!isLoading && filteredProducts.length > 0 && !invalidPage && (
           <>
             <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
               {filteredProducts
-                .slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+                .slice(
+                  (currentPage - 1) * ITEMS_PER_PAGE,
+                  currentPage * ITEMS_PER_PAGE
+                )
                 .map((product) => {
-              const showOffer = hasValidOffer(product);
-              const badgeData = getBadgeData(product);
-              const currentPrice = showOffer
-                ? product.offerPrice!
-                : product.price;
+                  const showOffer = hasValidOffer(product);
+                  const badgeData = getBadgeData(product);
+                  const showPopularBadge = isPopularProduct(product);
+                  const productIsFavorite = isFavorite(product.id);
+                  const currentPrice = showOffer
+                    ? product.offerPrice!
+                    : product.price;
 
-              return (
-                <article
-                  key={product.id}
-                  className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border-light bg-card-bg-light transition-all duration-300 hover:-translate-y-1"
-                >
-                  <a
-                    href={`/productos/${product.slug}`}
-                    aria-label={`Ver detalle de ${product.name}`}
-                    className="absolute inset-0 z-10 rounded-2xl"
-                  />
-
-                  <div className="relative flex aspect-square items-center justify-center overflow-hidden bg-secondary-bg-light">
-                    <img
-                      src={product.imageUrl || PRODUCT_PLACEHOLDER}
-                      alt={product.name}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      onError={(event) => {
-                        event.currentTarget.onerror = null;
-                        event.currentTarget.src = PRODUCT_PLACEHOLDER;
-                      }}
-                    />
-
-                    {badgeData && (
-                      <span
-                        className={`absolute left-3 top-3 rounded-full px-2 py-0.5 text-xs font-semibold ${badgeData.className}`}
-                      >
-                        {badgeData.label}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="relative z-20 flex flex-1 flex-col p-3 sm:p-4">
-                    <span 
-                      className="block w-full text-sm sm:text-base font-semibold text-text-light transition-colors group-hover:text-primary"
-                      style={{
-                        display: '-webkit-box',
-                        WebkitBoxOrient: 'vertical',
-                        WebkitLineClamp: 2,
-                        overflow: 'hidden',
-                      }}
-                      title={product.name}
+                  return (
+                    <article
+                      key={product.id}
+                      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border-light bg-card-bg-light transition-all duration-300 hover:-translate-y-1"
                     >
-                      {highlightText(
-                        product.name,
-                        appliedSearch,
-                        getMatchField(product, appliedSearch) === 'name'
-                      )}
-                    </span>
+                      <a
+                        href={`/productos/${product.slug}`}
+                        aria-label={`Ver detalle de ${product.name}`}
+                        className="absolute inset-0 z-10 rounded-2xl"
+                      />
 
-                    <div className="mt-auto flex items-center justify-between gap-2 pt-2 sm:pt-3">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm sm:text-base font-bold text-text-light">
-                          {formatPrice(currentPrice)}
-                        </span>
-                        {showOffer && (
-                          <span className="text-xs sm:text-sm text-text-light opacity-40 line-through">
-                            {formatPrice(product.price)}
-                          </span>
-                        )}
+                      <div className="relative flex aspect-square items-center justify-center overflow-hidden bg-secondary-bg-light">
+                        <img
+                          src={product.imageUrl || PRODUCT_PLACEHOLDER}
+                          alt={product.name}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          onError={(event) => {
+                            event.currentTarget.onerror = null;
+                            event.currentTarget.src = PRODUCT_PLACEHOLDER;
+                          }}
+                        />
+
+                        <div className="absolute left-3 top-3 flex flex-wrap gap-2">
+                          {badgeData && (
+                            <span
+                              className={`rounded-full px-2 py-0.5 text-xs font-semibold ${badgeData.className}`}
+                            >
+                              {badgeData.label}
+                            </span>
+                          )}
+                          {showPopularBadge && (
+                            <span className="rounded-full bg-amber-400 px-2 py-0.5 text-xs font-semibold text-amber-950">
+                              Popular
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          aria-label={
+                            productIsFavorite
+                              ? `Quitar ${product.name} de favoritos`
+                              : `Agregar ${product.name} a favoritos`
+                          }
+                          aria-pressed={productIsFavorite}
+                          title={
+                            productIsFavorite
+                              ? 'Quitar de favoritos'
+                              : 'Agregar a favoritos'
+                          }
+                          data-testid={`favorite-button-${product.slug}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleFavorite(product.id);
+                          }}
+                          className={`absolute right-3 top-3 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-all active:scale-95 ${
+                            productIsFavorite
+                              ? 'border-primary bg-primary text-bg-light shadow-md shadow-primary/25'
+                              : 'border-border-light bg-card-bg-light/90 text-text-light hover:border-primary hover:text-primary'
+                          }`}
+                        >
+                          <Heart
+                            size={18}
+                            fill={productIsFavorite ? 'currentColor' : 'none'}
+                          />
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        title="Agregar al carrito"
-                        className="flex items-center justify-center rounded-full p-2.5 sm:p-3 transition-all active:scale-95 text-primary hover:scale-110 hover:drop-shadow-lg shrink-0"
-                      >
-                        <FaCartPlus className="text-lg sm:text-xl" />
-                      </button>
-                    </div>
 
+                      <div className="relative z-20 flex flex-1 flex-col p-3 sm:p-4">
+                        <span
+                          className="block w-full text-sm sm:text-base font-semibold text-text-light transition-colors group-hover:text-primary"
+                          style={{
+                            display: '-webkit-box',
+                            WebkitBoxOrient: 'vertical',
+                            WebkitLineClamp: 2,
+                            overflow: 'hidden',
+                          }}
+                          title={product.name}
+                        >
+                          {highlightText(
+                            product.name,
+                            appliedSearch,
+                            getMatchField(product, appliedSearch) === 'name'
+                          )}
+                        </span>
 
-                  </div>
-                </article>
-              );
-            })}
+                        <div className="mt-auto flex items-center justify-between gap-2 pt-2 sm:pt-3">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-sm sm:text-base font-bold text-text-light">
+                              {formatPrice(currentPrice)}
+                            </span>
+                            {showOffer && (
+                              <span className="text-xs sm:text-sm text-text-light opacity-40 line-through">
+                                {formatPrice(product.price)}
+                              </span>
+                            )}
+                          </div>
+                          <button
+                            type="button"
+                            title="Agregar al carrito"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              addToCart(
+                                product.id,
+                                product.stockAvailable ?? 0,
+                                currentPrice
+                              );
+                            }}
+                            className="flex items-center justify-center rounded-full p-2.5 sm:p-3 transition-all active:scale-95 text-primary hover:scale-110 hover:drop-shadow-lg shrink-0 relative z-20"
+                          >
+                            <FaCartPlus className="text-lg sm:text-xl" />
+                          </button>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
             </div>
 
             {Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) > 1 && (
@@ -814,7 +1044,13 @@ export default function FeaturedProducts({
                   onClick={() => {
                     const newPage = currentPage - 1;
                     setCurrentPage(newPage);
-                    updateUrl(appliedSearch, showOffersOnly, selectedCategory, newPage, sortBy);
+                    updateUrl(
+                      appliedSearch,
+                      showOffersOnly,
+                      selectedCategory,
+                      newPage,
+                      sortBy
+                    );
                     setInvalidPage(false);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
@@ -825,35 +1061,40 @@ export default function FeaturedProducts({
 
                 <div className="flex gap-1 flex-wrap justify-center items-center">
                   {(() => {
-                    const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+                    const totalPages = Math.ceil(
+                      filteredProducts.length / ITEMS_PER_PAGE
+                    );
                     const pages: (number | string)[] = [];
                     const showRange = 1;
                     let ellipsisCount = 0;
-                    
+
                     // Always show first page
                     pages.push(1);
-                    
+
                     // Add ellipsis and pages before current
                     const rangeStart = Math.max(2, currentPage - showRange);
                     if (rangeStart > 2) {
                       pages.push(`...left-${ellipsisCount++}`);
                     }
-                    
+
                     for (let i = rangeStart; i < currentPage; i++) {
                       pages.push(i);
                     }
-                    
+
                     // Add current page
                     if (currentPage !== 1) {
                       pages.push(currentPage);
                     }
-                    
+
                     // Add pages after current
-                    const rangeEnd = Math.min(totalPages - 1, currentPage + showRange);
+                    const rangeEnd = Math.min(
+                      totalPages - 1,
+                      currentPage + showRange
+                    );
                     for (let i = currentPage + 1; i <= rangeEnd; i++) {
                       pages.push(i);
                     }
-                    
+
                     // Add ellipsis and last page
                     if (rangeEnd < totalPages - 1) {
                       pages.push(`...right-${ellipsisCount++}`);
@@ -861,13 +1102,17 @@ export default function FeaturedProducts({
                     if (totalPages > 1 && currentPage !== totalPages) {
                       pages.push(totalPages);
                     }
-                    
+
                     return pages.map((page, index) => {
-                      const isEllipsis = typeof page === 'string' && page.startsWith('...');
+                      const isEllipsis =
+                        typeof page === 'string' && page.startsWith('...');
                       const pageNum = typeof page === 'number' ? page : null;
-                      
+
                       return isEllipsis ? (
-                        <span key={`${page}-${index}`} className="px-2 py-2 text-text-light opacity-50">
+                        <span
+                          key={`${page}-${index}`}
+                          className="px-2 py-2 text-text-light opacity-50"
+                        >
                           ...
                         </span>
                       ) : (
@@ -876,7 +1121,13 @@ export default function FeaturedProducts({
                           type="button"
                           onClick={() => {
                             setCurrentPage(pageNum as number);
-                            updateUrl(appliedSearch, showOffersOnly, selectedCategory, pageNum as number, sortBy);
+                            updateUrl(
+                              appliedSearch,
+                              showOffersOnly,
+                              selectedCategory,
+                              pageNum as number,
+                              sortBy
+                            );
                             setInvalidPage(false);
                             window.scrollTo({ top: 0, behavior: 'smooth' });
                           }}
@@ -895,11 +1146,20 @@ export default function FeaturedProducts({
 
                 <button
                   type="button"
-                  disabled={currentPage === Math.ceil(filteredProducts.length / ITEMS_PER_PAGE)}
+                  disabled={
+                    currentPage ===
+                    Math.ceil(filteredProducts.length / ITEMS_PER_PAGE)
+                  }
                   onClick={() => {
                     const newPage = currentPage + 1;
                     setCurrentPage(newPage);
-                    updateUrl(appliedSearch, showOffersOnly, selectedCategory, newPage, sortBy);
+                    updateUrl(
+                      appliedSearch,
+                      showOffersOnly,
+                      selectedCategory,
+                      newPage,
+                      sortBy
+                    );
                     setInvalidPage(false);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
@@ -912,16 +1172,27 @@ export default function FeaturedProducts({
           </>
         )}
 
-        {!loading && invalidPage && (
+        {!isLoading && invalidPage && (
           <div className="flex h-96 items-center justify-center rounded-2xl border border-border-light bg-card-bg-light">
             <div className="text-center">
               <Package className="mx-auto h-12 w-12 text-text-light opacity-50 mb-4" />
-              <p className="text-lg font-semibold text-text-light">No hay más productos</p>
-              <p className="text-sm text-text-light opacity-70">La página que buscas no existe</p>
+              <p className="text-lg font-semibold text-text-light">
+                No hay más productos
+              </p>
+              <p className="text-sm text-text-light opacity-70">
+                La página que buscas no existe
+              </p>
             </div>
           </div>
         )}
       </div>
     </section>
+  );
+}
+export default function FeaturedProducts(props: FeaturedProductsProps) {
+  return (
+    <CartProvider>
+      <FeaturedProductsInner {...props} />
+    </CartProvider>
   );
 }

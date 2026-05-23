@@ -168,6 +168,7 @@ classDiagram
     +string productId
     +string operatorId
     +string type
+    +string reason
     +number quantity
     +timestamp createdAt
   }

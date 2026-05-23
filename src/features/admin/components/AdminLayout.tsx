@@ -13,17 +13,27 @@ import {
   Menu,
   X,
   ChevronRight,
-  ArrowLeft, // <- Agregado para el botón de retroceso
+  ArrowLeft,
 } from 'lucide-react';
 import UserManagement from '../users/components/UserManagement.tsx';
 import CategoryList from '../categories/components/CategoryList.tsx';
+import OrderReceptionPanel from '../orders/components/OrderReceptionPanel.tsx';
 import DailySales from '../ventas/components/DailySales.tsx';
+import TopSellingProducts from '../ventas/top-products/components/TopSellingProducts.tsx';
+// ── HU #152: Parámetros del sistema ──
+import ConfigPanel from '../settings/components/ConfigPanel.tsx';
+// ── HU #161: Reportes de ventas ──
+import SalesReport from '../analytics/components/SalesReport.tsx';
 
 type Section =
   | 'dashboard'
+  | 'pedidos'
   | 'usuarios'
   | 'categorias'
   | 'ventas-diarias'
+  | 'mas-vendidos'
+  | 'parametros'     // ── HU #152 ──
+  | 'reportes'       // ── HU #161 ──
   | null;
 
 interface NavItem {
@@ -56,9 +66,7 @@ export default function AdminLayout() {
         {
           label: 'Pedidos',
           icon: <ShoppingBag size={15} />,
-          section: null,
-          badge: 8,
-          disabled: true,
+          section: 'pedidos',
         },
       ],
     },
@@ -76,10 +84,10 @@ export default function AdminLayout() {
           section: 'categorias',
         },
         {
+          // ── HU #152: habilitado ──
           label: 'Parámetros',
           icon: <Settings size={15} />,
-          section: null,
-          disabled: true,
+          section: 'parametros',
         },
       ],
     },
@@ -89,16 +97,27 @@ export default function AdminLayout() {
         { label: 'Ventas', icon: <BarChart2 size={15} />, section: 'ventas-diarias' },
         { label: 'Inventario', icon: <Package size={15} />, section: null, disabled: true },
         { label: 'Mensajeros', icon: <Bike size={15} />, section: null, disabled: true },
-        { label: 'Reportes', icon: <FileText size={15} />, section: null, disabled: true },
+        {
+          // ── HU #161: habilitado ──
+          label: 'Reportes',
+          icon: <FileText size={15} />,
+          section: 'reportes',
+        },
       ],
     },
   ];
 
   const pageTitles: Record<string, { title: string; subtitle: string }> = {
     dashboard: { title: 'Dashboard', subtitle: 'Panel de administración' },
+    pedidos: { title: 'Pedidos', subtitle: 'Validación de recepción por comprador' },
     usuarios: { title: 'Gestión de usuarios', subtitle: 'Registra y administra usuarios' },
     categorias: { title: 'Categorías', subtitle: 'Gestiona las categorías de productos' },
     'ventas-diarias': { title: 'Ventas diarias', subtitle: 'Monitorea el rendimiento diario de ventas' },
+    'mas-vendidos': { title: 'Más vendidos', subtitle: 'Productos con más unidades vendidas' },
+    // ── HU #152 ──
+    parametros: { title: 'Parámetros del sistema', subtitle: 'Configura los parámetros globales del sistema' },
+    // ── HU #161 ──
+    reportes: { title: 'Reportes de ventas', subtitle: 'Genera reportes de ventas por rango de fechas' },
   };
 
   const currentPage = pageTitles[activeSection ?? 'dashboard'];
@@ -176,8 +195,16 @@ export default function AdminLayout() {
                           </button>
 
                           <button
-                            className="w-full text-left px-3 py-2 rounded-lg text-[12px]
-                            text-white/20 cursor-not-allowed"
+                            onClick={() => {
+                              setActiveSection('mas-vendidos');
+                              setSidebarOpen(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
+                            transition-colors ${
+                              activeSection === 'mas-vendidos'
+                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
+                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
+                            }`}
                           >
                             Más vendidos
                           </button>
@@ -241,10 +268,9 @@ export default function AdminLayout() {
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#fafafa]">
 
-        {/* Topbar: Modificado para replicar el Mockup */}
+        {/* Topbar */}
         <header className="flex items-center justify-between px-6 py-5 md:px-10 md:py-6 bg-[#0a0a0a]">
           <div className="flex items-center gap-4 md:gap-8">
-            {/* Menú Hamburguesa Mobile */}
             <button
               className="md:hidden p-1 text-white/50 hover:text-white transition-colors"
               onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -252,7 +278,6 @@ export default function AdminLayout() {
               {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
 
-            {/* Grupo de Título y Botón Volver */}
             <div className="flex items-center gap-4 md:gap-8">
               {activeSection !== 'dashboard' && (
                 <button
@@ -262,18 +287,16 @@ export default function AdminLayout() {
                   <ArrowLeft size={16} /> Dashboard
                 </button>
               )}
-              
               <h1 className="text-xl md:text-3xl font-bold text-white tracking-tight">
                 {currentPage.title}
               </h1>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-4">
-             {/* Badge Área 7 */}
-             <div className="px-5 py-1.5 border border-[#88b04b] text-[#88b04b] rounded-full text-xs md:text-sm font-medium tracking-wide">
-               Área 7
-             </div>
+            <div className="px-5 py-1.5 border border-[#88b04b] text-[#88b04b] rounded-full text-xs md:text-sm font-medium tracking-wide">
+              Área 7
+            </div>
           </div>
         </header>
 
@@ -287,12 +310,22 @@ export default function AdminLayout() {
           {activeSection === 'usuarios' && (
             <UserManagement />
           )}
+          {activeSection === 'pedidos' && (
+            <OrderReceptionPanel />
+          )}
           {activeSection === 'categorias' && (
             <CategoryList />
           )}
           {activeSection === 'ventas-diarias' && (
             <DailySales />
           )}
+          {activeSection === 'mas-vendidos' && (
+            <TopSellingProducts />
+          )}
+          {/*Parámetros del sistema*/}
+          {activeSection === 'parametros' && <ConfigPanel />}
+          {/*Reportes de ventas*/}
+          {activeSection === 'reportes' && <SalesReport />}
         </main>
 
       </div>

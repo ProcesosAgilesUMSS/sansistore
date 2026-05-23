@@ -212,6 +212,12 @@
 - **Today:** Dar cierre a ajustes del PR #313 del issue #34 y dejarlo listo para merge.
 - **Blockers:** No avance una HU de la seccion de carrito porque otros integrantes debian hacer la base y hasta la fecha del reporte no terminaron, por lo que no pude continuar.
 
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Implemente un login simple y un /me para automatizar las pruebas que necesitan login de un usuario, agregar pruebas automatizada de login y carrito, agregar mas criterios de aceptacion de la HU #288 
+- **Today:** Revisar el codigo de los demas miembros, ademas de corregir las pruebas automatizadas.
+- **Blockers:** Tenia dudas con areas de otros equipos de la parte del vendedor para automatizar pruebas y reportar bugs a otros equipos pero no me respondieron, y se bloqueo la hu de reseñas por falta de analisis.
+
 ## Merudia Calderon Dayeza
 
 - **Yesterday:** Desarrollé la vista básica /cart para iniciar el flujo e implementé la sección del resumen del pedido.   
@@ -223,3 +229,23 @@
 - **Yesterday:** Se coordinó el diseño del carrito de compras, alineando la estructura visual y los flujos de interacción con el equipo para asegurar coherencia con las demás funcionalidades del sprint.
 - **Today:** Se desarrollarán los componentes necesarios para añadir productos al carrito, incluyendo la lógica de interacción entre la card de producto y el estado del carrito.
 - **Blockers:** Ninguno.
+
+## Velasquez Vela Marcos
+
+- **Yesterday:** Trabajé en el carrito de compras. Primero completé las descripciones y criterios de las tasks pendientes. Luego implementé que el comprador pueda ver el total antes de confirmar, validar la disponibilidad de los productos y remover productos del carrito para modificar su selección. También agregué datos de prueba para poder revisar mejor el flujo.
+- **Today:** Revisar el funcionamiento del carrito con el equipo y corregir cualquier detalle que salga en QA.
+- **Blockers:** n/a.
+
+# 05/21/2026
+
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Completé los detalles del carrito de compras, corregí errores y reporté bugs detectados.
+- **Today:** Realizar revisiones finales en staging antes de la demo, preparar los datos de seed y alistar el script de despliegue a producción.
+- **Blockers:** n/a.
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Finalicé las tareas para mostrar el total del carrito y para eliminar un producto del mismo.
+- **Today:** Realizar pruebas y revisiones en busca de errores previos a la demo.
+- **Blockers:** n/a.
