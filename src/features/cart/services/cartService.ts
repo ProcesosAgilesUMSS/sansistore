@@ -74,7 +74,8 @@ export async function getUserCartItems(userId: string): Promise<CartItem[]> {
           ? (inventorySnap.data() as CartInventory)
           : null;
       const unitPrice = getProductPrice(product);
-      const stockAvailable = toPositiveStock(inventory?.stockAvailable);
+      const stockReserved = toPositiveStock(inventory?.stockReserved);
+      const stockAvailable = Math.max(0, toPositiveStock(inventory?.stockAvailable) - stockReserved);
       const availabilityMessage = getAvailabilityMessage({
         product,
         inventory,
@@ -92,6 +93,7 @@ export async function getUserCartItems(userId: string): Promise<CartItem[]> {
         quantity,
         unitPrice,
         stockAvailable,
+        stockReserved,
         isAvailable,
         availabilityMessage,
         subtotal: isAvailable ? Number((unitPrice * quantity).toFixed(2)) : 0,

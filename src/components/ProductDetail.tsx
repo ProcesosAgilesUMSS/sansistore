@@ -35,6 +35,7 @@ interface Product {
   offerPrice?: number | null;
   active?: boolean;
   stockAvailable?: number;
+  stockReserved?: number;
   stockTotal?: number;
   enabled?: boolean;
   soldCount?: number;
@@ -57,6 +58,7 @@ interface ProductDetailProps {
 interface InventoryRecord {
   productId: string;
   stockAvailable?: number;
+  stockReserved?: number;
   stockTotal?: number;
   enabled?: boolean;
 }
@@ -370,6 +372,7 @@ function ProductDetailInner({
               soldCount: getSoldCount(parsed),
               enabled: inventoryData?.enabled ?? true,
               stockAvailable: inventoryData?.stockAvailable ?? 0,
+              stockReserved: inventoryData?.stockReserved ?? 0,
               stockTotal: inventoryData?.stockTotal ?? inventoryData?.stockAvailable ?? 0,
             });
             setReviews(productReviews);
@@ -423,6 +426,7 @@ function ProductDetailInner({
             soldCount: getSoldCount(productData),
             enabled: inventoryData?.enabled ?? true,
             stockAvailable: inventoryData?.stockAvailable ?? 0,
+            stockReserved: inventoryData?.stockReserved ?? 0,
             stockTotal: inventoryData?.stockTotal ?? inventoryData?.stockAvailable ?? 0,
           });
           setReviews(productReviews);
@@ -510,8 +514,10 @@ function ProductDetailInner({
   const showOffer = hasValidOffer(product);
   const currentPrice = showOffer ? (product?.offerPrice ?? 0) : (product?.price ?? 0);
   const stockAvailable = product?.stockAvailable ?? 0;
+  const stockReserved = product?.stockReserved ?? 0;
+  const effectiveStock = Math.max(0, stockAvailable - stockReserved);
   const isAvailable =
-    stockAvailable > 0 &&
+    effectiveStock > 0 &&
     product?.enabled !== false &&
     (product?.active ?? true) !== false;
   const normalizedDescription = product?.description?.trim();
@@ -756,7 +762,7 @@ function ProductDetailInner({
                   </span>
                   {isAvailable && (
                     <span className="text-sm text-text-light opacity-70">
-                      Stock: {stockAvailable} disponibles
+                      Stock: {effectiveStock} disponibles
                     </span>
                   )}
                 </div>
@@ -764,7 +770,7 @@ function ProductDetailInner({
                 {isAvailable && (
                   <button
                     type="button"
-                    onClick={() => addToCart(product.id, stockAvailable, currentPrice)}
+                    onClick={() => addToCart(product.id, effectiveStock, currentPrice)}
                     className="mt-4 inline-flex w-fit items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95"
                   >
                     <FaCartPlus size={16} />
