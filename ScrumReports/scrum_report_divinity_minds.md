@@ -258,3 +258,8 @@
 - **Blockers:** n/a.
 
 
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Desarrollé el panel del carrito de compras, implementando la funcionalidad para añadir productos al carrito, modificar sus cantidades y persistir el estado mediante localStorage.
+- **Today:** Realizar pruebas y revisiones finales del carrito antes de la demo, validando el flujo completo de interacción.
+- **Blockers:** Ninguno.
