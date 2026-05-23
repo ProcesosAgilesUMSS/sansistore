@@ -21,6 +21,62 @@ initializeApp();
 
 const db = getFirestore();
 
+/**
+ * Cancela pedidos vencidos de un snapshot y libera su stock reservado.
+ *
+ * @param {FirebaseFirestore.QueryDocumentSnapshot[]} orderDocs
+ * Pedidos vencidos.
+ * @return {Promise<number>} Cantidad de pedidos cancelados.
+ */
+async function cancelExpiredOrders(orderDocs) {
+  if (orderDocs.length === 0) {
+    return 0;
+  }
+
+  const promises = orderDocs.map(async (orderDoc) => {
+    const orderId = orderDoc.id;
+
+    console.log(`[liberarReservas] Procesando pedido: ${orderId}`);
+
+    const itemsSnap = await db
+        .collection("orders")
+        .doc(orderId)
+        .collection("orderItems")
+        .get();
+
+    const batch = db.batch();
+    const orderRef = db.collection("orders").doc(orderId);
+
+    batch.update(orderRef, {
+      status: "CANCELADO",
+      incidentReason: "Tiempo límite de reserva superado",
+      cancelledAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    itemsSnap.docs.forEach((itemDoc) => {
+      const {productId, quantity} = itemDoc.data();
+      if (!productId || !quantity) return;
+
+      const inventoryRef = db.collection("inventory").doc(productId);
+
+      batch.update(inventoryRef, {
+        stockReserved: FieldValue.increment(-quantity),
+        stockAvailable: FieldValue.increment(quantity),
+      });
+    });
+
+    await batch.commit();
+    console.log(
+        `[liberarReservas] Pedido ${orderId} cancelado. ` +
+        `${itemsSnap.size} items liberados.`,
+    );
+  });
+
+  await Promise.all(promises);
+  return orderDocs.length;
+}
+
 export const marcarTiempoReserva = onDocumentUpdated(
     {
       document: "orders/{orderId}",
@@ -82,7 +138,19 @@ export const liberarReservas = onSchedule(
             .where("reservedAt", "<", cutoffTimestamp)
             .get();
 
-        if (ordersSnap.empty) {
+        const legacyOrdersSnap = await db
+            .collection("orders")
+            .where("status", "==", "RESERVADO")
+            .where("createdAt", "<", cutoffTimestamp)
+            .get();
+
+        const legacyOrders = legacyOrdersSnap.docs.filter((orderDoc) => {
+          return !orderDoc.data().reservedAt;
+        });
+
+        const totalExpired = ordersSnap.size + legacyOrders.length;
+
+        if (totalExpired === 0) {
           console.log(
               "[liberarReservas] No hay pedidos vencidos. Nada que liberar.",
           );
@@ -91,61 +159,15 @@ export const liberarReservas = onSchedule(
 
         console.log(
             "[liberarReservas] Pedidos vencidos encontrados: " +
-            ordersSnap.size,
+            totalExpired,
         );
 
-        // ── Paso 3: Procesar cada pedido vencido ─────────────────
-        const promises = ordersSnap.docs.map(async (orderDoc) => {
-          const orderId = orderDoc.id;
-          // orderData eliminado — no se usaba
+        const cancelledCurrent = await cancelExpiredOrders(ordersSnap.docs);
+        const cancelledLegacy = await cancelExpiredOrders(legacyOrders);
 
-          console.log(`[liberarReservas] Procesando pedido: ${orderId}`);
-
-          // Obtener los items del pedido (subcolección orderItems)
-          const itemsSnap = await db
-              .collection("orders")
-              .doc(orderId)
-              .collection("orderItems")
-              .get();
-
-          // Batch: operación atómica — todo o nada
-          const batch = db.batch();
-
-          // Cancelar el pedido
-          const orderRef = db.collection("orders").doc(orderId);
-          batch.update(orderRef, {
-            status: "CANCELADO",
-            incidentReason: "Tiempo límite de reserva superado",
-            cancelledAt: new Date(),
-            updatedAt: new Date(),
-          });
-
-          // Liberar stock de cada item
-          itemsSnap.docs.forEach((itemDoc) => {
-            const {productId, quantity} = itemDoc.data();
-            if (!productId || !quantity) return;
-
-            const inventoryRef = db
-                .collection("inventory")
-                .doc(productId);
-
-            batch.update(inventoryRef, {
-              stockReserved: FieldValue.increment(-quantity),
-              stockAvailable: FieldValue.increment(quantity),
-            });
-          });
-
-          await batch.commit();
-          console.log(
-              `[liberarReservas] ✓ Pedido ${orderId} cancelado. ` +
-              `${itemsSnap.size} items liberados.`,
-          );
-        });
-
-        await Promise.all(promises);
         console.log(
             "[liberarReservas] ✅ Proceso completado. " +
-            `${ordersSnap.size} pedidos cancelados.`,
+            `${cancelledCurrent + cancelledLegacy} pedidos cancelados.`,
         );
       } catch (error) {
         console.error("[liberarReservas] ❌ Error:", error);
