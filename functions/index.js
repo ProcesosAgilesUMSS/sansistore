@@ -12,7 +12,7 @@
 import {onSchedule} from "firebase-functions/v2/scheduler";
 import {onDocumentUpdated} from "firebase-functions/v2/firestore";
 import {initializeApp} from "firebase-admin/app";
-import {getFirestore, FieldValue, Timestamp} from "firebase-admin/firestore";
+import {getFirestore, FieldValue} from "firebase-admin/firestore";
 
 // Inicializar Firebase Admin SDK
 // Esto da acceso a Firestore con permisos de administrador
@@ -20,6 +20,19 @@ import {getFirestore, FieldValue, Timestamp} from "firebase-admin/firestore";
 initializeApp();
 
 const db = getFirestore();
+
+/**
+ * Convierte valores Timestamp/Date/string de Firestore a Date.
+ *
+ * @param {unknown} value Valor de fecha.
+ * @return {Date|null} Fecha normalizada.
+ */
+function toDate(value) {
+  if (!value) return null;
+  if (typeof value.toDate === "function") return value.toDate();
+  const date = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
 
 /**
  * Cancela pedidos vencidos de un snapshot y libera su stock reservado.
@@ -123,7 +136,6 @@ export const liberarReservas = onSchedule(
 
         const limitMs = reservationTimeLimit * 60 * 1000;
         const cutoffTime = new Date(Date.now() - limitMs);
-        const cutoffTimestamp = Timestamp.fromDate(cutoffTime);
 
         const cutoffIso = cutoffTime.toISOString();
         console.log(
@@ -131,26 +143,19 @@ export const liberarReservas = onSchedule(
             `${cutoffIso} (límite: ${reservationTimeLimit} min)`,
         );
 
-        // ── Paso 2: Buscar pedidos RESERVADO vencidos ────────────
-        const ordersSnap = await db
+        const reservedOrdersSnap = await db
             .collection("orders")
             .where("status", "==", "RESERVADO")
-            .where("reservedAt", "<", cutoffTimestamp)
             .get();
 
-        const legacyOrdersSnap = await db
-            .collection("orders")
-            .where("status", "==", "RESERVADO")
-            .where("createdAt", "<", cutoffTimestamp)
-            .get();
-
-        const legacyOrders = legacyOrdersSnap.docs.filter((orderDoc) => {
-          return !orderDoc.data().reservedAt;
+        const expiredOrders = reservedOrdersSnap.docs.filter((orderDoc) => {
+          const data = orderDoc.data();
+          const referenceDate =
+            toDate(data.reservedAt) ?? toDate(data.createdAt);
+          return referenceDate !== null && referenceDate < cutoffTime;
         });
 
-        const totalExpired = ordersSnap.size + legacyOrders.length;
-
-        if (totalExpired === 0) {
+        if (expiredOrders.length === 0) {
           console.log(
               "[liberarReservas] No hay pedidos vencidos. Nada que liberar.",
           );
@@ -159,15 +164,14 @@ export const liberarReservas = onSchedule(
 
         console.log(
             "[liberarReservas] Pedidos vencidos encontrados: " +
-            totalExpired,
+            expiredOrders.length,
         );
 
-        const cancelledCurrent = await cancelExpiredOrders(ordersSnap.docs);
-        const cancelledLegacy = await cancelExpiredOrders(legacyOrders);
+        const cancelledOrders = await cancelExpiredOrders(expiredOrders);
 
         console.log(
             "[liberarReservas] ✅ Proceso completado. " +
-            `${cancelledCurrent + cancelledLegacy} pedidos cancelados.`,
+            `${cancelledOrders} pedidos cancelados.`,
         );
       } catch (error) {
         console.error("[liberarReservas] ❌ Error:", error);
