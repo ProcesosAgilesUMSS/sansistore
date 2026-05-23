@@ -238,6 +238,12 @@
 
 # 05/21/2026
 
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Complete las issues #48 y #345 (favoritos y pruebas Playwright) y deje lista la rama `feature/favorite-products`.
+- **Today:** Verifique que pase todo el set de pruebas correctamente y hice el merge a `main` desde `feature/favorite-products`.
+- **Blockers:** n/a.
+
 ## Gutierrez Hinojosa Jhon Deymar
 
 - **Yesterday:** Completé los detalles del carrito de compras, corregí errores y reporté bugs detectados.
