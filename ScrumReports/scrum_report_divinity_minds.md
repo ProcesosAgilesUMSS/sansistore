@@ -250,3 +250,9 @@
 - **Today:** Realizar pruebas y revisiones en busca de errores previos a la demo.
 - **Blockers:** n/a.
 
+## Velasquez Vela Marcos
+
+- **Yesterday:** Continué trabajando en la HU del carrito de compras, mejorando validaciones, flujo de actualización y corrigiendo detalles encontrados en pruebas. También apoyé en la estabilización de pruebas automatizadas, revisé y definí algunas historias de usuario y tasks pendientes del sprint, y ayudé en el despliegue de Cloud Functions de otros grupos en Firebase.
+- **Today:** Revisar los últimos ajustes integrados, dar seguimiento a los despliegues y continuar apoyando en la organización de tareas y validación de funcionalidades del equipo.
+- **Blockers:** n/a.
+
