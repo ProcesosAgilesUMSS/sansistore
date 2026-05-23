@@ -327,6 +327,7 @@ export async function reserveConfirmedOrder(
     tx.update(orderRef, {
       status: 'RESERVADO',
       sellerId,
+      reservedAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
   });
