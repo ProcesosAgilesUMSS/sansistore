@@ -9,6 +9,9 @@ import {
   MessageSquare,
   Package,
   Star,
+  Pencil,
+  Trash2,
+  User as UserIcon,
 } from 'lucide-react';
 import { FaCartPlus } from 'react-icons/fa';
 import {
@@ -22,6 +25,8 @@ import {
   serverTimestamp,
   doc,
   getDoc,
+  updateDoc,
+  deleteDoc,
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { getOfferBadgeData, hasValidOffer } from '../lib/productOffers';
@@ -49,6 +54,8 @@ interface Product {
 interface Review {
   id: string;
   authorName?: string;
+  authorId?: string;
+  authorPhotoUrl?: string | null;
   comment: string;
   rating: number;
   active?: boolean;
@@ -304,6 +311,10 @@ function ProductDetailInner({
   const [newReviewRating, setNewReviewRating] = useState(5);
   const [newReviewComment, setNewReviewComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
+  const [editReviewRating, setEditReviewRating] = useState(5);
+  const [editReviewComment, setEditReviewComment] = useState('');
+  const [updatingReview, setUpdatingReview] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -331,6 +342,8 @@ function ProductDetailInner({
       const reviewData = {
         productId: product.id,
         authorName: user.displayName || 'Comprador',
+        authorId: user.uid,
+        authorPhotoUrl: user.photoURL || null,
         rating: newReviewRating,
         comment: newReviewComment.trim(),
         active: true,
@@ -349,6 +362,44 @@ function ProductDetailInner({
       alert('Error al publicar el comentario.');
     } finally {
       setSubmittingReview(false);
+    }
+  };
+
+  const handleUpdateReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingReviewId || !user) return;
+    setUpdatingReview(true);
+    try {
+      const reviewRef = doc(db, 'reviews', editingReviewId);
+      await updateDoc(reviewRef, {
+        rating: editReviewRating,
+        comment: editReviewComment.trim(),
+      });
+      setReviews((prev) =>
+        prev.map((r) =>
+          r.id === editingReviewId
+            ? { ...r, rating: editReviewRating, comment: editReviewComment.trim() }
+            : r
+        )
+      );
+      setEditingReviewId(null);
+    } catch (err) {
+      console.error(err);
+      alert('Error al actualizar el comentario.');
+    } finally {
+      setUpdatingReview(false);
+    }
+  };
+
+  const handleDeleteReview = async (id: string) => {
+    if (!confirm('¿Estás seguro de que quieres eliminar tu comentario?')) return;
+    try {
+      const reviewRef = doc(db, 'reviews', id);
+      await deleteDoc(reviewRef);
+      setReviews((prev) => prev.filter((r) => r.id !== id));
+    } catch (err) {
+      console.error(err);
+      alert('Error al eliminar el comentario.');
     }
   };
 
@@ -970,45 +1021,137 @@ function ProductDetailInner({
                         key={review.id}
                         className="rounded-2xl border border-border-light bg-secondary-bg-light/50 px-5 py-4"
                       >
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                          <div>
-                            <p className="text-sm font-bold text-text-light">
-                              {review.authorName?.trim() || 'Comprador anónimo'}
-                            </p>
-                            {formatReviewDate(review) ? (
-                              <p className="mt-1 text-xs uppercase tracking-[0.16em] text-text-light opacity-45">
-                                {formatReviewDate(review)}
-                              </p>
-                            ) : null}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="flex items-center gap-1">
-                              {renderStars(review.rating)}
+                        {editingReviewId === review.id ? (
+                          <form onSubmit={handleUpdateReview} className="flex flex-col gap-4">
+                            <div>
+                              <label className="block text-sm font-medium text-text-light mb-2">Calificación (1-5)</label>
+                              <div className="flex gap-2 items-center">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                   <button
+                                     type="button"
+                                     key={star}
+                                     onClick={() => setEditReviewRating(star)}
+                                     className="focus:outline-none transition-transform hover:scale-110"
+                                   >
+                                     <Star
+                                       size={28}
+                                       className={star <= editReviewRating ? "fill-primary text-primary" : "text-text-light opacity-20"}
+                                     />
+                                   </button>
+                                ))}
+                              </div>
                             </div>
-                            <span className="text-sm font-semibold text-text-light opacity-70">
-                              {review.rating.toFixed(1)}
-                            </span>
-                          </div>
-                        </div>
-                        {review.comment && (
-                          <>
-                            <p
-                              ref={(element) => {
-                                if (element) reviewRefs.current.set(review.id, element);
-                                else reviewRefs.current.delete(review.id);
-                              }}
-                              className={`mt-3 break-all text-sm leading-6 text-text-light opacity-80 ${!expandedReviews.has(review.id) ? 'line-clamp-3' : ''}`}
-                            >
-                              {review.comment}
-                            </p>
-                            {(truncatedReviews.has(review.id) || expandedReviews.has(review.id)) && (
+                            <div>
+                              <div className="flex justify-between items-center mb-2">
+                                <label className="block text-sm font-medium text-text-light">Comentario</label>
+                                <span className="text-xs text-text-light opacity-60">{editReviewComment.length}/256</span>
+                              </div>
+                              <textarea
+                                rows={3}
+                                maxLength={256}
+                                value={editReviewComment}
+                                onChange={(e) => setEditReviewComment(e.target.value)}
+                                placeholder="¿Qué te pareció el producto? (Opcional)"
+                                className="w-full resize-none rounded-xl border border-border-light bg-secondary-bg-light/50 px-4 py-3 text-sm text-text-light outline-none transition-colors hover:border-primary focus:border-primary"
+                              />
+                            </div>
+                            <div className="flex gap-2">
+                              <button
+                                type="submit"
+                                disabled={updatingReview}
+                                className="rounded-full bg-primary px-6 py-2 text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+                              >
+                                {updatingReview ? 'Guardando...' : 'Guardar'}
+                              </button>
                               <button
                                 type="button"
-                                onClick={() => toggleReview(review.id)}
-                                className="mt-1 cursor-pointer text-sm font-semibold text-primary hover:underline"
+                                onClick={() => setEditingReviewId(null)}
+                                className="rounded-full border border-border-light px-6 py-2 text-sm font-semibold text-text-light transition-all hover:border-primary"
                               >
-                                {expandedReviews.has(review.id) ? 'mostrar menos' : 'mostrar más'}
+                                Cancelar
                               </button>
+                            </div>
+                          </form>
+                        ) : (
+                          <>
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                              <div className="flex items-center gap-3">
+                                {review.authorPhotoUrl ? (
+                                  <img
+                                    src={review.authorPhotoUrl}
+                                    alt={review.authorName || 'Avatar'}
+                                    className="h-10 w-10 rounded-full object-cover shadow-sm"
+                                  />
+                                ) : (
+                                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary-bg-light/80 text-text-light/50">
+                                    <UserIcon size={20} />
+                                  </div>
+                                )}
+                                <div>
+                                  <p className="text-sm font-bold text-text-light">
+                                    {review.authorName?.trim() || 'Comprador anónimo'}
+                                  </p>
+                                  {formatReviewDate(review) ? (
+                                    <p className="mt-1 text-xs uppercase tracking-[0.16em] text-text-light opacity-45">
+                                      {formatReviewDate(review)}
+                                    </p>
+                                  ) : null}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1">
+                                  {renderStars(review.rating)}
+                                </div>
+                                <span className="text-sm font-semibold text-text-light opacity-70">
+                                  {review.rating.toFixed(1)}
+                                </span>
+                              </div>
+                            </div>
+                            {review.comment && (
+                              <>
+                                <p
+                                  ref={(element) => {
+                                    if (element) reviewRefs.current.set(review.id, element);
+                                    else reviewRefs.current.delete(review.id);
+                                  }}
+                                  className={`mt-3 break-all text-sm leading-6 text-text-light opacity-80 ${!expandedReviews.has(review.id) ? 'line-clamp-3' : ''}`}
+                                >
+                                  {review.comment}
+                                </p>
+                                {(truncatedReviews.has(review.id) || expandedReviews.has(review.id)) && (
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleReview(review.id)}
+                                    className="mt-1 cursor-pointer text-sm font-semibold text-primary hover:underline"
+                                  >
+                                    {expandedReviews.has(review.id) ? 'mostrar menos' : 'mostrar más'}
+                                  </button>
+                                )}
+                              </>
+                            )}
+                            {user?.uid === review.authorId && (
+                              <div className="mt-3 flex gap-3">
+                                <button
+                                  type="button"
+                                  title="Editar comentario"
+                                  onClick={() => {
+                                    setEditingReviewId(review.id);
+                                    setEditReviewRating(review.rating);
+                                    setEditReviewComment(review.comment);
+                                  }}
+                                  className="rounded p-1 text-primary transition-colors hover:bg-primary/10"
+                                >
+                                  <Pencil size={18} />
+                                </button>
+                                <button
+                                  type="button"
+                                  title="Eliminar comentario"
+                                  onClick={() => handleDeleteReview(review.id)}
+                                  className="rounded p-1 text-red-500 transition-colors hover:bg-red-500/10"
+                                >
+                                  <Trash2 size={18} />
+                                </button>
+                              </div>
                             )}
                           </>
                         )}
