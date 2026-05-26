@@ -185,6 +185,7 @@ classDiagram
 
   class orders {
     +string orderId
+    +string code
     +string buyerId
     +string sellerId
     +string status

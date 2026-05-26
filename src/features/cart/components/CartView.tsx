@@ -19,7 +19,6 @@ import {
   serverTimestamp,
   writeBatch,
   increment,
-  collection,
 } from 'firebase/firestore';
 import { CartItemRow } from './CartItemRow';
 import { AnimatedAmount } from './AnimatedAmount';
@@ -30,14 +29,23 @@ import { useAuthUser } from '../../../hooks/useAuthUser';
 import { subscribeToUserLocations } from '../../location/services/locationService';
 import type { Location } from '../../location/types';
 
-function generateOrderCode() {
+function generateOrderId() {
   const timestamp = Date.now().toString(36);
   const random = Math.random().toString(36).substring(2, 6);
   return `order-${timestamp}-${random}`;
 }
 
-function generateItemId(orderCode: string, idx: number) {
-  return `${orderCode}-item-${idx + 1}`;
+function generateOrderCode(): string {
+  const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+  for (let i = digits.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [digits[i], digits[j]] = [digits[j], digits[i]];
+  }
+  return digits.slice(0, 4).join('');
+}
+
+function generateItemId(orderId: string, idx: number) {
+  return `${orderId}-item-${idx + 1}`;
 }
 
 function LoginModal({ onClose }: { onClose: () => void }) {
@@ -179,11 +187,10 @@ function LocationSelectorModal({
                 key={loc.id}
                 type="button"
                 onClick={() => setSelectedId(loc.id ?? null)}
-                className={`w-full rounded-xl border p-3 text-left transition ${
-                  selectedId === loc.id
+                className={`w-full rounded-xl border p-3 text-left transition ${selectedId === loc.id
                     ? 'border-primary bg-primary/5'
                     : 'border-border-light hover:border-primary/50'
-                }`}
+                  }`}
               >
                 <p className="text-sm font-semibold text-text-light">
                   {loc.label}
@@ -564,13 +571,14 @@ function CartViewInner() {
     setShowPaymentConfirmModal(false);
 
     try {
+      const orderId = generateOrderId();
       const orderCode = generateOrderCode();
-      const paymentCode = orderCode.replace('order', 'payment');
+      const paymentCode = orderId.replace('order', 'payment');
       const orderItems = includedItems.map((item, idx) => {
         const unitPrice = item.unitPrice;
         const lineSubtotal = Number((unitPrice * item.quantity).toFixed(2));
         return {
-          itemId: generateItemId(orderCode, idx),
+          itemId: generateItemId(orderId, idx),
           productId: item.productId,
           productName: item.product?.name ?? item.productId,
           unitPrice,
@@ -581,9 +589,10 @@ function CartViewInner() {
 
       const batch = writeBatch(db);
 
-      const ordersRef = doc(db, 'orders', orderCode);
+      const ordersRef = doc(db, 'orders', orderId);
       batch.set(ordersRef, {
-        orderId: orderCode,
+        orderId: orderId,
+        code: orderCode,
         buyerId: user.uid,
         sellerId: null,
         status: 'CREADO',
@@ -603,7 +612,7 @@ function CartViewInner() {
       for (const orderItem of orderItems) {
         const orderItemRef = doc(
           db,
-          `orders/${orderCode}/orderItems`,
+          `orders/${orderId}/orderItems`,
           orderItem.itemId
         );
         batch.set(orderItemRef, orderItem);
@@ -620,7 +629,7 @@ function CartViewInner() {
       const paymentsRef = doc(db, 'payments', paymentCode);
       batch.set(paymentsRef, {
         paymentId: paymentCode,
-        orderId: orderCode,
+        orderId: orderId,
         amount: total,
         method: 'cash_on_delivery',
         status: 'PENDIENTE',
@@ -795,7 +804,7 @@ function CartViewInner() {
             const effectiveStock = Math.max(
               0,
               (item.product?.stockAvailable ?? 0) -
-                (item.product?.stockReserved ?? 0)
+              (item.product?.stockReserved ?? 0)
             );
             return (
               <CartItemRow
