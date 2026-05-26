@@ -1,0 +1,19 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar';
+import RouteGuard from '../../components/RouteGuard';
+import MyOrderDetailView from '../../features/orders/components/MyOrderDetailView';
+
+export const prerender = false;
+
+const { id } = Astro.params;
+---
+
+<Layout title={`Pedido ${id} | Sansistore`}>
+  <Navbar client:load />
+  <main class="pt-20 min-h-screen bg-(--theme-bg)">
+    <RouteGuard client:load allowedRoles={['comprador']} roleName="Comprador">
+      <MyOrderDetailView client:load orderId={id!} />
+    </RouteGuard>
+  </main>
+</Layout>

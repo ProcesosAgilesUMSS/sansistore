@@ -4,23 +4,16 @@ import { getMyOrders, getMyReturns } from '../services/ordersService';
 import ReturnCard from './ReturnCard';
 import type { Order, ReturnRequest } from '../types';
 import OrderCard from './OrderCard';
-import OrderDetailsPanel from './OrderDetailsPanel';
 
 export default function MyOrdersDashboard() {
   const { user, authReady } = useAuthUser();
   const [activeTab, setActiveTab] = useState<'orders' | 'returns'>('orders');
   const [orders, setOrders] = useState<Order[]>([]);
   const [returns, setReturns] = useState<ReturnRequest[]>([]);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null); // Estado para la vista de detalle
   const [loading, setLoading] = useState(true);
 
-  const handleOrderConfirmed = (updatedOrder: Order) => {
-    setSelectedOrder(updatedOrder);
-    setOrders((currentOrders) =>
-      currentOrders.map((order) =>
-        order.id === updatedOrder.id ? updatedOrder : order
-      )
-    );
+  const navigateToOrder = (order: Order) => {
+    window.location.href = `/mis-pedidos/${order.id}`;
   };
 
 useEffect(() => {
@@ -59,13 +52,13 @@ useEffect(() => {
       
       <div className="flex gap-4 mb-8 border-b border-(--theme-border)">
         <button 
-          onClick={() => { setActiveTab('orders'); setSelectedOrder(null); }}
+          onClick={() => setActiveTab('orders')}
           className={`pb-2.5 text-sm font-bold transition-all ${activeTab === 'orders' ? 'border-b-2 border-primary text-primary' : 'opacity-60 hover:opacity-100'}`}
         >
           Pedidos ({orders.length})
         </button>
         <button 
-          onClick={() => { setActiveTab('returns'); setSelectedOrder(null); }}
+          onClick={() => setActiveTab('returns')}
           className={`pb-2.5 text-sm font-bold transition-all ${activeTab === 'returns' ? 'border-b-2 border-primary text-primary' : 'opacity-60 hover:opacity-100'}`}
         >
         Devoluciones ({returns.length})
@@ -73,29 +66,21 @@ useEffect(() => {
       </div>
 
       {activeTab === 'orders' ? (
-        !selectedOrder ? (
-          <div className="flex flex-col gap-4">
-            {orders.length === 0 ? (
-              <div className="text-center py-12 border border-dashed border-(--theme-border) rounded-2xl opacity-60">
-                Aún no has realizado ninguna compra.
-              </div>
-            ) : (
-              orders.map(order => (
-                <OrderCard 
-                  key={order.id} 
-                  order={order} 
-                  onSelect={(ord) => setSelectedOrder(ord)} 
-                />
-              ))
-            )}
-          </div>
-        ) : (
-          <OrderDetailsPanel 
-            order={selectedOrder} 
-            onBack={() => setSelectedOrder(null)} 
-            onOrderConfirmed={handleOrderConfirmed}
-          />
-        )
+        <div className="flex flex-col gap-4">
+          {orders.length === 0 ? (
+            <div className="text-center py-12 border border-dashed border-(--theme-border) rounded-2xl opacity-60">
+              Aún no has realizado ninguna compra.
+            </div>
+          ) : (
+            orders.map(order => (
+              <OrderCard 
+                key={order.id} 
+                order={order} 
+                onSelect={navigateToOrder} 
+              />
+            ))
+          )}
+        </div>
       ) : (
         <div className="flex flex-col gap-4">
           {returns.length === 0 ? (
