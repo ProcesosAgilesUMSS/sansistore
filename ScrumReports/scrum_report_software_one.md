@@ -323,3 +323,44 @@ También realice pruebas funcionales en entorno local sobre el flujo completo de
 - **Yesterday:** Refinación de HU #80
 - **Today:** Finalizar HU #80, hacer integración
 - **Blockers:** none
+
+# 26/05/ 2026
+## Daily Reports - Team 6 SoftwareOne
+
+
+### Llanos Vega Juan Carlos
+
+
+- **Yesterday:** Realice la demo del Sprint 2.
+- **Today:** Participar en la retrospectiva del sprint y en la sesión de planning para definir las tareas del Sprint 3.
+- **Blockers:** Ninguno.
+
+
+### Rodriguez Torrico Arnold Guery
+
+
+- **Yesterday:** Apoyo en la ejecución de la demo del Sprint 2 y resolución de dudas técnicas durante la presentación.
+- **Today:** Participación activa en la retrospectiva del sprint y estimación de User Stories (US) para el planning del Sprint 3.
+- **Blockers:** Ninguno.
+
+
+### Pereira Fiorilo Oliver Do Santos
+- **Yesterday:** Realice la corrección de un bug en la lista de productos de compras al listar estaba desactualizado según a los nuevos cambios en la base de datos US Fix #396
+- **Today:** Realizaremos la retrospectiva del sprint y también el planning del sprint 3 escogiendo y puntuando las US
+- **Blockers:** Ninguno.
+
+
+### Paqui Rojas Aaron David
+
+
+- **Yesterday:** Consolidación del entorno de pruebas y despliegue para la correcta ejecución de la demo del Sprint 2.
+- **Today:** Análisis de métricas en la retrospectiva y selección de tareas durante el planning del Sprint 3.
+- **Blockers:** Ninguno.
+
+
+### Gutiérrez Fuentes Alexander Raul
+
+
+- **Yesterday:** Diseño de listas de vendedor (órdenes creadas, mis reservas, órdenes enviadas)
+- **Today:** Rediseño de más detalles de una orden creada, rediseño de más detalles de una orden reservada, rediseño de más detalles de una orden de órdenes [enviadas, en camino].
+- **Blockers:** NONE
