@@ -146,12 +146,25 @@ export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: O
         </span>
       </div>
 
-      <div className="bg-(--theme-secondary-bg) p-4 rounded-xl flex items-start gap-3">
-        <MapPin className="text-primary mt-0.5 shrink-0" size={18} />
-        <div>
-          <h4 className="text-sm font-bold mb-1">Ubicación de entrega</h4>
-          <p className="text-sm opacity-80">{order.delivery.destination}</p>
+      <div className="bg-(--theme-secondary-bg) p-4 rounded-xl flex flex-col gap-3">
+        <div className="flex items-start gap-3">
+          <MapPin className="text-primary mt-0.5 shrink-0" size={18} />
+          <div>
+            <h4 className="text-sm font-bold mb-1">Ubicación de entrega</h4>
+            <p className="text-sm opacity-80">{order.delivery.destination}</p>
+          </div>
         </div>
+        {order.code && (
+          <div className="flex items-start gap-3 pt-3 border-t border-(--theme-border)">
+            <div className="flex items-center justify-center w-5 h-5 mt-0.5 shrink-0 rounded-full bg-primary/10 text-primary font-bold text-xs">
+              <span>#</span>
+            </div>
+            <div>
+              <h4 className="text-sm font-bold mb-1">Código de seguridad</h4>
+              <p className="text-lg font-mono font-black tracking-widest text-primary">{order.code}</p>
+            </div>
+          </div>
+        )}
       </div>
 
       <div>
