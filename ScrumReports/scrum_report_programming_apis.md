@@ -269,3 +269,9 @@
 - **Yesterday:** Trabaje en el retrospective y correcciones de bugs del sistema para repartidor
 - **Today:** Continuare trabajando en el arreglo de bugs y prepararé parte de las nuevas historias de usuario para el siguiente sprint.
 - **Blockers:** None,
+
+### Efrain Peralta Felipe
+- **Yesterday:** Trabaje en el retrospective y correcciones del vendedor.
+- **Today:** Trabajare en los bugs del vendedor.
+- **Blockers:** None,
+
