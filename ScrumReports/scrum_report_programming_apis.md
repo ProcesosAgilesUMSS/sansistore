@@ -257,3 +257,10 @@
 - **Yesterday:** Avancé con la implementación del mapa para la visualización de la ubicación de entrega, revisando límites del área navegable y ajustes de coordenadas con Leaflet.
 - **Today:** Continuaré corrigiendo detalles de integración del mapa y validando que la funcionalidad funcione correctamente dentro del flujo del mensajero.
 - **Blockers:** Dudas puntuales sobre ajustes de Leaflet y manejo de coordenadas.
+
+## 26-05-2026
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Trabajé con diferentes grupos para mantener la integración estable y las funcionalidades que fueron asignadas.
+- **Today:** Prepararé parte de las nuevas historias de usuario para el siguiente sprint, trabajaré en los bugs que nos indicó el ingeniero.
+- **Blockers:** Integraciones érroneas.
