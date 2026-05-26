@@ -3,26 +3,17 @@ import { MessageSquare } from 'lucide-react';
 import type { Review, ReviewSortKey } from './types';
 import { REVIEW_PAGE_SIZE } from './types';
 import { renderStars, sortReviews, areSetsEqual } from './utils';
-import ReviewForm from './ReviewForm';
 import ReviewCard from './ReviewCard';
 import DeleteModal from './DeleteModal';
 
 interface ReviewSectionProps {
   reviews: Review[];
-  userReview: Review | undefined;
-  canReview: boolean;
-  authReady: boolean;
-  newReviewRating: number;
-  newReviewComment: string;
-  submittingReview: boolean;
+  allReviews: Review[];
   editingReviewId: string | null;
   editReviewRating: number;
   editReviewComment: string;
   updatingReview: boolean;
   reviewToDelete: string | null;
-  onNewReviewRatingChange: (rating: number) => void;
-  onNewReviewCommentChange: (comment: string) => void;
-  onSubmitReview: (e: React.FormEvent) => void;
   onEditRatingChange: (rating: number) => void;
   onEditCommentChange: (comment: string) => void;
   onStartEdit: (reviewId: string, rating: number, comment: string) => void;
@@ -35,20 +26,12 @@ interface ReviewSectionProps {
 
 export default function ReviewSection({
   reviews,
-  userReview,
-  canReview,
-  authReady,
-  newReviewRating,
-  newReviewComment,
-  submittingReview,
+  allReviews,
   editingReviewId,
   editReviewRating,
   editReviewComment,
   updatingReview,
   reviewToDelete,
-  onNewReviewRatingChange,
-  onNewReviewCommentChange,
-  onSubmitReview,
   onEditRatingChange,
   onEditCommentChange,
   onStartEdit,
@@ -65,8 +48,7 @@ export default function ReviewSection({
 
   const reviewRefs = useRef<Map<string, HTMLParagraphElement>>(new Map());
 
-  const otherReviews = userReview ? reviews.filter((r) => r.id !== userReview.id) : reviews;
-  const sortedReviews = useMemo(() => sortReviews(otherReviews, reviewSort), [otherReviews, reviewSort]);
+  const sortedReviews = useMemo(() => sortReviews(reviews, reviewSort), [reviews, reviewSort]);
   const visibleReviews = useMemo(
     () => sortedReviews.slice(0, visibleReviewsCount),
     [sortedReviews, visibleReviewsCount]
@@ -107,9 +89,9 @@ export default function ReviewSection({
     return () => window.removeEventListener('resize', checkReviewTruncation);
   }, [visibleReviews]);
 
-  const reviewsCount = reviews.length;
+  const reviewsCount = allReviews.length;
   const averageRating = reviewsCount
-    ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviewsCount
+    ? allReviews.reduce((sum, review) => sum + review.rating, 0) / reviewsCount
     : 0;
   const averageLabel = reviewsCount ? `${averageRating.toFixed(1)} de 5` : 'Sin calificaciones';
   const hasMoreReviews = sortedReviews.length > visibleReviews.length;
@@ -149,22 +131,6 @@ export default function ReviewSection({
         )}
       </div>
 
-      {authReady && canReview && !userReview && (
-        <div className="mt-6 rounded-3xl border border-border-light bg-secondary-bg-light/20 p-5 sm:p-6 shadow-sm">
-          <h3 className="text-lg font-bold text-text-light mb-4">Dejar un comentario</h3>
-          <ReviewForm
-            rating={newReviewRating}
-            comment={newReviewComment}
-            onRatingChange={onNewReviewRatingChange}
-            onCommentChange={onNewReviewCommentChange}
-            onSubmit={onSubmitReview}
-            isSubmitting={submittingReview}
-            submitLabel="Publicar comentario"
-            submittingLabel="Publicando..."
-          />
-        </div>
-      )}
-
       {reviewsCount === 0 ? (
         <div className="mt-6 rounded-3xl border border-dashed border-border-light px-5 py-8 text-center">
           <p className="text-base font-semibold text-text-light">Sin calificaciones</p>
@@ -186,35 +152,8 @@ export default function ReviewSection({
             </div>
           </div>
 
-          {userReview && (
-            <div className="mt-8">
-              <h3 className="mb-4 text-lg font-bold text-text-light">Tu comentario</h3>
-              <ReviewCard
-                review={userReview}
-                isUserReview
-                isEditing={editingReviewId === userReview.id}
-                isExpanded={expandedReviews.has(userReview.id)}
-                isTruncated={truncatedReviews.has(userReview.id)}
-                editRating={editReviewRating}
-                editComment={editReviewComment}
-                isUpdating={updatingReview}
-                onEditRatingChange={onEditRatingChange}
-                onEditCommentChange={onEditCommentChange}
-                onStartEdit={() => onStartEdit(userReview.id, userReview.rating, userReview.comment)}
-                onCancelEdit={onCancelEdit}
-                onSaveEdit={onUpdateReview}
-                onDelete={() => onDeleteRequest(userReview.id)}
-                onToggleExpand={() => toggleReview(userReview.id)}
-                setReviewRef={(element) => {
-                  if (element) reviewRefs.current.set(userReview.id, element);
-                  else reviewRefs.current.delete(userReview.id);
-                }}
-              />
-            </div>
-          )}
-
           <div className="mt-6 grid gap-4">
-            {otherReviews.length > 0 && <h3 className="text-lg font-bold text-text-light mb-2">Comentarios de otros compradores</h3>}
+            {reviews.length > 0 && <h3 className="text-lg font-bold text-text-light mb-2">Comentarios de otros compradores</h3>}
             {visibleReviews.map((review) => (
               <ReviewCard
                 key={review.id}

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Timestamp,
   collection,
@@ -17,12 +17,13 @@ import { db } from '../../lib/firebase';
 import { getSoldCount } from '../../lib/productPopularity';
 import { useAuthUser } from '../../hooks/useAuthUser';
 import type { Product, ProductDetailProps, Review, InventoryRecord } from './types';
-import { getProductDerivedData } from './utils';
 import BreadcrumbNav from './BreadcrumbNav';
 import LoadingSkeleton from './LoadingSkeleton';
 import ErrorState from './ErrorState';
 import ProductImageSection from './ProductImageSection';
 import ProductInfoSection from './ProductInfoSection';
+import ReviewForm from './ReviewForm';
+import ReviewCard from './ReviewCard';
 import ReviewSection from './ReviewSection';
 
 export default function ProductDetailInner({
@@ -42,6 +43,26 @@ export default function ProductDetailInner({
   const [editReviewComment, setEditReviewComment] = useState('');
   const [updatingReview, setUpdatingReview] = useState(false);
   const [reviewToDelete, setReviewToDelete] = useState<string | null>(null);
+
+  const [userReviewExpanded, setUserReviewExpanded] = useState(false);
+  const [userReviewTruncated, setUserReviewTruncated] = useState(false);
+  const userReviewRef = useRef<HTMLParagraphElement | null>(null);
+
+  const setUserReviewRef = useCallback((element: HTMLParagraphElement | null) => {
+    userReviewRef.current = element;
+  }, []);
+
+  const checkUserReviewTruncation = useCallback(() => {
+    if (userReviewRef.current) {
+      setUserReviewTruncated(userReviewRef.current.scrollHeight > userReviewRef.current.clientHeight);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkUserReviewTruncation();
+    window.addEventListener('resize', checkUserReviewTruncation);
+    return () => window.removeEventListener('resize', checkUserReviewTruncation);
+  }, [checkUserReviewTruncation]);
 
   const { user, authReady } = useAuthUser();
 
@@ -63,6 +84,7 @@ export default function ProductDetailInner({
 
   const canReview = user && userRoles.includes('comprador');
   const userReview = user ? reviews.find((r) => r.authorId === user.uid) : undefined;
+  const otherReviews = userReview ? reviews.filter((r) => r.id !== userReview.id) : reviews;
 
   useEffect(() => {
     let ignore = false;
@@ -273,22 +295,58 @@ export default function ProductDetailInner({
               <ProductInfoSection product={product} loading={loading} />
             </div>
 
+            {authReady && canReview && !userReview && (
+              <div className="rounded-[2rem] border border-border-light bg-card-bg-light px-5 py-6 sm:px-8 sm:py-8">
+                <h3 className="mb-4 text-lg font-bold text-text-light">Dejar un comentario</h3>
+                <ReviewForm
+                  rating={newReviewRating}
+                  comment={newReviewComment}
+                  onRatingChange={setNewReviewRating}
+                  onCommentChange={setNewReviewComment}
+                  onSubmit={handleSubmitReview}
+                  isSubmitting={submittingReview}
+                  submitLabel="Publicar comentario"
+                  submittingLabel="Publicando..."
+                />
+              </div>
+            )}
+
+            {userReview && (
+              <div>
+                <h3 className="mb-4 text-lg font-bold text-text-light">Tu comentario</h3>
+                <ReviewCard
+                  review={userReview}
+                  isUserReview
+                  isEditing={editingReviewId === userReview.id}
+                  isExpanded={userReviewExpanded}
+                  isTruncated={userReviewTruncated}
+                  editRating={editReviewRating}
+                  editComment={editReviewComment}
+                  isUpdating={updatingReview}
+                  onEditRatingChange={setEditReviewRating}
+                  onEditCommentChange={setEditReviewComment}
+                  onStartEdit={() => {
+                    setEditingReviewId(userReview.id);
+                    setEditReviewRating(userReview.rating);
+                    setEditReviewComment(userReview.comment);
+                  }}
+                  onCancelEdit={() => setEditingReviewId(null)}
+                  onSaveEdit={handleUpdateReview}
+                  onDelete={() => setReviewToDelete(userReview.id)}
+                  onToggleExpand={() => setUserReviewExpanded((prev) => !prev)}
+                  setReviewRef={setUserReviewRef}
+                />
+              </div>
+            )}
+
             <ReviewSection
-              reviews={reviews}
-              userReview={userReview}
-              canReview={!!canReview}
-              authReady={authReady}
-              newReviewRating={newReviewRating}
-              newReviewComment={newReviewComment}
-              submittingReview={submittingReview}
+              reviews={otherReviews}
+              allReviews={reviews}
               editingReviewId={editingReviewId}
               editReviewRating={editReviewRating}
               editReviewComment={editReviewComment}
               updatingReview={updatingReview}
               reviewToDelete={reviewToDelete}
-              onNewReviewRatingChange={setNewReviewRating}
-              onNewReviewCommentChange={setNewReviewComment}
-              onSubmitReview={handleSubmitReview}
               onEditRatingChange={setEditReviewRating}
               onEditCommentChange={setEditReviewComment}
               onStartEdit={(reviewId, rating, comment) => {
