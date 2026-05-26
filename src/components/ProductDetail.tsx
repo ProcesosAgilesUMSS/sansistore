@@ -18,10 +18,15 @@ import {
   limit,
   query,
   where,
+  addDoc,
+  serverTimestamp,
+  doc,
+  getDoc,
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { getOfferBadgeData, hasValidOffer } from '../lib/productOffers';
 import { getSoldCount, isPopularProduct } from '../lib/productPopularity';
+import { useAuthUser } from '../hooks/useAuthUser';
 
 interface Product {
   id: string;
@@ -293,6 +298,60 @@ function ProductDetailInner({
   const [descriptionTruncated, setDescriptionTruncated] = useState(false);
   const [expandedReviews, setExpandedReviews] = useState<Set<string>>(new Set());
   const [truncatedReviews, setTruncatedReviews] = useState<Set<string>>(new Set());
+  
+  const { user, authReady } = useAuthUser();
+  const [userRoles, setUserRoles] = useState<string[]>([]);
+  const [newReviewRating, setNewReviewRating] = useState(5);
+  const [newReviewComment, setNewReviewComment] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      setUserRoles([]);
+      return;
+    }
+    const fetchRole = async () => {
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        setUserRoles(snap.data()?.roles || []);
+      } catch (e) {
+        console.error("Error fetching user role", e);
+      }
+    };
+    fetchRole();
+  }, [user]);
+
+  const canReview = user && userRoles.includes('comprador');
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!product || !user || !canReview || !newReviewComment.trim()) return;
+    setSubmittingReview(true);
+    try {
+      const reviewData = {
+        productId: product.id,
+        authorName: user.displayName || 'Comprador',
+        rating: newReviewRating,
+        comment: newReviewComment.trim(),
+        active: true,
+      };
+      
+      const docRef = await addDoc(collection(db, 'reviews'), {
+        ...reviewData,
+        createdAt: serverTimestamp(),
+      });
+      
+      setReviews((prev) => [{ ...reviewData, id: docRef.id, createdAt: Timestamp.now() } as Review, ...prev]);
+      setNewReviewComment('');
+      setNewReviewRating(5);
+    } catch (err) {
+      console.error(err);
+      alert('Error al publicar el comentario.');
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
   const titleRef = useRef<HTMLElement | null>(null);
   const descriptionRef = useRef<HTMLParagraphElement | null>(null);
   const fullDescriptionRef = useRef<HTMLParagraphElement | null>(null);
@@ -835,6 +894,51 @@ function ProductDetailInner({
                   </label>
                 )}
               </div>
+
+              {authReady && canReview && (
+                <div className="mt-6 rounded-3xl border border-border-light bg-secondary-bg-light/20 p-5 sm:p-6 shadow-sm">
+                  <h3 className="text-lg font-bold text-text-light mb-4">Dejar un comentario</h3>
+                  <form onSubmit={handleSubmitReview} className="flex flex-col gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-text-light mb-2">Calificación (1-5)</label>
+                      <div className="flex gap-2 items-center">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                           <button
+                             type="button"
+                             key={star}
+                             onClick={() => setNewReviewRating(star)}
+                             className="focus:outline-none transition-transform hover:scale-110"
+                           >
+                             <Star
+                               size={28}
+                               className={star <= newReviewRating ? "fill-primary text-primary" : "text-text-light opacity-20"}
+                             />
+                           </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label htmlFor="comment" className="block text-sm font-medium text-text-light mb-2">Comentario</label>
+                      <textarea
+                        id="comment"
+                        rows={3}
+                        required
+                        value={newReviewComment}
+                        onChange={(e) => setNewReviewComment(e.target.value)}
+                        placeholder="¿Qué te pareció el producto?"
+                        className="w-full resize-none rounded-xl border border-border-light bg-secondary-bg-light/50 px-4 py-3 text-sm text-text-light outline-none transition-colors hover:border-primary focus:border-primary"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={submittingReview || !newReviewComment.trim()}
+                      className="mt-2 self-start rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+                    >
+                      {submittingReview ? 'Publicando...' : 'Publicar comentario'}
+                    </button>
+                  </form>
+                </div>
+              )}
 
               {reviewsCount === 0 ? (
                 <div className="mt-6 rounded-3xl border border-dashed border-border-light px-5 py-8 text-center">
