@@ -264,3 +264,8 @@
 - **Yesterday:** Trabajé con diferentes grupos para mantener la integración estable y las funcionalidades que fueron asignadas.
 - **Today:** Prepararé parte de las nuevas historias de usuario para el siguiente sprint, trabajaré en los bugs que nos indicó el ingeniero.
 - **Blockers:** Integraciones érroneas.
+
+### Bruno Salcedo Cadiz
+- **Yesterday:** Trabaje en el retrospective y correcciones de bugs del sistema para repartidor
+- **Today:** Continuare trabajando en el arreglo de bugs y prepararé parte de las nuevas historias de usuario para el siguiente sprint.
+- **Blockers:** None,
