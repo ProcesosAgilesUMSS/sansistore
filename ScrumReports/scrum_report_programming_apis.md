@@ -275,3 +275,8 @@
 - **Today:** Trabajare en los bugs del vendedor.
 - **Blockers:** None,
 
+### Jhoel Gustavo Aiza Arce
+
+- **Yesterday:** Revisión del Sprint Retrospective, análisis de bugs reportados y verificación del correcto merge de cambios a main.
+- **Today:** Participación en la retrospectiva del equipo y análisis de lecciones aprendidas para el próximo sprint.
+- **Blockers:** None.
