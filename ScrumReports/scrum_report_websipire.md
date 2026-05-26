@@ -251,3 +251,11 @@ por las dudas que se tienen.
 * **Yesterday:** Terminé mis HUs del vendedor, implementando y ajustando el flujo de **cambio de estado a `RESERVADO`** al confirmar la reserva de producto, además de la vista para **consultar el historial de cobros por pedido** para auditoría.
 * **Today:** Realicé pruebas y correcciones sobre el flujo del vendedor, validando la visualización de pedidos reservados, el historial de pedidos pagados y ajustando conflictos y datos de seed para dejar el entorno listo para pruebas.
 * **Blockers:** None
+
+# Daily Reports - Team 3 Webspire 26/05/26
+
+## Dayana Saleth Ortuño Guzman
+
+ * **Yesterday:** Reunion con mi grupo para coordinar que HUs se desarrollaran para el Sprint 3.
+* **Today:** Vi algunas dependencias que podria tener nuestras HUs elegidas, tambien estaba viendo algunos criterios de aceptacion para mi HU.
+* **Blockers:** none
