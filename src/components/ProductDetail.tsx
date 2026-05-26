@@ -325,7 +325,7 @@ function ProductDetailInner({
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!product || !user || !canReview || !newReviewComment.trim()) return;
+    if (!product || !user || !canReview) return;
     setSubmittingReview(true);
     try {
       const reviewData = {
@@ -925,17 +925,16 @@ function ProductDetailInner({
                       <textarea
                         id="comment"
                         rows={3}
-                        required
                         maxLength={256}
                         value={newReviewComment}
                         onChange={(e) => setNewReviewComment(e.target.value)}
-                        placeholder="¿Qué te pareció el producto?"
+                        placeholder="¿Qué te pareció el producto? (Opcional)"
                         className="w-full resize-none rounded-xl border border-border-light bg-secondary-bg-light/50 px-4 py-3 text-sm text-text-light outline-none transition-colors hover:border-primary focus:border-primary"
                       />
                     </div>
                     <button
                       type="submit"
-                      disabled={submittingReview || !newReviewComment.trim()}
+                      disabled={submittingReview}
                       className="mt-2 self-start rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
                     >
                       {submittingReview ? 'Publicando...' : 'Publicar comentario'}
@@ -991,23 +990,27 @@ function ProductDetailInner({
                             </span>
                           </div>
                         </div>
-                        <p
-                          ref={(element) => {
-                            if (element) reviewRefs.current.set(review.id, element);
-                            else reviewRefs.current.delete(review.id);
-                          }}
-                          className={`mt-3 break-all text-sm leading-6 text-text-light opacity-80 ${!expandedReviews.has(review.id) ? 'line-clamp-3' : ''}`}
-                        >
-                          {review.comment}
-                        </p>
-                        {(truncatedReviews.has(review.id) || expandedReviews.has(review.id)) && (
-                          <button
-                            type="button"
-                            onClick={() => toggleReview(review.id)}
-                            className="mt-1 cursor-pointer text-sm font-semibold text-primary hover:underline"
-                          >
-                            {expandedReviews.has(review.id) ? 'mostrar menos' : 'mostrar más'}
-                          </button>
+                        {review.comment && (
+                          <>
+                            <p
+                              ref={(element) => {
+                                if (element) reviewRefs.current.set(review.id, element);
+                                else reviewRefs.current.delete(review.id);
+                              }}
+                              className={`mt-3 break-all text-sm leading-6 text-text-light opacity-80 ${!expandedReviews.has(review.id) ? 'line-clamp-3' : ''}`}
+                            >
+                              {review.comment}
+                            </p>
+                            {(truncatedReviews.has(review.id) || expandedReviews.has(review.id)) && (
+                              <button
+                                type="button"
+                                onClick={() => toggleReview(review.id)}
+                                className="mt-1 cursor-pointer text-sm font-semibold text-primary hover:underline"
+                              >
+                                {expandedReviews.has(review.id) ? 'mostrar menos' : 'mostrar más'}
+                              </button>
+                            )}
+                          </>
                         )}
                       </article>
                     ))}
