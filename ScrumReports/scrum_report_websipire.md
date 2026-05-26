@@ -259,3 +259,9 @@ por las dudas que se tienen.
  * **Yesterday:** Reunion con mi grupo para coordinar que HUs se desarrollaran para el Sprint 3.
 * **Today:** Vi algunas dependencias que podria tener nuestras HUs elegidas, tambien estaba viendo algunos criterios de aceptacion para mi HU.
 * **Blockers:** none
+
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Me reuní con mi grupo para coordinar y definir las HUs que se trabajarán durante el Sprint 3.
+* **Today:** Revisé las posibles dependencias de las HUs seleccionadas y avancé en la definición de algunos criterios de aceptación de algunas HUs.
+* **Blockers:** none
