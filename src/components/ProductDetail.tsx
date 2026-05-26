@@ -334,6 +334,8 @@ function ProductDetailInner({
   }, [user]);
 
   const canReview = user && userRoles.includes('comprador');
+  const userReview = user ? reviews.find((r) => r.authorId === user.uid) : undefined;
+  const otherReviews = userReview ? reviews.filter((r) => r.id !== userReview.id) : reviews;
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -596,7 +598,7 @@ function ProductDetailInner({
     };
   }, [product?.name, loading]);
 
-  const sortedReviews = useMemo(() => sortReviews(reviews, reviewSort), [reviews, reviewSort]);
+  const sortedReviews = useMemo(() => sortReviews(otherReviews, reviewSort), [otherReviews, reviewSort]);
   const visibleReviews = useMemo(
     () => sortedReviews.slice(0, visibleReviewsCount),
     [sortedReviews, visibleReviewsCount]
@@ -948,7 +950,7 @@ function ProductDetailInner({
                 )}
               </div>
 
-              {authReady && canReview && (
+              {authReady && canReview && !userReview && (
                 <div className="mt-6 rounded-3xl border border-border-light bg-secondary-bg-light/20 p-5 sm:p-6 shadow-sm">
                   <h3 className="text-lg font-bold text-text-light mb-4">Dejar un comentario</h3>
                   <form onSubmit={handleSubmitReview} className="flex flex-col gap-4">
@@ -1017,7 +1019,150 @@ function ProductDetailInner({
                     </div>
                   </div>
 
+                  {userReview && (
+                    <div className="mt-8">
+                      <h3 className="mb-4 text-lg font-bold text-text-light">Tu comentario</h3>
+                      <div className="grid gap-4">
+                        <article className="rounded-2xl border-2 border-primary/20 bg-secondary-bg-light/80 px-5 py-4 shadow-[0_0_15px_-3px_rgba(var(--color-primary-rgb),0.1)]">
+                          {editingReviewId === userReview.id ? (
+                            <form onSubmit={handleUpdateReview} className="flex flex-col gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-text-light mb-2">Calificación (1-5)</label>
+                                <div className="flex gap-2 items-center">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                     <button
+                                       type="button"
+                                       key={star}
+                                       onClick={() => setEditReviewRating(star)}
+                                       className="focus:outline-none transition-transform hover:scale-110"
+                                     >
+                                       <Star
+                                         size={28}
+                                         className={star <= editReviewRating ? "fill-primary text-primary" : "text-text-light opacity-20"}
+                                       />
+                                     </button>
+                                  ))}
+                                </div>
+                              </div>
+                              <div>
+                                <div className="flex justify-between items-center mb-2">
+                                  <label className="block text-sm font-medium text-text-light">Comentario</label>
+                                  <span className="text-xs text-text-light opacity-60">{editReviewComment.length}/256</span>
+                                </div>
+                                <textarea
+                                  rows={3}
+                                  maxLength={256}
+                                  value={editReviewComment}
+                                  onChange={(e) => setEditReviewComment(e.target.value)}
+                                  placeholder="¿Qué te pareció el producto? (Opcional)"
+                                  className="w-full resize-none rounded-xl border border-border-light bg-secondary-bg-light/50 px-4 py-3 text-sm text-text-light outline-none transition-colors hover:border-primary focus:border-primary"
+                                />
+                              </div>
+                              <div className="flex gap-2">
+                                <button
+                                  type="submit"
+                                  disabled={updatingReview}
+                                  className="rounded-full bg-primary px-6 py-2 text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+                                >
+                                  {updatingReview ? 'Guardando...' : 'Guardar'}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setEditingReviewId(null)}
+                                  className="rounded-full border border-border-light px-6 py-2 text-sm font-semibold text-text-light transition-all hover:border-primary"
+                                >
+                                  Cancelar
+                                </button>
+                              </div>
+                            </form>
+                          ) : (
+                            <>
+                              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                <div className="flex items-center gap-3">
+                                  {userReview.authorPhotoUrl ? (
+                                    <img
+                                      src={userReview.authorPhotoUrl}
+                                      alt={userReview.authorName || 'Avatar'}
+                                      className="h-10 w-10 rounded-full object-cover shadow-sm"
+                                    />
+                                  ) : (
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary-bg-light/80 text-text-light/50">
+                                      <UserIcon size={20} />
+                                    </div>
+                                  )}
+                                  <div>
+                                    <p className="text-sm font-bold text-text-light">
+                                      {userReview.authorName?.trim() || 'Comprador anónimo'}
+                                    </p>
+                                    {formatReviewDate(userReview) ? (
+                                      <p className="mt-1 text-xs uppercase tracking-[0.16em] text-text-light opacity-45">
+                                        {formatReviewDate(userReview)}
+                                      </p>
+                                    ) : null}
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <div className="flex items-center gap-1">
+                                    {renderStars(userReview.rating)}
+                                  </div>
+                                  <span className="text-sm font-semibold text-text-light opacity-70">
+                                    {userReview.rating.toFixed(1)}
+                                  </span>
+                                </div>
+                              </div>
+                              {userReview.comment && (
+                                <>
+                                  <p
+                                    ref={(element) => {
+                                      if (element) reviewRefs.current.set(userReview.id, element);
+                                      else reviewRefs.current.delete(userReview.id);
+                                    }}
+                                    className={`mt-3 break-all text-sm leading-6 text-text-light opacity-80 ${!expandedReviews.has(userReview.id) ? 'line-clamp-3' : ''}`}
+                                  >
+                                    {userReview.comment}
+                                  </p>
+                                  {(truncatedReviews.has(userReview.id) || expandedReviews.has(userReview.id)) && (
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleReview(userReview.id)}
+                                      className="mt-1 cursor-pointer text-sm font-semibold text-primary hover:underline"
+                                    >
+                                      {expandedReviews.has(userReview.id) ? 'mostrar menos' : 'mostrar más'}
+                                    </button>
+                                  )}
+                                </>
+                              )}
+                              <div className="mt-3 flex gap-3">
+                                <button
+                                  type="button"
+                                  title="Editar comentario"
+                                  onClick={() => {
+                                    setEditingReviewId(userReview.id);
+                                    setEditReviewRating(userReview.rating);
+                                    setEditReviewComment(userReview.comment);
+                                  }}
+                                  className="rounded p-1 text-primary transition-colors hover:bg-primary/10"
+                                >
+                                  <Pencil size={18} />
+                                </button>
+                                <button
+                                  type="button"
+                                  title="Eliminar comentario"
+                                  onClick={() => setReviewToDelete(userReview.id)}
+                                  className="rounded p-1 text-text-light transition-colors hover:bg-text-light/10"
+                                >
+                                  <Trash2 size={18} />
+                                </button>
+                              </div>
+                            </>
+                          )}
+                        </article>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="mt-6 grid gap-4">
+                    {otherReviews.length > 0 && <h3 className="text-lg font-bold text-text-light mb-2">Comentarios de otros compradores</h3>}
                     {visibleReviews.map((review) => (
                       <article
                         key={review.id}
@@ -1130,30 +1275,6 @@ function ProductDetailInner({
                                   </button>
                                 )}
                               </>
-                            )}
-                            {user?.uid === review.authorId && (
-                              <div className="mt-3 flex gap-3">
-                                <button
-                                  type="button"
-                                  title="Editar comentario"
-                                  onClick={() => {
-                                    setEditingReviewId(review.id);
-                                    setEditReviewRating(review.rating);
-                                    setEditReviewComment(review.comment);
-                                  }}
-                                  className="rounded p-1 text-primary transition-colors hover:bg-primary/10"
-                                >
-                                  <Pencil size={18} />
-                                </button>
-                                <button
-                                  type="button"
-                                  title="Eliminar comentario"
-                                  onClick={() => setReviewToDelete(review.id)}
-                                  className="rounded p-1 text-text-light transition-colors hover:bg-text-light/10"
-                                >
-                                  <Trash2 size={18} />
-                                </button>
-                              </div>
                             )}
                           </>
                         )}
