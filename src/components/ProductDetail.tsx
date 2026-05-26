@@ -918,11 +918,15 @@ function ProductDetailInner({
                       </div>
                     </div>
                     <div>
-                      <label htmlFor="comment" className="block text-sm font-medium text-text-light mb-2">Comentario</label>
+                      <div className="flex justify-between items-center mb-2">
+                        <label htmlFor="comment" className="block text-sm font-medium text-text-light">Comentario</label>
+                        <span className="text-xs text-text-light opacity-60">{newReviewComment.length}/256</span>
+                      </div>
                       <textarea
                         id="comment"
                         rows={3}
                         required
+                        maxLength={256}
                         value={newReviewComment}
                         onChange={(e) => setNewReviewComment(e.target.value)}
                         placeholder="¿Qué te pareció el producto?"
