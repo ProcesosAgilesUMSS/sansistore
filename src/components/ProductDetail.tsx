@@ -996,7 +996,7 @@ function ProductDetailInner({
                             if (element) reviewRefs.current.set(review.id, element);
                             else reviewRefs.current.delete(review.id);
                           }}
-                          className={`mt-3 text-sm leading-6 text-text-light opacity-80 ${!expandedReviews.has(review.id) ? 'line-clamp-3' : ''}`}
+                          className={`mt-3 break-all text-sm leading-6 text-text-light opacity-80 ${!expandedReviews.has(review.id) ? 'line-clamp-3' : ''}`}
                         >
                           {review.comment}
                         </p>
