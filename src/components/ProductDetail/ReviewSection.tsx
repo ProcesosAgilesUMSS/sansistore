@@ -153,7 +153,6 @@ export default function ReviewSection({
           </div>
 
           <div className="mt-6 grid gap-4">
-            {reviews.length > 0 && <h3 className="text-lg font-bold text-text-light mb-2">Comentarios de otros compradores</h3>}
             {visibleReviews.map((review) => (
               <ReviewCard
                 key={review.id}

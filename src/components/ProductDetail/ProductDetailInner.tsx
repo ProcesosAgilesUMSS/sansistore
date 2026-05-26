@@ -295,47 +295,44 @@ export default function ProductDetailInner({
               <ProductInfoSection product={product} loading={loading} />
             </div>
 
-            {authReady && canReview && !userReview && (
+            {authReady && canReview && (
               <div className="rounded-[2rem] border border-border-light bg-card-bg-light px-5 py-6 sm:px-8 sm:py-8">
-                <h3 className="mb-4 text-lg font-bold text-text-light">Dejar un comentario</h3>
-                <ReviewForm
-                  rating={newReviewRating}
-                  comment={newReviewComment}
-                  onRatingChange={setNewReviewRating}
-                  onCommentChange={setNewReviewComment}
-                  onSubmit={handleSubmitReview}
-                  isSubmitting={submittingReview}
-                  submitLabel="Publicar comentario"
-                  submittingLabel="Publicando..."
-                />
-              </div>
-            )}
-
-            {userReview && (
-              <div>
-                <h3 className="mb-4 text-lg font-bold text-text-light">Tu comentario</h3>
-                <ReviewCard
-                  review={userReview}
-                  isUserReview
-                  isEditing={editingReviewId === userReview.id}
-                  isExpanded={userReviewExpanded}
-                  isTruncated={userReviewTruncated}
-                  editRating={editReviewRating}
-                  editComment={editReviewComment}
-                  isUpdating={updatingReview}
-                  onEditRatingChange={setEditReviewRating}
-                  onEditCommentChange={setEditReviewComment}
-                  onStartEdit={() => {
-                    setEditingReviewId(userReview.id);
-                    setEditReviewRating(userReview.rating);
-                    setEditReviewComment(userReview.comment);
-                  }}
-                  onCancelEdit={() => setEditingReviewId(null)}
-                  onSaveEdit={handleUpdateReview}
-                  onDelete={() => setReviewToDelete(userReview.id)}
-                  onToggleExpand={() => setUserReviewExpanded((prev) => !prev)}
-                  setReviewRef={setUserReviewRef}
-                />
+                <h3 className="mb-6 text-lg font-bold text-text-light">Tu opinión</h3>
+                {!userReview ? (
+                  <ReviewForm
+                    rating={newReviewRating}
+                    comment={newReviewComment}
+                    onRatingChange={setNewReviewRating}
+                    onCommentChange={setNewReviewComment}
+                    onSubmit={handleSubmitReview}
+                    isSubmitting={submittingReview}
+                    submitLabel="Publicar comentario"
+                    submittingLabel="Publicando..."
+                  />
+                ) : (
+                  <ReviewCard
+                    review={userReview}
+                    isUserReview
+                    isEditing={editingReviewId === userReview.id}
+                    isExpanded={userReviewExpanded}
+                    isTruncated={userReviewTruncated}
+                    editRating={editReviewRating}
+                    editComment={editReviewComment}
+                    isUpdating={updatingReview}
+                    onEditRatingChange={setEditReviewRating}
+                    onEditCommentChange={setEditReviewComment}
+                    onStartEdit={() => {
+                      setEditingReviewId(userReview.id);
+                      setEditReviewRating(userReview.rating);
+                      setEditReviewComment(userReview.comment);
+                    }}
+                    onCancelEdit={() => setEditingReviewId(null)}
+                    onSaveEdit={handleUpdateReview}
+                    onDelete={() => setReviewToDelete(userReview.id)}
+                    onToggleExpand={() => setUserReviewExpanded((prev) => !prev)}
+                    setReviewRef={setUserReviewRef}
+                  />
+                )}
               </div>
             )}
 

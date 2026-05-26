@@ -26,19 +26,19 @@ export default function ReviewForm({
   showCancel,
 }: ReviewFormProps) {
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4">
-      <div>
-        <label className="block text-sm font-medium text-text-light mb-2">Calificación (1-5)</label>
-        <div className="flex gap-2 items-center">
+    <form onSubmit={onSubmit} className="flex flex-col gap-5">
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-medium text-text-light">Calificación</span>
+        <div className="flex gap-1">
           {[1, 2, 3, 4, 5].map((star) => (
              <button
                type="button"
                key={star}
                onClick={() => onRatingChange(star)}
-               className="focus:outline-none transition-transform hover:scale-110"
+               className="transition-transform hover:scale-110"
              >
                <Star
-                 size={28}
+                 size={24}
                  className={star <= rating ? "fill-primary text-primary" : "text-text-light opacity-20"}
                />
              </button>
@@ -47,7 +47,7 @@ export default function ReviewForm({
       </div>
       <div>
         <div className="flex justify-between items-center mb-2">
-          <label htmlFor="comment" className="block text-sm font-medium text-text-light">Comentario</label>
+          <label htmlFor="comment" className="text-sm font-medium text-text-light">Comentario</label>
           <span className="text-xs text-text-light opacity-60">{comment.length}/256</span>
         </div>
         <textarea
@@ -64,7 +64,7 @@ export default function ReviewForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="mt-2 self-start rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+          className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
         >
           {isSubmitting ? submittingLabel : submitLabel}
         </button>
@@ -72,7 +72,7 @@ export default function ReviewForm({
           <button
             type="button"
             onClick={onCancel}
-            className="mt-2 rounded-full border border-border-light px-6 py-2.5 text-sm font-semibold text-text-light transition-all hover:border-primary"
+            className="rounded-full border border-border-light px-6 py-2.5 text-sm font-semibold text-text-light transition-all hover:border-primary"
           >
             Cancelar
           </button>
