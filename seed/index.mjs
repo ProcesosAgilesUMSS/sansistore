@@ -229,6 +229,7 @@ async function seedOrders() {
 
     await setDoc('orders', order.code, {
       orderId: order.code,
+      code: order.buyerCode,
       buyerId: order.buyer.uid,
       sellerId: order.seller.uid,
       customerName: order.customerName,

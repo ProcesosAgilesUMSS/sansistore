@@ -5,6 +5,7 @@ import { Locations } from './locations.mjs';
 export const Orders = {
   ORDER_001: {
     code: 'order-001',
+    buyerCode: '2491',
     buyer: Users.ANA,
     seller: Users.PEDRO,
     location: Locations.LOC_ANA_AULA,
@@ -22,6 +23,7 @@ export const Orders = {
   },
   ORDER_002: {
     code: 'order-002',
+    buyerCode: '5763',
     buyer: Users.CARLOS,
     seller: Users.PEDRO,
     location: Locations.LOC_CARLOS,
@@ -39,6 +41,7 @@ export const Orders = {
   },
   ORDER_003: {
     code: 'order-003',
+    buyerCode: '8305',
     buyer: Users.MARIA,
     seller: Users.PEDRO,
     location: Locations.LOC_ANA_LAB,
@@ -55,6 +58,7 @@ export const Orders = {
   },
   ORDER_004: {
     code: 'order-004',
+    buyerCode: '6147',
     buyer: Users.JUAN,
     seller: Users.PEDRO,
     location: Locations.LOC_CARLOS,
@@ -71,6 +75,7 @@ export const Orders = {
   },
   ORDER_005: {
     code: 'order-005',
+    buyerCode: '3927',
     buyer: Users.MARIA,
     seller: Users.PEDRO,
     location: Locations.LOC_MARIA,
@@ -88,6 +93,7 @@ export const Orders = {
   },
   ORDER_006: {
     code: 'order-006',
+    buyerCode: '1582',
     buyer: Users.JUAN,
     seller: Users.PEDRO,
     location: Locations.LOC_JUAN,
@@ -105,6 +111,7 @@ export const Orders = {
   },
   ORDER_007: {
     code: 'order-007',
+    buyerCode: '7048',
     buyer: Users.ANA,
     seller: Users.PEDRO,
     location: Locations.LOC_ANA_AULA,
@@ -121,6 +128,7 @@ export const Orders = {
   },
   ORDER_008: {
     code: 'order-008',
+    buyerCode: '4651',
     buyer: Users.ANA,
     seller: Users.PEDRO,
     location: Locations.LOC_ANA_LAB,
@@ -138,6 +146,7 @@ export const Orders = {
   },
   ORDER_009: {
     code: 'order-009',
+    buyerCode: '2836',
     buyer: Users.JUAN,
     seller: Users.PEDRO,
     location: Locations.LOC_JUAN,
@@ -155,6 +164,7 @@ export const Orders = {
   },
   ORDER_010: {
     code: 'order-010',
+    buyerCode: '9174',
     buyer: Users.MARIA,
     seller: Users.PEDRO,
     location: Locations.LOC_MARIA,
@@ -172,6 +182,7 @@ export const Orders = {
   },
   ORDER_011: {
     code: 'order-011',
+    buyerCode: '3560',
     buyer: Users.CARLOS,
     seller: Users.PEDRO,
     location: Locations.LOC_CARLOS,
@@ -189,6 +200,7 @@ export const Orders = {
   },
   ORDER_012: {
     code: 'order-012',
+    buyerCode: '6428',
     buyer: Users.MARIA,
     seller: Users.PEDRO,
     location: Locations.LOC_MARIA,
@@ -206,6 +218,7 @@ export const Orders = {
   },
   ORDER_013: {
     code: 'order-013',
+    buyerCode: '8073',
     buyer: Users.JUAN,
     seller: Users.PEDRO,
     location: Locations.LOC_JUAN,
@@ -221,6 +234,7 @@ export const Orders = {
   },
   ORDER_014: {
     code: 'order-014',
+    buyerCode: '1290',
     buyer: Users.ANA,
     seller: Users.PEDRO,
     location: Locations.LOC_ANA_AULA,
@@ -236,6 +250,7 @@ export const Orders = {
   },
   ORDER_015: {
     code: 'order-015',
+    buyerCode: '4735',
     buyer: Users.CARLOS,
     seller: Users.PEDRO,
     location: Locations.LOC_CARLOS,
@@ -252,6 +267,7 @@ export const Orders = {
   },
   ORDER_016: {
     code: 'order-016',
+    buyerCode: '5681',
     buyer: Users.MARIA,
     seller: Users.PEDRO,
     location: Locations.LOC_MARIA,
@@ -267,6 +283,7 @@ export const Orders = {
   },
   ORDER_017: {
     code: 'order-017',
+    buyerCode: '3049',
     buyer: Users.ANA,
     seller: Users.PEDRO,
     location: Locations.LOC_ANA_AULA,
@@ -282,6 +299,7 @@ export const Orders = {
   },
   ORDER_018: {
     code: 'order-018',
+    buyerCode: '7206',
     buyer: Users.CARLOS,
     seller: Users.PEDRO,
     location: Locations.LOC_CARLOS,
@@ -297,6 +315,7 @@ export const Orders = {
   },
   ORDER_019: {
     code: 'order-019',
+    buyerCode: '8951',
     buyer: Users.MARIA,
     seller: Users.PEDRO,
     location: Locations.LOC_MARIA,
@@ -312,6 +331,7 @@ export const Orders = {
   },
   ORDER_020: {
     code: 'order-020',
+    buyerCode: '1463',
     buyer: Users.JUAN,
     seller: Users.PEDRO,
     location: Locations.LOC_JUAN,
@@ -328,6 +348,7 @@ export const Orders = {
 
   ORDER_021: {
     code: 'order-021',
+    buyerCode: '6382',
     buyer: Users.JUAN,
     seller: Users.PEDRO,
     location: Locations.LOC_JUAN,
@@ -346,6 +367,7 @@ export const Orders = {
   },
   ORDER_022: {
     code: 'order-022',
+    buyerCode: '4578',
     buyer: Users.MARIA,
     seller: Users.PEDRO,
     location: Locations.LOC_MARIA,
@@ -364,6 +386,7 @@ export const Orders = {
   },
   ORDER_023: {
     code: 'order-023',
+    buyerCode: '2914',
     buyer: Users.CARLOS,
     seller: Users.PEDRO,
     location: Locations.LOC_CARLOS,
@@ -381,6 +404,7 @@ export const Orders = {
   },
   ORDER_024: {
     code: 'order-020',
+    buyerCode: '8357',
     buyer: Users.ANA,
     seller: Users.PEDRO,
     location: Locations.LOC_ANA_AULA,
@@ -399,6 +423,7 @@ export const Orders = {
   },
   ORDER_014: {
     code: 'order-014',
+    buyerCode: '5192',
     buyer: Users.ANA,
     seller: Users.PEDRO,
     location: Locations.LOC_ANA_AULA,
@@ -416,6 +441,7 @@ export const Orders = {
   },
   ORDER_015: {
     code: 'order-015',
+    buyerCode: '6804',
     buyer: Users.JUAN,
     seller: Users.PEDRO,
     location: Locations.LOC_JUAN,
