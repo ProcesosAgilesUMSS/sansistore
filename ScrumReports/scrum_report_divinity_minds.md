@@ -282,3 +282,9 @@
 - **Yesterday:** Participé en la reunión de Sprint Retrospective junto al equipo, aportando en la identificación de mejoras y acuerdos del sprint.
 - **Today:** Apoyé a otro grupo con el despliegue y configuración de sus Cloud Functions en Firebase.
 - **Blockers:** n/a.
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Finalicé el desarrollo de la Tarea #35, implementando la funcionalidad para que el comprador pueda dejar reseñas de un producto. Incluye la opción de escribir comentarios y un sistema de calificación que permite seleccionar de 1 a 5 estrellas.
+- **Today:** Me enfocaré en realizar las pruebas correspondientes a esta tarea para validar su correcto funcionamiento.
+- **Blockers:** n/a.
