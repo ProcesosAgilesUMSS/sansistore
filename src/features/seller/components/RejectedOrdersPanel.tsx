@@ -117,7 +117,7 @@ export default function RejectedOrdersPanel({ embedded = false }: { embedded?: b
           <SectionHeader title="Pendiente reasignación" count={rejected.length} />
 
           {loading ? skeletons : rejected.length === 0 ? emptyState('No hay pedidos pendientes de reasignación.') : (
-            <div className="grid gap-4 2xl:grid-cols-2">
+            <div className="grid gap-4">
               {rejected.map((order) => (
                 <CardOrder
                   key={order.orderId}

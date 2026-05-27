@@ -95,7 +95,7 @@ export default function ReadyOrdersPanel({ embedded = false }: { embedded?: bool
     <div className={embedded ? 'w-full min-w-0' : 'min-h-screen bg-(--theme-bg) px-4 pb-10 pt-10 md:px-8 xl:px-10'}>
       <Header
         title="Pedidos listos"
-        description="Revisa los pedidos listos y asigna un mensajero desde una vista más visual."
+        description="Revisa los pedidos listos y asigna a un mensajero."
       />
 
       {error && (
@@ -146,7 +146,7 @@ export default function ReadyOrdersPanel({ embedded = false }: { embedded?: bool
           {loading ? skeletons : ready.length === 0
             ? emptyState('No hay pedidos listos para asignar.')
             : (
-              <div className="grid gap-4 2xl:grid-cols-2">
+              <div className="grid gap-4">
                 {ready.map((order) => (
                   <CardOrder
                     key={order.orderId}

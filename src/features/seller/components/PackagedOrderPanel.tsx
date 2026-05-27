@@ -105,7 +105,7 @@ export default function PackagedOrdersPanel({ embedded = false }: { embedded?: b
       )}
 
       {loading ? (
-        <div className="grid gap-6 xl:grid-cols-2">
+        <div className="grid gap-6">
           {[1, 2, 3, 4].map((i) => (
             <div
               key={i}
@@ -150,7 +150,7 @@ export default function PackagedOrdersPanel({ embedded = false }: { embedded?: b
                 </p>
               </div>
             ) : (
-              <div className="grid gap-4 2xl:grid-cols-2">
+              <div className="grid gap-4">
                 {reserved.map((order) => (
                   <CardOrder
                     key={order.orderId}

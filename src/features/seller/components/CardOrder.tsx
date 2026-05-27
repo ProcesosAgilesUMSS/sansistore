@@ -24,6 +24,7 @@ export const CardOrder = ({
   successLabel = 'Pedido marcado como listo',
   primaryActionLoadingLabel = 'Procesando…',
 }: Props) => {
+  console.log('Rendering CardOrder for orderId:', order);
   return (
     <article className="overflow-hidden rounded-3xl border border-(--theme-border) bg-linear-to-br from-(--theme-card-bg) to-(--theme-secondary-bg)/40 shadow-sm duration-200 hover:shadow-xl">
       <div className="p-5">
