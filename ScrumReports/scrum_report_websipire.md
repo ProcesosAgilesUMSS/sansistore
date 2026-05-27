@@ -266,7 +266,6 @@ por las dudas que se tienen.
 * **Today:** Revisé las posibles dependencias de las HUs seleccionadas y avancé en la definición de algunos criterios de aceptación de algunas HUs.
 * **Blockers:** none
 
-# Daily Reports - Team 3 Webspire 21/05/26
 
 ## Alejandro Torrico Quispe
 
