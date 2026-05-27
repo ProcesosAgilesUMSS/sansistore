@@ -265,3 +265,25 @@ por las dudas que se tienen.
 * **Yesterday:** Me reuní con mi grupo para coordinar y definir las HUs que se trabajarán durante el Sprint 3.
 * **Today:** Revisé las posibles dependencias de las HUs seleccionadas y avancé en la definición de algunos criterios de aceptación de algunas HUs.
 * **Blockers:** none
+
+# Daily Reports - Team 3 Webspire 21/05/26
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Apoyar en la revisión y corrección de funcionalidades pendientes dentro del flujo de comprador.
+* **Today:** Implementar mejoras relacionadas al proceso de pago contra entrega y validar el correcto funcionamiento del flujo completo.
+* **Blockers:** none
+
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Revisar integraciones y coordinar detalles técnicos con el equipo para las HUs pendientes.
+* **Today:** Continuar con ajustes en el flujo de comprador y apoyar en la resolución de dudas entre equipos.
+* **Blockers:** none
+
+
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Realizar pruebas y validaciones de las funcionalidades implementadas en las últimas HUs.
+* **Today:** Colaborar en la integración de la opción “Pagar contra entrega” y verificar posibles errores en el flujo.
+* **Blockers:** none
