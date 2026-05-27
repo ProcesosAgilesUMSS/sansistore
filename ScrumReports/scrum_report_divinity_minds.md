@@ -269,3 +269,16 @@
 - **Today:** Revisar los últimos ajustes integrados, dar seguimiento a los despliegues y continuar apoyando en la organización de tareas y validación de funcionalidades del equipo.
 - **Blockers:** n/a.
 
+# 05/26/2026
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Participé en la reunión de Sprint Retrospective, aportando observaciones y puntos de mejora para el equipo.
+- **Today:** Revisé las tareas a realizar para el sprint actual, organizando y priorizando las actividades del equipo.
+- **Blockers:** n/a.
+
+## Velasquez Vela Marcos
+
+- **Yesterday:** Participé en la reunión de Sprint Retrospective junto al equipo, aportando en la identificación de mejoras y acuerdos del sprint.
+- **Today:** Apoyé a otro grupo con el despliegue y configuración de sus Cloud Functions en Firebase.
+- **Blockers:** n/a.
