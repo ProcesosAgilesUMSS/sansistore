@@ -2,6 +2,7 @@
 import Layout from './Layout.astro';
 import SideBarInventory from '../features/inventory/components/SideBarInventory.tsx';
 import Navbar from '../components/Navbar';
+import RouteGuard from '../components/RouteGuard';
 
 interface Props {
   title?: string;
@@ -17,12 +18,14 @@ const pathname = Astro.url.pathname;
 
     <div class="h-14 shrink-0"></div>
 
-    <div class="flex flex-1 min-h-0">
-      <SideBarInventory client:load pathname={pathname} />
+    <RouteGuard client:load allowedRoles={['operador_inv']} roleName="Inventario">
+      <div class="flex flex-1 min-h-0">
+        <SideBarInventory client:load pathname={pathname} />
 
-      <main class="flex-1 min-w-0 p-6 md:p-8 pb-24 md:pb-8">
-        <slot />
-      </main>
-    </div>
+        <main class="flex-1 min-w-0 p-6 md:p-8 pb-24 md:pb-8">
+          <slot />
+        </main>
+      </div>
+    </RouteGuard>
   </div>
 </Layout>

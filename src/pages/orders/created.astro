@@ -1,0 +1,8 @@
+---
+import OrdersLayout from '../../layouts/OrdersLayout.astro';
+import CreatedOrdersList from '../../features/orders/components/CreatedOrdersList';
+---
+
+<OrdersLayout title="Pedidos Creados" activeTab="created">
+  <CreatedOrdersList client:load />
+</OrdersLayout>

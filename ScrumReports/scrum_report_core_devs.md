@@ -76,7 +76,7 @@
 - **Blockers:**     Problemas al hacer push a la rama main.
 
 # Daily Report
-# 05/06/2026
+# 05/07/2026
 
 ## Soliz Moya Alejandra
 - **Yesterday:**    Mejore los detalles de las US.
@@ -92,3 +92,119 @@
 - **Yesterday:**    Realizar la estructura del proyecto
 - **Today:**        Terminar la creacion de productos
 - **Blockers:**     conlflictos menores
+
+
+
+
+# Daily Report
+# 05/12/2026
+  ## Gonza Rojas Willian D.
+  - **Yesterday:**    Revisar la demo, contratiempos de integracion
+  - **Today:**        Revisar y refinar US a trabajar en sprint 2
+  - **Blockers:**     Ninguno
+
+  ## Llanos Villarroel Vania F.
+  - **Yesterday:** Revisé los componentes del módulo de inventarios
+  - **Today:**  Continuar con mejoras en la interfaz de productos.      
+  - **Blockers:** Ninguno     
+
+  ## Rios Quiruchi Edney Jhojan
+  - **Yesterday:**    Implemente la subida de imagenes desde firebase
+  - **Today:**        Ayude en el retrospective
+  - **Blockers:**     ninguno
+
+  ## Sejas Arze Eddy
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Soliz Moya Alejandra
+  - **Yesterday:**    Realizar el retrospective
+  - **Today:**        Buscar posibles errores en la pagina
+  - **Blockers:**     ninguno
+
+# Daily Report
+# 05/14/2026
+  ## Gonza Rojas Willian D.
+  - **Yesterday:**    Terminar el refinamiento de US y coordinar trabajo y seleccion de US del sprint 2
+  - **Today:**        Seleccionar una US (Visualizacion en tiempo real) y revisar el bug reportado en el repositorio remoto
+  - **Blockers:**     Bug detectado.
+
+  ## Llanos Villarroel Vania F.
+  - **Yesterday:**   Apoyé en la revisión visual del módulo de inventarios. 
+  - **Today:**       Revisar la organización visual del stock 
+  - **Blockers:**    ninguno  
+
+  ## Rios Quiruchi Edney Jhojan
+  - **Yesterday:**    Colaborar en la seleccion de US para el srpint 2
+  - **Today:**        Colaborar en el detalle de las US
+  - **Blockers:**     ninguno
+
+  ## Sejas Arze Eddy
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Soliz Moya Alejandra
+  - **Yesterday:**   Revisar las US que se nos asignaron
+  - **Today:**       Mejorar la US 4
+  - **Blockers:**    ninguno    
+
+
+
+
+# Daily Report
+# 05/19/2026
+  ## Gonza Rojas Willian D.
+  - **Yesterday:**    Replantear solución al bug reportado, se resolvio el bug (es una US mal resuelta) y se estuvo terminando la US de visualizacion de stock en tiempo real
+  - **Today:**        Se realizó la US05 - visualización de stock en tiempo real, #62 pendiente de revision y coordinar con equipo de ventas y falta integrar a main
+  - **Blockers:**     El bug tomó mas tiempo del previsto.
+
+  ## Llanos Villarroel Vania F.
+  - **Yesterday:**  Colaboré con mejoras de diseño en el sistema de inventarios.  
+  - **Today:**      Continuar con detalles de interfaz y visualización. 
+  - **Blockers:**   ninguno  
+
+  ## Rios Quiruchi Edney Jhojan
+  - **Yesterday:**    Avanzar con la US de stock de inventario
+  - **Today:**        continuar con la US de stock de inventario
+  - **Blockers:**     dudas con la US
+
+  ## Sejas Arze Eddy
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Soliz Moya Alejandra
+  - **Yesterday:**    Mejorar las US definidas
+  - **Today:**        Colaborar en el diseño para visualizacion del stock
+  - **Blockers:**     ninguno
+
+ 
+
+# Daily Report
+# 05/21/2026
+  ## Gonza Rojas Willian D.
+  - **Yesterday:**    Se ayudó a terminar la US#61 de ajuste manual de cantidades, se realizó la US#62 de visualizacion de stock disponible, falta mejorar el diseño. Se coordino con los demas grupos para el flujo de STATUS para la realizacion de la US#73
+  - **Today:**        Se realizó las US#64 y US#65 de entrada y salida de productos segun corresponda, tambien se corrigio y termino la US#73 con la correccion de estados con el docente.
+  - **Blockers:**     Se tardó mucho en preguntar y entender el flujo de estados para #73
+
+  ## Llanos Villarroel Vania F.
+  - **Yesterday:**  
+  - **Today:**      
+  - **Blockers:**   
+
+  ## Rios Quiruchi Edney Jhojan
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Sejas Arze Eddy
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Soliz Moya Alejandra
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     

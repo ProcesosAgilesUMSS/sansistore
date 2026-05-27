@@ -1,0 +1,14 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import { CartView } from '../features/cart';
+---
+
+<Layout title="Mi Carrito | SansiStore">
+  <Navbar client:load />
+  <main class="cart-page w-full max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-12 flex-1">
+    <CartView client:load />
+  </main>
+  <Footer client:idle />
+</Layout>

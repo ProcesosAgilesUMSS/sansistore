@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { db } from '../../../lib/firebase';
+import { useAuthUser } from '../../../hooks/useAuthUser';
 import type { Order, Messenger } from '../types';
 import {
   subscribeSellerOrders,
@@ -9,9 +10,8 @@ import {
   unassignCourierFromDelivery,
 } from '../services/sellerServices';
 
-const TEMP_SELLER_ID = 'user-vendedor-001';
-
 export function useAssignOrders() {
+  const { user, authReady } = useAuthUser();
   const [ready, setReady] = useState<Order[]>([]);
   const [assigned, setAssigned] = useState<Order[]>([]);
   const [messengers, setMessengers] = useState<Messenger[]>([]);
@@ -22,9 +22,18 @@ export function useAssignOrders() {
   const [assigningOrderId, setAssigningOrderId] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!authReady) return;
+
+    if (!user?.uid) {
+      setReady([]);
+      setAssigned([]);
+      setLoading(false);
+      return;
+    }
+
     const unsub = subscribeSellerOrders(
       db,
-      TEMP_SELLER_ID,
+      user.uid,
       (_reserved, readyOrders) => {
         setReady(readyOrders);
         setLoading(false);
@@ -35,17 +44,24 @@ export function useAssignOrders() {
       },
     );
     return unsub;
-  }, []);
+  }, [authReady, user?.uid]);
 
   useEffect(() => {
+    if (!authReady) return;
+
+    if (!user?.uid) {
+      setAssigned([]);
+      return;
+    }
+
     const unsub = subscribeAssignedOrders(
       db,
-      TEMP_SELLER_ID,
+      user.uid,
       (assignedOrders) => setAssigned(assignedOrders),
       (err) => setError(err.message),
     );
     return unsub;
-  }, []);
+  }, [authReady, user?.uid]);
 
   useEffect(() => {
     fetchMessengers(db)
@@ -53,6 +69,23 @@ export function useAssignOrders() {
       .catch(() => setError('No se pudieron cargar los mensajeros.'))
       .finally(() => setMessengersLoading(false));
   }, []);
+
+  const reassignOrder = useCallback(
+    async (orderId: string, deliveryId: string, newCourierId: string) => {
+      if (!newCourierId || !deliveryId) return;
+
+      setAssigningOrderId(orderId);
+      try {
+        const { reassignCourierToDelivery } = await import('../services/sellerServices');
+        await reassignCourierToDelivery(db, deliveryId, orderId, newCourierId);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Error al reasignar mensajero.');
+      } finally {
+        setAssigningOrderId(null);
+      }
+    },
+    [],
+  );
 
   const selectCourier = useCallback((orderId: string, courierId: string) => {
     setSelectedCourier((prev) => ({ ...prev, [orderId]: courierId }));
@@ -98,5 +131,6 @@ export function useAssignOrders() {
     assigningOrderId,
     assignOrder,
     unassignOrder,
+    reassignOrder,
   };
 }

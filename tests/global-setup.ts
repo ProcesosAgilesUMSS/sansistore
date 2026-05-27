@@ -1,13 +1,44 @@
-import { spawn } from 'child_process';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import { execSync, spawn } from 'child_process';
 
 let emulatorProcess = null;
 
-process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080';
-process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
+const FIRESTORE_TEST_HOST = '127.0.0.1:8180';
+const AUTH_TEST_HOST = '127.0.0.1:9199';
+
+process.env.FIRESTORE_EMULATOR_HOST = FIRESTORE_TEST_HOST;
+process.env.FIREBASE_AUTH_EMULATOR_HOST = AUTH_TEST_HOST;
+
+function stopProcessesOnPorts(ports: number[]) {
+  if (process.platform === 'win32') {
+    for (const port of ports) {
+      try {
+        const output = execSync(
+          `powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort ${port} -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique"`,
+          { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }
+        );
+        const pids = output
+          .split(/\r?\n/)
+          .map((line) => Number(line.trim()))
+          .filter((pid) => Number.isInteger(pid) && pid > 0);
+
+        for (const pid of pids) {
+          execSync(`taskkill /PID ${pid} /T /F`, { stdio: 'ignore' });
+        }
+      } catch {
+      }
+    }
+    return;
+  }
+
+  for (const port of ports) {
+    try {
+      execSync(`lsof -ti tcp:${port} | xargs -r kill -9`, {
+        stdio: 'ignore',
+      });
+    } catch {
+    }
+  }
+}
 
 async function waitForEmulator(
   host: string,
@@ -25,8 +56,7 @@ async function waitForEmulator(
         console.log(`✓ ${label} emulator is ready`);
         return true;
       }
-    } catch (err) {
-      // Connection failed, retry
+    } catch {
     }
     attempts++;
     await new Promise((resolve) => setTimeout(resolve, delayMs));
@@ -36,17 +66,19 @@ async function waitForEmulator(
 
 async function runSeed() {
   await new Promise<void>((resolve, reject) => {
-    const seedProcess = spawn('bun', ['run', 'seed'], {
+    const seedProcess = spawn(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['run', 'seed'], {
       stdio: 'inherit',
       detached: false,
+      shell: true,
       env: {
         ...process.env,
-        FIRESTORE_EMULATOR_HOST: 'localhost:8080',
-        FIREBASE_AUTH_EMULATOR_HOST: 'localhost:9099',
+        FIRESTORE_EMULATOR_HOST: FIRESTORE_TEST_HOST,
+        FIREBASE_AUTH_EMULATOR_HOST: AUTH_TEST_HOST,
         PUBLIC_FIREBASE_PROJECT_ID:
           process.env.PUBLIC_FIREBASE_PROJECT_ID || 'sansistore',
       },
     });
+
 
     seedProcess.on('error', reject);
     seedProcess.on('exit', (code) => {
@@ -64,16 +96,27 @@ async function runSeed() {
 
 export default async function globalSetup() {
   console.log('Starting Playwright global setup...');
+  stopProcessesOnPorts([8180, 9199, 4100, 4502, 4600, 9151]);
 
   console.log(
-    'Starting Firestore and Auth emulators on ports 8080 and 9099...'
+    'Starting Firestore and Auth emulators on ports 8180 and 9199...'
   );
   emulatorProcess = spawn(
-    'firebase',
-    ['emulators:start', '--only', 'firestore,auth', '--project', 'sansistore'],
+    process.platform === 'win32' ? 'npx.cmd' : 'npx',
+    [
+      'firebase-tools',
+      'emulators:start',
+      '--only',
+      'firestore,auth',
+      '--project',
+      'sansistore',
+      '--config',
+      'firebase.testing.json',
+    ],
     {
       stdio: ['ignore', 'pipe', 'pipe'],
       detached: false,
+      shell: true,
     }
   );
 
@@ -90,8 +133,9 @@ export default async function globalSetup() {
     });
   }
 
-  await waitForEmulator('localhost:8080', 'Firestore');
-  await waitForEmulator('localhost:9099', 'Auth');
+  await waitForEmulator(FIRESTORE_TEST_HOST, 'Firestore');
+  await waitForEmulator(AUTH_TEST_HOST, 'Auth');
+  await new Promise((resolve) => setTimeout(resolve, 1500));
 
   await runSeed();
   console.log('✓ Shared test data seeded');

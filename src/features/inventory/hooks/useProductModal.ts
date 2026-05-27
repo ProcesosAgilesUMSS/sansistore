@@ -1,5 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { collection, addDoc, getDocs, updateDoc } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  serverTimestamp,
+  doc,
+  setDoc,
+} from 'firebase/firestore';
 import {
   uploadBytesResumable,
   getDownloadURL,
@@ -28,6 +34,9 @@ export const useProductModal = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [successProductName, setSuccessProductName] = useState('');
 
   const uploadTaskRef = useRef<ReturnType<typeof uploadBytesResumable> | null>(
     null
@@ -69,6 +78,8 @@ export const useProductModal = () => {
     setUploadProgress(0);
     setUploadError('');
     setIsUploading(false);
+    setIsSuccess(false); // Resetear estado de éxito
+    setSuccessProductName('');
   }, [form]);
 
   const handleCancelUpload = useCallback(() => {
@@ -138,23 +149,58 @@ export const useProductModal = () => {
           imageUrl = await uploadImage(imageFile);
           if (!imageUrl) return;
         }
-        const docRef = await addDoc(collection(db, 'products'), {
+
+        const slug = data.name
+          .toLowerCase()
+          .trim()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/[\s_-]+/g, '-')
+          .replace(/^-+|-+$/g, '');
+
+        const formData = data as any;
+
+        const productData = {
           ...data,
+          slug,
           imageUrl,
+          active: true,
+          createdAt: serverTimestamp(),
           price: Number(data.price),
           offerPrice: data.hasOffer ? Number(data.offerPrice) : null,
           soldCount: Number(data.soldCount) || 0,
-        });
-        await updateDoc(docRef, { productId: docRef.id });
-        handleClose();
+          categoryId: data.categoryId,
+        };
+
+        const inventoryData = {
+          enabled: true,
+          minStock: Number(formData.minStock || 5),
+          productId: slug,
+          stockAvailable: Number(formData.stockTotal || 0),
+          stockReserved: 0,
+          stockTotal: Number(formData.stockTotal || 0),
+          updatedAt: serverTimestamp(),
+        };
+
+        await setDoc(doc(db, 'products', slug), productData);
+        await setDoc(doc(db, 'inventory', slug), inventoryData);
+
+        setSuccessProductName(data.name);
+        setIsSuccess(true);
+
+        setTimeout(() => {
+          window.location.reload();
+        }, 2500);
+
       } catch (err) {
         if (err instanceof Error && err.message === 'CANCELLED') return;
         setUploadError(
-          `Error al guardar: ${err instanceof Error ? err.message : 'Error desconocido'}`
+          `Error: ${err instanceof Error ? err.message : 'Error desconocido'}`
         );
       }
     },
-    [imageFile, handleClose, uploadImage]
+    [imageFile, uploadImage]
   );
 
   return {
@@ -174,5 +220,7 @@ export const useProductModal = () => {
     handleClose,
     handleCancelUpload,
     onSubmit,
+    isSuccess,
+    successProductName
   };
 };

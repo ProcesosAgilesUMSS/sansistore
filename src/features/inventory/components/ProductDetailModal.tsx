@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   X,
   Tag,
@@ -9,6 +9,7 @@ import {
   Hash,
   Layers,
   ImageOff,
+  CheckCircle2,
 } from 'lucide-react';
 import { type InventoryProduct } from '../models/product.model';
 
@@ -16,17 +17,58 @@ interface Props {
   product: InventoryProduct;
   onClose: () => void;
   onToggleActive: () => void;
+  onInitializeStock: (productId: string, quantity: number) => Promise<void>;
 }
 
 export const ProductDetailModal: React.FC<Props> = ({
   product,
   onClose,
   onToggleActive,
+  onInitializeStock,
 }) => {
+  const [initialQty, setInitialQty] = useState<number | ''>('');
+  const [isInitializing, setIsInitializing] = useState(false);
+  
+  const [successQty, setSuccessQty] = useState<number | null>(null);
+  const [hasInitializedLocal, setHasInitializedLocal] = useState(false);
+
+  const handleInitialize = async () => {
+    if (initialQty === '' || initialQty <= 0) return;
+    
+    setIsInitializing(true);
+    try {
+      await onInitializeStock(product.id, Number(initialQty));
+      
+      setSuccessQty(Number(initialQty));
+      
+      setHasInitializedLocal(true);
+      
+      setTimeout(() => {
+        setSuccessQty(null);
+      }, 3000);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsInitializing(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+      {successQty !== null && (
+        <div className="absolute z-[60] flex flex-col items-center justify-center bg-(--theme-card-bg) border border-green-500/30 shadow-2xl rounded-2xl p-6 animate-in zoom-in-95 fade-in duration-200">
+          <div className="w-12 h-12 rounded-full bg-green-500/15 flex items-center justify-center text-green-500 mb-3">
+            <CheckCircle2 className="w-6 h-6" />
+          </div>
+          <p className="font-['Outfit'] font-bold text-lg text-(--theme-text)">¡Éxito!</p>
+          <p className="text-sm text-(--theme-text) opacity-70 text-center mt-1">
+            Se inicializaron <strong className="text-green-500">{successQty} unidades</strong>.
+          </p>
+        </div>
+      )}
+
       <div className="bg-(--theme-card-bg) border border-(--theme-border) rounded-3xl w-full max-w-sm shadow-2xl animate-in fade-in zoom-in duration-200 overflow-hidden flex flex-col max-h-[90vh]">
-        {/* ── Imagen hero ── */}
+        
         <div className="relative h-48 bg-(--theme-secondary-bg) flex items-center justify-center overflow-hidden shrink-0">
           {product.imageUrl ? (
             <img
@@ -38,7 +80,6 @@ export const ProductDetailModal: React.FC<Props> = ({
             <ImageOff className="w-14 h-14 opacity-20 text-(--theme-text)" />
           )}
 
-          {/* Badge */}
           {product.badge && (
             <span className="absolute top-3 left-3 bg-primary text-white text-[0.6rem] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full flex items-center gap-1">
               <Tag className="w-2.5 h-2.5" />
@@ -46,7 +87,6 @@ export const ProductDetailModal: React.FC<Props> = ({
             </span>
           )}
 
-          {/* Botón cerrar */}
           <button
             onClick={onClose}
             className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition-colors"
@@ -54,10 +94,7 @@ export const ProductDetailModal: React.FC<Props> = ({
             <X className="w-4 h-4" />
           </button>
         </div>
-
-        {/* ── Contenido scrolleable ── */}
         <div className="overflow-y-auto flex-1 px-5 py-4 space-y-4">
-          {/* Nombre, slug y categoría */}
           <div>
             <div className="flex items-center gap-1.5 text-[0.65rem] uppercase tracking-widest text-(--theme-text) opacity-40 mb-1">
               <Layers className="w-3 h-3" />
@@ -78,7 +115,6 @@ export const ProductDetailModal: React.FC<Props> = ({
             )}
           </div>
 
-          {/* Descripción */}
           {product.description && (
             <p className="text-sm text-(--theme-text) opacity-60 leading-relaxed">
               {product.description}
@@ -94,17 +130,11 @@ export const ProductDetailModal: React.FC<Props> = ({
                 <span className="font-['Outfit'] font-bold text-2xl text-green-500">
                   ${product.offerPrice.toFixed(2)}
                 </span>
-
                 <span className="text-base text-(--theme-text) opacity-40 line-through">
                   ${product.price.toFixed(2)}
                 </span>
-
                 <span className="text-[0.65rem] bg-green-500/15 text-green-500 font-bold px-2 py-0.5 rounded-full">
-                  -
-                  {Math.round(
-                    ((product.price - product.offerPrice) / product.price) * 100
-                  )}
-                  %
+                  -{Math.round(((product.price - product.offerPrice) / product.price) * 100)}%
                 </span>
               </>
             ) : (
@@ -114,8 +144,38 @@ export const ProductDetailModal: React.FC<Props> = ({
             )}
           </div>
 
-          {/* Divider */}
           <hr className="border-(--theme-border)" />
+
+          {product.stockAvailable === 0 && !hasInitializedLocal && (
+            <div className="p-4 rounded-2xl bg-primary/5 border border-primary/20 space-y-3">
+              <div className="flex flex-col">
+                <span className="text-[0.65rem] uppercase tracking-widest font-bold text-primary mb-2">
+                  Inicialice Stock
+                </span>
+                <p className="text-[0.7rem] opacity-70 mb-3 text-(--theme-text)">
+                  Este producto no tiene existencias todavia. Ingresa el stock inicial contado físicamente.
+                </p>
+                
+                <div className="flex flex-col gap-2.5">
+                  <input
+                    type="number"
+                    min="0"
+                    value={initialQty}
+                    onChange={(e) => setInitialQty(e.target.value === '' ? '' : Number(e.target.value))}
+                    placeholder="Cantidad inicial..."
+                    className="w-full bg-(--theme-secondary-bg) border border-(--theme-border) text-(--theme-text) rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-primary transition-colors"
+                  />
+                  <button
+                    disabled={isInitializing || initialQty === '' || initialQty <= 0}
+                    onClick={handleInitialize}
+                    className="w-full bg-primary text-white py-2.5 rounded-xl font-bold text-xs hover:brightness-110 disabled:opacity-50 disabled:grayscale transition-all shadow-md shadow-primary/10"
+                  >
+                    {isInitializing ? 'Cargando...' : 'Inicializar Stock'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Estado */}
           <div className="flex items-center justify-between pt-1">
@@ -139,7 +199,6 @@ export const ProductDetailModal: React.FC<Props> = ({
             </span>
           </div>
 
-          {/* Source URL */}
           {product.sourceUrl && (
             <a
               href={product.sourceUrl}
@@ -152,8 +211,7 @@ export const ProductDetailModal: React.FC<Props> = ({
             </a>
           )}
         </div>
-
-        {/* ── Acciones fijas al fondo ── */}
+        
         <div className="px-5 py-4 border-t border-(--theme-border) shrink-0">
           <button
             onClick={onToggleActive}

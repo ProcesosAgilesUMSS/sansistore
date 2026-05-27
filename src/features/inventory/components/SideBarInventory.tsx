@@ -57,11 +57,14 @@ export default function SideBarInventory({ pathname }: SideBarInventoryProps) {
         overflow-y-auto overflow-x-hidden
       "
     >
+      {/* logo repetido??? 
       <div className="flex items-center gap-2.5 px-2 pb-5 mb-5 border-b border-(--theme-border)">
         <span className="font-['Outfit'] font-black text-[1.05rem] text-(--theme-text) tracking-tight leading-none">
           sansi<span className="text-primary">store</span>
         </span>
       </div>
+      */}
+
 
       {NAV_SECTIONS.map((section, si) => (
         <div key={si} className="mb-6">
