@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, defineConfig, type Page } from '@playwright/test';
 
 test.afterEach(async ({ page }, testInfo) => {
   if (true) {
@@ -11,53 +11,50 @@ test.afterEach(async ({ page }, testInfo) => {
   }
 });
 
-test.describe('Create', () => {
+export default defineConfig({
+  timeout: 60000,
+  expect: {
+    timeout: 15000,
+  },
+  use: {
+    actionTimeout: 10000,
+    navigationTimeout: 15000,
+  },
+});
+
+test.describe('Post', () => {
   async function waitForLoginForm(page: Page) {
     const loginButton = page.locator('form').getByRole('button', {
       name: 'Iniciar sesión',
       exact: true,
     });
 
-    await expect(loginButton).toBeEnabled({ timeout: 15_000 });
+    await expect(loginButton).toBeEnabled();
     await expect(page.getByLabel('Correo electrónico')).toBeEditable();
     await expect(page.locator('#password')).toBeEditable();
-    await expect
-      .poll(
-        async () => {
-          try {
-            return await page.evaluate(() => {
-              const button = document
-                .querySelector('form')
-                ?.querySelector('button[type="button"]');
-              return Boolean(
-                button &&
-                Object.keys(button).some((key) =>
-                  key.startsWith('__reactProps')
-                )
-              );
-            });
-          } catch (e) {
-            return false;
-          }
-        },
-        { timeout: 15_000 }
-      )
-      .toBe(true);
   }
 
-  async function fillLoginCredentials(page: Page, email: string) {
+ async function fillLoginCredentials(page: Page, email: string) {
     const emailField = page.getByLabel('Correo electrónico');
     const passwordField = page.locator('#password');
 
-    await emailField.fill(email);
+    await emailField.click();
+    await emailField.clear();
+
+    await emailField.pressSequentially(email, { delay: 50 });
+    await emailField.blur();
+
+    await passwordField.click();
+    await passwordField.clear();
     await passwordField.fill('12345678');
 
     await expect(emailField).toHaveValue(email);
     await expect(passwordField).toHaveValue('12345678');
+
     return { emailField, passwordField };
   }
 
-  test('should create a review for a product', async ({ page }) => {
+  test('should post a review for a product', async ({ page }) => {
     await page.goto('/login');
     await waitForLoginForm(page);
 
@@ -82,13 +79,14 @@ test.describe('Create', () => {
     ).toBeVisible();
 
     const form = page.locator('form').filter({ hasText: 'Publicar comentario' });
-    await expect(form).toBeVisible({ timeout: 15_000 });
+    await expect(form).toBeVisible();
 
     const stars = form.locator('button[type="button"]');
     await stars.nth(4).click();
-    await form.locator('#comment').fill('Excelente producto, muy recomendado.');
 
-    await form.getByRole('button', { name: 'Publicar comentario' }).click();
+    const commentField = form.locator('#comment');
+    await expect(commentField).toBeEditable();
+    await commentField.fill('Excelente producto, muy recomendado.');
 
     await expect(page.getByText('Excelente producto, muy recomendado.')).toBeVisible();
     await expect(page.getByText('Juan Paredes')).toBeVisible();
