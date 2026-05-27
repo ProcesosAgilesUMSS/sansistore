@@ -5,9 +5,9 @@ interface Props {
 export const SectionHeader = ({ title, count }: Props) => {
   return (
     <div className="sticky top-0 z-10 mb-6">
-      <div className="overflow-hidden rounded-[1.5rem] border border-(--theme-border) bg-gradient-to-r from-(--theme-card-bg) via-(--theme-card-bg) to-(--theme-secondary-bg)/55 p-4 shadow-sm backdrop-blur-sm">
+      <div className="overflow-hidden rounded-3xl border border-(--theme-border) bg-linear-to-r from-(--theme-card-bg) via-(--theme-card-bg) to-(--theme-secondary-bg)/55 p-4 shadow-sm backdrop-blur-sm">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-white shadow-[0_12px_30px_rgba(136,176,75,0.24)]">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-white ">
             <span className="text-sm font-900">{count}</span>
           </div>
 

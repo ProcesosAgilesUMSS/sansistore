@@ -7,7 +7,7 @@ export const sections = [
   {
     id: 'entregados',
     label: 'Pedidos Empaquetados',
-    route: '/seller/orders',
+    route: '/seller/packaged-orders',
   },
   {
     id: 'listos',
@@ -17,7 +17,7 @@ export const sections = [
   {
     id: 'asignar',
     label: 'Pedidos rechazados',
-    route: '/seller/assign',
+    route: '/seller/rejected-orders',
   },
   {
     id: 'compra',

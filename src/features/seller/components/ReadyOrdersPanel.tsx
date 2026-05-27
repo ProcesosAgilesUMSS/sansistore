@@ -1,14 +1,12 @@
 import { useState } from 'react';
 import { useAssignOrders } from '../hooks/useAssignOrders';
-import { StatusPill } from './StatusPill';
 import { SectionHeader } from './SectionHeader';
 import { Header } from './Header'
-import { formatCurrency } from '../utils/currency';
-import { formatDate } from '../utils/formatDate';
 import { fetchOrderDetails } from '../services/sellerServices';
 import { OrderDetailsModal } from './OrderDetailsModal';
 import { AssignMessengerModal } from './AssignMessengerModal';
 import { db } from '../../../lib/firebase';
+import { CardOrder } from './CardOrder';
 
 export default function ReadyOrdersPanel({ embedded = false }: { embedded?: boolean }) {
   const {
@@ -150,89 +148,14 @@ export default function ReadyOrdersPanel({ embedded = false }: { embedded?: bool
             : (
               <div className="grid gap-4 2xl:grid-cols-2">
                 {ready.map((order) => (
-                  <article
+                  <CardOrder
                     key={order.orderId}
-                    className="overflow-hidden rounded-[1.5rem] border border-(--theme-border) bg-gradient-to-br from-(--theme-card-bg) to-(--theme-secondary-bg)/40 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-xl"
-                  >
-                    <div className="p-5">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="min-w-0">
-                          <p className="text-[11px] font-800 uppercase tracking-[0.24em] text-(--theme-text) opacity-45">
-                            Pedido listo
-                          </p>
-                          <h3 className="mt-1 text-xl font-900 tracking-tight text-(--theme-text)" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                            #{order.orderId.slice(-10).toUpperCase()}
-                          </h3>
-                          <p className="mt-2 text-sm font-700 text-(--theme-text) opacity-80">
-                            {order.buyerName ?? 'Comprador desconocido'}
-                          </p>
-                          <p className="mt-1 text-xs text-(--theme-text) opacity-55">
-                            {order.locationLabel ?? 'Ubicación no registrada'}
-                          </p>
-                        </div>
-
-                        <div className="text-right">
-                          <p className="text-[10px] uppercase tracking-[0.2em] text-(--theme-text) opacity-40">
-                            Total
-                          </p>
-                          <p className="font-900 text-2xl tracking-tight text-primary">
-                            {formatCurrency(order.total)}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="mt-4 flex flex-wrap items-center gap-2">
-                        <StatusPill status={order.status} />
-                        <span className="rounded-full border border-(--theme-border) bg-(--theme-secondary-bg) px-3 py-1 text-xs font-700 text-(--theme-text) opacity-80">
-                          {order.paymentStatus || 'Pago pendiente'}
-                        </span>
-                      </div>
-
-                      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                        <div className="rounded-2xl border border-(--theme-border) bg-(--theme-secondary-bg)/60 px-4 py-3">
-                          <p className="text-[11px] font-800 uppercase tracking-[0.22em] text-(--theme-text) opacity-45">
-                            Cliente
-                          </p>
-                          <p className="mt-1 text-sm font-700 text-(--theme-text)">
-                            {order.buyerName ?? 'Comprador desconocido'}
-                          </p>
-                          <p className="mt-1 text-xs text-(--theme-text) opacity-55">
-                            {order.buyerEmail ?? 'Sin correo'}
-                          </p>
-                        </div>
-
-                        <div className="rounded-2xl border border-(--theme-border) bg-(--theme-secondary-bg)/60 px-4 py-3">
-                          <p className="text-[11px] font-800 uppercase tracking-[0.22em] text-(--theme-text) opacity-45">
-                            Fecha
-                          </p>
-                          <p className="mt-1 text-sm font-700 text-(--theme-text)">
-                            {formatDate(order.confirmedAt ?? order.createdAt)}
-                          </p>
-                          <p className="mt-1 text-xs text-(--theme-text) opacity-55">
-                            Actualizado {formatDate(order.updatedAt)}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
-                        <button
-                          type="button"
-                          onClick={() => handleViewDetails(order)}
-                          className="inline-flex items-center justify-center rounded-full border border-(--theme-border) px-5 py-2.5 text-sm font-700 text-(--theme-text) transition hover:border-primary hover:bg-(--theme-secondary-bg) hover:text-primary"
-                        >
-                          Ver detalles
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => handleOpenAssignModal(order)}
-                          className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-800 text-white transition hover:opacity-90"
-                        >
-                          Asignar mensajero
-                        </button>
-                      </div>
-                    </div>
-                  </article>
+                    order={order}
+                    onViewDetails={handleViewDetails}
+                    onPrimaryAction={handleOpenAssignModal}
+                    primaryActionLabel="Asignar mensajero"
+                    isPrimaryActionLoading={false}
+                  />
                 ))}
               </div>
             )}
