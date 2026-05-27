@@ -280,3 +280,9 @@
 - **Yesterday:** Revisión del Sprint Retrospective, análisis de bugs reportados y verificación del correcto merge de cambios a main.
 - **Today:** Participación en la retrospectiva del equipo y análisis de lecciones aprendidas para el próximo sprint.
 - **Blockers:** None.
+
+### Adrian
+
+- **Yesterday:** Verificacion de bugs reportados y analisis de las historias de usuario.
+- **Today:** Participación en la retrospectiva del equipo.
+- **Blockers:** None.
