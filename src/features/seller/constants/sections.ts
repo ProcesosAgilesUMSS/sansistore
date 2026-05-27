@@ -16,7 +16,7 @@ export const sections = [
   },
   {
     id: 'asignar',
-    label: 'Pedidos asignados',
+    label: 'Pedidos rechazados',
     route: '/seller/assign',
   },
   {

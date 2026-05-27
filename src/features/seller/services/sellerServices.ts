@@ -11,6 +11,7 @@ import {
   updateDoc,
   type Unsubscribe,
   type Firestore,
+  orderBy,
 } from 'firebase/firestore';
 import type { Order, OrderItem, OrderDoc, OrderItemDoc, Messenger } from '../types';
 
@@ -148,7 +149,7 @@ async function fetchPaymentData(
   }
 }
 
-async function fetchDeliveryData(
+export async function fetchDeliveryData(
   db: Firestore,
   deliveryId: string | null | undefined,
 ): Promise<{ deliveryCode: string | null; deliveryCourierName: string | null; deliveryCourierInstitutionalId: string | null } | null> {
@@ -176,10 +177,41 @@ async function fetchDeliveryData(
       deliveryCode: data.deliveryCode ?? null,
       deliveryCourierName,
       deliveryCourierInstitutionalId,
-    };
+      courierId: data.courierId ?? null,
+    } as any;
   } catch {
     return null;
   }
+}
+
+export function subscribeRejectedOrders(
+  db: Firestore,
+  sellerId: string,
+  onData: (orders: Order[]) => void,
+  onError?: (err: Error) => void,
+): Unsubscribe {
+  const q = query(
+    collection(db, 'orders'),
+    where('sellerId', '==', sellerId),
+    where('status', '==', 'PENDIENTE REASIGNACION'),
+    orderBy('updatedAt', 'desc'),
+  );
+
+  return onSnapshot(
+    q,
+    async (snap) => {
+      try {
+        const orders = snap.docs.map((d) => docToOrder(d.id, d.data() as OrderDoc));
+        console.debug('[sellerServices] subscribeRejectedOrders snapshot size:', snap.size);
+        const enriched = await enrichOrdersWithData(db, orders);
+        onData(enriched);
+      } catch (err) {
+        console.error('[sellerServices] subscribeRejectedOrders error:', err);
+        onError?.(err instanceof Error ? err : new Error('Unknown error'));
+      }
+    },
+    (err) => onError?.(err),
+  );
 }
 
 
@@ -209,12 +241,14 @@ export function subscribeSellerOrders(
     ordersRef,
     where('sellerId', '==', sellerId),
     where('status', '==', 'EMPAQUETADO'),
-  );
+    orderBy('updatedAt', 'desc'),
+  )
 
   const qReady = query(
     ordersRef,
     where('sellerId', '==', sellerId),
     where('status', '==', 'LISTO'),
+    orderBy('updatedAt', 'desc'),
   );
 
   const unsubReserved = onSnapshot(
@@ -573,6 +607,43 @@ export async function reassignCourierToDelivery(
     });
 
     tx.update(orderRef, {
+      updatedAt: serverTimestamp(),
+    });
+  });
+}
+
+export async function reassignCourierFromPending(
+  db: Firestore,
+  deliveryId: string,
+  orderId: string,
+  newCourierId: string,
+): Promise<void> {
+  await runTransaction(db, async (tx) => {
+    const deliveryRef = doc(db, 'deliveries', deliveryId);
+    const orderRef = doc(db, 'orders', orderId);
+
+    const deliverySnap = await tx.get(deliveryRef);
+    const orderSnap = await tx.get(orderRef);
+
+    if (!deliverySnap.exists()) throw new Error('Delivery no existe.');
+    if (!orderSnap.exists()) throw new Error('Order no existe.');
+
+    const orderData: any = orderSnap.data();
+
+    if (orderData.status !== 'PENDIENTE REASIGNACION') {
+      throw new Error('No se puede reasignar: la orden no está en PENDIENTE REASIGNACION.');
+    }
+
+    tx.update(deliveryRef, {
+      courierId: newCourierId,
+      status: 'assigned',
+      assignedAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+
+    tx.update(orderRef, {
+      status: 'ASIGNADO',
+      deliveryStatus: 'ASIGNADO',
       updatedAt: serverTimestamp(),
     });
   });
