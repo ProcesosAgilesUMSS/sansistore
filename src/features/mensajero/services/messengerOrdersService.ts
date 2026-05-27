@@ -102,6 +102,7 @@ export async function getMessengerOrders(
         phone: String(order.customerPhone || 'Sin telefono'),
         address: String(order.address || 'Direccion no registrada'),
         city: String(order.deliveryZone || 'Cochabamba'),
+        reference: String(order.reference || order.locationLabel || ''),
         items,
         cashToCollect: Number(delivery.amountCollected || order.total || 0),
         paymentMethod: 'cash_on_delivery' as const,
@@ -163,6 +164,7 @@ export function subscribeToMessengerOrders(
               phone: String(order.customerPhone || 'Sin telefono'),
               address: String(order.address || 'Direccion no registrada'),
               city: String(order.deliveryZone || 'Cochabamba'),
+              reference: String(order.reference || order.locationLabel || ''),
               items,
               cashToCollect: Number(delivery.amountCollected || order.total || 0),
               paymentMethod: 'cash_on_delivery' as const,
@@ -201,6 +203,7 @@ export function subscribeToMessengerOrders(
     }
   );
 }
+
 const getStatusForORder = (status: DeliveryStatus) => {
   switch (status) {
     case 'accepted':
@@ -328,7 +331,6 @@ export async function markMessengerOrderAsNotDelivered({
     });
   }
 
-  //Este es para los no entregados
   await setDoc(doc(db, 'undelivered_orders', order.id), {
     orderId: order.id,
     orderCode: order.orderCode,
@@ -349,6 +351,7 @@ export async function markMessengerOrderAsNotDelivered({
     createdAt: serverTimestamp(),
   });
 }
+
 export async function markMessengerOrderAsCancelledByNoPayment({
   order,
   notes,
@@ -374,18 +377,18 @@ export async function markMessengerOrderAsCancelledByNoPayment({
   });
 
   if (order.id) {
-  batch.update(doc(db, 'orders', order.id), {
-    status: 'CANCELADO',
-    deliveryStatus: 'CANCELLED',
-    paymentStatus: 'CANCELADO',
-    paymentStatusLabel: 'Cancelado por falta de pago',
-    incidentReason: reason,
-    incidentNotes: notes,
-    cancelledAt,
-    cancelledBy: courierId,
-    updatedAt: cancelledAt,
-  });
-}
+    batch.update(doc(db, 'orders', order.id), {
+      status: 'CANCELADO',
+      deliveryStatus: 'CANCELLED',
+      paymentStatus: 'CANCELADO',
+      paymentStatusLabel: 'Cancelado por falta de pago',
+      incidentReason: reason,
+      incidentNotes: notes,
+      cancelledAt,
+      cancelledBy: courierId,
+      updatedAt: cancelledAt,
+    });
+  }
 
   if (order.paymentId) {
     batch.set(
