@@ -4,6 +4,7 @@ import type { Order } from '../types';
 import { ConfirmModal } from './ConfirmModal';
 import { OrderCard } from './OrderCard';
 import { SectionHeader } from './SectionHeader';
+import { Header } from './Header';
 
 export default function SellerOrdersPanel({ embedded = false }: { embedded?: boolean }) {
   const {
@@ -45,19 +46,10 @@ export default function SellerOrdersPanel({ embedded = false }: { embedded?: boo
         />
       )}
 
-      <header className="mb-8 rounded-[1.75rem] border border-(--theme-border) bg-(--theme-card-bg) px-6 py-6 shadow-sm backdrop-blur-sm">
-        <h1
-          className="text-3xl font-900 leading-tight text-(--theme-text) md:text-4xl"
-          style={{ fontFamily: 'Outfit, sans-serif' }}
-        >
-          Pedidos Empaquetados
-        </h1>
-
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-(--theme-text) opacity-70 md:text-base">
-          Revisa y prepara los pedidos empaquetados
-          antes de su asignación a mensajeros.
-        </p>
-      </header>
+      <Header
+        title="Pedidos Empaquetados"
+        description="Revisa y prepara los pedidos empaquetados antes de su asignación a mensajeros."
+      />
 
       {error && (
         <div className="mb-6 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-4 dark:border-red-800/40 dark:bg-red-900/20">
@@ -97,7 +89,7 @@ export default function SellerOrdersPanel({ embedded = false }: { embedded?: boo
           ))}
         </div>
       ) : (
-        <div className="grid gap-6 xl:grid-cols-2">
+        <div className="grid gap-6">
           <section className="rounded-3xl border border-(--theme-border) bg-(--theme-card-bg) p-5 shadow-sm">
             <SectionHeader
               title="Empaquetados"
@@ -152,67 +144,14 @@ export default function SellerOrdersPanel({ embedded = false }: { embedded?: boo
               </div>
             )}
           </section>
-
-          <section className="rounded-3xl border border-(--theme-border) bg-(--theme-card-bg) p-5 shadow-sm">
-            <SectionHeader
-              title="Listos para asignar a mensajero"
-              count={ready.length}
-            />
-
-            {ready.length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-(--theme-border) px-6 py-14 text-center">
-                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-(--theme-secondary-bg)">
-                  <svg
-                    className="h-6 w-6 opacity-40"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={1.8}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 12l2 2 4-4"
-                    />
-                  </svg>
-                </div>
-
-                <p className="text-sm text-(--theme-text) opacity-50">
-                  Aún no hay pedidos marcados como listos.
-                </p>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-4">
-                {ready.map((order) => (
-                  <OrderCard
-                    key={order.orderId}
-                    order={order}
-                    isExpanded={expandedOrderId === order.orderId}
-                    expandedItems={
-                      expandedOrderId === order.orderId
-                        ? expandedItems
-                        : []
-                    }
-                    itemsLoading={
-                      itemsLoading &&
-                      expandedOrderId === order.orderId
-                    }
-                    onToggle={toggleOrderDetail}
-                    isMarking={false}
-                    isSuccess={false}
-                  />
-                ))}
-              </div>
-            )}
-          </section>
         </div>
       )}
       <div className="mt-6 text-end mr-3">
         <a
-          href="/seller/assign"
+          href="/seller/ready-orders"
           className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-700 text-white transition hover:opacity-90"
         >
-          ir a asignar mensajero
+          ir a pedidos listos
         </a>
       </div>
     </div>

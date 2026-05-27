@@ -1,9 +1,8 @@
 import { useAssignOrders } from '../hooks/useAssignOrders';
 import { AssignOrderCard } from './AssignOrderCard';
-import { Header } from './Header';
 import { SectionHeader } from './SectionHeader';
-
-export default function AssignOrdersPanel({ embedded = false }: { embedded?: boolean }) {
+import { Header } from './Header'
+export default function ReadyOrdersPanel({ embedded = false }: { embedded?: boolean }) {
   const {
     ready,
     assigned,
@@ -53,10 +52,9 @@ export default function AssignOrdersPanel({ embedded = false }: { embedded?: boo
 
   return (
     <div className={embedded ? 'min-w-0' : 'min-h-screen bg-(--theme-bg) px-4 pb-10 pt-10 md:px-8 xl:px-10'}>
-
       <Header
-        title="Pedidos asignados"
-        description=""
+        title="Pedidos Listo"
+        description="Revisa los pedidos que ya están listos para su asignación a mensajeros."
       />
 
       {error && (
@@ -80,13 +78,13 @@ export default function AssignOrdersPanel({ embedded = false }: { embedded?: boo
 
       <div className="grid gap-6">
         <section className="rounded-3xl border border-(--theme-border) bg-(--theme-card-bg) p-5 shadow-sm">
-          <SectionHeader title="Asignados" count={assigned.length} />
+          <SectionHeader title="Por asignar" count={ready.length} />
 
-          {loading ? skeletons : assigned.length === 0
-            ? emptyState('Aún no has asignado ningún pedido.')
+          {loading ? skeletons : ready.length === 0
+            ? emptyState('No hay pedidos pendientes de asignar.')
             : (
               <div className="flex flex-col gap-4">
-                {assigned.map((order) => (
+                {ready.map((order) => (
                   <AssignOrderCard
                     key={order.orderId}
                     order={order}
@@ -95,10 +93,8 @@ export default function AssignOrdersPanel({ embedded = false }: { embedded?: boo
                     selectedCourierId={selectedCourier[order.orderId]}
                     onSelectCourier={selectCourier}
                     onAssign={assignOrder}
-                    onUnassign={unassignOrder}
-                    onReassign={reassignOrder}
                     isAssigning={assigningOrderId === order.orderId}
-                    isSuccess={true}
+                    isSuccess={false}
                   />
                 ))}
               </div>

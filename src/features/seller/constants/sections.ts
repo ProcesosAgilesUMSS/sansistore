@@ -10,8 +10,13 @@ export const sections = [
     route: '/seller/orders',
   },
   {
+    id: 'listos',
+    label: 'Pedidos Listos',
+    'route': '/seller/ready-orders',
+  },
+  {
     id: 'asignar',
-    label: 'Asignar a Mensajero',
+    label: 'Pedidos asignados',
     route: '/seller/assign',
   },
   {

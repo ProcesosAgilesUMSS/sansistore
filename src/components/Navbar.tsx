@@ -59,15 +59,13 @@ function CartButton() {
     >
       <ShoppingBag
         size={18}
-        className={`transition-all duration-300 ease-out ${
-          isAnimating ? 'text-primary opacity-100 scale-105' : ''
-        }`}
+        className={`transition-all duration-300 ease-out ${isAnimating ? 'text-primary opacity-100 scale-105' : ''
+          }`}
       />
       <span
         key={totalUnits}
-        className={`absolute -top-1 -right-1 text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold border border-primary bg-primary text-bg-dark transition-transform duration-300 ease-out ${
-          isAnimating ? 'scale-110' : 'scale-100'
-        }`}
+        className={`absolute -top-1 -right-1 text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold border border-primary bg-primary text-bg-dark transition-transform duration-300 ease-out ${isAnimating ? 'scale-110' : 'scale-100'
+          }`}
       >
         {mounted ? (totalUnits > 99 ? '99+' : totalUnits) : 0}
       </span>
@@ -174,7 +172,7 @@ export default function Navbar() {
             <div className="hidden md:flex items-center gap-8">
               {[
                 { label: 'Productos', href: '/productos', reqComprador: true },
-                { label: 'Ordenes', href: '/seller/orders', reqVendedor: true },
+                { label: 'Ordenes', href: '/seller/reserved-orders', reqVendedor: true },
                 { label: 'Inventario', href: '/inventory', reqOperadorInv: true },
                 { label: 'Entregas', href: '/courier', reqMensajero: true },
                 { label: 'Admin', href: '/admin', reqAdmin: true },
@@ -188,14 +186,14 @@ export default function Navbar() {
                   return true;
                 })
                 .map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  className="text-[13px] text-text-light opacity-[0.60] font-semibold tracking-[0.02em] transition-all hover:text-primary hover:opacity-100"
-                >
-                  {item.label}
-                </a>
-              ))}
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    className="text-[13px] text-text-light opacity-[0.60] font-semibold tracking-[0.02em] transition-all hover:text-primary hover:opacity-100"
+                  >
+                    {item.label}
+                  </a>
+                ))}
             </div>
 
             {/* ACTIONS */}
@@ -253,9 +251,8 @@ export default function Navbar() {
 
                       <ChevronDown
                         size={14}
-                        className={`text-text-light opacity-50 transition-transform ${
-                          profileMenuOpen ? 'rotate-180' : ''
-                        }`}
+                        className={`text-text-light opacity-50 transition-transform ${profileMenuOpen ? 'rotate-180' : ''
+                          }`}
                       />
                     </button>
 
@@ -373,14 +370,14 @@ export default function Navbar() {
                   return true;
                 })
                 .map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  className="text-[13px] text-text-light opacity-[0.55] font-semibold tracking-[0.02em] transition-all hover:text-primary hover:opacity-100"
-                >
-                  {item.label}
-                </a>
-              ))}
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    className="text-[13px] text-text-light opacity-[0.55] font-semibold tracking-[0.02em] transition-all hover:text-primary hover:opacity-100"
+                  >
+                    {item.label}
+                  </a>
+                ))}
 
               {user && showCompradorFeatures && (
                 <>
