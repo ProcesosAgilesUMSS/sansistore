@@ -251,3 +251,38 @@ por las dudas que se tienen.
 * **Yesterday:** Terminé mis HUs del vendedor, implementando y ajustando el flujo de **cambio de estado a `RESERVADO`** al confirmar la reserva de producto, además de la vista para **consultar el historial de cobros por pedido** para auditoría.
 * **Today:** Realicé pruebas y correcciones sobre el flujo del vendedor, validando la visualización de pedidos reservados, el historial de pedidos pagados y ajustando conflictos y datos de seed para dejar el entorno listo para pruebas.
 * **Blockers:** None
+
+# Daily Reports - Team 3 Webspire 26/05/26
+
+## Dayana Saleth Ortuño Guzman
+
+ * **Yesterday:** Reunion con mi grupo para coordinar que HUs se desarrollaran para el Sprint 3.
+* **Today:** Vi algunas dependencias que podria tener nuestras HUs elegidas, tambien estaba viendo algunos criterios de aceptacion para mi HU.
+* **Blockers:** none
+
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Me reuní con mi grupo para coordinar y definir las HUs que se trabajarán durante el Sprint 3.
+* **Today:** Revisé las posibles dependencias de las HUs seleccionadas y avancé en la definición de algunos criterios de aceptación de algunas HUs.
+* **Blockers:** none
+
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Apoyar en la revisión y corrección de funcionalidades pendientes dentro del flujo de comprador.
+* **Today:** Implementar mejoras relacionadas al proceso de pago contra entrega y validar el correcto funcionamiento del flujo completo.
+* **Blockers:** none
+
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Revisar integraciones y coordinar detalles técnicos con el equipo para las HUs pendientes.
+* **Today:** Continuar con ajustes en el flujo de comprador y apoyar en la resolución de dudas entre equipos.
+* **Blockers:** none
+
+
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Realizar pruebas y validaciones de las funcionalidades implementadas en las últimas HUs.
+* **Today:** Colaborar en la integración de la opción “Pagar contra entrega” y verificar posibles errores en el flujo.
+* **Blockers:** none

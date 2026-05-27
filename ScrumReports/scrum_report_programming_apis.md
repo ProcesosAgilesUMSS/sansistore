@@ -257,3 +257,32 @@
 - **Yesterday:** Avancé con la implementación del mapa para la visualización de la ubicación de entrega, revisando límites del área navegable y ajustes de coordenadas con Leaflet.
 - **Today:** Continuaré corrigiendo detalles de integración del mapa y validando que la funcionalidad funcione correctamente dentro del flujo del mensajero.
 - **Blockers:** Dudas puntuales sobre ajustes de Leaflet y manejo de coordenadas.
+
+## 26-05-2026
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Trabajé con diferentes grupos para mantener la integración estable y las funcionalidades que fueron asignadas.
+- **Today:** Prepararé parte de las nuevas historias de usuario para el siguiente sprint, trabajaré en los bugs que nos indicó el ingeniero.
+- **Blockers:** Integraciones érroneas.
+
+### Bruno Salcedo Cadiz
+- **Yesterday:** Trabaje en el retrospective y correcciones de bugs del sistema para repartidor
+- **Today:** Continuare trabajando en el arreglo de bugs y prepararé parte de las nuevas historias de usuario para el siguiente sprint.
+- **Blockers:** None,
+
+### Efrain Peralta Felipe
+- **Yesterday:** Trabaje en el retrospective y correcciones del vendedor.
+- **Today:** Trabajare en los bugs del vendedor.
+- **Blockers:** None,
+
+### Jhoel Gustavo Aiza Arce
+
+- **Yesterday:** Revisión del Sprint Retrospective, análisis de bugs reportados y verificación del correcto merge de cambios a main.
+- **Today:** Participación en la retrospectiva del equipo y análisis de lecciones aprendidas para el próximo sprint.
+- **Blockers:** None.
+
+### Adrian
+
+- **Yesterday:** Verificacion de bugs reportados y analisis de las historias de usuario.
+- **Today:** Participación en la retrospectiva del equipo.
+- **Blockers:** None.
