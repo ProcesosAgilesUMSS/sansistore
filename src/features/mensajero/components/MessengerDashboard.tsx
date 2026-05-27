@@ -308,14 +308,24 @@ function PendingOrderCard({
             </div>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <button
+                <a
+                        className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+                        href={sellerLocationUrl ?? '#'}
+                        rel="noreferrer"
+                        target="_blank"
+                    >
+                        <Send size={17} />
+                        Ubi. Vendedor
+                    </a>
+                <a
                     className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-                    onClick={() => openDeliveryMap(order)}
-                    type="button"
+                    href={sellerLocationUrl ?? '#'}
+                    rel="noreferrer"
+                    target="_blank"
                 >
                     <Send size={17} />
-                    Abrir en Maps
-                </button>
+                    Abrir Maps
+                </a>
 
                 {order.deliveryStatus !== 'assigned' && (
                     <button
