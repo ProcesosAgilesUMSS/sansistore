@@ -269,3 +269,34 @@
 - **Today:** Revisar los últimos ajustes integrados, dar seguimiento a los despliegues y continuar apoyando en la organización de tareas y validación de funcionalidades del equipo.
 - **Blockers:** n/a.
 
+# 05/26/2026
+
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Agregue observaciones, acuerdos y puntos de mejora al Sprint Retrospective.
+- **Today:** Revise y valide los comentarios del Sprint Retrospective junto con la documentación relacionada.
+- **Blockers:** n/a.
+
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Participé en el sprint retrospective y completé la HU de agregar código para el delivery.
+- **Today:** Realizar pruebas automáticas para la HU de reseñas.
+- **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Participé en la reunión de Sprint Retrospective, aportando observaciones y puntos de mejora para el equipo.
+- **Today:** Revisé las tareas a realizar para el sprint actual, organizando y priorizando las actividades del equipo.
+- **Blockers:** n/a.
+
+## Velasquez Vela Marcos
+
+- **Yesterday:** Participé en la reunión de Sprint Retrospective junto al equipo, aportando en la identificación de mejoras y acuerdos del sprint.
+- **Today:** Apoyé a otro grupo con el despliegue y configuración de sus Cloud Functions en Firebase.
+- **Blockers:** n/a.
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Finalicé el desarrollo de la Tarea #35, implementando la funcionalidad para que el comprador pueda dejar reseñas de un producto. Incluye la opción de escribir comentarios y un sistema de calificación que permite seleccionar de 1 a 5 estrellas.
+- **Today:** Me enfocaré en realizar las pruebas correspondientes a esta tarea para validar su correcto funcionamiento.
+- **Blockers:** n/a.
