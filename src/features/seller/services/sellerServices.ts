@@ -5,9 +5,9 @@ import {
   where,
   onSnapshot,
   getDocs,
+  getDoc,
   runTransaction,
   serverTimestamp,
-  getDoc,
   updateDoc,
   type Unsubscribe,
   type Firestore,
@@ -30,8 +30,10 @@ function docToOrder(id: string, data: OrderDoc): Order {
     total: data.total ?? 0,
     locationId: data.locationId ?? '',
     paymentStatus: data.paymentStatus ?? '',
+    paymentId: data.paymentId ?? null,
     deliveryStatus: data.deliveryStatus ?? null,
     deliveryId: data.deliveryId ?? null,
+    deliveryCode: data.deliveryCode ?? null,
     incidentReason: data.incidentReason ?? null,
     confirmedAt: toDate(data.confirmedAt),
     createdAt: toDate(data.createdAt) ?? new Date(),
@@ -55,19 +57,22 @@ async function enrichOrdersWithData(
 
   return orders.map((order) => ({
     ...order,
-    buyerName: buyerMap[order.buyerId],
-    locationLabel: locationMap[order.locationId],
+    buyerName: buyerMap[order.buyerId]?.displayName,
+    buyerEmail: buyerMap[order.buyerId]?.email,
+    buyerInstitutionalId: buyerMap[order.buyerId]?.institutionalId,
+    locationLabel: locationMap[order.locationId]?.label,
+    locationType: locationMap[order.locationId]?.type,
   }));
 }
 
 async function fetchBuyersData(
   db: Firestore,
   buyerIds: string[],
-): Promise<Record<string, string>> {
+): Promise<Record<string, { displayName: string; email: string; institutionalId: string }>> {
   if (buyerIds.length === 0) return {};
 
   try {
-    const map: Record<string, string> = {};
+    const map: Record<string, { displayName: string; email: string; institutionalId: string }> = {};
 
     const userSnapshots = await Promise.all(
       buyerIds.map((uid) => getDoc(doc(db, 'users', uid)))
@@ -76,7 +81,11 @@ async function fetchBuyersData(
     userSnapshots.forEach((userSnap) => {
       if (userSnap.exists()) {
         const data = userSnap.data();
-        map[userSnap.id] = data.displayName ?? data.email ?? 'Comprador desconocido';
+        map[userSnap.id] = {
+          displayName: data.displayName ?? data.email ?? 'Comprador desconocido',
+          email: data.email ?? '',
+          institutionalId: data.institutionalId ?? '',
+        };
       }
     });
 
@@ -90,11 +99,11 @@ async function fetchBuyersData(
 async function fetchLocationsData(
   db: Firestore,
   locationIds: string[],
-): Promise<Record<string, string>> {
+): Promise<Record<string, { label: string; type: string }>> {
   if (locationIds.length === 0) return {};
 
   try {
-    const map: Record<string, string> = {};
+    const map: Record<string, { label: string; type: string }> = {};
 
     const locationSnapshots = await Promise.all(
       locationIds.map((locId) => getDoc(doc(db, 'locations', locId)))
@@ -103,7 +112,10 @@ async function fetchLocationsData(
     locationSnapshots.forEach((locSnap) => {
       if (locSnap.exists()) {
         const data = locSnap.data();
-        map[locSnap.id] = data.label ?? 'Ubicación desconocida';
+        map[locSnap.id] = {
+          label: data.label ?? 'Ubicación desconocida',
+          type: data.type ?? '',
+        };
       }
     });
 
@@ -111,6 +123,62 @@ async function fetchLocationsData(
   } catch {
     console.error('Error al obtener la localizacióin');
     return {};
+  }
+}
+
+async function fetchPaymentData(
+  db: Firestore,
+  paymentId: string | null | undefined,
+): Promise<{ paymentMethod: string | null; paymentAmount: number | null } | null> {
+  if (!paymentId) return null;
+
+  try {
+    const paymentSnap = await getDoc(doc(db, 'payments', paymentId));
+
+    if (!paymentSnap.exists()) return null;
+
+    const data = paymentSnap.data() as { method?: string; amount?: number };
+
+    return {
+      paymentMethod: data.method ?? null,
+      paymentAmount: typeof data.amount === 'number' ? data.amount : null,
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function fetchDeliveryData(
+  db: Firestore,
+  deliveryId: string | null | undefined,
+): Promise<{ deliveryCode: string | null; deliveryCourierName: string | null; deliveryCourierInstitutionalId: string | null } | null> {
+  if (!deliveryId) return null;
+
+  try {
+    const deliverySnap = await getDoc(doc(db, 'deliveries', deliveryId));
+
+    if (!deliverySnap.exists()) return null;
+
+    const data = deliverySnap.data() as { deliveryCode?: string; courierId?: string | null };
+    let deliveryCourierName: string | null = null;
+    let deliveryCourierInstitutionalId: string | null = null;
+
+    if (data.courierId) {
+      const courierSnap = await getDoc(doc(db, 'users', data.courierId));
+      if (courierSnap.exists()) {
+        const courierData = courierSnap.data();
+        deliveryCourierName = courierData.displayName ?? courierData.email ?? 'Mensajero';
+        deliveryCourierInstitutionalId = courierData.institutionalId ?? '';
+      }
+    }
+
+    return {
+      deliveryCode: data.deliveryCode ?? null,
+      deliveryCourierName,
+      deliveryCourierInstitutionalId,
+    };
+  } catch {
+    return null;
   }
 }
 
@@ -193,6 +261,44 @@ export async function fetchOrderItems(
       subtotal: data.subtotal,
     };
   });
+}
+
+export async function fetchOrderDetails(
+  db: Firestore,
+  orderId: string,
+): Promise<Order> {
+  const orderSnap = await getDoc(doc(db, 'orders', orderId));
+
+  if (!orderSnap.exists()) {
+    throw new Error('El pedido no existe.');
+  }
+
+  const order = docToOrder(orderSnap.id, orderSnap.data() as OrderDoc);
+  const [items, buyerMap, locationMap, paymentData, deliveryData] = await Promise.all([
+    fetchOrderItems(db, orderId),
+    fetchBuyersData(db, order.buyerId ? [order.buyerId] : []),
+    fetchLocationsData(db, order.locationId ? [order.locationId] : []),
+    fetchPaymentData(db, order.paymentId),
+    fetchDeliveryData(db, order.deliveryId),
+  ]);
+
+  const buyer = buyerMap[order.buyerId];
+  const location = locationMap[order.locationId];
+
+  return {
+    ...order,
+    buyerName: buyer?.displayName,
+    buyerEmail: buyer?.email,
+    buyerInstitutionalId: buyer?.institutionalId,
+    locationLabel: location?.label,
+    locationType: location?.type,
+    paymentMethod: paymentData?.paymentMethod ?? null,
+    paymentAmount: paymentData?.paymentAmount ?? null,
+    deliveryCode: deliveryData?.deliveryCode ?? null,
+    deliveryCourierName: deliveryData?.deliveryCourierName ?? null,
+    deliveryCourierInstitutionalId: deliveryData?.deliveryCourierInstitutionalId ?? null,
+    items,
+  };
 }
 
 export async function markOrderAsReady(

@@ -1,27 +1,30 @@
 import { useState } from 'react';
+import { db } from '../../../lib/firebase';
 import { useSellerOrders } from '../hooks/useSellerOrders';
 import type { Order } from '../types';
 import { ConfirmModal } from './ConfirmModal';
-import { OrderCard } from './OrderCard';
+import { OrderDetailsModal } from './OrderDetailsModal';
 import { SectionHeader } from './SectionHeader';
 import { Header } from './Header';
+import { StatusPill } from './StatusPill';
+import { fetchOrderDetails } from '../services/sellerServices';
+import { formatCurrency } from '../utils/currency';
+import { formatDate } from '../utils/formatDate';
 
 export default function SellerOrdersPanel({ embedded = false }: { embedded?: boolean }) {
   const {
     reserved,
-    ready,
     loading,
     error,
-    expandedOrderId,
-    expandedItems,
-    itemsLoading,
-    toggleOrderDetail,
     markingOrderId,
     markAsReady,
     successOrderId,
   } = useSellerOrders();
 
   const [pendingOrder, setPendingOrder] = useState<Order | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [detailsLoading, setDetailsLoading] = useState(false);
+  const [detailsError, setDetailsError] = useState<string | null>(null);
 
   const handleMarkReady = (order: Order) => {
     setPendingOrder(order);
@@ -36,13 +39,43 @@ export default function SellerOrdersPanel({ embedded = false }: { embedded?: boo
 
   const handleCancel = () => setPendingOrder(null);
 
+  const handleViewDetails = async (order: Order) => {
+    setSelectedOrder(order);
+    setDetailsError(null);
+    setDetailsLoading(true);
+
+    try {
+      const orderDetails = await fetchOrderDetails(db, order.orderId);
+      setSelectedOrder(orderDetails);
+    } catch (err) {
+      setDetailsError(err instanceof Error ? err.message : 'No se pudieron cargar los detalles del pedido.');
+    } finally {
+      setDetailsLoading(false);
+    }
+  };
+
+  const handleCloseDetails = () => {
+    setSelectedOrder(null);
+    setDetailsLoading(false);
+    setDetailsError(null);
+  };
+
   return (
-    <div className={embedded ? 'min-w-0' : 'min-h-screen bg-(--theme-bg) px-4 pb-10 pt-10 md:px-8 xl:px-10'}>
+    <div className={embedded ? 'w-full min-w-0' : 'min-h-screen bg-(--theme-bg) px-4 pb-10 pt-10 md:px-8 xl:px-10'}>
       {pendingOrder && (
         <ConfirmModal
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           isLoading={!!markingOrderId}
+        />
+      )}
+
+      {selectedOrder && (
+        <OrderDetailsModal
+          order={selectedOrder}
+          loading={detailsLoading}
+          error={detailsError}
+          onClose={handleCloseDetails}
         />
       )}
 
@@ -89,8 +122,8 @@ export default function SellerOrdersPanel({ embedded = false }: { embedded?: boo
           ))}
         </div>
       ) : (
-        <div className="grid gap-6">
-          <section className="rounded-3xl border border-(--theme-border) bg-(--theme-card-bg) p-5 shadow-sm">
+        <div className="grid w-full gap-6">
+          <section className="w-full p-5">
             <SectionHeader
               title="Empaquetados"
               count={reserved.length}
@@ -119,39 +152,104 @@ export default function SellerOrdersPanel({ embedded = false }: { embedded?: boo
                 </p>
               </div>
             ) : (
-              <div className="flex flex-col gap-4">
+              <div className="grid gap-4 2xl:grid-cols-2">
                 {reserved.map((order) => (
-                  <OrderCard
+                  <article
                     key={order.orderId}
-                    order={order}
-                    isExpanded={expandedOrderId === order.orderId}
-                    expandedItems={
-                      expandedOrderId === order.orderId
-                        ? expandedItems
-                        : []
-                    }
-                    itemsLoading={
-                      itemsLoading &&
-                      expandedOrderId === order.orderId
-                    }
-                    onToggle={toggleOrderDetail}
-                    title="Marcar como listo"
-                    onClick={handleMarkReady}
-                    isMarking={markingOrderId === order.orderId}
-                    isSuccess={successOrderId === order.orderId}
-                  />
+                    className="overflow-hidden rounded-3xl border border-(--theme-border) bg-linear-to-br from-(--theme-card-bg) to-(--theme-secondary-bg)/40 shadow-sm duration-200 hover:shadow-xl"
+                  >
+                    <div className="p-5">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0">
+                          <p className="text-[11px] font-800 uppercase tracking-[0.24em] text-(--theme-text) opacity-45">
+                            Pedido empaquetado
+                          </p>
+                          <h3 className="mt-1 text-xl font-900 tracking-tight text-(--theme-text)" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                            #{order.orderId.slice(-10).toUpperCase()}
+                          </h3>
+                          <p className="mt-2 text-sm font-700 text-(--theme-text) opacity-80">
+                            {order.buyerName ?? 'Comprador desconocido'}
+                          </p>
+                        </div>
+
+                        <div className="text-right">
+                          <p className="text-[10px] uppercase tracking-[0.2em] text-(--theme-text) opacity-40">
+                            Total
+                          </p>
+                          <p className="font-900 text-2xl tracking-tight text-primary">
+                            {formatCurrency(order.total)}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 flex flex-wrap items-center gap-2">
+                        <StatusPill status={order.status} />
+                      </div>
+
+                      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                        <div className="rounded-2xl border border-(--theme-border) bg-(--theme-secondary-bg)/60 px-4 py-3">
+                          <p className="text-[11px] font-800 uppercase tracking-[0.22em] text-(--theme-text) opacity-45">
+                            Ubicación
+                          </p>
+                          <p className="mt-1 text-sm font-700 text-(--theme-text)">
+                            {order.locationLabel ?? 'No registrada'}
+                          </p>
+                          <p className="mt-1 text-xs text-(--theme-text) opacity-55">
+                            {order.locationType ?? 'Tipo no registrado'}
+                          </p>
+                        </div>
+
+                        <div className="rounded-2xl border border-(--theme-border) bg-(--theme-secondary-bg)/60 px-4 py-3">
+                          <p className="text-[11px] font-800 uppercase tracking-[0.22em] text-(--theme-text) opacity-45">
+                            Fecha
+                          </p>
+                          <p className="mt-1 text-sm font-700 text-(--theme-text)">
+                            {formatDate(order.createdAt)}
+                          </p>
+                          <p className="mt-1 text-xs text-(--theme-text) opacity-55">
+                            Actualizado {formatDate(order.updatedAt)}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
+                        <button
+                          type="button"
+                          onClick={() => handleViewDetails(order)}
+                          className="inline-flex items-center justify-center rounded-full border border-(--theme-border) px-5 py-2.5 text-sm font-700 text-(--theme-text) transition hover:border-primary hover:bg-(--theme-secondary-bg) hover:text-primary"
+                        >
+                          Ver detalles
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleMarkReady(order)}
+                          disabled={markingOrderId === order.orderId}
+                          className="inline-flex items-center justify-center cursor-pointer rounded-full bg-primary px-5 py-2.5 text-sm font-800 text-white transition hover:opacity-90 disabled:opacity-50"
+                        >
+                          {markingOrderId === order.orderId ? 'Procesando…' : 'Marcar como listo'}
+                        </button>
+                      </div>
+
+                      {successOrderId === order.orderId && (
+                        <p className="mt-4 text-sm font-700 text-primary">
+                          Pedido marcado como listo.
+                        </p>
+                      )}
+                    </div>
+                  </article>
                 ))}
               </div>
             )}
           </section>
         </div>
       )}
-      <div className="mt-6 text-end mr-3">
+      <div className="mt-6 flex justify-end pr-3">
         <a
           href="/seller/ready-orders"
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-700 text-white transition hover:opacity-90"
+          className="inline-flex items-center justify-center gap-2 rounded-full border border-primary bg-primary px-5 py-2.5 text-sm font-700 text-white shadow-sm transition hover:-translate-y-px hover:opacity-95"
         >
-          ir a pedidos listos
+          Ir a pedidos listos
         </a>
       </div>
     </div>
