@@ -271,6 +271,12 @@
 
 # 05/26/2026
 
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Agregue observaciones, acuerdos y puntos de mejora al Sprint Retrospective.
+- **Today:** Revise y valide los comentarios del Sprint Retrospective junto con la documentación relacionada.
+- **Blockers:** n/a.
+
 ## Gutierrez Hinojosa Jhon Deymar
 
 - **Yesterday:** Participé en el sprint retrospective y completé la HU de agregar código para el delivery.
