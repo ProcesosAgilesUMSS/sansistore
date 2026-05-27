@@ -271,6 +271,12 @@
 
 # 05/26/2026
 
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Participé en el sprint retrospective y completé la HU de agregar código para el delivery.
+- **Today:** Realizar pruebas automáticas para la HU de reseñas.
+- **Blockers:** n/a.
+
 ## Merino Vidal Mateo Alejandro
 
 - **Yesterday:** Participé en la reunión de Sprint Retrospective, aportando observaciones y puntos de mejora para el equipo.
