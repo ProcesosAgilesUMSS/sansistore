@@ -20,6 +20,11 @@ concurrency:
   group: playwright-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  checks: write
+  pull-requests: read
+
 jobs:
   test:
     timeout-minutes: 60
