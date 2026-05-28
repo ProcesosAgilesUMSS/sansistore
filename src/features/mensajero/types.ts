@@ -51,6 +51,9 @@ export interface MessengerOrder {
   phone: string;
   address: string;
   city: string;
+  locationLabel?: string;
+  deliveryLat?: number | null;
+  deliveryLng?: number | null;
   reference?: string;
   items: MessengerOrderItem[];
   cashToCollect: number;
