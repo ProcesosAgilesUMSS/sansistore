@@ -324,3 +324,9 @@
   - Análisis del panorama del Sprint 3 para identificar dependencias con otros equipos.
 
 - **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+
+- **Yesterday:** Estube trabajando para añadir la funcionalidad pedida de agregar un boton de pago  para confirmar el cobro del dinero de un pedido en la vista de rendición
+- **Today:** Continue trabajando en esa funcionalidad y espero terminarlo hoy.
+- **Blockers:** None.
