@@ -25,6 +25,7 @@ export default defineConfig({
     ? [
       ['dot'],
       ['junit', { outputFile: 'junit-result/results.xml' }],
+      ['json', { outputFile: 'junit-result/results.json' }],
     ]
     : [
       ['list'],

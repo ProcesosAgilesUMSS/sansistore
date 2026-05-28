@@ -23,7 +23,7 @@ concurrency:
 permissions:
   contents: read
   checks: write
-  pull-requests: read
+  pull-requests: write
 
 jobs:
   test:
@@ -49,3 +49,9 @@ jobs:
         name: Playwright Test Report
         path: junit-result/results.xml
         reporter: java-junit
+
+    - name: Comment Playwright summary
+      uses: daun/playwright-report-summary@v4
+      if: always() && github.event_name == 'pull_request'
+      with:
+        report-file: junit-result/results.json
