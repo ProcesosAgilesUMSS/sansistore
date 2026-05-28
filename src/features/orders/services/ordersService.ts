@@ -159,10 +159,10 @@ async function processQuerySnapshot(querySnapshot: QuerySnapshot<DocumentData>):
     const items = itemsSnapshot.docs.map(itemDoc => {
       const item = itemDoc.data();
       return {
-        itemId: item.itemId ?? itemDoc.id,
+        itemId: itemDoc.id,
         productId: item.productId,
         productName: item.productName,
-        price: item.price ?? item.unitPrice ?? 0,
+        unitPrice: item.unitPrice,
         quantity: item.quantity,
         subtotal: item.subtotal,
         description: item.description,
@@ -171,7 +171,8 @@ async function processQuerySnapshot(querySnapshot: QuerySnapshot<DocumentData>):
 
     return {
       id: orderDoc.id,
-      buyerId: data.buyerId ?? '',
+      secret: data.secret,
+      buyerId: data.buyerId,
       sellerId: data.sellerId,
       status: normalizeBuyerOrderStatus(data),
       buyerReceptionConfirmed: isReceptionConfirmed(data),
@@ -209,10 +210,10 @@ export async function getOrderById(orderId: string): Promise<Order | null> {
   const items = itemsSnapshot.docs.map((itemDoc) => {
     const item = itemDoc.data();
     return {
-      itemId: item.itemId ?? itemDoc.id,
+      itemId: itemDoc.id,
       productId: item.productId,
       productName: item.productName,
-      price: item.price ?? item.unitPrice ?? 0,
+      unitPrice: item.unitPrice,
       quantity: item.quantity,
       subtotal: item.subtotal,
       description: item.description,
@@ -221,7 +222,8 @@ export async function getOrderById(orderId: string): Promise<Order | null> {
 
   return {
     id: orderSnap.id,
-    buyerId: data.buyerId ?? "",
+    secret: data.secret,
+    buyerId: data.buyerId,
     sellerId: data.sellerId,
     status: normalizeBuyerOrderStatus(data),
     buyerReceptionConfirmed: isReceptionConfirmed(data),
