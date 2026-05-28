@@ -40,8 +40,6 @@ function formatDateTime(value: Order['buyerReceptionConfirmedAt']) {
 }
 
 export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: OrderDetailsPanelProps) {
-  console.log(typeof (order.createdAt));
-
   const [showReturnForm, setShowReturnForm] = useState(false);
   const [showReceptionConfirm, setShowReceptionConfirm] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState<string>('');
@@ -127,7 +125,7 @@ export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: O
           </button>
           <div>
             <h2 className="font-display font-extrabold text-xl tracking-tight">
-              Pedido #{order.id.substring(0, 8).toUpperCase()}
+              Pedido #{order.id}
             </h2>
             <p className="text-xs opacity-60 flex items-center gap-1 mt-1">
               <Calendar size={12} /> {formattedDate}
