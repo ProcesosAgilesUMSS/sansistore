@@ -32,4 +32,10 @@ jobs:
     - name: Run Playwright tests
       run: docker compose run --rm testing
 
-
+    - name: Report test results
+      uses: dorny/test-reporter@v1
+      if: success() || failure()
+      with:
+        name: Playwright Test Report
+        path: test-results/results.xml
+        reporter: java-junit
