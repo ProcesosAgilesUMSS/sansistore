@@ -50,7 +50,7 @@ export function ReassignModal({
   return createPortal(
     (
       <div
-        className="fixed inset-0 z-[999] flex items-center justify-center bg-black/75 p-4 backdrop-blur-md"
+        className="fixed inset-0 z-999 flex items-center justify-center bg-black/75 p-4 backdrop-blur-md"
         role="dialog"
         aria-modal="true"
         aria-labelledby="reassign-messenger-title"
@@ -61,7 +61,6 @@ export function ReassignModal({
         <section className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-[28px] border border-(--theme-border) bg-(--theme-card-bg) shadow-2xl">
           <header className="flex items-start justify-between gap-4 border-b border-(--theme-border) px-6 py-5">
             <div>
-              <p className="text-xs font-800 uppercase tracking-[0.28em] text-primary">Reasignar mensajero</p>
               <h2 id="reassign-messenger-title" className="mt-2 text-2xl font-900 tracking-tight text-(--theme-text)" style={{ fontFamily: 'Outfit, sans-serif' }}>
                 #{order.orderId.slice(-10).toUpperCase()}
               </h2>
@@ -115,7 +114,7 @@ export function ReassignModal({
                         </div>
                       </div>
 
-                      <span className="text-xs font-800 uppercase tracking-[0.2em] opacity-70">{isRejecting ? 'Rechazó' : isSelected ? 'Seleccionado' : 'Elegir'}</span>
+                      <span className="text-sm font-semibold  opacity-70">{isRejecting ? 'Rechazó' : isSelected ? 'Seleccionado' : 'Elegir'}</span>
                     </button>
                   );
                 })
