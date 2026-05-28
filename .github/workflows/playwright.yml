@@ -28,16 +28,19 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Create output directories
+      run: |
+        mkdir -p junit-result 
     - name: Build Docker image
       run: docker compose build testing
 
     - name: Run Playwright tests
-      run: docker compose run -e CI --rm testing
+      run: docker compose run -e CI=true --rm testing
 
     - name: Report test results
       uses: dorny/test-reporter@v1
       if: success() || failure()
       with:
         name: Playwright Test Report
-        path: test-results/results.xml
+        path: junit-result/results.xml
         reporter: java-junit

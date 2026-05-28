@@ -23,8 +23,8 @@ export default defineConfig({
   workers: undefined,
   reporter: process.env.CI
     ? [
-      ['github'],
-      ['junit', { outputFile: 'test-results/results.xml' }],
+      ['dot'],
+      ['junit', { outputFile: 'junit-result/results.xml' }],
     ]
     : [
       ['list'],
