@@ -6,8 +6,6 @@ import { formatDate } from '../utils/formatDate';
 
 interface Props {
   order: Order | null;
-  loading: boolean;
-  error?: string | null;
   onClose: () => void;
 }
 
@@ -24,7 +22,7 @@ function DetailRow({ label, value }: { label: string; value?: string | number | 
   );
 }
 
-export function OrderDetailsModal({ order, loading, error, onClose }: Props) {
+export function OrderDetailsModal({ order, onClose }: Props) {
   if (!order) return null;
 
   const items = order.items ?? [];
@@ -45,9 +43,6 @@ export function OrderDetailsModal({ order, loading, error, onClose }: Props) {
           <header className="border-b border-(--theme-border) px-6 py-5">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
-                <p className="text-xs font-800 uppercase tracking-[0.28em] text-primary">
-                  Detalle de pedido
-                </p>
                 <h2
                   id="order-details-title"
                   className="mt-2 text-2xl font-900 tracking-tight text-(--theme-text)"
@@ -55,9 +50,6 @@ export function OrderDetailsModal({ order, loading, error, onClose }: Props) {
                 >
                   #{order.orderId.slice(-10).toUpperCase()}
                 </h2>
-                <p className="mt-1 text-sm text-(--theme-text) opacity-70">
-                  Información esencial del pedido empaquetado.
-                </p>
               </div>
 
               <button
@@ -83,7 +75,7 @@ export function OrderDetailsModal({ order, loading, error, onClose }: Props) {
 
           <div className="grid gap-6 p-6 lg:grid-cols-[1fr_320px]">
             <div className="space-y-6">
-              <article className="rounded-3xl border border-(--theme-border) bg-(--theme-secondary-bg)/50 p-5 shadow-sm">
+              <article className="p-5">
                 <div className="grid gap-3 sm:grid-cols-3">
                   <DetailRow label="Cliente" value={order.buyerName ?? 'Comprador desconocido'} />
                   <DetailRow label="Ubicación" value={order.locationLabel ?? 'No registrada'} />
@@ -91,7 +83,7 @@ export function OrderDetailsModal({ order, loading, error, onClose }: Props) {
                 </div>
               </article>
 
-              <article className="rounded-3xl border border-(--theme-border) bg-(--theme-card-bg) p-5 shadow-sm">
+              <article className="p-5">
                 <div className="flex items-center gap-2">
                   <Package size={18} className="text-primary" />
                   <h3 className="text-lg font-800 tracking-tight text-(--theme-text)">
@@ -126,7 +118,7 @@ export function OrderDetailsModal({ order, loading, error, onClose }: Props) {
             </div>
 
             <aside className="space-y-6">
-              <article className="rounded-3xl border border-(--theme-border) bg-linear-to-br from-(--theme-card-bg) via-(--theme-card-bg) to-(--theme-secondary-bg)/60 p-5 shadow-sm">
+              <article className="p-5">
                 <div className="flex items-center gap-2">
                   <ReceiptText size={18} className="text-primary" />
                   <h3 className="text-lg font-800 tracking-tight text-(--theme-text)">

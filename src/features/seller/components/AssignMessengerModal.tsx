@@ -3,144 +3,141 @@ import { X, UserRound } from 'lucide-react';
 import type { Messenger, Order } from '../types';
 
 interface Props {
-    order: Order;
-    messengers: Messenger[];
-    selectedCourierId?: string;
-    messengersLoading: boolean;
-    isLoading: boolean;
-    onSelectCourier: (orderId: string, courierId: string) => void;
-    onConfirm: () => void;
-    onClose: () => void;
+  order: Order;
+  messengers: Messenger[];
+  selectedCourierId?: string;
+  messengersLoading: boolean;
+  isLoading: boolean;
+  onSelectCourier: (orderId: string, courierId: string) => void;
+  onConfirm: () => void;
+  onClose: () => void;
 }
 
 export function AssignMessengerModal({
-    order,
-    messengers,
-    selectedCourierId,
-    messengersLoading,
-    isLoading,
-    onSelectCourier,
-    onConfirm,
-    onClose,
+  order,
+  messengers,
+  selectedCourierId,
+  messengersLoading,
+  isLoading,
+  onSelectCourier,
+  onConfirm,
+  onClose,
 }: Props) {
-    return createPortal(
-        (
-            <div
-                className="fixed inset-0 z-[999] flex items-center justify-center bg-black/75 p-4 backdrop-blur-md"
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="assign-messenger-title"
-                onClick={(event) => {
-                    if (event.target === event.currentTarget) onClose();
-                }}
-            >
-                <section className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-[28px] border border-(--theme-border) bg-(--theme-card-bg) shadow-2xl">
-                    <header className="flex items-start justify-between gap-4 border-b border-(--theme-border) px-6 py-5">
-                        <div>
-                            <p className="text-xs font-800 uppercase tracking-[0.28em] text-primary">
-                                Asignar mensajero
-                            </p>
-                            <h2
-                                id="assign-messenger-title"
-                                className="mt-2 text-2xl font-900 tracking-tight text-(--theme-text)"
-                                style={{ fontFamily: 'Outfit, sans-serif' }}
-                            >
-                                #{order.orderId.slice(-10).toUpperCase()}
-                            </h2>
-                            <p className="mt-1 text-sm text-(--theme-text) opacity-70">
-                                Selecciona un mensajero y confirma la asignación.
-                            </p>
-                        </div>
-
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="flex h-10 w-10 items-center justify-center rounded-full border border-(--theme-border) bg-(--theme-secondary-bg) text-(--theme-text) transition hover:border-primary hover:text-primary"
-                            aria-label="Cerrar modal"
-                        >
-                            <X size={18} />
-                        </button>
-                    </header>
-
-                    <div className="p-6">
-                        <div className="rounded-3xl border border-(--theme-border) bg-(--theme-secondary-bg)/50 p-4">
-                            <p className="text-[11px] font-800 uppercase tracking-[0.24em] text-(--theme-text) opacity-45">
-                                Pedido listo
-                            </p>
-                            <p className="mt-1 text-lg font-900 text-(--theme-text)">
-                                {order.buyerName ?? 'Comprador desconocido'}
-                            </p>
-                            <p className="mt-1 text-sm text-(--theme-text) opacity-70">
-                                {order.locationLabel ?? 'Ubicación no registrada'}
-                            </p>
-                        </div>
-
-                        <div className="mt-5 grid gap-3">
-                            {messengersLoading ? (
-                                <div className="rounded-2xl border border-dashed border-(--theme-border) px-4 py-6 text-sm text-(--theme-text) opacity-50">
-                                    Cargando mensajeros…
-                                </div>
-                            ) : messengers.length === 0 ? (
-                                <div className="rounded-2xl border border-dashed border-(--theme-border) px-4 py-6 text-sm text-(--theme-text) opacity-50">
-                                    No hay mensajeros disponibles.
-                                </div>
-                            ) : (
-                                messengers.map((messenger) => {
-                                    const isSelected = selectedCourierId === messenger.uid;
-
-                                    return (
-                                        <button
-                                            key={messenger.uid}
-                                            type="button"
-                                            onClick={() => onSelectCourier(order.orderId, messenger.uid)}
-                                            className={`flex items-center justify-between rounded-2xl border px-4 py-4 text-left transition hover:border-primary hover:bg-(--theme-secondary-bg) ${isSelected
-                                                ? 'border-primary bg-primary/10 text-primary'
-                                                : 'border-(--theme-border) bg-(--theme-card-bg) text-(--theme-text)'
-                                                }`}
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <span className={`flex h-10 w-10 items-center justify-center rounded-full ${isSelected ? 'bg-primary text-white' : 'bg-(--theme-secondary-bg)'}`}>
-                                                    <UserRound size={16} />
-                                                </span>
-                                                <div>
-                                                    <p className="font-800">{messenger.displayName}</p>
-                                                    <p className="text-xs opacity-55">
-                                                        {messenger.institutionalId || 'Sin CI institucional'}
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            <span className="text-xs font-800 uppercase tracking-[0.2em] opacity-70">
-                                                {isSelected ? 'Seleccionado' : 'Elegir'}
-                                            </span>
-                                        </button>
-                                    );
-                                })
-                            )}
-                        </div>
-
-                        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
-                            <button
-                                type="button"
-                                onClick={onClose}
-                                disabled={isLoading}
-                                className="rounded-full border border-(--theme-border) px-5 py-2.5 text-sm font-700 text-(--theme-text) transition hover:bg-(--theme-secondary-bg) disabled:opacity-50"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                type="button"
-                                onClick={onConfirm}
-                                disabled={!selectedCourierId || isLoading || messengersLoading}
-                                className="rounded-full bg-primary px-5 py-2.5 text-sm font-800 text-white transition hover:opacity-90 disabled:opacity-50"
-                            >
-                                {isLoading ? 'Asignando…' : 'Confirmar asignación'}
-                            </button>
-                        </div>
-                    </div>
-                </section>
+  return createPortal(
+    (
+      <div
+        className="fixed inset-0 z-999 flex items-center justify-center bg-black/75 p-4 backdrop-blur-md"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="assign-messenger-title"
+        onClick={(event) => {
+          if (event.target === event.currentTarget) onClose();
+        }}
+      >
+        <section className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-[28px] border border-(--theme-border) bg-(--theme-card-bg) shadow-2xl">
+          <header className="flex items-start justify-between gap-4 border-b border-(--theme-border) px-6 py-5">
+            <div>
+              <h2
+                id="assign-messenger-title"
+                className="mt-2 text-2xl font-900 tracking-tight text-(--theme-text)"
+                style={{ fontFamily: 'Outfit, sans-serif' }}
+              >
+                #{order.orderId.slice(-10).toUpperCase()}
+              </h2>
+              <p className="mt-1 text-sm text-(--theme-text) opacity-70">
+                Selecciona un mensajero y confirma la asignación.
+              </p>
             </div>
-        ),
-        document.body,
-    );
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-(--theme-border) bg-(--theme-secondary-bg) text-(--theme-text) transition hover:border-primary hover:text-primary"
+              aria-label="Cerrar modal"
+            >
+              <X size={18} />
+            </button>
+          </header>
+
+          <div className="p-6">
+            <div className="rounded-3xl border border-(--theme-border) bg-(--theme-secondary-bg)/50 p-4">
+              <p className="text-[11px] font-800 uppercase tracking-[0.24em] text-(--theme-text) opacity-45">
+                Pedido listo
+              </p>
+              <p className="mt-1 text-lg font-900 text-(--theme-text)">
+                {order.buyerName ?? 'Comprador desconocido'}
+              </p>
+              <p className="mt-1 text-sm text-(--theme-text) opacity-70">
+                {order.locationLabel ?? 'Ubicación no registrada'}
+              </p>
+            </div>
+
+            <div className="mt-5 grid gap-3">
+              {messengersLoading ? (
+                <div className="rounded-2xl border border-dashed border-(--theme-border) px-4 py-6 text-sm text-(--theme-text) opacity-50">
+                  Cargando mensajeros…
+                </div>
+              ) : messengers.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-(--theme-border) px-4 py-6 text-sm text-(--theme-text) opacity-50">
+                  No hay mensajeros disponibles.
+                </div>
+              ) : (
+                messengers.map((messenger) => {
+                  const isSelected = selectedCourierId === messenger.uid;
+
+                  return (
+                    <button
+                      key={messenger.uid}
+                      type="button"
+                      onClick={() => onSelectCourier(order.orderId, messenger.uid)}
+                      className={`flex items-center justify-between rounded-2xl border px-4 py-4 text-left transition hover:border-primary hover:bg-(--theme-secondary-bg) ${isSelected
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-(--theme-border) bg-(--theme-card-bg) text-(--theme-text)'
+                        }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className={`flex h-10 w-10 items-center justify-center rounded-full ${isSelected ? 'bg-primary text-white' : 'bg-(--theme-secondary-bg)'}`}>
+                          <UserRound size={16} />
+                        </span>
+                        <div>
+                          <p className="font-800">{messenger.displayName}</p>
+                          <p className="text-xs opacity-55">
+                            {messenger.institutionalId || 'Sin CI institucional'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <span className="text-sm font-semibold  opacity-70">
+                        {isSelected ? 'Seleccionado' : 'Elegir'}
+                      </span>
+                    </button>
+                  );
+                })
+              )}
+            </div>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={isLoading}
+                className="rounded-full border border-(--theme-border) px-5 py-2.5 text-sm font-700 text-(--theme-text) transition hover:bg-(--theme-secondary-bg) disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={onConfirm}
+                disabled={!selectedCourierId || isLoading || messengersLoading}
+                className="rounded-full bg-primary px-5 py-2.5 text-sm font-800 text-white transition hover:opacity-90 disabled:opacity-50"
+              >
+                {isLoading ? 'Asignando…' : 'Confirmar asignación'}
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    ),
+    document.body,
+  );
 }

@@ -1,8 +1,9 @@
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { db } from '../../../lib/firebase';
 import { useAuthUser } from '../../../hooks/useAuthUser';
-import { subscribeSellerOrders, fetchOrderItems, markOrderAsReady } from '../services/sellerServices'
+import { useGetOrders } from './useGetOrders';
+import { fetchOrderItems, markOrderAsReady } from '../services/sellerServices'
 import type { Order, OrderItem } from '../types';
 
 interface UseSellerOrdersReturn {
@@ -20,11 +21,13 @@ interface UseSellerOrdersReturn {
 }
 
 export function useSellerOrders(): UseSellerOrdersReturn {
-  const { user, authReady } = useAuthUser();
-  const [reserved, setReserved] = useState<Order[]>([]);
-  const [ready, setReady] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuthUser();
+  const { orders: reserved, loading: reservedLoading, error: reservedError } = useGetOrders({ status: 'EMPAQUETADO', ordby: 'desc' });
+  const { orders: ready, loading: readyLoading, error: readyError } = useGetOrders({ status: 'LISTO', ordby: 'desc' });
+
+  const loading = reservedLoading || readyLoading;
+  const [actionError, setActionError] = useState<string | null>(null);
+  const error = actionError ?? reservedError ?? readyError;
 
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [expandedItems, setExpandedItems] = useState<OrderItem[]>([]);
@@ -34,32 +37,6 @@ export function useSellerOrders(): UseSellerOrdersReturn {
   const [successOrderId, setSuccessOrderId] = useState<string | null>(null);
 
   const itemsCache = useRef<Record<string, OrderItem[]>>({});
-
-  useEffect(() => {
-    if (!authReady) return;
-
-    if (!user?.uid) {
-      setReserved([]);
-      setReady([]);
-      setLoading(false);
-      return;
-    }
-
-    const unsub = subscribeSellerOrders(
-      db,
-      user.uid,
-      (res, rdy) => {
-        setReserved(res.filter((order) => order.sellerId === user.uid));
-        setReady(rdy);
-        setLoading(false);
-      },
-      (err) => {
-        setError(err.message);
-        setLoading(false);
-      },
-    );
-    return unsub;
-  }, [authReady, user?.uid]);
 
   const toggleOrderDetail = useCallback(async (orderId: string) => {
     if (expandedOrderId === orderId) {
@@ -81,7 +58,7 @@ export function useSellerOrders(): UseSellerOrdersReturn {
       itemsCache.current[orderId] = items;
       setExpandedItems(items);
     } catch {
-      setError('No se pudieron cargar los productos del pedido.');
+      setActionError('No se pudieron cargar los productos del pedido.');
     } finally {
       setItemsLoading(false);
     }
@@ -91,7 +68,7 @@ export function useSellerOrders(): UseSellerOrdersReturn {
     if (!user?.uid) return;
 
     setMarkingOrderId(orderId);
-    setError(null);
+    setActionError(null);
     try {
       await markOrderAsReady(db, orderId, user.uid);
       setSuccessOrderId(orderId);
@@ -101,7 +78,7 @@ export function useSellerOrders(): UseSellerOrdersReturn {
       }
       setTimeout(() => setSuccessOrderId(null), 3000);
     } catch {
-      setError('Error al marcar el pedido como listo.');
+      setActionError('Error al marcar el pedido como listo.');
     } finally {
       setMarkingOrderId(null);
     }
