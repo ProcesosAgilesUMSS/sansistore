@@ -171,7 +171,7 @@ async function processQuerySnapshot(querySnapshot: QuerySnapshot<DocumentData>):
 
     return {
       id: orderDoc.id,
-      code: data.code,
+      secret: data.secret,
       buyerId: data.buyerId,
       sellerId: data.sellerId,
       status: normalizeBuyerOrderStatus(data),
@@ -222,7 +222,7 @@ export async function getOrderById(orderId: string): Promise<Order | null> {
 
   return {
     id: orderSnap.id,
-    code: data.code,
+    secret: data.secret,
     buyerId: data.buyerId,
     sellerId: data.sellerId,
     status: normalizeBuyerOrderStatus(data),

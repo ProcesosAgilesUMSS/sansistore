@@ -3,6 +3,7 @@ import { ArrowLeft, MapPin, Package, Calendar, AlertCircle, CheckCircle } from '
 import type { Order } from '../types';
 import { confirmOrderReception, createReturnRequest } from '../services/ordersService';
 import { Timestamp } from 'firebase/firestore';
+import { parseOrderId } from '../../cart/services/orderService';
 
 interface OrderDetailsPanelProps {
   order: Order;
@@ -40,6 +41,7 @@ function formatDateTime(value: Order['buyerReceptionConfirmedAt']) {
 }
 
 export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: OrderDetailsPanelProps) {
+  const { uuid, friendlyName } = parseOrderId(order.id);
   const [showReturnForm, setShowReturnForm] = useState(false);
   const [showReceptionConfirm, setShowReceptionConfirm] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState<string>('');
@@ -124,8 +126,9 @@ export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: O
             <ArrowLeft size={20} />
           </button>
           <div>
+            <p className="text-[10px] font-mono text-text-light/40">{uuid}</p>
             <h2 className="font-display font-extrabold text-xl tracking-tight">
-              Pedido #{order.id}
+              {friendlyName.replace(/-/g, ' ')}
             </h2>
             <p className="text-xs opacity-60 flex items-center gap-1 mt-1">
               <Calendar size={12} /> {formattedDate}
@@ -145,14 +148,14 @@ export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: O
             <p className="text-sm opacity-80">{order.delivery.destination}</p>
           </div>
         </div>
-        {order.code && (
+        {order.secret && (
           <div className="flex items-start gap-3 pt-3 border-t border-(--theme-border)">
             <div className="flex items-center justify-center w-5 h-5 mt-0.5 shrink-0 rounded-full bg-primary/10 text-primary font-bold text-xs">
               <span>#</span>
             </div>
             <div>
               <h4 className="text-sm font-bold mb-1">Código de seguridad</h4>
-              <p className="text-lg font-mono font-black tracking-widest text-primary">{order.code}</p>
+              <p className="text-lg font-mono font-black tracking-widest text-primary">{order.secret}</p>
             </div>
           </div>
         )}

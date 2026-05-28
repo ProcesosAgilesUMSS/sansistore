@@ -28,7 +28,7 @@ export interface OrderItem {
 
 export interface Order {
   id: string;
-  code?: string;
+  secret?: string;
   buyerId: string;
   sellerId?: string;
   status: OrderStatus;

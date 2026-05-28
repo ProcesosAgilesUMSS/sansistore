@@ -81,6 +81,15 @@ function generateOrderSecret(): string {
   return digits.slice(0, 4).join('');
 }
 
+export function parseOrderId(orderId: string): { uuid: string; friendlyName: string } {
+  const idx = orderId.indexOf('_');
+  if (idx === -1) return { uuid: orderId, friendlyName: orderId };
+  return {
+    uuid: orderId.slice(0, idx),
+    friendlyName: orderId.slice(idx + 1),
+  };
+}
+
 export interface CreateOrderParams {
   user: User;
   selectedLocation: Location;
