@@ -1,0 +1,8 @@
+---
+import PackagedOrdersPanel from '../../features/seller/components/PackagedOrderPanel';
+import SellerLayout from '../../layouts/SellerLayout.astro';
+---
+
+<SellerLayout title="Pedidos empaquetados">
+  <PackagedOrdersPanel client:load embedded />
+</SellerLayout>
