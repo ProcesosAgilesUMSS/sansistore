@@ -6,6 +6,7 @@ on:
       - production
     paths:
       - 'src/**'
+      - 'tests/**'
       - '.github/workflows/playwright.yml'
   pull_request:
     branches:
@@ -13,6 +14,7 @@ on:
       - production
     paths:
       - 'src/**'
+      - 'tests/**'
       - '.github/workflows/playwright.yml'
 concurrency:
   group: playwright-${{ github.ref }}
@@ -30,7 +32,7 @@ jobs:
       run: docker compose build testing
 
     - name: Run Playwright tests
-      run: docker compose run --rm testing
+      run: docker compose run -e CI --rm testing
 
     - name: Report test results
       uses: dorny/test-reporter@v1
