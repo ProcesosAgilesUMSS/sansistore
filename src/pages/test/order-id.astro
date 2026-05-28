@@ -1,0 +1,16 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar';
+import Footer from '../../components/Footer';
+import OrderIdGenerator from '../../features/cart/components/OrderIdGenerator';
+
+export const prerender = false;
+---
+
+<Layout title="Order ID Test | Sansistore">
+  <Navbar client:load />
+  <main class="flex-1">
+    <OrderIdGenerator client:load />
+  </main>
+  <Footer client:load />
+</Layout>
