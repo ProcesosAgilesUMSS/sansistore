@@ -313,3 +313,14 @@
 - **Today:** Empezare en el desarrollo de mi hu de este sprint.
 - **Blockers:** None.
 
+### Jhoel Gustavo Aiza Arce
+
+- **Yesterday:** 
+  - Se completó el bug de la descripción de ubicación para mensajero, permitiendo que el campo `reference` se muestre correctamente en el dashboard. (PR #410)
+  - Se implementó la HU de historial de entregas, agregando fecha, `orderCode` y ordenamiento descendente. (PR #411)
+
+- **Today:** 
+  - Estar atento a la revisión y aprobación de los PRs.
+  - Análisis del panorama del Sprint 3 para identificar dependencias con otros equipos.
+
+- **Blockers:** None.
