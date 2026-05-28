@@ -1,5 +1,6 @@
 import { Package, Calendar, MapPin, ChevronRight } from 'lucide-react';
 import type { Order } from '../types';
+import { parseOrderId } from '../../cart/services/orderService';
 
 interface OrderCardProps {
   order: Order;
@@ -34,6 +35,7 @@ const getStatusLabel = (status: string) => {
 export default function OrderCard({ order }: OrderCardProps) {
   const formattedDate = order.createdAt.toDate().toLocaleDateString('es-BO', { day: 'numeric', month: 'short', year: 'numeric' });
   const totalItemsCount = order.items.reduce((acc, item) => acc + item.quantity, 0);
+  const { uuid, friendlyName } = parseOrderId(order.id);
   return (
     <a
       href={`/mis-pedidos/${order.id}`}
@@ -45,12 +47,17 @@ export default function OrderCard({ order }: OrderCardProps) {
         </div>
 
         <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="font-mono text-xs font-bold opacity-60">
-              #{order.id}
-            </span>
-            <span className={`text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${getStatusStyles(order.status)}`}>
-              {getStatusLabel(order.status)}
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <span className="font-mono text-[10px] font-bold opacity-40 truncate max-w-[200px]">
+                {uuid}
+              </span>
+              <span className={`text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${getStatusStyles(order.status)}`}>
+                {getStatusLabel(order.status)}
+              </span>
+            </div>
+            <span className="font-display font-extrabold text-base mt-0.5">
+              {friendlyName.replace(/-/g, ' ')}
             </span>
           </div>
 
