@@ -189,6 +189,8 @@ classDiagram
     +string buyerId
     +string sellerId
     +string customerName
+    +string customerPhone
+    +string address
     +string status
     +string incidentReason
     +number total
