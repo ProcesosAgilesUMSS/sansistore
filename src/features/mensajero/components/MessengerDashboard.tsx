@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
+
 import {
     AlertTriangle,
     CheckCircle2,
@@ -30,6 +31,7 @@ import {
     type AcceptedOrderSort,
 } from '../utils/acceptedOrderSorting';
 import UndeliveredModal from '../modals/UndeliveredModal';
+import ConfirmPaymentModal from '../modals/ConfirmPaymentModal';
 import CancelNoPaymentModal from '../modals/CancelNoPaymentModal';
 import './MessengerDashboard.css';
 
@@ -658,6 +660,7 @@ export default function MessengerDashboard({
     const [cancelNoPaymentOrder, setCancelNoPaymentOrder] =
         useState<MessengerOrder | null>(null);
     const [savingCancelNoPayment, setSavingCancelNoPayment] = useState(false);
+    const [confirmPaymentOrder, setConfirmPaymentOrder] = useState<MessengerOrder | null>(null);
     const [currentCourierId, setCurrentCourierId] = useState<string | null>(null);
     const [newOrderCount, setNewOrderCount] = useState(0);
     const [acceptedSortOrder, setAcceptedSortOrder] =
@@ -861,52 +864,55 @@ export default function MessengerDashboard({
         }
     };
 
-    const markAsDelivered = async (order: MessengerOrder) => {
-        if (!currentCourierId) {
-            setMessage('No se pudo identificar al mensajero para registrar el pago.');
-            return;
-        }
-
-        if (order.paymentStatusLabel === 'Cobrado') {
-            setMessage('Este pedido ya tiene el pago registrado.');
-            return;
-        }
-
-        const confirmed = window.confirm(
-            `Confirmar pago en efectivo de ${formatBolivianos(order.cashToCollect)} del pedido ${order.orderCode}.`
-        );
-
-        if (!confirmed) return;
-
-        const previousOrder = order;
+    const markAsDelivered = (order: MessengerOrder) => {
+    setConfirmPaymentOrder(order);
+};
+ 
+const confirmPayment = async (order: MessengerOrder, secret: string) => {
+    if (!currentCourierId) {
+        throw new Error('No se pudo identificar al mensajero.');
+    }
+ 
+    if (order.paymentStatusLabel === 'Cobrado') {
+        throw new Error('Este pedido ya tiene el pago registrado.');
+    }
+ 
+    // Validar secret contra order.secret (campo del tipo Order)
+    if (secret !== order.secret) {
+        throw new Error('Código incorrecto.');
+    }
+ 
+    const previousOrder = order;
+    setOrders((currentOrders) =>
+        currentOrders.map((currentOrder) =>
+            currentOrder.id === order.id
+                ? {
+                    ...currentOrder,
+                    deliveryStatus: 'delivered',
+                    paymentStatus: 'COBRADO',
+                    paymentStatusLabel: 'Cobrado',
+                    collectedBy: currentCourierId,
+                    paymentCollectedAt: new Date(),
+                }
+                : currentOrder
+        )
+    );
+ 
+    try {
+        await registerMessengerCashPayment(order, currentCourierId);
+        setMessage('Pago en efectivo registrado y venta cerrada correctamente.');
+        setConfirmPaymentOrder(null);
+    } catch (error) {
+        console.error(error);
         setOrders((currentOrders) =>
             currentOrders.map((currentOrder) =>
-                currentOrder.id === order.id
-                    ? {
-                        ...currentOrder,
-                        deliveryStatus: 'delivered',
-                        paymentStatus: 'COBRADO',
-                        paymentStatusLabel: 'Cobrado',
-                        collectedBy: currentCourierId,
-                        paymentCollectedAt: new Date(),
-                    }
-                    : currentOrder
+                currentOrder.id === previousOrder.id ? previousOrder : currentOrder
             )
         );
-
-        try {
-            await registerMessengerCashPayment(order, currentCourierId);
-            setMessage('Pago en efectivo registrado y venta cerrada correctamente.');
-        } catch (error) {
-            console.error(error);
-            setMessage('No se pudo registrar el pago en efectivo.');
-            setOrders((currentOrders) =>
-                currentOrders.map((currentOrder) =>
-                    currentOrder.id === previousOrder.id ? previousOrder : currentOrder
-                )
-            );
-        }
-    };
+        throw error; // el modal captura y muestra el error
+    }
+};
+    
 
     const acceptOrder = (orderId: string) => {
         void updateOrderStatus(orderId, 'accepted');
@@ -1233,6 +1239,13 @@ export default function MessengerDashboard({
                     order={cancelNoPaymentOrder}
                     onClose={() => setCancelNoPaymentOrder(null)}
                     onConfirm={registerCancelNoPayment}
+                />
+            )}
+            {confirmPaymentOrder && (
+                <ConfirmPaymentModal
+                    order={confirmPaymentOrder}
+                    onClose={() => setConfirmPaymentOrder(null)}
+                    onConfirm={confirmPayment}
                 />
             )}
         </main>

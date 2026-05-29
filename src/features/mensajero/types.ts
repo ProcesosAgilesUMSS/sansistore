@@ -45,7 +45,8 @@ export interface MessengerOrder {
   id: string;
   deliveryId: string;
   paymentId: string | null;
-  orderCode: string;        
+  orderCode: string;
+  secret?: string;        
   customerName: string;
   buyerName: string;        
   phone: string;
