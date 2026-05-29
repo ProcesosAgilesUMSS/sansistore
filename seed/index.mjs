@@ -34,6 +34,34 @@ const setDoc = async (collection, id, data) => {
   return ref.id;
 };
 
+const clearCollection = async (collectionPath) => {
+  const snapshot = await db.collection(collectionPath).get();
+  if (snapshot.empty) return;
+
+  const batch = db.batch();
+  snapshot.docs.forEach((doc) => batch.delete(doc.ref));
+  await batch.commit();
+};
+
+const buildOrderItems = (order) =>
+  order.items.map((item, idx) => {
+    const unitPrice = item.product.hasOffer
+      ? item.product.offerPrice
+      : item.product.price;
+    const subtotal = unitPrice * item.quantity;
+    return {
+      itemId: `${order.id}-item-${idx + 1}`,
+      productId: item.product.slug,
+      productName: item.product.name,
+      unitPrice,
+      quantity: item.quantity,
+      subtotal,
+    };
+  });
+
+const calculateOrderTotal = (order) =>
+  buildOrderItems(order).reduce((sum, item) => sum + item.subtotal, 0);
+
 async function seedAuthUsers() {
   for (const user of userList) {
     try {
@@ -193,21 +221,9 @@ async function seedLocations() {
 
 async function seedOrders() {
   for (const order of orderList) {
-    const items = order.items.map((item, idx) => {
-      const unitPrice = item.product.hasOffer
-        ? item.product.offerPrice
-        : item.product.price;
-      const subtotal = unitPrice * item.quantity;
-      return {
-        itemId: `${order.code}-item-${idx + 1}`,
-        productId: item.product.slug,
-        productName: item.product.name,
-        unitPrice,
-        quantity: item.quantity,
-        subtotal,
-      };
-    });
+    await clearCollection(`orders/${order.id}/orderItems`);
 
+    const items = buildOrderItems(order);
     const total = items.reduce((sum, item) => sum + item.subtotal, 0);
     const deliveryStatus = order.deliveryStatus;
 
@@ -227,7 +243,7 @@ async function seedOrders() {
       sellerId: order.seller?.uid || null,
       customerName: order.customerName,
       customerPhone: order.customerPhone,
-      address: order.address ?? null,
+      address: order.location?.label ?? null,
       status: order.status,
       incidentReason: null,
       total,
@@ -264,9 +280,15 @@ async function seedOrders() {
 
 async function seedDeliveries() {
   for (const d of deliveryList) {
+    const legacyIndex = /^order-(\d+)$/.exec(d.orderCode)?.[1];
+    const order = legacyIndex
+      ? orderList[Number(legacyIndex) - 1]
+      : orderList.find((item) => item.id === d.orderCode);
+
     await setDoc('deliveries', d.code, {
       deliveryId: d.code,
-      orderId: d.orderCode,
+      orderId: order?.id || d.orderCode,
+      orderCode: d.orderCode,
       courierId: d.courier ? d.courier.uid : null,
       status: d.status,
       deliveryCode: d.code.replace('delivery-', 'DEL-2026-'),
@@ -274,7 +296,7 @@ async function seedDeliveries() {
       incidentReason: null,
       evidenceUrl: null,
       failureReason: null,
-      amountCollected: d.amountCollected,
+      amountCollected: order ? calculateOrderTotal(order) : null,
       customerConfirmed: d.customerConfirmed,
       customerConfirmedAt: toTimestamp(d.customerConfirmedAt),
       assignedAt: toTimestamp(d.assignedAt),

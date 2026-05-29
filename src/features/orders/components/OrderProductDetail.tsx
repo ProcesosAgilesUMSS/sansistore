@@ -34,7 +34,7 @@ export default function OrderProductDetail({
             id="order-detail-title"
             className="text-[clamp(1.75rem,4vw,3rem)] font-black tracking-[-0.04em] leading-none text-text-light"
           >
-            {friendlyName.replace(/-/g, ' ')}
+            {friendlyName}
           </h3>
           <p className="text-sm text-text-light/80 mt-4">
             Destino: {order.delivery.destination}
