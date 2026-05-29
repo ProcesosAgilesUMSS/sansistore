@@ -65,6 +65,10 @@ export function subscribeToSellerOrders(sellerId: string, onUpdate: (orders: Ord
   });
 }
 
+export async function getSentOrders(): Promise<Order[]> {
+  return [];
+}
+
 // --- Internal Processing Logic ---
 
 

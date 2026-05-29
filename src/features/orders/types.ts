@@ -13,6 +13,20 @@ export type OrderStatus =
   'EMPAQUETADO' |
   'LISTO';
 
+export const STATUS_LABELS: Record<OrderStatus, string> = {
+  CREADO: "Creado",
+  ASIGNADO: "Asignado",
+  'EN CAMINO': "En camino",
+  ENTREGADO: "Entregado",
+  PAGADO: "Pagado",
+  CANCELADO: "Cancelado",
+  'NO ENTREGADO': "No entregado",
+  RESERVADO: "Reservado",
+  PENDIENTE: "Pendiente",
+  EMPAQUETADO: "Empaquetado",
+  LISTO: "Listo"
+};
+
 export interface OrderItem {
   itemId: string;
   productId: string;
