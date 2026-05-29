@@ -12,10 +12,11 @@ import { SkeletonRows } from './SkeletonRows';
 import { ErrorMessage } from './ErrorMessage';
 
 export default function PackagedOrdersPanel({ embedded = false }: { embedded?: boolean }) {
-  const { orders: packaged,
+  const {
+    orders: packaged,
     loading,
     error
-  } = useGetOrders({ status: 'EMPAQUETADO', ordby: 'desc' });
+  } = useGetOrders({ status: 'EMPAQUETADO', ordby: 'asc' });
 
   const {
     markAsReady,

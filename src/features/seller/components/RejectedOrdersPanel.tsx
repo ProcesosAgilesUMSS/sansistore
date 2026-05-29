@@ -17,7 +17,7 @@ export default function RejectedOrdersPanel({ embedded = false }: { embedded?: b
     orders: rejected,
     loading,
     error
-  } = useGetOrders({ status: 'PENDIENTE REASIGNACION', ordby: 'desc' });
+  } = useGetOrders({ status: 'PENDIENTE REASIGNACION', ordby: 'asc' });
 
 
   const {
