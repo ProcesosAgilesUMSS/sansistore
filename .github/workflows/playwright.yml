@@ -6,6 +6,7 @@ on:
       - production
     paths:
       - 'src/**'
+      - 'tests/**'
       - '.github/workflows/playwright.yml'
   pull_request:
     branches:
@@ -13,10 +14,16 @@ on:
       - production
     paths:
       - 'src/**'
+      - 'tests/**'
       - '.github/workflows/playwright.yml'
 concurrency:
   group: playwright-${{ github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
 
 jobs:
   test:
@@ -26,10 +33,25 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Create output directories
+      run: |
+        mkdir -p junit-result 
     - name: Build Docker image
       run: docker compose build testing
 
     - name: Run Playwright tests
-      run: docker compose run --rm testing
+      run: docker compose run -e CI=true --rm testing
 
+    - name: Report test results
+      uses: dorny/test-reporter@v1
+      if: success() || failure()
+      with:
+        name: Playwright Test Report
+        path: junit-result/results.xml
+        reporter: java-junit
 
+    - name: Comment Playwright summary
+      uses: daun/playwright-report-summary@v4
+      if: always() && github.event_name == 'pull_request'
+      with:
+        report-file: junit-result/results.json
