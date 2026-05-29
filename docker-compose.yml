@@ -10,6 +10,7 @@ services:
       - ./src:/app/src
       - ./tests:/app/tests
       - ./playwright.config.ts:/app/playwright.config.ts
+      - ./junit-result:/app/junit-result
       - ./playwright-report:/app/playwright-report
       - ./test-results:/app/test-results
     command: ["bunx", "playwright", "test"]

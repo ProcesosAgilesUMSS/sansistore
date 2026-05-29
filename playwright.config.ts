@@ -21,8 +21,16 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: undefined,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [['html', { open: 'never' }]],
+  reporter: process.env.CI
+    ? [
+      ['dot'],
+      ['junit', { outputFile: 'junit-result/results.xml' }],
+      ['json', { outputFile: 'junit-result/results.json' }],
+    ]
+    : [
+      ['list'],
+      ['html', { open: 'never' }]
+    ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
