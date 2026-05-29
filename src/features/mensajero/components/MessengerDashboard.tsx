@@ -17,6 +17,7 @@ import {
 import { onAuthStateChanged } from 'firebase/auth';
 import { getSellerLocation } from '../../location/services/locationService';
 import { auth } from '../../../lib/firebase';
+import { parseOrderId } from '../../cart/services/orderService';
 import {
     markMessengerOrderAsCancelledByNoPayment,
     markMessengerOrderAsNotDelivered,
@@ -56,6 +57,33 @@ const formatOrderAgeDate = (order: MessengerOrder) => {
     }).format(date);
 };
 
+function CopyableOrderId({
+    order,
+    codeClassName,
+}: {
+    order: MessengerOrder;
+    codeClassName: string;
+}) {
+    const { uuid, friendlyName } = parseOrderId(order.id);
+    const copyOrderId = () => {
+        void navigator.clipboard?.writeText(order.id);
+    };
+
+    return (
+        <button
+            className="block text-left"
+            onClick={copyOrderId}
+            title="Copiar ID del pedido"
+            type="button"
+        >
+            <p className="font-mono text-[10px] font-bold opacity-40">{uuid}</p>
+            <h3 className={codeClassName}>{friendlyName}</h3>
+        </button>
+    );
+}
+
+const getOrderDisplayId = (order: MessengerOrder) => parseOrderId(order.id).friendlyName;
+
 const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']) => {
     if (status === 'assigned') return 'Asignado';
     if (status === 'accepted') return 'Aceptado';
@@ -65,28 +93,40 @@ const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']) => {
     if (status === 'cancelled') return 'Cancelado';
     return 'Entregado';
 };
+
+const buildBuyerMapUrl = (order: MessengerOrder) => {
+    const url = new URL('/mapa', window.location.origin);
+
+    if (order.deliveryLat != null && order.deliveryLng != null) {
+        url.searchParams.set('lat', String(order.deliveryLat));
+        url.searchParams.set('lng', String(order.deliveryLng));
+    }
+
+    url.searchParams.set('order', order.id);
+
+    return url.toString();
+};
+
+const storeBuyerMapOrder = (order: MessengerOrder) => {
+    localStorage.setItem(
+        'courier_panel_order',
+        JSON.stringify({
+            customerName: order.customerName,
+            phone: order.phone,
+            address: order.address,
+            reference: order.reference || order.locationLabel,
+            items: order.items.map((item) => ({
+                name: item.name,
+                quantity: item.quantity,
+            })),
+            cashToCollect: order.cashToCollect,
+        })
+    );
+};
+
 const openDeliveryMap = (order: MessengerOrder) => {
-  localStorage.setItem('courier_panel_order', JSON.stringify({
-    customerName: order.customerName,
-    phone: order.phone,
-    address: order.address,
-    reference: order.reference || order.locationLabel,
-    items: order.items.map((item) => ({ name: item.name, quantity: item.quantity })),
-    cashToCollect: order.cashToCollect,
-  }));
-
-  const lat = order.deliveryLat ?? order.lat ?? null;
-  const lng = order.deliveryLng ?? order.lng ?? null;
-  const url = new URL('/mapa', window.location.origin);
-
-  if (lat != null && lng != null) {
-    url.searchParams.set('lat', String(lat));
-    url.searchParams.set('lng', String(lng));
-  } else {
-    url.searchParams.set('location', order.address);
-  }
-
-  window.location.href = url.toString();
+    storeBuyerMapOrder(order);
+    window.location.href = buildBuyerMapUrl(order);
 };
 
 const canCancelByNoPayment = (order: MessengerOrder) => {
@@ -233,6 +273,10 @@ function PendingOrderCard({
     onReject: (orderId: string) => void;
 }) {
     const [sellerLocationUrl, setSellerLocationUrl] = useState<string | null>(null);
+    const customerLocationUrl = useMemo(() => {
+        return buildBuyerMapUrl(order);
+    }, [order]);
+
     useEffect(() => {
         getSellerLocation(order.id).then(setSellerLocationUrl);
     }, [order.id]);
@@ -241,7 +285,7 @@ function PendingOrderCard({
             <div className="messenger-order-grid grid gap-8">
                 <div>
                     <div className="mb-6 flex items-center gap-3">
-                        <h3 className="text-base font-black">#{order.id}</h3>
+                        <CopyableOrderId order={order} codeClassName="text-base font-black" />
                         <span className="messenger-status-badge rounded-full px-3 py-1 text-xs font-bold">
                             {formatDeliveryStatus(order.deliveryStatus)}
                         </span>
@@ -315,21 +359,12 @@ function PendingOrderCard({
                 </div>
             </div>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <a
-                        className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-                        href={sellerLocationUrl ?? '#'}
-                        rel="noreferrer"
-                        target="_blank"
-                    >
-                        <Send size={17} />
-                        Ubi. Vendedor
-                    </a>
+            <div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <a
                     className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-                    href={sellerLocationUrl ?? '#'}
-                    rel="noreferrer"
-                    target="_blank"
+                    href={customerLocationUrl}
+                    onClick={() => storeBuyerMapOrder(order)}
                 >
                     <Send size={17} />
                     Abrir Maps
@@ -406,6 +441,17 @@ function PendingOrderCard({
                         </button>
                     </>
                 )}
+                </div>
+
+                <a
+                        className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+                        href={sellerLocationUrl ?? '#'}
+                        rel="noreferrer"
+                        target="_blank"
+                    >
+                        <Send size={17} />
+                        Ubi. Vendedor
+                    </a>
             </div>
         </article>
     );
@@ -421,7 +467,7 @@ function DeliveredOrderRow({ order }: { order: MessengerOrder }) {
                     <CheckCircle2 size={20} />
                 </span>
                 <div>
-                    <h3 className="font-black">#{order.orderCode || order.id}</h3>
+                    <CopyableOrderId order={order} codeClassName="font-black" />
                     <p className="messenger-copy text-sm">{order.customerName}</p>
                     <p className="messenger-muted mt-1 text-xs">
                         Entregado: {formatDate(deliveryDate)}
@@ -488,7 +534,7 @@ function OrderDetailModal({
                     <div className="space-y-5">
                         <article className="rounded-[24px] border border-border-light bg-secondary-bg-light/40 p-5">
                             <div className="flex flex-wrap items-center gap-3">
-                                <h3 className="text-lg font-black">#{order.id}</h3>
+                                <CopyableOrderId order={order} codeClassName="text-lg font-black" />
                                 <span className="messenger-status-badge rounded-full px-3 py-1 text-xs font-bold">
                                     {formatDeliveryStatus(order.deliveryStatus)}
                                 </span>
@@ -661,7 +707,7 @@ export default function MessengerDashboard({
     const [currentCourierId, setCurrentCourierId] = useState<string | null>(null);
     const [newOrderCount, setNewOrderCount] = useState(0);
     const [acceptedSortOrder, setAcceptedSortOrder] =
-        useState<AcceptedOrderSort>('oldest-first');
+        useState<AcceptedOrderSort>('newest-first');
     const notifiedOrderIdsRef = useRef<Set<string>>(new Set());
     const isFirstLoadRef = useRef(true);
 
@@ -729,7 +775,11 @@ export default function MessengerDashboard({
     }, []);
 
     const assignedOrders = useMemo(
-        () => orders.filter((order) => order.deliveryStatus === 'assigned'),
+        () =>
+            sortAcceptedOrdersByAge(
+                orders.filter((order) => order.deliveryStatus === 'assigned'),
+                'newest-first'
+            ),
         [orders]
     );
 
@@ -825,7 +875,11 @@ export default function MessengerDashboard({
     );
     
     const notDeliveredOrders = useMemo(
-        () => orders.filter((order) => order.deliveryStatus === 'not_delivered'),
+        () =>
+            sortAcceptedOrdersByAge(
+                orders.filter((order) => order.deliveryStatus === 'not_delivered'),
+                'newest-first'
+            ),
         [orders]
     );
 
@@ -873,7 +927,7 @@ export default function MessengerDashboard({
         }
 
         const confirmed = window.confirm(
-            `Confirmar pago en efectivo de ${formatBolivianos(order.cashToCollect)} del pedido ${order.orderCode}.`
+            `Confirmar pago en efectivo de ${formatBolivianos(order.cashToCollect)} del pedido ${getOrderDisplayId(order)}.`
         );
 
         if (!confirmed) return;

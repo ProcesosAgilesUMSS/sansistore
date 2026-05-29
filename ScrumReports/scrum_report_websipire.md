@@ -286,3 +286,35 @@ por las dudas que se tienen.
 * **Yesterday:** Realizar pruebas y validaciones de las funcionalidades implementadas en las últimas HUs.
 * **Today:** Colaborar en la integración de la opción “Pagar contra entrega” y verificar posibles errores en el flujo.
 * **Blockers:** none
+
+# Daily Reports - Team 3 Webspire 28/05/26
+
+## Dayana Saleth Ortuño Guzman
+
+ * **Yesterday:** Hice el mockup de la HU que me tocó en Figma.
+* **Today:** Revisé algunas dependencias relacionadas con mi HU y empecé a desarrollarla.
+* **Blockers:** none
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Avancé en el diseño del mockup correspondiente a mi HU, definiendo la estructura visual y el flujo principal.
+* **Today:** Revisé las posibles dependencias de mi HU y comencé con su desarrollo, tomando en cuenta los ajustes necesarios para su implementación.
+* **Blockers:** none
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Avancé con el mockup de mi HU y revisé algunos detalles relacionados con el flujo.
+* **Today:** Continuaré revisando dependencias relacionadas con la HU y comenzaré con su desarrollo.
+* **Blockers:** none
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Avancé con el mockup de mi HU, definiendo la estructura visual y algunos detalles del flujo principal.
+* **Today:** Continuaré con el desarrollo de la HU y verificaré posibles ajustes necesarios para su implementación.
+* **Blockers:** none
+
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Revisé los requerimientos y el flujo de la HU asignada para identificar las funcionalidades necesarias.
+* **Today:** Comenzaré con el diseño y desarrollo inicial de la HU, tomando en cuenta las dependencias relacionadas.
+* **Blockers:** none
+

@@ -45,10 +45,10 @@ export function OrderDetailsModal({ order, onClose }: Props) {
               <div className="min-w-0">
                 <h2
                   id="order-details-title"
-                  className="mt-2 text-2xl font-900 tracking-tight text-(--theme-text)"
+                  className="mt-2 text-2xl font-bold tracking-tight text-(--theme-text)"
                   style={{ fontFamily: 'Outfit, sans-serif' }}
                 >
-                  #{order.orderId.slice(-10).toUpperCase()}
+                  #{order.orderId}
                 </h2>
               </div>
 

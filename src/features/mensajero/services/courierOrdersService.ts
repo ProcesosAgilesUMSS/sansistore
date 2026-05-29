@@ -1,7 +1,6 @@
 import {
   collection,
   doc,
-  getDocs,
   onSnapshot,
   orderBy,
   query,
@@ -12,6 +11,7 @@ import {
   type QueryDocumentSnapshot,
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
+import { parseOrderId } from '../../cart/services/orderService';
 import type {
   CourierDashboardStats,
   CourierOrder,
@@ -22,8 +22,7 @@ const ORDERS_COLLECTION = 'orders';
 const PAYMENTS_COLLECTION = 'payments';
 
 const mapOrder = (
-  snapshot: QueryDocumentSnapshot<DocumentData>,
-  index: number
+  snapshot: QueryDocumentSnapshot<DocumentData>
 ): CourierOrder => {
   const data = snapshot.data();
   const createdAt = data.createdAt?.toDate?.() ?? null;
@@ -32,9 +31,7 @@ const mapOrder = (
 
   return {
     id: snapshot.id,
-    orderCode:
-      data.orderCode ??
-      `ORD-${createdAt?.getFullYear() ?? new Date().getFullYear()}-${String(index + 1).padStart(3, '0')}`,
+    displayId: parseOrderId(snapshot.id).friendlyName,
     buyerName: data.buyerName ?? 'Comprador invitado',
     deliveryZone: data.deliveryZone ?? 'Zona pendiente',
     productsTotal:
@@ -106,9 +103,7 @@ export const subscribeToCourierOrders = (
   );
 
   return onSnapshot(ordersQuery, (snapshot) => {
-    const orders = snapshot.docs.map((docSnapshot, index) =>
-      mapOrder(docSnapshot, index)
-    );
+    const orders = snapshot.docs.map((docSnapshot) => mapOrder(docSnapshot));
     const pendingOrders = orders.filter((order) => order.status !== 'Entregado');
 
     onChange({
@@ -174,31 +169,4 @@ export const registerPayment = async (order: CourierOrder) => {
     paymentCollectedAt: collectedAt,
     updatedAt: collectedAt,
   });
-};
-
-export const backfillCourierOrderCodes = async () => {
-  const snapshot = await getDocs(
-    query(collection(db, ORDERS_COLLECTION), orderBy('createdAt', 'asc'))
-  );
-
-  const batch = writeBatch(db);
-
-  snapshot.docs.forEach((docSnapshot, index) => {
-    const data = docSnapshot.data();
-
-    if (data.orderCode && data.deliveryZone) {
-      return;
-    }
-
-    batch.update(docSnapshot.ref, {
-      orderCode:
-        data.orderCode ??
-        `ORD-${new Date().getFullYear()}-${String(index + 1).padStart(3, '0')}`,
-      deliveryZone: data.deliveryZone ?? 'Zona pendiente',
-      deliveryStatus: data.deliveryStatus ?? 'Pendiente',
-      updatedAt: serverTimestamp(),
-    });
-  });
-
-  await batch.commit();
 };

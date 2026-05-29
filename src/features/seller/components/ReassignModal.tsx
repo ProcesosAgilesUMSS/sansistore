@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { db } from '../../../lib/firebase';
 import { fetchDeliveryData } from '../services/sellerServices';
 import type { Messenger, Order } from '../types';
+import { ErrorMessage } from './ErrorMessage';
 
 interface Props {
   order: Order;
@@ -28,24 +29,27 @@ export function ReassignModal({
 }: Props) {
   const [rejectingCourierId, setRejectingCourierId] = useState<string | null>(null);
   const [rejectingCourierName, setRejectingCourierName] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
 
     (async () => {
-      if (!order.deliveryId) return;
+      if (!order.deliveryId) {
+        setError('El pedido no tiene un ID de entrega asociado.');
+      };
       try {
         const d = await fetchDeliveryData(db, order.deliveryId);
         if (!mounted) return;
         setRejectingCourierId((d as any)?.courierId ?? null);
         setRejectingCourierName((d as any)?.deliveryCourierName ?? null);
       } catch {
-        // ignore
+        setError('No se pudo obtener la información de la entrega');
       }
     })();
 
     return () => { mounted = false; };
-  }, [order.deliveryId]);
+  }, [order.deliveryId, order.orderId]);
 
   return createPortal(
     (
@@ -61,8 +65,8 @@ export function ReassignModal({
         <section className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-[28px] border border-(--theme-border) bg-(--theme-card-bg) shadow-2xl">
           <header className="flex items-start justify-between gap-4 border-b border-(--theme-border) px-6 py-5">
             <div>
-              <h2 id="reassign-messenger-title" className="mt-2 text-2xl font-900 tracking-tight text-(--theme-text)" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                #{order.orderId.slice(-10).toUpperCase()}
+              <h2 id="reassign-messenger-title" className="mt-2 text-2xl font-bold tracking-tight text-(--theme-text)" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                #{order.orderId}
               </h2>
               <p className="mt-1 text-sm text-(--theme-text) opacity-70">El mensajero que rechazó no puede ser seleccionado.</p>
             </div>
@@ -72,6 +76,11 @@ export function ReassignModal({
             </button>
           </header>
 
+          {
+            error && (
+              <ErrorMessage message={error} />
+            )
+          }
           <div className="p-6">
             <div className="rounded-3xl border border-(--theme-border) bg-(--theme-secondary-bg)/50 p-4">
               <p className="text-[11px] font-800 uppercase tracking-[0.24em] text-(--theme-text) opacity-45">Pedido pendiente</p>
@@ -101,7 +110,7 @@ export function ReassignModal({
                       key={messenger.uid}
                       type="button"
                       onClick={() => !isRejecting && onSelectCourier(order.orderId, messenger.uid)}
-                      disabled={isRejecting}
+                      disabled={isRejecting || !!error}
                       className={`flex items-center justify-between rounded-2xl border px-4 py-4 text-left transition hover:border-primary hover:bg-(--theme-secondary-bg) ${isSelected ? 'border-primary bg-primary/10 text-primary' : 'border-(--theme-border) bg-(--theme-card-bg) text-(--theme-text)'} ${isRejecting ? 'opacity-60 cursor-not-allowed' : ''}`}
                     >
                       <div className="flex items-center gap-3">
@@ -123,7 +132,7 @@ export function ReassignModal({
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
               <button type="button" onClick={onClose} disabled={isLoading} className="rounded-full border border-(--theme-border) px-5 py-2.5 text-sm font-700 text-(--theme-text) transition hover:bg-(--theme-secondary-bg) disabled:opacity-50">Cancelar</button>
-              <button type="button" onClick={onConfirm} disabled={!selectedCourierId || isLoading || messengersLoading} className="rounded-full bg-primary px-5 py-2.5 text-sm font-800 text-white transition hover:opacity-90 disabled:opacity-50">{isLoading ? 'Reasignando…' : 'Confirmar reasignación'}</button>
+              <button type="button" onClick={onConfirm} disabled={!selectedCourierId || isLoading || messengersLoading || !!error} className="rounded-full bg-primary px-5 py-2.5 text-sm font-800 text-white transition hover:opacity-90 disabled:opacity-50">{isLoading ? 'Reasignando…' : 'Confirmar reasignación'}</button>
             </div>
           </div>
         </section>
