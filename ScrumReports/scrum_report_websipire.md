@@ -286,3 +286,11 @@ por las dudas que se tienen.
 * **Yesterday:** Realizar pruebas y validaciones de las funcionalidades implementadas en las últimas HUs.
 * **Today:** Colaborar en la integración de la opción “Pagar contra entrega” y verificar posibles errores en el flujo.
 * **Blockers:** none
+
+# Daily Reports - Team 3 Webspire 28/05/26
+
+## Dayana Saleth Ortuño Guzman
+
+ * **Yesterday:** Hice el mockup de la HU que me tocó en Figma.
+* **Today:** Revisé algunas dependencias relacionadas con mi HU y empecé a desarrollarla.
+* **Blockers:** none
