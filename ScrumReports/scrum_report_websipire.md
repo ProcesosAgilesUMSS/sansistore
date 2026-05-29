@@ -294,3 +294,8 @@ por las dudas que se tienen.
  * **Yesterday:** Hice el mockup de la HU que me tocó en Figma.
 * **Today:** Revisé algunas dependencias relacionadas con mi HU y empecé a desarrollarla.
 * **Blockers:** none
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Avancé en el diseño del mockup correspondiente a mi HU, definiendo la estructura visual y el flujo principal.
+* **Today:** Revisé las posibles dependencias de mi HU y comencé con su desarrollo, tomando en cuenta los ajustes necesarios para su implementación.
+* **Blockers:** none
