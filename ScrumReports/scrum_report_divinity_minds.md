@@ -314,3 +314,9 @@
 - **Yesterday:** Desarrollé y ejecuté las pruebas para la sección de comentarios de los productos, verificando su correcto funcionamiento
 - **Today:** Continuaré con la implementación de pruebas en otras funcionalidades que lo requieran.
 - **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Revisé el sistema en su estado actual para identificar posibles mejoras funcionales y de experiencia, documentando observaciones para su posterior análisis.
+- **Today:** Realicé una revisión general del sistema enfocada en la identificación de bugs, cubriendo las distintas funcionalidades para asegurar su correcto funcionamiento.
+- **Blockers:** Ninguno.
