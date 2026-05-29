@@ -42,7 +42,7 @@ export default function SellerOrderItem({
       >
         <OrderStatusBadge status={order.status} />
       </div>
-      
+
       {order.status === "EMPAQUETADO" && (
         <button
           className="text-left min-[760px]:col-start-16 min-[960px]:col-start-21 min-[960px]:col-end-23 text-sm underline decoration-2 cursor-pointer underline-offset-2"

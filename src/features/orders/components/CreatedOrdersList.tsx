@@ -5,7 +5,6 @@ import CreatedOrderItem from "./CreatedOrderItem";
 import OrderDetailModal from "./OrderDetailModal";
 import OrderGridSection from "./OrderGridSection";
 
-
 export default function CreatedOrdersList() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
