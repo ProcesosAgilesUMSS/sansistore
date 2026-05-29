@@ -61,8 +61,8 @@ export function ReassignModal({
         <section className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-[28px] border border-(--theme-border) bg-(--theme-card-bg) shadow-2xl">
           <header className="flex items-start justify-between gap-4 border-b border-(--theme-border) px-6 py-5">
             <div>
-              <h2 id="reassign-messenger-title" className="mt-2 text-2xl font-900 tracking-tight text-(--theme-text)" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                #{order.orderId.slice(-10).toUpperCase()}
+              <h2 id="reassign-messenger-title" className="mt-2 text-2xl font-bold tracking-tight text-(--theme-text)" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                #{order.orderId}
               </h2>
               <p className="mt-1 text-sm text-(--theme-text) opacity-70">El mensajero que rechazó no puede ser seleccionado.</p>
             </div>
