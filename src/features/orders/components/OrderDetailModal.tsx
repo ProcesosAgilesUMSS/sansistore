@@ -26,6 +26,14 @@ export default function OrderDetailModal({ order, closeModal }: { order: Order, 
     });
   };
 
+  const formatCurrency = (value: number | undefined) => {
+    if (value === undefined || value === null) return "BS 0.00";
+    return new Intl.NumberFormat("es-BO", {
+      style: "currency",
+      currency: "BOB",
+    }).format(value);
+  };
+
   const date = formatDate(order.createdAt)
   const totalQuantity = order.items.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -42,7 +50,7 @@ export default function OrderDetailModal({ order, closeModal }: { order: Order, 
       >
         <div className="col-span-full grid grid-cols-subgrid items-center mb-6">
           <span className="uppercase text-lg font-bold tracking-tight truncate col-start-1 col-end-7">{order.id}</span>
-          <div className="col-start-8 col-end-12">
+          <div className="col-start-8 col-end-12 w-fit">
             <OrderStatusBadge status={order.status} />
           </div>
           <button
@@ -64,19 +72,19 @@ export default function OrderDetailModal({ order, closeModal }: { order: Order, 
         <div className="col-span-full grid grid-cols-subgrid">
           <div className="col-span-full grid grid-cols-subgrid border-y border-dashed py-0.5">
             <div className="col-start-1 col-end-3">Cantidad</div>
-            <div className="col-start-3 col-end-9 ml-4">Producto</div>
-            <div className="col-start-10 col-end-12">Precio</div>
-            <div className="col-start-13 col-end-15">Monto</div>
+            <div className="col-start-3 col-end-9 ml-2">Producto</div>
+            <div className="col-start-11 col-end-13">Precio</div>
+            <div className="col-start-14 col-end-15">Monto</div>
             <div className="col-start-16 col-end-17">Stock</div>
           </div>
           <ul className="grid grid-cols-subgrid col-span-full py-2">
             {order.items.map((item, index) => (
               <li key={index} className="grid grid-cols-subgrid col-span-full">
                 <div className="col-start-1 col-end-2 text-center">{item.quantity}</div>
-                <div className="col-start-3 col-end-10 truncate ml-4">{item.productName}</div>
-                <div className="col-start-10 col-end-11 text-center">{item.unitPrice}</div>
-                <div className="col-start-13 col-end-14 text-center">{item.subtotal}</div>
-                <div className="col-start-16 col-end-17 text-center">{item.stockAvailable}</div>
+                <div className="col-start-3 col-end-10 truncate ml-2">{item.productName}</div>
+                <div className="col-start-11 col-end-13">{formatCurrency(item.unitPrice)}</div>
+                <div className="col-start-14 col-end-16">{formatCurrency(item.subtotal)}</div>
+                <div className="col-start-16 col-end-17 justify-self-end">{item.stockAvailable}</div>
               </li>
             ))}
           </ul>
@@ -89,7 +97,7 @@ export default function OrderDetailModal({ order, closeModal }: { order: Order, 
           </div>
           <div className="flex justify-between">
             Total:
-            <span>BS {order.total}</span>
+            <span>{formatCurrency(order.total)}</span>
           </div>
         </div>
 

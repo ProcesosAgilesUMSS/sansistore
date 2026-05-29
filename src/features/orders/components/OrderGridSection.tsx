@@ -12,6 +12,7 @@ interface OrderGridSectionProps {
   loadingMessage: string;
   ariaLabelledby: string;
   children: ReactNode;
+  headerContent?: ReactNode;
 }
 
 export default function OrderGridSection({
@@ -21,7 +22,8 @@ export default function OrderGridSection({
   loading,
   loadingMessage,
   ariaLabelledby,
-  children
+  children,
+  headerContent
 }: OrderGridSectionProps) {
   return (
     <section
@@ -36,10 +38,14 @@ export default function OrderGridSection({
         {title}
       </h2>
 
-      <div className="col-span-full flex items-center gap-2 min-[960px]:col-start-3 mb-12 ml-2 tracking-tight">
-        <Package strokeWidth={1.5} size={18} />
-        <span>{count} {countLabel}</span>
+      <div className={`col-span-full flex items-center justify-between min-[960px]:col-start-3 ${headerContent ? "mb-2" : "mb-12"} tracking-tight`}>
+        <div className="flex items-center gap-2">
+          <Package strokeWidth={1.5} size={18} />
+          <span>{count} {countLabel}</span>
+        </div>
       </div>
+
+      {headerContent}
 
       {loading ? (
         <div className="col-span-full flex justify-center items-center h-80 gap-x-5">
