@@ -17,7 +17,7 @@ export default function ReadyOrdersPanel({ embedded = false }: { embedded?: bool
     orders: ready,
     loading,
     error
-  } = useGetOrders({ status: 'LISTO', ordby: 'desc' });
+  } = useGetOrders({ status: 'LISTO', ordby: 'asc' });
 
   const {
     messengers,
