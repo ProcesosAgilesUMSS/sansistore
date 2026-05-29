@@ -197,7 +197,63 @@ export async function getMessengerOrders(
 
   const orders = await Promise.all(
     deliveriesSnapshot.docs.map(async (deliveryDoc) => {
-      return mapMessengerOrder(deliveryDoc.id, deliveryDoc.data());
+      const delivery = deliveryDoc.data();
+      const orderId = String(delivery.orderId || '');
+      const orderSnap = orderId
+        ? await getDoc(doc(db, 'orders', orderId))
+        : null;
+      const order = orderSnap?.exists() ? orderSnap.data() : {};
+      const items = orderId ? await readOrderItems(orderId) : [];
+      const paymentStatus = String(order.paymentStatus || 'PENDIENTE');
+      const customerLocation = await readCustomerLocation(order.locationId);
+      const courierZoneName =
+        customerLocation.lat != null && customerLocation.lng != null
+          ? formatCourierZoneName(
+              getCurrentZone(customerLocation.lat, customerLocation.lng)
+            )
+          : undefined;
+
+      return {
+        id: orderId || deliveryDoc.id,
+        deliveryId: deliveryDoc.id,
+        paymentId: typeof order.paymentId === 'string' ? order.paymentId : null,
+        orderCode: String(order.orderCode || order.code || orderId || ''),  
+        customerName: String(order.customerName || 'Cliente no registrado'),
+        buyerName: String(order.customerName || 'Comprador invitado'),       
+        phone: String(order.customerPhone || 'Sin telefono'),
+        address: String(
+          order.address || customerLocation.label || 'Direccion no registrada'
+        ),
+        city: String(order.deliveryZone || 'Cochabamba'),
+        locationLabel: customerLocation.label ?? undefined,
+        deliveryLat: customerLocation.lat,
+        deliveryLng: customerLocation.lng,
+        lat: customerLocation.lat,
+        lng: customerLocation.lng,
+        reference: String(
+          order.reference ||
+            order.locationLabel ||
+            customerLocation.label ||
+            courierZoneName ||
+            ''
+        ),
+        items,
+        cashToCollect: Number(delivery.amountCollected || order.total || 0),
+        paymentMethod: 'cash_on_delivery' as const,
+        paymentStatus,
+        paymentStatusLabel:
+          paymentStatus.toLowerCase() === 'cobrado' ||
+          paymentStatus.toLowerCase() === 'pagado'
+            ? 'Cobrado'
+            : 'Pendiente de cobro',
+        paymentCollectedAt: order.paymentCollectedAt?.toDate?.() ?? null,
+        collectedBy: typeof order.collectedBy === 'string' ? order.collectedBy : null,
+        deliveryMethod: String(order.deliveryMethod || 'Delivery'),         
+        deliveryStatus: normalizeDeliveryStatus(delivery.status),
+        assignedAt: toDate(delivery.assignedAt),
+        createdAt: toDate(delivery.createdAt) ?? toDate(order.createdAt),
+        updatedAt: toDate(delivery.updatedAt) ?? toDate(order.updatedAt),
+      };
     })
   );
 
@@ -220,7 +276,72 @@ export function subscribeToMessengerOrders(
       try {
         const orders = await Promise.all(
           deliveriesSnapshot.docs.map(async (deliveryDoc) => {
-            return mapMessengerOrder(deliveryDoc.id, deliveryDoc.data());
+            const delivery = deliveryDoc.data();
+            const orderId = String(delivery.orderId || '');
+            const orderSnap = orderId
+              ? await getDoc(doc(db, 'orders', orderId))
+              : null;
+            const order = orderSnap?.exists() ? orderSnap.data() : {};
+            const items = orderId ? await readOrderItems(orderId) : [];
+            const paymentStatus = String(order.paymentStatus || 'PENDIENTE');
+            const customerLocation = await readCustomerLocation(order.locationId);
+            const courierZoneName =
+              customerLocation.lat != null && customerLocation.lng != null
+                ? formatCourierZoneName(
+                    getCurrentZone(customerLocation.lat, customerLocation.lng)
+                  )
+                : undefined;
+
+            return {
+              id: orderId || deliveryDoc.id,
+              deliveryId: deliveryDoc.id,
+              paymentId:
+                typeof order.paymentId === 'string' ? order.paymentId : null,
+              orderCode: String(order.orderCode || order.code || orderId || ''),
+              customerName: String(
+                order.customerName || 'Cliente no registrado'
+              ),
+              buyerName: String(order.customerName || 'Comprador invitado'),
+              phone: String(order.customerPhone || 'Sin telefono'),
+              address: String(
+                order.address ||
+                  customerLocation.label ||
+                  'Direccion no registrada'
+              ),
+              city: String(order.deliveryZone || 'Cochabamba'),
+              locationLabel: customerLocation.label ?? undefined,
+              deliveryLat: customerLocation.lat,
+              deliveryLng: customerLocation.lng,
+              lat: customerLocation.lat,
+              lng: customerLocation.lng,
+              reference: String(
+                order.reference ||
+                  order.locationLabel ||
+                  customerLocation.label ||
+                  courierZoneName ||
+                  ''
+              ),
+              items,
+              cashToCollect: Number(delivery.amountCollected || order.total || 0),
+              paymentMethod: 'cash_on_delivery' as const,
+              paymentStatus,
+              paymentStatusLabel:
+                paymentStatus.toLowerCase() === 'cobrado' ||
+                paymentStatus.toLowerCase() === 'pagado'
+                  ? 'Cobrado'
+                  : 'Pendiente de cobro',
+              paymentCollectedAt:
+                order.paymentCollectedAt?.toDate?.() ?? null,
+              collectedBy:
+                typeof order.collectedBy === 'string'
+                  ? order.collectedBy
+                  : null,
+              deliveryMethod: String(order.deliveryMethod || 'Delivery'),
+              deliveryStatus: normalizeDeliveryStatus(delivery.status),
+              assignedAt: toDate(delivery.assignedAt),
+              createdAt: toDate(delivery.createdAt) ?? toDate(order.createdAt),
+              updatedAt: toDate(delivery.updatedAt) ?? toDate(order.updatedAt),
+            };
           })
         );
 
