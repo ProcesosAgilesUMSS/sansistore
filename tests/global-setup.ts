@@ -74,7 +74,6 @@ async function runSeed() {
     const seedProcess = spawn(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['run', 'seed'], {
       stdio: 'inherit',
       detached: false,
-      shell: true,
       env: {
         ...process.env,
         FIRESTORE_EMULATOR_HOST: FIRESTORE_TEST_HOST,
@@ -124,16 +123,9 @@ export default async function globalSetup() {
     {
       stdio: ['ignore', 'pipe', 'pipe'],
       detached: false,
-      shell: true,
     }
   );
 
-  if (emulatorProcess.stdout) {
-    emulatorProcess.stdout.on('data', (data) => {
-      const msg = data.toString().trim();
-      if (msg) console.log(`[Emulator] ${msg}`);
-    });
-  }
   if (emulatorProcess.stderr) {
     emulatorProcess.stderr.on('data', (data) => {
       const msg = data.toString().trim();

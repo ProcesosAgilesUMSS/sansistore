@@ -1,0 +1,10 @@
+---
+import SellerLayout from '../../layouts/SellerLayout.astro';
+//import ReservedOrdersPanel from '../../features/seller/components/ReservedOrdersPanel';
+import CreatedOrdersList from '../../features/orders/components/CreatedOrdersList';
+---
+
+<SellerLayout title="Pedidos reservados">
+  {/*<ReservedOrdersPanel client:load embedded />*/}
+  <CreatedOrdersList client:load/>
+</SellerLayout>

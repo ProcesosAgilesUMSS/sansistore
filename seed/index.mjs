@@ -31,12 +31,10 @@ const setDoc = async (collection, id, data) => {
     ? db.collection(collection).doc(id)
     : db.collection(collection).doc();
   await ref.set(data, { merge: true });
-  console.log(`  ✓ ${collection}/${ref.id}`);
   return ref.id;
 };
 
 async function seedAuthUsers() {
-  console.log('\n Seeding Auth users...');
   for (const user of userList) {
     try {
       const existing = await auth.getUser(user.uid);
@@ -47,7 +45,6 @@ async function seedAuthUsers() {
       if (user.authType === 'google' && !hasGoogle) {
         await auth.deleteUser(user.uid);
       } else {
-        console.log(`  ✓ Auth: ${user.email} (exists)`);
         continue;
       }
     } catch {
@@ -87,16 +84,15 @@ async function seedAuthUsers() {
             password: '12345678',
           });
         }
-        console.log(`  ✓ Auth: ${user.email} (${user.authType})`);
       } catch (err) {
         console.log(`  ⚠ Auth: ${user.email} - ${err.message}`);
       }
     }
   }
+  console.log('auth seeded');
 }
 
 async function seedFirestoreUsers() {
-  console.log('\n Seeding Firestore users...');
   for (const user of userList) {
     await setDoc('users', user.uid, {
       uid: user.uid,
@@ -111,10 +107,10 @@ async function seedFirestoreUsers() {
       updatedAt: TS(),
     });
   }
+  console.log('users seeded');
 }
 
 async function seedCategories() {
-  console.log('\n Seeding categories...');
   for (const cat of categoryList) {
     await setDoc('categories', cat.id, {
       categoryId: cat.id,
@@ -124,10 +120,10 @@ async function seedCategories() {
       createdAt: TS(),
     });
   }
+  console.log('categories seeded');
 }
 
 async function seedProducts() {
-  console.log('\n Seeding products, inventory & reviews...');
   for (const p of productList) {
     const productId = await setDoc('products', p.slug, {
       productId: p.slug,
@@ -175,10 +171,10 @@ async function seedProducts() {
       });
     }
   }
+  console.log('products seeded');
 }
 
 async function seedLocations() {
-  console.log('\n Seeding locations...');
   for (const loc of locationList) {
     await setDoc('locations', loc.id, {
       locationId: loc.id,
@@ -192,10 +188,10 @@ async function seedLocations() {
       updatedAt: TS(),
     });
   }
+  console.log('locations seeded');
 }
 
 async function seedOrders() {
-  console.log('\n Seeding orders & orderItems...');
   for (const order of orderList) {
     const items = order.items.map((item, idx) => {
       const unitPrice = item.product.hasOffer
@@ -263,10 +259,10 @@ async function seedOrders() {
       updatedAt: toTimestamp(order.updatedAt),
     });
   }
+  console.log('orders seeded');
 }
 
 async function seedDeliveries() {
-  console.log('\n Seeding deliveries...');
   for (const d of deliveryList) {
     await setDoc('deliveries', d.code, {
       deliveryId: d.code,
@@ -291,25 +287,23 @@ async function seedDeliveries() {
       updatedAt: toTimestamp(d.updatedAt),
     });
   }
+  console.log('deliveries seeded');
 }
 
 async function main() {
-  console.log(' Starting seed...\n');
-
-  await seedAuthUsers();
-  await seedFirestoreUsers();
-  await seedCategories();
-  await seedProducts();
-  await seedCartItems({ db });
-  await seedLocations();
-  await seedOrders();
-  await seedDeliveries();
-
-  console.log('\n Seed complete!\n');
-  process.exit(0);
+  try {
+    await seedAuthUsers();
+    await seedFirestoreUsers();
+    await seedCategories();
+    await seedProducts();
+    await seedCartItems({ db });
+    await seedLocations();
+    await seedOrders();
+    await seedDeliveries();
+  } catch (err) {
+    console.error('seed failed:', err);
+    process.exit(1);
+  }
 }
 
-main().catch((err) => {
-  console.error(' Seed failed:', err);
-  process.exit(1);
-});
+main();

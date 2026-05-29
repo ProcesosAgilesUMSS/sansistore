@@ -1,11 +1,11 @@
 export const sections = [
   {
-    id: 'reservados',
-    label: 'Pedidos Reservados',
-    route: '/seller/reserved-orders',
+    id: 'creados',
+    label: 'Pedidos Creados',
+    route: '/seller/created-orders',
   },
   {
-    id: 'entregados',
+    id: 'empaqutados',
     label: 'Pedidos Empaquetados',
     route: '/seller/packaged-orders',
   },
@@ -25,7 +25,7 @@ export const sections = [
     route: '/seller/purchase'
   },
   {
-    id: 'ofertas', label: 'Gestionar Ofertas', route: '/seller/offers'
+    id: 'ofertas', label: 'Registrar Oferta', route: '/seller/offers'
   },
   {
     id: 'rendicion',
@@ -38,4 +38,3 @@ export const sections = [
     route: '/seller/order-history',
   },
 ];
-
