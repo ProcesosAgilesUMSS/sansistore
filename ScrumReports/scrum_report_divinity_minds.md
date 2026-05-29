@@ -309,3 +309,8 @@
 - **Today:** Me enfocaré en implementar los tests correspondientes y continuar con la optimización de los flujos.
 - **Blockers:** n/a.
 
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Desarrollé y ejecuté las pruebas para la sección de comentarios de los productos, verificando su correcto funcionamiento
+- **Today:** Continuaré con la implementación de pruebas en otras funcionalidades que lo requieran.
+- **Blockers:** n/a.
