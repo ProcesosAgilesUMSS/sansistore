@@ -74,6 +74,8 @@ const buildBuyerMapUrl = (order: MessengerOrder) => {
         url.searchParams.set('lng', String(order.deliveryLng));
     }
 
+    url.searchParams.set('order', order.id);
+
     return url.toString();
 };
 

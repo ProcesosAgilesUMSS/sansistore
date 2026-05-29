@@ -1,7 +1,9 @@
 import { ArrowLeft, Banknote, MapPin, Package, Phone } from 'lucide-react';
 import L from 'leaflet';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import { MapContainer, Marker, Polygon, TileLayer, ZoomControl } from 'react-leaflet';
+import { db } from '../../../lib/firebase';
 import { ALLOWED_ZONES } from '../../location/utils/zoneLimits';
 import 'leaflet/dist/leaflet.css';
 
@@ -45,8 +47,77 @@ function readOrderFromStorage(): BuyerMapOrder | null {
   }
 }
 
+function readInitialOrder(): BuyerMapOrder | null {
+  if (typeof window === 'undefined') return null;
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('order')) return null;
+
+  return readOrderFromStorage();
+}
+
+const asString = (value: unknown): string | null =>
+  typeof value === 'string' && value.trim() ? value.trim() : null;
+
+async function readOrderFromFirestore(orderId: string): Promise<BuyerMapOrder | null> {
+  const orderSnap = await getDoc(doc(db, 'orders', orderId));
+  if (!orderSnap.exists()) return null;
+
+  const order = orderSnap.data();
+  const itemsSnapshot = await getDocs(collection(db, 'orders', orderId, 'orderItems'));
+  const locationId = asString(order.locationId);
+  const locationSnap = locationId ? await getDoc(doc(db, 'locations', locationId)) : null;
+  const location = locationSnap?.exists() ? locationSnap.data() : {};
+
+  const items = itemsSnapshot.docs.map((itemDoc) => {
+    const item = itemDoc.data();
+
+    return {
+      name: String(item.productName || 'Producto sin nombre'),
+      quantity: Number(item.quantity || 0),
+    };
+  });
+
+  return {
+    customerName: String(order.customerName || 'Cliente no registrado'),
+    phone: String(order.customerPhone || 'Sin telefono'),
+    address: String(
+      order.address || asString(location.label) || 'Direccion no registrada'
+    ),
+    reference:
+      asString(order.reference) ||
+      asString(order.locationLabel) ||
+      asString(location.label) ||
+      undefined,
+    items,
+    cashToCollect: Number(order.total || 0),
+  };
+}
+
 export default function CourierBuyerMap() {
-  const [order] = useState<BuyerMapOrder | null>(() => readOrderFromStorage());
+  const [order, setOrder] = useState<BuyerMapOrder | null>(() => readInitialOrder());
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get('order');
+    if (!orderId) return;
+
+    let isMounted = true;
+
+    readOrderFromFirestore(orderId)
+      .then((freshOrder) => {
+        if (!isMounted || !freshOrder) return;
+        setOrder(freshOrder);
+        localStorage.setItem('courier_panel_order', JSON.stringify(freshOrder));
+      })
+      .catch(() => {
+        // Keep the storage fallback if Firestore is temporarily unavailable.
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const position = useMemo<[number, number]>(() => {
     const params = new URLSearchParams(window.location.search);
