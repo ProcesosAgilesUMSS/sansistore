@@ -17,6 +17,7 @@ import {
 import { onAuthStateChanged } from 'firebase/auth';
 import { getSellerLocation } from '../../location/services/locationService';
 import { auth } from '../../../lib/firebase';
+import { parseOrderId } from '../../cart/services/orderService';
 import {
     markMessengerOrderAsCancelledByNoPayment,
     markMessengerOrderAsNotDelivered,
@@ -55,6 +56,33 @@ const formatOrderAgeDate = (order: MessengerOrder) => {
         timeStyle: 'short',
     }).format(date);
 };
+
+function CopyableOrderId({
+    order,
+    codeClassName,
+}: {
+    order: MessengerOrder;
+    codeClassName: string;
+}) {
+    const { uuid, friendlyName } = parseOrderId(order.id);
+    const copyOrderId = () => {
+        void navigator.clipboard?.writeText(order.id);
+    };
+
+    return (
+        <button
+            className="block text-left"
+            onClick={copyOrderId}
+            title="Copiar ID del pedido"
+            type="button"
+        >
+            <p className="font-mono text-[10px] font-bold opacity-40">{uuid}</p>
+            <h3 className={codeClassName}>{friendlyName}</h3>
+        </button>
+    );
+}
+
+const getOrderDisplayId = (order: MessengerOrder) => parseOrderId(order.id).friendlyName;
 
 const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']) => {
     if (status === 'assigned') return 'Asignado';
@@ -257,7 +285,7 @@ function PendingOrderCard({
             <div className="messenger-order-grid grid gap-8">
                 <div>
                     <div className="mb-6 flex items-center gap-3">
-                        <h3 className="text-base font-black">#{order.orderCode || order.id}</h3>
+                        <CopyableOrderId order={order} codeClassName="text-base font-black" />
                         <span className="messenger-status-badge rounded-full px-3 py-1 text-xs font-bold">
                             {formatDeliveryStatus(order.deliveryStatus)}
                         </span>
@@ -439,7 +467,7 @@ function DeliveredOrderRow({ order }: { order: MessengerOrder }) {
                     <CheckCircle2 size={20} />
                 </span>
                 <div>
-                    <h3 className="font-black">#{order.orderCode || order.id}</h3>
+                    <CopyableOrderId order={order} codeClassName="font-black" />
                     <p className="messenger-copy text-sm">{order.customerName}</p>
                     <p className="messenger-muted mt-1 text-xs">
                         Entregado: {formatDate(deliveryDate)}
@@ -506,7 +534,7 @@ function OrderDetailModal({
                     <div className="space-y-5">
                         <article className="rounded-[24px] border border-border-light bg-secondary-bg-light/40 p-5">
                             <div className="flex flex-wrap items-center gap-3">
-                                <h3 className="text-lg font-black">#{order.id}</h3>
+                                <CopyableOrderId order={order} codeClassName="text-lg font-black" />
                                 <span className="messenger-status-badge rounded-full px-3 py-1 text-xs font-bold">
                                     {formatDeliveryStatus(order.deliveryStatus)}
                                 </span>
@@ -899,7 +927,7 @@ export default function MessengerDashboard({
         }
 
         const confirmed = window.confirm(
-            `Confirmar pago en efectivo de ${formatBolivianos(order.cashToCollect)} del pedido ${order.orderCode}.`
+            `Confirmar pago en efectivo de ${formatBolivianos(order.cashToCollect)} del pedido ${getOrderDisplayId(order)}.`
         );
 
         if (!confirmed) return;

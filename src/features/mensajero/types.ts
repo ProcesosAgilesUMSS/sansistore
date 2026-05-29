@@ -8,7 +8,7 @@ export interface CourierOrderItem {
 
 export interface CourierOrder {
   id: string;
-  orderCode: string;
+  displayId: string;
   buyerName: string;
   deliveryZone: string;
   productsTotal: number;
@@ -45,7 +45,6 @@ export interface MessengerOrder {
   id: string;
   deliveryId: string;
   paymentId: string | null;
-  orderCode: string;        
   customerName: string;
   buyerName: string;        
   phone: string;

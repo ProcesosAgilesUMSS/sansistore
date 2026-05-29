@@ -13,7 +13,6 @@ import {
   Wallet,
 } from 'lucide-react';
 import {
-  backfillCourierOrderCodes,
   markOrderAsDelivered,
   registerPayment,
   subscribeToCourierOrders,
@@ -105,7 +104,7 @@ function OrderDetailView({
             <div className={sectionCardClass}>
               <div className="flex flex-wrap items-center gap-3">
                 <h2 className="text-2xl font-black tracking-[-0.04em]">
-                  {selectedOrder.orderCode}
+                  {selectedOrder.displayId}
                 </h2>
                 <span className={`${badgeClass} bg-[#fff2b8] py-1 text-[#aa7300]`}>
                   Cobrar
@@ -353,7 +352,6 @@ export default function CourierDashboard({ embedded = false }: { embedded?: bool
   const [stats, setStats] = useState<CourierDashboardStats>(emptyStats);
   const [selectedOrder, setSelectedOrder] = useState<CourierOrder | null>(null);
   const [loading, setLoading] = useState(true);
-  const [syncing, setSyncing] = useState(false);
   const [updatingOrderId, setUpdatingOrderId] = useState('');
   const [updatingPaymentId, setUpdatingPaymentId] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -370,21 +368,6 @@ export default function CourierDashboard({ embedded = false }: { embedded?: bool
     return unsubscribe;
   }, []);
 
-  useEffect(() => {
-    const syncOrders = async () => {
-      try {
-        setSyncing(true);
-        await backfillCourierOrderCodes();
-      } catch {
-        // Ignore sync errors. The dashboard has local fallbacks.
-      } finally {
-        setSyncing(false);
-      }
-    };
-
-    void syncOrders();
-  }, []);
-
   const deliveredOrders = useMemo(
     () => orders.filter((order) => order.status === 'Entregado'),
     [orders]
@@ -397,7 +380,7 @@ export default function CourierDashboard({ embedded = false }: { embedded?: bool
     }
 
     const confirmed = window.confirm(
-      `Confirmar cobro de ${formatMoney(order.total)} del pedido ${order.orderCode}`
+      `Confirmar cobro de ${formatMoney(order.total)} del pedido ${order.displayId}`
     );
 
     if (!confirmed) return;
@@ -438,7 +421,7 @@ export default function CourierDashboard({ embedded = false }: { embedded?: bool
     }
 
     const confirmed = window.confirm(
-      `Confirmar entrega de ${order.orderCode}. Monto a cobrar: ${formatMoney(order.total)}.`
+      `Confirmar entrega de ${order.displayId}. Monto a cobrar: ${formatMoney(order.total)}.`
     );
 
     if (!confirmed) return;
@@ -525,12 +508,8 @@ export default function CourierDashboard({ embedded = false }: { embedded?: bool
             </div>
 
             <div className="inline-flex items-center gap-2 self-start rounded-full border border-primary/20 bg-card-bg-light px-4 py-2 text-sm font-semibold text-text-light opacity-80 shadow-[0_10px_24px_rgba(18,32,56,0.08)]">
-              {syncing ? (
-                <LoaderCircle className="h-4 w-4 animate-spin text-primary" />
-              ) : (
-                <PackageCheck className="h-4 w-4 text-primary" />
-              )}
-              Sincronizando datos de pedidos
+              <PackageCheck className="h-4 w-4 text-primary" />
+              Datos de pedidos actualizados
             </div>
           </div>
         </div>
@@ -647,7 +626,7 @@ export default function CourierDashboard({ embedded = false }: { embedded?: bool
                         key={order.id}
                         className="border-t border-border-light text-[1.05rem] text-text-light"
                       >
-                        <td className="px-8 py-5 font-medium">{order.orderCode}</td>
+                        <td className="px-8 py-5 font-medium">{order.displayId}</td>
                         <td className="px-8 py-5 font-medium">{order.buyerName}</td>
                         <td className="px-8 py-5">
                           <span className="inline-flex items-center gap-2 font-medium text-text-light opacity-75">

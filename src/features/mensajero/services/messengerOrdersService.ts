@@ -126,8 +126,6 @@ const mapMessengerOrder = async (
   delivery: OrderData
 ): Promise<MessengerOrder> => {
   const orderId = String(delivery.orderId || '');
-  const legacyOrderCode =
-    asString(delivery.orderCode) || deliveryId.replace(/^delivery-/, 'order-');
   const orderSnap = orderId ? await getDoc(doc(db, 'orders', orderId)) : null;
   const order = orderSnap?.exists() ? orderSnap.data() : {};
   const [items, buyerName, customerLocation] = await Promise.all([
@@ -154,7 +152,6 @@ const mapMessengerOrder = async (
     id: orderId || deliveryId,
     deliveryId,
     paymentId: typeof order.paymentId === 'string' ? order.paymentId : null,
-    orderCode: String(order.orderCode || order.code || legacyOrderCode || orderId || ''),
     customerName,
     buyerName: asString(order.customerName) || buyerName || 'Comprador invitado',
     phone: String(order.customerPhone || order.phone || 'Sin telefono'),
@@ -217,7 +214,6 @@ export async function getMessengerOrders(
         id: orderId || deliveryDoc.id,
         deliveryId: deliveryDoc.id,
         paymentId: typeof order.paymentId === 'string' ? order.paymentId : null,
-        orderCode: String(order.orderCode || order.code || delivery.orderCode || orderId || ''),  
         customerName: String(order.customerName || 'Cliente no registrado'),
         buyerName: String(order.customerName || 'Comprador invitado'),       
         phone: String(order.customerPhone || 'Sin telefono'),
@@ -297,9 +293,6 @@ export function subscribeToMessengerOrders(
               deliveryId: deliveryDoc.id,
               paymentId:
                 typeof order.paymentId === 'string' ? order.paymentId : null,
-              orderCode: String(
-                order.orderCode || order.code || delivery.orderCode || orderId || ''
-              ),
               customerName: String(
                 order.customerName || 'Cliente no registrado'
               ),
@@ -491,7 +484,6 @@ export async function markMessengerOrderAsNotDelivered({
 
   await setDoc(doc(db, 'undelivered_orders', order.id), {
     orderId: order.id,
-    orderCode: order.orderCode,
     deliveryId: order.deliveryId,
     buyerName: order.buyerName || order.customerName,
     deliveryZone: order.city,
@@ -566,7 +558,6 @@ export async function markMessengerOrderAsCancelledByNoPayment({
 
   batch.set(doc(db, 'cancelled_orders', order.id || order.deliveryId), {
     orderId: order.id,
-    orderCode: order.orderCode,
     deliveryId: order.deliveryId,
     buyerName: order.buyerName || order.customerName,
     deliveryZone: order.city,
