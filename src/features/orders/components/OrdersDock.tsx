@@ -50,23 +50,24 @@ export default function OrdersDock() {
         <div className="relative">
           <button
             onClick={() => toggleMenu('pedidos')}
-            className={`text-white tracking-tight cursor-pointer hover:text-white/80 transition-colors ${isOrdersActive ? "underline decoration-2 underline-offset-3" : ""}`}
+            className={`text-white tracking-tight cursor-pointer hover:text-white/80 transition-all active:scale-[0.97] ${isOrdersActive ? "underline decoration-2 underline-offset-3" : ""}`}
           >
             Pedidos
           </button>
           <div
-            className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-4 bg-[#3E3E3E] rounded-lg py-2 px-0.5 flex flex-col gap-1 shadow-2xl border border-white/10 min-w-[180px] transition-all duration-200 origin-bottom ${openMenu === 'pedidos' ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-2 pointer-events-none'}`}
+            className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-4 bg-[#3E3E3E] rounded-lg py-2 px-0.5 flex flex-col gap-1 shadow-2xl border border-white/10 min-w-[180px] transition-all duration-300 origin-bottom ${openMenu === 'pedidos' ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-[0.97] translate-y-1 pointer-events-none'}`}
+            style={{ transitionTimingFunction: 'cubic-bezier(0.32, 0.72, 0, 1)' }}
           >
             <a
               href="/seller/created-orders"
-              className={`text-white px-4 py-2 hover:bg-white/10 rounded-md transition-colors ${isCurrentRoute('/seller/created-orders') ? 'bg-white/5 ' : ''}`}
+              className={`text-white px-4 py-2 hover:bg-white/10 rounded-md transition-colors active:bg-white/20 ${isCurrentRoute('/seller/created-orders') ? 'bg-white/5 ' : ''}`}
               onClick={() => setOpenMenu(null)}
             >
               Pedidos Creados
             </a>
             <a
               href="/seller/orders"
-              className={`text-white px-4 py-2 hover:bg-white/10 rounded-md transition-colors ${isCurrentRoute('/seller/orders') ? 'bg-white/5' : ''}`}
+              className={`text-white px-4 py-2 hover:bg-white/10 rounded-md transition-colors active:bg-white/20 ${isCurrentRoute('/seller/orders') ? 'bg-white/5' : ''}`}
               onClick={() => setOpenMenu(null)}
             >
               Mis pedidos
@@ -78,23 +79,24 @@ export default function OrdersDock() {
         <div className="relative">
           <button
             onClick={() => toggleMenu('registrar')}
-            className={`text-white tracking-tight cursor-pointer hover:text-white/80 transition-colors ${isRegisterActive ? "underline decoration-2 underline-offset-3 " : ""}`}
+            className={`text-white tracking-tight cursor-pointer hover:text-white/80 transition-all active:scale-[0.97] ${isRegisterActive ? "underline decoration-2 underline-offset-3 " : ""}`}
           >
             Registrar
           </button>
           <div
-            className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-4 bg-[#3E3E3E] rounded-lg py-2 px-1 flex flex-col gap-1 shadow-2xl border border-white/10 min-w-[160px] transition-all duration-200 origin-bottom ${openMenu === 'registrar' ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-2 pointer-events-none'}`}
+            className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-4 bg-[#3E3E3E] rounded-lg py-2 px-1 flex flex-col gap-1 shadow-2xl border border-white/10 min-w-[160px] transition-all duration-300 origin-bottom ${openMenu === 'registrar' ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-[0.97] translate-y-1 pointer-events-none'}`}
+            style={{ transitionTimingFunction: 'cubic-bezier(0.32, 0.72, 0, 1)' }}
           >
             <a
               href="/seller/purchase"
-              className={`text-white px-4 py-2 hover:bg-white/10 rounded-md transition-colors ${isCurrentRoute('/seller/purchase') ? 'bg-white/5' : ''}`}
+              className={`text-white px-4 py-2 hover:bg-white/10 rounded-md transition-colors active:bg-white/20 ${isCurrentRoute('/seller/purchase') ? 'bg-white/5' : ''}`}
               onClick={() => setOpenMenu(null)}
             >
               Registrar compra
             </a>
             <a
               href="/seller/offers"
-              className={`text-white px-4 py-2 hover:bg-white/10 rounded-md transition-colors ${isCurrentRoute('/seller/offers') ? 'bg-white/5' : ''}`}
+              className={`text-white px-4 py-2 hover:bg-white/10 rounded-md transition-colors active:bg-white/20 ${isCurrentRoute('/seller/offers') ? 'bg-white/5' : ''}`}
               onClick={() => setOpenMenu(null)}
             >
               Registrar oferta
@@ -112,7 +114,7 @@ export default function OrdersDock() {
               key={section.id}
               href={section.route}
               aria-current={isActive ? 'page' : undefined}
-              className={`text-white tracking-tight hover:text-white/80 transition-colors ${isActive ? "underline decoration-2 underline-offset-3" : ""}`}
+              className={`text-white tracking-tight hover:text-white/80 transition-all active:scale-[0.97] ${isActive ? "underline decoration-2 underline-offset-3" : ""}`}
             >
               {section.label}
             </a>

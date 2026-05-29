@@ -30,17 +30,28 @@ export default function OrderDetailModal({ order, closeModal }: { order: Order, 
   const totalQuantity = order.items.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
-    <div className="fixed inset-0 bg-black/35 backdrop-blur-xs flex items-center z-50 tracking-tight" onClick={closeModal}>
+    <div
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center z-50 tracking-tight transition-opacity duration-200 ease-out"
+      onClick={closeModal}
+      style={{ animation: 'fadeIn 200ms ease-out' }}
+    >
       <div
-        className="mx-auto w-[65ch] grid grid-cols-[repeat(16,_1fr)] p-4 rounded-lg bg-white z-10 shadow-2xl border border-black/10"
+        className="mx-auto w-[65ch] grid grid-cols-[repeat(16,_1fr)] p-4 rounded-xl bg-white z-10 shadow-2xl border border-black/10 transition-all duration-300 ease-out"
         onClick={(e) => e.stopPropagation()}
+        style={{ animation: 'slideUp 300ms cubic-bezier(0.23, 1, 0.32, 1)' }}
       >
-        <div className="col-span-full mb-2 flex items-center justify-between">
-          <div className="flex items-center uppercase gap-8">
-            <span className="uppercase text-lg tracking-tight">{order.id}</span>
+        <div className="col-span-full grid grid-cols-subgrid items-center mb-6">
+          <span className="uppercase text-lg font-bold tracking-tight truncate col-start-1 col-end-7">{order.id}</span>
+          <div className="col-start-8 col-end-12">
             <OrderStatusBadge status={order.status} />
           </div>
-          <X size={18} className="cursor-pointer" onClick={closeModal} />
+          <button
+            className="cursor-pointer col-start-16 col-end-17 justify-self-end p-1 hover:bg-black/5 rounded-full transition-all active:scale-90"
+            onClick={closeModal}
+            aria-label="Cerrar modal"
+          >
+            <X size={16} />
+          </button>
         </div>
 
         <div className="col-start-1 col-end-4 truncate text-sm text-black/50 leading-[100%]">Comprador:</div>
@@ -63,7 +74,7 @@ export default function OrderDetailModal({ order, closeModal }: { order: Order, 
               <li key={index} className="grid grid-cols-subgrid col-span-full">
                 <div className="col-start-1 col-end-2 text-center">{item.quantity}</div>
                 <div className="col-start-3 col-end-10 truncate ml-4">{item.productName}</div>
-                <div className="col-start-10 col-end-11 text-center">{item.price}</div>
+                <div className="col-start-10 col-end-11 text-center">{item.unitPrice}</div>
                 <div className="col-start-13 col-end-14 text-center">{item.subtotal}</div>
               </li>
             ))}

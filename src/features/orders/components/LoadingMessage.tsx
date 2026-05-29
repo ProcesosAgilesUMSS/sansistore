@@ -21,8 +21,8 @@ export default function LoadingMessage({ text }: { text: string }) {
   const length = text.length;
 
   return (
-    <div className={`tracking-tighter w-[${length}ch]`}>
-      <div className="flex gap-2">
+    <div className={`tracking-tight w-[${length}ch]`}>
+      <div className="flex gap-1 text-xs">
         {text}
         <div>
           {titles[index]}

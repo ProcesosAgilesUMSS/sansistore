@@ -1,6 +1,6 @@
 import type { Order } from "../types";
-import { STATUS_LABELS } from "../types";
 import OrderStatusBadge from "./OrderStatusBadge";
+import { readyOrder } from "../services/ordersService";
 
 export default function SellerOrderItem({
   order,
@@ -13,7 +13,14 @@ export default function SellerOrderItem({
 }) {
   const displayId = `ord-${(index + 1).toString().padStart(3, "0")}`;
 
-
+  const handleReady = async () => {
+    try {
+      await readyOrder(order.id);
+    } catch (error) {
+      console.error("Error updating order to ready:", error);
+      alert("Error al marcar la orden como lista. Por favor intenta de nuevo.");
+    }
+  };
 
   return (
     <li
@@ -30,22 +37,23 @@ export default function SellerOrderItem({
       </div>
 
       <div
-        className="min-[960px]:col-start-14 min-[960px]:col-end-16 min-[760px]:col-start-11 min-[760px]:col-end-13 text-[11px] flex
-        items-center col-span-full tracking-tight"
+        className="min-[960px]:col-start-14 min-[960px]:col-end-18 min-[760px]:col-start-10 min-[760px]:col-end-14 text-[11px] flex
+        items-center col-span-full tracking-tight min-[760px]:ml-4 min-[960px]:ml-0"
       >
-        {/*{STATUS_LABELS[order.status] || order.status}*/}
-        {/*<div className="size-1.5 bg-[#FFA500] rounded-full" />*/}
         <OrderStatusBadge status={order.status} />
       </div>
-      <button
-        className="text-left min-[760px]:col-start-16 min-[960px]:col-start-21 min-[960px]:col-end-23 text-sm underline decoration-2 cursor-pointer underline-offset-2"
-        onClick={(e) => {
-          e.stopPropagation();
-          selectOrder(order);
-        }}
-      >
-        Reservar
-      </button>
+      
+      {order.status === "EMPAQUETADO" && (
+        <button
+          className="text-left min-[760px]:col-start-16 min-[960px]:col-start-21 min-[960px]:col-end-23 text-sm underline decoration-2 cursor-pointer underline-offset-2"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleReady();
+          }}
+        >
+          Listo
+        </button>
+      )}
     </li>
   );
 }

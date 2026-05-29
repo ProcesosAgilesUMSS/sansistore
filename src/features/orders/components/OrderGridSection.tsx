@@ -36,7 +36,7 @@ export default function OrderGridSection({
         {title}
       </h2>
 
-      <div className="col-span-full flex items-center gap-3 min-[960px]:col-start-3 mb-12 ml-2 tracking-tight">
+      <div className="col-span-full flex items-center gap-2 min-[960px]:col-start-3 mb-12 ml-2 tracking-tight">
         <Package strokeWidth={1.5} size={18} />
         <span>{count} {countLabel}</span>
       </div>

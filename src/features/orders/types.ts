@@ -1,20 +1,17 @@
 import { Timestamp } from "firebase/firestore";
 
-export type OrderStatus = 'pending' | 'preparing' | 'in_transit' | 'delivered' | 'cancelled' | 'CREADO' | 'RESERVADO' | 'PENDIENTE' | 'EMPAQUETADO';
-
-export const STATUS_LABELS: Record<OrderStatus, string> = {
-  pending: "Pendiente",
-  preparing: "Preparando",
-  in_transit: "En camino",
-  delivered: "Entregado",
-  cancelled: "Cancelado",
-  CREADO: "creado",
-  RESERVADO: "reservado",
-  PENDIENTE: "pendiente",
-  EMPAQUETADO: "empaquetado"
-};
-
-export const AVAILABLE_STATUSES = Object.keys(STATUS_LABELS) as OrderStatus[];
+export type OrderStatus =
+  'CREADO' |
+  'ASIGNADO' |
+  'EN CAMINO' |
+  'ENTREGADO' |
+  'PAGADO' |
+  'CANCELADO' |
+  'NO ENTREGADO' |
+  'RESERVADO' |
+  'PENDIENTE' |
+  'EMPAQUETADO' |
+  'LISTO';
 
 export interface OrderItem {
   itemId: string;

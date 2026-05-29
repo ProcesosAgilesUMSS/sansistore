@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Order } from "../types";
-import { reserveOrder } from "../services/ordersService";
+import { reserveOrder, readyOrder } from "../services/ordersService";
 
 export default function OrderActions({ order, onSuccess }: { order: Order; onSuccess?: () => void }) {
   const [loading, setLoading] = useState(false);
@@ -18,12 +18,25 @@ export default function OrderActions({ order, onSuccess }: { order: Order; onSuc
     }
   };
 
+
+  if (order.status === "EMPAQUETADO") {
+    return (
+      <button
+        disabled={loading}
+        onClick={() => handleAction(() => readyOrder(order.id))}
+        className="bg-[#059669] text-white rounded-lg disabled:opacity-50 transition-opacity tracking-tight px-4 py-0.5 cursor-pointer text-sm"
+      >
+        {loading ? "Procesando..." : "ORDEN LISTA"}
+      </button>
+    );
+  }
+
   if (order.status === "CREADO") {
     return (
       <button
         disabled={loading}
         onClick={() => handleAction(() => reserveOrder(order.id))}
-        className="bg-[#2071F5] text-white rounded-lg disabled:opacity-50 transition-opacity tracking-tight px-4 py-0.5 cursor-pointer"
+        className="bg-[#2071F5] text-white rounded-lg disabled:opacity-50 transition-opacity tracking-tight px-4 py-0.5 cursor-pointer text-sm"
       >
         {loading ? "Procesando..." : "Reservar"}
       </button>

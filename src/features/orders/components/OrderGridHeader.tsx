@@ -9,7 +9,7 @@ export default function OrderGridHeader() {
         <span>/</span>
         dirección
       </div>
-      <div className="col-start-11 col-end-12 uppercase min-[960px]:col-start-14 min-[960px]:col-end-14 text-xs flex gap-[4px]">
+      <div className="ml-4 min-[960px]:ml-0  col-start-10 col-end-12 uppercase min-[960px]:col-start-14 min-[960px]:col-end-14 text-xs flex gap-[4px]">
         <span>/</span>
         estado
       </div>
