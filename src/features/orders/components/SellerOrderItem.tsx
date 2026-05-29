@@ -1,0 +1,51 @@
+import type { Order } from "../types";
+import { STATUS_LABELS } from "../types";
+import OrderStatusBadge from "./OrderStatusBadge";
+
+export default function SellerOrderItem({
+  order,
+  index,
+  selectOrder
+}: {
+  order: Order;
+  index: number;
+  selectOrder: (order: Order) => void
+}) {
+  const displayId = `ord-${(index + 1).toString().padStart(3, "0")}`;
+
+
+
+  return (
+    <li
+      onClick={() => selectOrder(order)}
+      className="grid grid-cols-subgrid col-span-full border-b py-[10px] min-[760px]:py-0 border-black/20 cursor-pointer hover:bg-black/5"
+    >
+      <div className="col-span-full min-[760px]:col-start-1 min-[760px]:col-end-3 text-sm flex items-center gap-[8px] text-xs uppercase">
+        <div className="size-1.5 bg-[#1e1e1e]" />
+        {displayId}
+      </div>
+      <div className="col-start-1 col-end-9 min-[760px]:col-start-3 min-[760px]:col-end-10 text-[calc(.78125vw+13.5px)] truncate
+      min-[960px]:col-end-13 tracking-tight">
+        {order.delivery.destination}
+      </div>
+
+      <div
+        className="min-[960px]:col-start-14 min-[960px]:col-end-16 min-[760px]:col-start-11 min-[760px]:col-end-13 text-[11px] flex
+        items-center col-span-full tracking-tight"
+      >
+        {/*{STATUS_LABELS[order.status] || order.status}*/}
+        {/*<div className="size-1.5 bg-[#FFA500] rounded-full" />*/}
+        <OrderStatusBadge status={order.status} />
+      </div>
+      <button
+        className="text-left min-[760px]:col-start-16 min-[960px]:col-start-21 min-[960px]:col-end-23 text-sm underline decoration-2 cursor-pointer underline-offset-2"
+        onClick={(e) => {
+          e.stopPropagation();
+          selectOrder(order);
+        }}
+      >
+        Reservar
+      </button>
+    </li>
+  );
+}

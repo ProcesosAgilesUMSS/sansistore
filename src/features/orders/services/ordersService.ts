@@ -82,7 +82,7 @@ export async function reserveOrder(orderId: string): Promise<void> {
   await updateDoc(orderRef, {
     status: "RESERVADO",
     sellerId: user.uid,
-    reservedAt: serverTimestamp(),
+    //reservedAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
 }
@@ -113,7 +113,19 @@ export async function getCreatedOrders(): Promise<Order[]> {
 export function subscribeToCreatedOrders(onUpdate: (orders: Order[]) => void) {
   const q = query(
     collection(db, "orders"),
-    where("status", "in", ["CREADO", "RESERVADO", "EMPAQUETADO", "PENDIENTE"])
+    where("status", "==", "CREADO")
+  );
+
+  return onSnapshot(q, async (querySnapshot) => {
+    const orders = await processQuerySnapshot(querySnapshot);
+    onUpdate(orders);
+  });
+}
+
+export function subscribeToSellerOrders(sellerId: string, onUpdate: (orders: Order[]) => void) {
+  const q = query(
+    collection(db, "orders"),
+    where("sellerId", "==", sellerId)
   );
 
   return onSnapshot(q, async (querySnapshot) => {

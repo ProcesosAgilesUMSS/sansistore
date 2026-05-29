@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import type { Order } from "../types";
-import { subscribeToCreatedOrders } from "../services/ordersService";
-import CreatedOrderItem from "./CreatedOrderItem";
+import { subscribeToSellerOrders } from "../services/ordersService";
+import { auth } from "../../../lib/firebase";
 import OrderDetailModal from "./OrderDetailModal";
+import SellerOrderItem from "./SellerOrderItem";
 import OrderGridSection from "./OrderGridSection";
 
-
-export default function CreatedOrdersList() {
+export default function Orders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -16,7 +16,13 @@ export default function CreatedOrdersList() {
   }
 
   useEffect(() => {
-    const unsubscribe = subscribeToCreatedOrders((data) => {
+    const user = auth.currentUser;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    const unsubscribe = subscribeToSellerOrders(user.uid, (data) => {
       setOrders(data);
       setLoading(false);
     });
@@ -33,15 +39,15 @@ export default function CreatedOrdersList() {
         />
       )}
       <OrderGridSection
-        title="Ordenes creadas"
+        title="Mis Ordenes"
         count={orders.length}
-        countLabel="orderenes creadas"
+        countLabel="ordenes"
         loading={loading}
-        loadingMessage="Receiving created orders"
-        ariaLabelledby="orders-created-title"
+        loadingMessage="Receiving your orders"
+        ariaLabelledby="orders-seller-title"
       >
         {orders.map((order, index) => (
-          <CreatedOrderItem
+          <SellerOrderItem
             selectOrder={handleSelectOrder}
             key={order.id + order.status}
             order={order}
