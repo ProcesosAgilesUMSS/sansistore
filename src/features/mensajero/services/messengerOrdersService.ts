@@ -154,6 +154,7 @@ const mapMessengerOrder = async (
     paymentId: typeof order.paymentId === 'string' ? order.paymentId : null,
     customerName,
     buyerName: asString(order.customerName) || buyerName || 'Comprador invitado',
+    secret: typeof order.secret === 'string' ? order.secret : undefined,
     phone: String(order.customerPhone || order.phone || 'Sin telefono'),
     address,
     city: String(order.deliveryZone || 'Cochabamba'),
@@ -215,7 +216,9 @@ export async function getMessengerOrders(
         deliveryId: deliveryDoc.id,
         paymentId: typeof order.paymentId === 'string' ? order.paymentId : null,
         customerName: String(order.customerName || 'Cliente no registrado'),
-        buyerName: String(order.customerName || 'Comprador invitado'),       
+        buyerName: String(order.customerName || 'Comprador invitado'),  
+         
+        secret: typeof order.secret === 'string' ? order.secret : undefined,    
         phone: String(order.customerPhone || 'Sin telefono'),
         address: String(
           order.address || customerLocation.label || 'Direccion no registrada'
@@ -297,6 +300,7 @@ export function subscribeToMessengerOrders(
                 order.customerName || 'Cliente no registrado'
               ),
               buyerName: String(order.customerName || 'Comprador invitado'),
+              secret: typeof order.secret === 'string' ? order.secret : undefined,
               phone: String(order.customerPhone || 'Sin telefono'),
               address: String(
                 order.address ||
