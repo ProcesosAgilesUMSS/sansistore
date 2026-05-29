@@ -217,7 +217,7 @@ export async function getMessengerOrders(
         id: orderId || deliveryDoc.id,
         deliveryId: deliveryDoc.id,
         paymentId: typeof order.paymentId === 'string' ? order.paymentId : null,
-        orderCode: String(order.orderCode || order.code || orderId || ''),  
+        orderCode: String(order.orderCode || order.code || delivery.orderCode || orderId || ''),  
         customerName: String(order.customerName || 'Cliente no registrado'),
         buyerName: String(order.customerName || 'Comprador invitado'),       
         phone: String(order.customerPhone || 'Sin telefono'),
@@ -233,8 +233,8 @@ export async function getMessengerOrders(
         reference: String(
           order.reference ||
             order.locationLabel ||
-            customerLocation.label ||
             courierZoneName ||
+            customerLocation.label ||
             ''
         ),
         items,
@@ -297,7 +297,9 @@ export function subscribeToMessengerOrders(
               deliveryId: deliveryDoc.id,
               paymentId:
                 typeof order.paymentId === 'string' ? order.paymentId : null,
-              orderCode: String(order.orderCode || order.code || orderId || ''),
+              orderCode: String(
+                order.orderCode || order.code || delivery.orderCode || orderId || ''
+              ),
               customerName: String(
                 order.customerName || 'Cliente no registrado'
               ),
@@ -317,8 +319,8 @@ export function subscribeToMessengerOrders(
               reference: String(
                 order.reference ||
                   order.locationLabel ||
-                  customerLocation.label ||
                   courierZoneName ||
+                  customerLocation.label ||
                   ''
               ),
               items,
