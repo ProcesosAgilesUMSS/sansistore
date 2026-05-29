@@ -300,3 +300,17 @@
 - **Yesterday:** Finalicé el desarrollo de la Tarea #35, implementando la funcionalidad para que el comprador pueda dejar reseñas de un producto. Incluye la opción de escribir comentarios y un sistema de calificación que permite seleccionar de 1 a 5 estrellas.
 - **Today:** Me enfocaré en realizar las pruebas correspondientes a esta tarea para validar su correcto funcionamiento.
 - **Blockers:** n/a.
+
+# 05/28/2026
+
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Optimicé el workflow de Playwright en GitHub, mejoré la integración de los Pull Requests y completé la historia de usuario para la creación de IDs de órdenes junto con su código secreto
+- **Today:** Me enfocaré en implementar los tests correspondientes y continuar con la optimización de los flujos.
+- **Blockers:** n/a.
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Desarrollé y ejecuté las pruebas para la sección de comentarios de los productos, verificando su correcto funcionamiento
+- **Today:** Continuaré con la implementación de pruebas en otras funcionalidades que lo requieran.
+- **Blockers:** n/a.
