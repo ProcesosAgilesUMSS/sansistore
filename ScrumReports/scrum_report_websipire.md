@@ -311,3 +311,10 @@ por las dudas que se tienen.
 * **Yesterday:** Avancé con el mockup de mi HU, definiendo la estructura visual y algunos detalles del flujo principal.
 * **Today:** Continuaré con el desarrollo de la HU y verificaré posibles ajustes necesarios para su implementación.
 * **Blockers:** none
+
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Revisé los requerimientos y el flujo de la HU asignada para identificar las funcionalidades necesarias.
+* **Today:** Comenzaré con el diseño y desarrollo inicial de la HU, tomando en cuenta las dependencias relacionadas.
+* **Blockers:** none
+
