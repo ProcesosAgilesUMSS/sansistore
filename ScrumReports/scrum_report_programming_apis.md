@@ -244,20 +244,45 @@
 - **Blockers:** None.
 
 ### Jhoel Gustavo Aiza Arce
-
 - **Yesterday:** Implementación completa de la HU #101 "registrar pago como mensajero", separando la lógica de pago de la entrega. Se habilitó el botón "Registrar pago" en el dashboard del mensajero, con validaciones para no entregar sin pagar. Se creó el PR #326 para revisión del equipo.
 - **Today:** Esperar la aprobación del PR #326 y estar atento a cualquier feedback o corrección solicitada por el equipo para proceder con el merge.
 - **Blockers:** None.
 
 ### Bruno Salcedo Cadiz
-
 - **Yesterday:** Continue trabajando con la implementacion de la HU #108 y preveo terminarla para el final del día.
 - **Today:** Terminar la HU #108 e integrarla correctamente
 - **Blockers:** Leves retrasos por la dependencia de mi HU #108 con la HU #105
 
-
 ### Adrian Said Andrade Medina
-
 - **Yesterday:** Avancé con la implementación del mapa para la visualización de la ubicación de entrega, revisando límites del área navegable y ajustes de coordenadas con Leaflet.
 - **Today:** Continuaré corrigiendo detalles de integración del mapa y validando que la funcionalidad funcione correctamente dentro del flujo del mensajero.
 - **Blockers:** Dudas puntuales sobre ajustes de Leaflet y manejo de coordenadas.
+
+## 26-05-2026
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Trabajé con diferentes grupos para mantener la integración estable y las funcionalidades que fueron asignadas.
+- **Today:** Prepararé parte de las nuevas historias de usuario para el siguiente sprint, trabajaré en los bugs que nos indicó el ingeniero.
+- **Blockers:** Integraciones érroneas.
+
+### Bruno Salcedo Cadiz
+- **Yesterday:** Trabaje en el retrospective y correcciones de bugs del sistema para repartidor
+- **Today:** Continuare trabajando en el arreglo de bugs y prepararé parte de las nuevas historias de usuario para el siguiente sprint.
+- **Blockers:** None,
+
+### Efrain Peralta Felipe
+- **Yesterday:** Trabaje en el retrospective y correcciones del vendedor.
+- **Today:** Trabajare en los bugs del vendedor.
+- **Blockers:** None,
+
+### Jhoel Gustavo Aiza Arce
+
+- **Yesterday:** Revisión del Sprint Retrospective, análisis de bugs reportados y verificación del correcto merge de cambios a main.
+- **Today:** Participación en la retrospectiva del equipo y análisis de lecciones aprendidas para el próximo sprint.
+- **Blockers:** None.
+
+### Adrian
+
+- **Yesterday:** Verificacion de bugs reportados y analisis de las historias de usuario.
+- **Today:** Participación en la retrospectiva del equipo.
+- **Blockers:** None.

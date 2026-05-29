@@ -15,8 +15,6 @@ export default function LoginPage() {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
 
-    const LOCATION = '/me';
-
     const performEmailLogin = async () => {
         if (loading) return;
         const emailValue = (document.getElementById('email') as HTMLInputElement | null)?.value || email;
@@ -29,7 +27,7 @@ export default function LoginPage() {
             await signInWithEmailAndPassword(auth, emailValue, passwordValue);
             console.log('[Login] success');
             setSuccess(true);
-            window.location.assign(LOCATION);
+            window.location.assign('/');
         } catch (err: unknown) {
             const firebaseError = err as FirebaseError;
             console.error('[Login] fail', firebaseError.code, firebaseError.message);
@@ -50,7 +48,7 @@ export default function LoginPage() {
 
     const handleGoogleSuccess = () => {
         setSuccess(true);
-        window.location.href = LOCATION;
+        window.location.href = '/me';
     };
 
     const handleGoogleError = (errorMsg: string) => {
@@ -106,6 +104,7 @@ export default function LoginPage() {
                                         onChange={(e) => setPassword(e.target.value)}
                                         placeholder="Tu contraseña"
                                         required
+                                        autoComplete="off"
                                         className="w-full px-3 py-2 pr-10 rounded-[0.75rem] border border-border-light bg-(--theme-secondary-bg) text-(--theme-text) text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
                                     />
                                     <button

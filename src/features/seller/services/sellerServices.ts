@@ -4,15 +4,11 @@ import {
   query,
   where,
   onSnapshot,
-  getDocs,
-  runTransaction,
-  serverTimestamp,
   getDoc,
-  updateDoc,
   type Unsubscribe,
   type Firestore,
 } from 'firebase/firestore';
-import type { Order, OrderItem, OrderDoc, OrderItemDoc, Messenger } from '../types';
+import type { Order, OrderDoc } from '../types';
 
 
 function toDate(value: unknown): Date | null {
@@ -30,8 +26,10 @@ function docToOrder(id: string, data: OrderDoc): Order {
     total: data.total ?? 0,
     locationId: data.locationId ?? '',
     paymentStatus: data.paymentStatus ?? '',
+    paymentId: data.paymentId ?? null,
     deliveryStatus: data.deliveryStatus ?? null,
     deliveryId: data.deliveryId ?? null,
+    deliveryCode: data.deliveryCode ?? null,
     incidentReason: data.incidentReason ?? null,
     confirmedAt: toDate(data.confirmedAt),
     createdAt: toDate(data.createdAt) ?? new Date(),
@@ -55,19 +53,22 @@ async function enrichOrdersWithData(
 
   return orders.map((order) => ({
     ...order,
-    buyerName: buyerMap[order.buyerId],
-    locationLabel: locationMap[order.locationId],
+    buyerName: buyerMap[order.buyerId]?.displayName,
+    buyerEmail: buyerMap[order.buyerId]?.email,
+    buyerInstitutionalId: buyerMap[order.buyerId]?.institutionalId,
+    locationLabel: locationMap[order.locationId]?.label,
+    locationType: locationMap[order.locationId]?.type,
   }));
 }
 
 async function fetchBuyersData(
   db: Firestore,
   buyerIds: string[],
-): Promise<Record<string, string>> {
+): Promise<Record<string, { displayName: string; email: string; institutionalId: string }>> {
   if (buyerIds.length === 0) return {};
 
   try {
-    const map: Record<string, string> = {};
+    const map: Record<string, { displayName: string; email: string; institutionalId: string }> = {};
 
     const userSnapshots = await Promise.all(
       buyerIds.map((uid) => getDoc(doc(db, 'users', uid)))
@@ -76,7 +77,11 @@ async function fetchBuyersData(
     userSnapshots.forEach((userSnap) => {
       if (userSnap.exists()) {
         const data = userSnap.data();
-        map[userSnap.id] = data.displayName ?? data.email ?? 'Comprador desconocido';
+        map[userSnap.id] = {
+          displayName: data.displayName ?? data.email ?? 'Comprador desconocido',
+          email: data.email ?? '',
+          institutionalId: data.institutionalId ?? '',
+        };
       }
     });
 
@@ -90,11 +95,11 @@ async function fetchBuyersData(
 async function fetchLocationsData(
   db: Firestore,
   locationIds: string[],
-): Promise<Record<string, string>> {
+): Promise<Record<string, { label: string; type: string }>> {
   if (locationIds.length === 0) return {};
 
   try {
-    const map: Record<string, string> = {};
+    const map: Record<string, { label: string; type: string }> = {};
 
     const locationSnapshots = await Promise.all(
       locationIds.map((locId) => getDoc(doc(db, 'locations', locId)))
@@ -103,7 +108,10 @@ async function fetchLocationsData(
     locationSnapshots.forEach((locSnap) => {
       if (locSnap.exists()) {
         const data = locSnap.data();
-        map[locSnap.id] = data.label ?? 'Ubicación desconocida';
+        map[locSnap.id] = {
+          label: data.label ?? 'Ubicación desconocida',
+          type: data.type ?? '',
+        };
       }
     });
 
@@ -115,147 +123,43 @@ async function fetchLocationsData(
 }
 
 
-export function subscribeSellerOrders(
+export async function fetchDeliveryData(
   db: Firestore,
-  sellerId: string,
-  onData: (reserved: Order[], ready: Order[]) => void,
-  onError?: (err: Error) => void,
-): Unsubscribe {
+  deliveryId: string | null | undefined,
+): Promise<{ deliveryCode: string | null; deliveryCourierName: string | null; deliveryCourierInstitutionalId: string | null } | null> {
+  if (!deliveryId) return null;
 
-  const ordersRef = collection(db, 'orders');
+  try {
+    const deliverySnap = await getDoc(doc(db, 'deliveries', deliveryId));
 
-  let reserved: Order[] = [];
-  let ready: Order[] = [];
-  let firstReservedLoaded = false;
-  let firstReadyLoaded = false;
+    if (!deliverySnap.exists()) return null;
 
-  const emit = async () => {
-    if (firstReservedLoaded && firstReadyLoaded) {
-      const enrichedReserved = await enrichOrdersWithData(db, [...reserved]);
-      const enrichedReady = await enrichOrdersWithData(db, [...ready]);
-      onData(enrichedReserved, enrichedReady);
+    const data = deliverySnap.data() as { deliveryCode?: string; courierId?: string | null };
+    let deliveryCourierName: string | null = null;
+    let deliveryCourierInstitutionalId: string | null = null;
+
+    if (data.courierId) {
+      const courierSnap = await getDoc(doc(db, 'users', data.courierId));
+      if (courierSnap.exists()) {
+        const courierData = courierSnap.data();
+        deliveryCourierName = courierData.displayName ?? courierData.email ?? 'Mensajero';
+        deliveryCourierInstitutionalId = courierData.institutionalId ?? '';
+      }
     }
-  };
 
-  const qReserved = query(
-    ordersRef,
-    where('status', '==', 'CONFIRMADO'),
-  );
-
-  const qReady = query(
-    ordersRef,
-    where('sellerId', '==', sellerId),
-    where('status', '==', 'LISTO'),
-  );
-
-  const unsubReserved = onSnapshot(
-    qReserved,
-    (snap) => {
-      reserved = snap.docs.map((d) => docToOrder(d.id, d.data() as OrderDoc));
-      firstReservedLoaded = true;
-      emit();
-    },
-    (err) => onError?.(err),
-  );
-
-  const unsubReady = onSnapshot(
-    qReady,
-    (snap) => {
-      ready = snap.docs.map((d) => docToOrder(d.id, d.data() as OrderDoc));
-      firstReadyLoaded = true;
-      emit();
-    },
-    (err) => onError?.(err),
-  );
-
-  return () => {
-    unsubReserved();
-    unsubReady();
-  };
-}
-
-
-export async function fetchOrderItems(
-  db: Firestore,
-  orderId: string,
-): Promise<OrderItem[]> {
-  const itemsRef = collection(db, 'orders', orderId, 'orderItems');
-  const snap = await getDocs(itemsRef);
-  return snap.docs.map((d) => {
-    const data = d.data() as OrderItemDoc;
     return {
-      itemId: d.id,
-      productId: data.productId,
-      productName: data.productName,
-      unitPrice: data.unitPrice,
-      quantity: data.quantity,
-      subtotal: data.subtotal,
-    };
-  });
+      deliveryCode: data.deliveryCode ?? null,
+      deliveryCourierName,
+      deliveryCourierInstitutionalId,
+      courierId: data.courierId ?? null,
+    } as any;
+  } catch {
+    return null;
+  }
 }
 
-export async function markOrderAsReady(
-  db: Firestore,
-  orderId: string,
-  sellerId: string,
-): Promise<{ deliveryId: string }> {
 
-  const orderRef = doc(db, 'orders', orderId);
-
-  const deliveryRef = doc(collection(db, 'deliveries'));
-  const deliveryId = deliveryRef.id;
-  const deliveryCode = `DEL-${Date.now().toString(36).toUpperCase()}`;
-
-  await runTransaction(db, async (tx) => {
-    const orderSnap = await tx.get(orderRef);
-
-    if (!orderSnap.exists()) {
-      throw new Error('El pedido no existe.');
-    }
-
-    const current = orderSnap.data();
-
-    if (current.status !== 'CONFIRMADO') {
-      throw new Error(
-        `El pedido ya no está en CONFIRMADO (estado actual: ${current.status}).`,
-      );
-    }
-
-    tx.update(orderRef, {
-      status: 'LISTO',
-      deliveryStatus: 'CREADO',
-      deliveryId,
-      sellerId,
-      updatedAt: serverTimestamp(),
-    });
-
-    tx.set(deliveryRef, {
-      orderId,
-      courierId: null,
-      status: 'CREADO',
-      deliveryCode,
-      attemptNumber: 1,
-      incidentReason: null,
-      evidenceUrl: null,
-      failureReason: null,
-      amountCollected: null,
-      customerConfirmed: false,
-      customerConfirmedAt: null,
-      assignedAt: null,
-      pickedUpAt: null,
-      inTransitAt: null,
-      deliveredAt: null,
-      failedAt: null,
-      reprogrammedAt: null,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    });
-  });
-
-  return { deliveryId };
-}
-
-export function subscribeConfirmedOrders(
+export function subscribePaidOrders(
   db: Firestore,
   sellerId: string,
   onData: (orders: Order[]) => void,
@@ -264,7 +168,7 @@ export function subscribeConfirmedOrders(
   const q = query(
     collection(db, 'orders'),
     where('sellerId', '==', sellerId),
-    where('status', '==', 'CONFIRMADO'),
+    where('status', '==', 'PAGADO'),
   );
 
   return onSnapshot(
@@ -278,171 +182,3 @@ export function subscribeConfirmedOrders(
   );
 }
 
-export function subscribeReservedOrders(
-  db: Firestore,
-  sellerId: string,
-  onData: (orders: Order[]) => void,
-  onError?: (err: Error) => void,
-): Unsubscribe {
-  const q = query(
-    collection(db, 'orders'),
-    where('sellerId', '==', sellerId),
-    where('status', '==', 'RESERVADO'),
-  );
-
-  return onSnapshot(
-    q,
-    async (snap) => {
-      const orders = snap.docs.map((d) => docToOrder(d.id, d.data() as OrderDoc));
-      const enriched = await enrichOrdersWithData(db, orders);
-      onData(enriched);
-    },
-    (err) => onError?.(err),
-  );
-}
-
-export async function reserveConfirmedOrder(
-  db: Firestore,
-  orderId: string,
-  sellerId: string,
-): Promise<void> {
-  const orderRef = doc(db, 'orders', orderId);
-
-  await runTransaction(db, async (tx) => {
-    const orderSnap = await tx.get(orderRef);
-
-    if (!orderSnap.exists()) {
-      throw new Error('El pedido no existe.');
-    }
-
-    const current = orderSnap.data();
-
-    if (current.status !== 'CONFIRMADO') {
-      throw new Error(
-        `El pedido ya no está en CONFIRMADO (estado actual: ${current.status}).`,
-      );
-    }
-
-    tx.update(orderRef, {
-      status: 'RESERVADO',
-      sellerId,
-      updatedAt: serverTimestamp(),
-    });
-  });
-}
-
-export function subscribeAssignedOrders(
-  db: Firestore,
-  sellerId: string,
-  onData: (assigned: Order[]) => void,
-  onError?: (err: Error) => void,
-): Unsubscribe {
-  const q = query(
-    collection(db, 'orders'),
-    where('sellerId', '==', sellerId),
-    where('status', '==', 'ASIGNADO'),
-  );
-
-  return onSnapshot(
-    q,
-    async (snap) => {
-      const orders = snap.docs.map((d) => docToOrder(d.id, d.data() as OrderDoc));
-      const enriched = await enrichOrdersWithData(db, orders);
-      onData(enriched);
-    },
-    (err) => onError?.(err),
-  );
-}
-
-export async function unassignCourierFromDelivery(
-  db: Firestore,
-  deliveryId: string,
-  orderId: string,
-): Promise<void> {
-  await Promise.all([
-    updateDoc(doc(db, 'deliveries', deliveryId), {
-      courierId: null,
-      status: 'CREADO',
-      assignedAt: null,
-      updatedAt: serverTimestamp(),
-    }),
-    updateDoc(doc(db, 'orders', orderId), {
-      status: 'LISTO',
-      deliveryStatus: 'CREADO',
-      updatedAt: serverTimestamp(),
-    }),
-  ]);
-}
-
-export async function fetchMessengers(db: Firestore): Promise<Messenger[]> {
-  const q = query(
-    collection(db, 'users'),
-    where('roles', 'array-contains', 'mensajero'),
-    where('isActive', '==', true),
-  );
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => {
-    const data = d.data();
-    return {
-      uid: d.id,
-      displayName: data.displayName ?? data.email ?? 'Mensajero',
-      institutionalId: data.institutionalId ?? '',
-    };
-  });
-}
-
-export async function assignCourierToDelivery(
-  db: Firestore,
-  deliveryId: string,
-  orderId: string,
-  courierId: string,
-): Promise<void> {
-  await Promise.all([
-    updateDoc(doc(db, 'deliveries', deliveryId), {
-      courierId,
-      status: 'assigned',
-      assignedAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    }),
-    updateDoc(doc(db, 'orders', orderId), {
-      status: 'ASIGNADO',
-      deliveryStatus: 'ASIGNADO',
-      updatedAt: serverTimestamp(),
-    }),
-  ]);
-}
-
-export async function reassignCourierToDelivery(
-  db: Firestore,
-  deliveryId: string,
-  orderId: string,
-  newCourierId: string,
-): Promise<void> {
-  await runTransaction(db, async (tx) => {
-    const deliveryRef = doc(db, 'deliveries', deliveryId);
-    const orderRef = doc(db, 'orders', orderId);
-
-    const deliverySnap = await tx.get(deliveryRef);
-    const orderSnap = await tx.get(orderRef);
-
-    if (!deliverySnap.exists()) throw new Error('Delivery no existe.');
-    if (!orderSnap.exists()) throw new Error('Order no existe.');
-
-    const deliveryData: any = deliverySnap.data();
-    const orderData: any = orderSnap.data();
-
-    if (orderData.status !== 'ASIGNADO') {
-      throw new Error('No se puede reasignar: la orden no está en estado ASIGNADO.');
-    }
-
-    tx.update(deliveryRef, {
-      courierId: newCourierId,
-      assignedAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    });
-
-    tx.update(orderRef, {
-      updatedAt: serverTimestamp(),
-    });
-  });
-}

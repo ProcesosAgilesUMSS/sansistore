@@ -7,30 +7,39 @@ export const SideBarSeller = () => {
   const [currentPath, setCurrentPath] = useState('');
 
   useEffect(() => {
-    const syncPath = () => setCurrentPath(window.location.pathname);
+    const syncPath = () => {
+      const pathname = window.location.pathname.replace(/\/$/, '');
+      setCurrentPath(pathname || '/');
+    };
 
     syncPath();
     document.addEventListener('astro:page-load', syncPath);
+    document.addEventListener('astro:after-swap', syncPath);
 
     return () => {
       document.removeEventListener('astro:page-load', syncPath);
+      document.removeEventListener('astro:after-swap', syncPath);
     };
   }, []);
 
   const activeSection = useMemo(
-    () => sections.find((section) => currentPath === section.route),
+    () => sections.find((section) => currentPath === section.route || currentPath.startsWith(`${section.route}/`)),
     [currentPath]
   );
+
+  const isCurrentRoute = (route: string) =>
+    currentPath === route || currentPath.startsWith(`${route}/`);
 
   const firstLabel = activeSection?.label ?? sections[0]?.label ?? 'Opciones';
 
   const linkClass = (isActive: boolean) =>
     [
-      'flex items-center justify-between rounded-2xl border px-4 py-3 text-sm font-600 transition',
+      'relative flex items-center justify-between rounded-2xl border px-4 py-3 text-sm transition-all duration-150 overflow-hidden',
       isActive
-        ? 'border-primary bg-primary/10 text-primary shadow-[0_10px_24px_rgba(136,176,75,0.12)]'
-        : 'border-(--theme-border) text-(--theme-text) hover:border-primary hover:bg-(--theme-secondary-bg) hover:text-primary',
+        ? 'border-primary/40 bg-primary/10 text-primary font-700 shadow-[0_4px_16px_rgba(136,176,75,0.15)] pl-5'
+        : 'border-(--theme-border) text-(--theme-text) font-500 hover:border-primary/40 hover:bg-(--theme-secondary-bg) hover:text-primary',
     ].join(' ');
+
 
   return (
     <section className="flex w-full flex-col gap-4">
@@ -46,22 +55,25 @@ export const SideBarSeller = () => {
 
         {openMenu && (
           <div className="mt-3 space-y-2">
-            {sections.map((section) => (
-              <a
-                key={section.id}
-                href={section.route}
-                aria-current={currentPath === section.route ? 'page' : undefined}
-                className={linkClass(currentPath === section.route)}
-              >
-                <span className="min-w-0 truncate">{section.label}</span>
-                <span
-                  className={`text-xs font-700 uppercase tracking-[0.18em] ${currentPath === section.route ? 'opacity-100' : 'opacity-50'
-                    }`}
+            {sections.map((section) => {
+              const isActive = isCurrentRoute(section.route);
+              return (
+                <a
+                  key={section.id}
+                  href={section.route}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={linkClass(isActive)}
                 >
-                  {currentPath === section.route ? 'Activo' : 'Ir'}
-                </span>
-              </a>
-            ))}
+                  {isActive && (
+                    <span className="absolute left-0 top-0 bottom-0 w-1 rounded-l-2xl bg-primary" />
+                  )}
+                  <span className="min-w-0 truncate">{section.label}</span>
+                  {isActive && (
+                    <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
+                  )}
+                </a>
+              );
+            })}
           </div>
         )}
       </div>
@@ -75,21 +87,25 @@ export const SideBarSeller = () => {
         </p>
 
         <div className="space-y-2">
-          {sections.map((section) => (
-            <a
-              key={section.id}
-              href={section.route}
-              aria-current={currentPath === section.route ? 'page' : undefined}
-              className={linkClass(currentPath === section.route)}
-            >
-              <span className="min-w-0 truncate">{section.label}</span>
-              <span
-                className={`text-xs font-700 uppercase tracking-[0.18em] ${currentPath === section.route ? 'opacity-100' : 'opacity-50'
-                  }`}
+          {sections.map((section) => {
+            const isActive = isCurrentRoute(section.route);
+            return (
+              <a
+                key={section.id}
+                href={section.route}
+                aria-current={isActive ? 'page' : undefined}
+                className={linkClass(isActive)}
               >
-              </span>
-            </a>
-          ))}
+                {isActive && (
+                  <span className="absolute left-0 top-0 bottom-0 w-1 rounded-l-2xl bg-primary" />
+                )}
+                <span className="min-w-0 truncate">{section.label}</span>
+                {isActive && (
+                  <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
+                )}
+              </a>
+            );
+          })}
         </div>
       </aside>
     </section>

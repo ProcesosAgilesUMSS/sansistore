@@ -1,6 +1,8 @@
 export type OrderStatus =
   | 'CREADO'
   | 'RESERVADO'
+  | 'PENDIENTE'
+  | 'EMPAQUETADO'
   | 'LISTO'
   | 'ASIGNADO'
   | 'EN CAMINO'
@@ -22,14 +24,23 @@ export interface Order {
   orderId: string;
   buyerId: string;
   buyerName?: string;
+  buyerEmail?: string;
+  buyerInstitutionalId?: string;
   sellerId: string;
   status: OrderStatus;
   total: number;
   locationId: string;
   locationLabel?: string;
+  locationType?: string;
   paymentStatus: string;
+  paymentId?: string | null;
+  paymentMethod?: string | null;
+  paymentAmount?: number | null;
   deliveryStatus: string | null;
   deliveryId: string | null;
+  deliveryCode?: string | null;
+  deliveryCourierName?: string | null;
+  deliveryCourierInstitutionalId?: string | null;
   incidentReason: string | null;
   confirmedAt: Date | null;
   createdAt: Date;
@@ -48,6 +59,7 @@ export type OrderDoc = {
   paymentId: string | null;
   paymentStatus: string;
   deliveryId: string | null;
+  deliveryCode: string | null;
   deliveryStatus: string | null;
   incidentReason: string | null;
   confirmedAt: Date | null;

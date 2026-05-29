@@ -6,7 +6,7 @@ import {
   reserveConfirmedOrder,
   subscribeConfirmedOrders,
   subscribeReservedOrders,
-} from '../services/sellerServices';
+} from '../services/sellerReservedOrdersService';
 import type { Order, OrderItem } from '../types';
 
 interface UseReservedOrdersPanelReturn {

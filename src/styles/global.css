@@ -138,3 +138,8 @@
         color: #1c1917;
     }
 }
+
+@keyframes toastProgress {
+  from { width: 100%; }
+  to   { width: 0%; }
+}

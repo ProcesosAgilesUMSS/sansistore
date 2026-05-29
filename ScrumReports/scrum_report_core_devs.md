@@ -181,3 +181,30 @@
   - **Blockers:**     ninguno
 
  
+
+# Daily Report
+# 05/21/2026
+  ## Gonza Rojas Willian D.
+  - **Yesterday:**    Se ayudó a terminar la US#61 de ajuste manual de cantidades, se realizó la US#62 de visualizacion de stock disponible, falta mejorar el diseño. Se coordino con los demas grupos para el flujo de STATUS para la realizacion de la US#73
+  - **Today:**        Se realizó las US#64 y US#65 de entrada y salida de productos segun corresponda, tambien se corrigio y termino la US#73 con la correccion de estados con el docente.
+  - **Blockers:**     Se tardó mucho en preguntar y entender el flujo de estados para #73
+
+  ## Llanos Villarroel Vania F.
+  - **Yesterday:**  
+  - **Today:**      
+  - **Blockers:**   
+
+  ## Rios Quiruchi Edney Jhojan
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Sejas Arze Eddy
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Soliz Moya Alejandra
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     

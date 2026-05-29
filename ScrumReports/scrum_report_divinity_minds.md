@@ -214,13 +214,13 @@
 
 ## Gutierrez Hinojosa Jhon Deymar
 
-- **Yesterday:** Implemente un login simple y un /me para automatizar las pruebas que necesitan login de un usuario, agregar pruebas automatizada de login y carrito, agregar mas criterios de aceptacion de la HU #288 
+- **Yesterday:** Implemente un login simple y un /me para automatizar las pruebas que necesitan login de un usuario, agregar pruebas automatizada de login y carrito, agregar mas criterios de aceptacion de la HU #288
 - **Today:** Revisar el codigo de los demas miembros, ademas de corregir las pruebas automatizadas.
 - **Blockers:** Tenia dudas con areas de otros equipos de la parte del vendedor para automatizar pruebas y reportar bugs a otros equipos pero no me respondieron, y se bloqueo la hu de reseñas por falta de analisis.
 
 ## Merudia Calderon Dayeza
 
-- **Yesterday:** Desarrollé la vista básica /cart para iniciar el flujo e implementé la sección del resumen del pedido.   
+- **Yesterday:** Desarrollé la vista básica /cart para iniciar el flujo e implementé la sección del resumen del pedido.
 - **Today:** Mejoraré el diseño de la vista del carrito por su simplicidad actual e implementé el cálculo del envío estimado.
 - **Blockers:** No estaba bien definido cómo calcular el envío estimado y la tarea de dejar reseñas de productos quedó suspendida.
 
@@ -234,4 +234,69 @@
 
 - **Yesterday:** Trabajé en el carrito de compras. Primero completé las descripciones y criterios de las tasks pendientes. Luego implementé que el comprador pueda ver el total antes de confirmar, validar la disponibilidad de los productos y remover productos del carrito para modificar su selección. También agregué datos de prueba para poder revisar mejor el flujo.
 - **Today:** Revisar el funcionamiento del carrito con el equipo y corregir cualquier detalle que salga en QA.
+- **Blockers:** n/a.
+
+# 05/21/2026
+
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Complete las issues #48 y #345 (favoritos y pruebas Playwright) y deje lista la rama `feature/favorite-products`.
+- **Today:** Verifique que pase todo el set de pruebas correctamente y hice el merge a `main` desde `feature/favorite-products`.
+- **Blockers:** n/a.
+
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Completé los detalles del carrito de compras, corregí errores y reporté bugs detectados.
+- **Today:** Realizar revisiones finales en staging antes de la demo, preparar los datos de seed y alistar el script de despliegue a producción.
+- **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Desarrollé el panel del carrito de compras, implementando la funcionalidad para añadir productos al carrito, modificar sus cantidades y persistir el estado mediante localStorage.
+- **Today:** Realizar pruebas y revisiones finales del carrito antes de la demo, validando el flujo completo de interacción.
+- **Blockers:** Ninguno.
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Finalicé las tareas para mostrar el total del carrito y para eliminar un producto del mismo.
+- **Today:** Realizar pruebas y revisiones en busca de errores previos a la demo.
+- **Blockers:** n/a.
+
+
+## Velasquez Vela Marcos
+
+- **Yesterday:** Continué trabajando en la HU del carrito de compras, mejorando validaciones, flujo de actualización y corrigiendo detalles encontrados en pruebas. También apoyé en la estabilización de pruebas automatizadas, revisé y definí algunas historias de usuario y tasks pendientes del sprint, y ayudé en el despliegue de Cloud Functions de otros grupos en Firebase.
+- **Today:** Revisar los últimos ajustes integrados, dar seguimiento a los despliegues y continuar apoyando en la organización de tareas y validación de funcionalidades del equipo.
+- **Blockers:** n/a.
+
+# 05/26/2026
+
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Agregue observaciones, acuerdos y puntos de mejora al Sprint Retrospective.
+- **Today:** Revise y valide los comentarios del Sprint Retrospective junto con la documentación relacionada.
+- **Blockers:** n/a.
+
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Participé en el sprint retrospective y completé la HU de agregar código para el delivery.
+- **Today:** Realizar pruebas automáticas para la HU de reseñas.
+- **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Participé en la reunión de Sprint Retrospective, aportando observaciones y puntos de mejora para el equipo.
+- **Today:** Revisé las tareas a realizar para el sprint actual, organizando y priorizando las actividades del equipo.
+- **Blockers:** n/a.
+
+## Velasquez Vela Marcos
+
+- **Yesterday:** Participé en la reunión de Sprint Retrospective junto al equipo, aportando en la identificación de mejoras y acuerdos del sprint.
+- **Today:** Apoyé a otro grupo con el despliegue y configuración de sus Cloud Functions en Firebase.
+- **Blockers:** n/a.
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Finalicé el desarrollo de la Tarea #35, implementando la funcionalidad para que el comprador pueda dejar reseñas de un producto. Incluye la opción de escribir comentarios y un sistema de calificación que permite seleccionar de 1 a 5 estrellas.
+- **Today:** Me enfocaré en realizar las pruebas correspondientes a esta tarea para validar su correcto funcionamiento.
 - **Blockers:** n/a.

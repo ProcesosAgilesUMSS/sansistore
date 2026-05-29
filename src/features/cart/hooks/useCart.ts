@@ -87,14 +87,16 @@ export function useCart() {
             : Number(product.price)
           : 0;
         const stockAvailable = product?.stockAvailable ?? 0;
+        const stockReserved = product?.stockReserved ?? 0;
+        const effectiveStock = Math.max(0, stockAvailable - stockReserved);
 
         let availabilityMessage = '';
         if (cached) {
           if (!product) availabilityMessage = 'El producto ya no existe.';
           else if (product.active === false) availabilityMessage = 'El producto ya no está activo.';
           else if (!inventoryEnabled) availabilityMessage = 'El producto no está disponible para venta.';
-          else if (stockAvailable <= 0) availabilityMessage = 'Sin stock disponible.';
-          else if (stockAvailable < item.quantity) availabilityMessage = `Stock insuficiente. Disponible: ${stockAvailable}.`;
+          else if (effectiveStock <= 0) availabilityMessage = 'Sin stock disponible.';
+          else if (effectiveStock < item.quantity) availabilityMessage = `Stock insuficiente. Disponible: ${effectiveStock}.`;
           else if (!Number.isFinite(unitPrice) || unitPrice <= 0) availabilityMessage = 'El producto no tiene un precio válido.';
         }
 
@@ -191,6 +193,7 @@ export function useCart() {
               id: productSnap.id,
               ...productSnap.data(),
               stockAvailable: currentState.product?.stockAvailable ?? 0,
+              stockReserved: currentState.product?.stockReserved ?? 0,
               stockTotal: currentState.product?.stockTotal ?? 0,
             } as CartProduct;
           } else {
@@ -224,6 +227,7 @@ export function useCart() {
             currentState.product = {
               ...currentState.product,
               stockAvailable: inventoryData?.stockAvailable ?? 0,
+              stockReserved: inventoryData?.stockReserved ?? 0,
               stockTotal: inventoryData?.stockTotal ?? 0,
             };
           }
@@ -238,6 +242,7 @@ export function useCart() {
             currentState.product = {
               ...currentState.product,
               stockAvailable: 0,
+              stockReserved: 0,
               stockTotal: currentState.product.stockTotal ?? 0,
             };
           }

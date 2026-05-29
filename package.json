@@ -13,7 +13,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "emu": "firebase emulators:start --only firestore,auth",
+    "emu": "firebase emulators:start --only firestore,auth,functions,pubsub",
     "seed": "node ./seed/index.mjs"
   },
   "seeds": {
@@ -36,13 +36,14 @@
     "leaflet": "^1.9.4",
     "lucide-react": "^1.8.0",
     "motion": "^12.38.0",
+    "nanostores": "^1.3.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "nanostores": "^1.3.0",
     "react-hook-form": "^7.75.0",
     "react-icons": "^5.6.0",
     "react-leaflet": "^5.0.0",
     "tailwindcss": "^4.2.2",
+    "uuid": "^14.0.0",
     "vite-plugin-pwa": "^1.3.0",
     "zod": "^4.4.3"
   },

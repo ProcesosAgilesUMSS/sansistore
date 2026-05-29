@@ -228,3 +228,32 @@
 * **Yesterday:**  Resolví algunos bugs qué tenía en el diseño de mi hu #147
 * **Today:** Finalice la revisión de los errores y con eso se concluye mi hu #147
 * **Blockers:** none.
+
+# 26/05/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+* **Yesterday:** empece a revisar la hus que nos falta por desarrollar
+* **Today:** coordine con mi equipo para escoger las hus que toca para este sprint y hablar de dudas sobre el proyecot
+* **Blockers:** Hay Hus que requieren una revision a profundidad
+
+## Dylan Coca Beltran
+- **Yesterday:** revise las historias de usuario y ver si se podian reformular, como (HU #150 y #159) que son demasiado ambiguas
+- **Today:** nos reunimos con mi equipo para discutir que historias de usuario podriamos hacer este sprint y revisar las hu
+- **Blockers:** las historias de usuario son bastante ambiguas
+
+## Fabricio Javier Córdova Caceres
+- **Yesterday:** revision grupal de las  historias de usuario y ver si se podian reformular, como HU #150 y #159 que no tienen mucho detalle y no se entiende la finalidad de cada una.
+- **Today:** Finalizamos con la decisión en grupo de las HU que se llevarán a cabo en este sprint y las preguntas que formularemos al ingeniero en clase
+- **Blockers:** las historias de usuario no están definidas
+
+## Camila Wara Fernandez Sandoval 
+- **Yesterday:** revise las historias de usuario del PB y ver cuales se pueden trabajar para este sprint, tambien realice el retrospective del sprint 
+- **Today:** nos reunimos con mi equipo para discutir que historias de usuario podriamos hacer este sprint 
+- **Blockers:** Hay algunas dudas con las historias de usuario
+
+## Jherlan Marcelo Calero Sardan
+- **Yesterday:** revise las HU que nos quedan para desarollar y proponer las de mayor prioridad.
+- **Today:** Participe de la reunion de equipo para discutir y definir las HUs para este sprint segun la importancia.
+- **Blockers:** Existe HUs confusas que no se logran entender su proposito.

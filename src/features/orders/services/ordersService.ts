@@ -81,7 +81,9 @@ export async function reserveOrder(orderId: string): Promise<void> {
   const orderRef = doc(db, "orders", orderId);
   await updateDoc(orderRef, {
     status: "RESERVADO",
-    sellerId: user.uid
+    sellerId: user.uid,
+    reservedAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
   });
 }
 
@@ -111,8 +113,7 @@ export async function getCreatedOrders(): Promise<Order[]> {
 export function subscribeToCreatedOrders(onUpdate: (orders: Order[]) => void) {
   const q = query(
     collection(db, "orders"),
-    where("status", "in", ["CREADO", "RESERVADO", "EMPAQUETADO", "PENDIENTE"]),
-    where("deliveryStatus", "==", null)
+    where("status", "in", ["CREADO", "RESERVADO", "EMPAQUETADO", "PENDIENTE"])
   );
 
   return onSnapshot(q, async (querySnapshot) => {
@@ -158,10 +159,10 @@ async function processQuerySnapshot(querySnapshot: QuerySnapshot<DocumentData>):
     const items = itemsSnapshot.docs.map(itemDoc => {
       const item = itemDoc.data();
       return {
-        itemId: item.itemId ?? itemDoc.id,
+        itemId: itemDoc.id,
         productId: item.productId,
         productName: item.productName,
-        price: item.price ?? item.unitPrice ?? 0,
+        unitPrice: item.unitPrice,
         quantity: item.quantity,
         subtotal: item.subtotal,
         description: item.description,
@@ -170,7 +171,9 @@ async function processQuerySnapshot(querySnapshot: QuerySnapshot<DocumentData>):
 
     return {
       id: orderDoc.id,
-      buyerId: data.buyerId ?? '',
+      secret: data.secret,
+      buyerId: data.buyerId,
+      sellerId: data.sellerId,
       status: normalizeBuyerOrderStatus(data),
       buyerReceptionConfirmed: isReceptionConfirmed(data),
       buyerReceptionConfirmedAt: data.buyerReceptionConfirmedAt ?? data.customerConfirmedAt ?? null,
@@ -187,6 +190,51 @@ async function processQuerySnapshot(querySnapshot: QuerySnapshot<DocumentData>):
 }
 
 // --- Buyer Actions (from main) ---
+
+export async function getOrderById(orderId: string): Promise<Order | null> {
+  const orderRef = doc(db, "orders", orderId);
+  const orderSnap = await getDoc(orderRef);
+  if (!orderSnap.exists()) return null;
+
+  const data = orderSnap.data() as Record<string, any>;
+
+  let destination = "Ubicación no encontrada";
+  if (data.locationId) {
+    const locSnap = await getDoc(doc(db, "locations", data.locationId));
+    if (locSnap.exists()) {
+      destination = (locSnap.data() as any).label || "Sin etiqueta";
+    }
+  }
+
+  const itemsSnapshot = await getDocs(collection(orderRef, "orderItems"));
+  const items = itemsSnapshot.docs.map((itemDoc) => {
+    const item = itemDoc.data();
+    return {
+      itemId: itemDoc.id,
+      productId: item.productId,
+      productName: item.productName,
+      unitPrice: item.unitPrice,
+      quantity: item.quantity,
+      subtotal: item.subtotal,
+      description: item.description,
+    };
+  }) as OrderItem[];
+
+  return {
+    id: orderSnap.id,
+    secret: data.secret,
+    buyerId: data.buyerId,
+    sellerId: data.sellerId,
+    status: normalizeBuyerOrderStatus(data),
+    buyerReceptionConfirmed: isReceptionConfirmed(data),
+    buyerReceptionConfirmedAt:
+      data.buyerReceptionConfirmedAt ?? data.customerConfirmedAt ?? null,
+    delivery: { destination },
+    items,
+    total: data.total,
+    createdAt: data.createdAt,
+  };
+}
 
 export async function getMyOrders(userId: string): Promise<Order[]> {
   const q = query(

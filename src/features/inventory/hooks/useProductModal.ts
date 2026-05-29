@@ -1,13 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { 
-  collection, 
-  addDoc, 
-  getDocs, 
-  updateDoc, 
+import {
+  collection,
+  getDocs,
   serverTimestamp,
   doc,
-  setDoc 
-} from 'firebase/firestore'; 
+  setDoc,
+} from 'firebase/firestore';
 import {
   uploadBytesResumable,
   getDownloadURL,
@@ -36,6 +34,9 @@ export const useProductModal = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [successProductName, setSuccessProductName] = useState('');
 
   const uploadTaskRef = useRef<ReturnType<typeof uploadBytesResumable> | null>(
     null
@@ -77,6 +78,8 @@ export const useProductModal = () => {
     setUploadProgress(0);
     setUploadError('');
     setIsUploading(false);
+    setIsSuccess(false); // Resetear estado de éxito
+    setSuccessProductName('');
   }, [form]);
 
   const handleCancelUpload = useCallback(() => {
@@ -158,7 +161,6 @@ export const useProductModal = () => {
 
         const formData = data as any;
 
-        // DATOS PARA LA COLECCIÓN 'products'
         const productData = {
           ...data,
           slug,
@@ -168,10 +170,9 @@ export const useProductModal = () => {
           price: Number(data.price),
           offerPrice: data.hasOffer ? Number(data.offerPrice) : null,
           soldCount: Number(data.soldCount) || 0,
-          categoryId: data.categoryId
+          categoryId: data.categoryId,
         };
 
-        // DATOS PARA LA COLECCIÓN 'inventory' (Lo que faltaba)
         const inventoryData = {
           enabled: true,
           minStock: Number(formData.minStock || 5),
@@ -179,22 +180,27 @@ export const useProductModal = () => {
           stockAvailable: Number(formData.stockTotal || 0),
           stockReserved: 0,
           stockTotal: Number(formData.stockTotal || 0),
-          updatedAt: serverTimestamp()
+          updatedAt: serverTimestamp(),
         };
 
-        // Guardar en 'products'
         await setDoc(doc(db, 'products', slug), productData);
-        
-        // Guardar en 'inventory' *
         await setDoc(doc(db, 'inventory', slug), inventoryData);
 
-        handleClose();
+        setSuccessProductName(data.name);
+        setIsSuccess(true);
+
+        setTimeout(() => {
+          window.location.reload();
+        }, 2500);
+
       } catch (err) {
         if (err instanceof Error && err.message === 'CANCELLED') return;
-        setUploadError(`Error: ${err instanceof Error ? err.message : 'Error desconocido'}`);
+        setUploadError(
+          `Error: ${err instanceof Error ? err.message : 'Error desconocido'}`
+        );
       }
     },
-    [imageFile, handleClose, uploadImage]
+    [imageFile, uploadImage]
   );
 
   return {
@@ -214,5 +220,7 @@ export const useProductModal = () => {
     handleClose,
     handleCancelUpload,
     onSubmit,
+    isSuccess,
+    successProductName
   };
 };

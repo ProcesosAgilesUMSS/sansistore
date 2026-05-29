@@ -4,12 +4,12 @@ services:
       context: .
       dockerfile: Dockerfile.testing
     working_dir: /app
+    ipc: host
+    init: true
     volumes:
       - ./src:/app/src
       - ./tests:/app/tests
-      - ./seed:/app/seed
       - ./playwright.config.ts:/app/playwright.config.ts
-
       - ./playwright-report:/app/playwright-report
       - ./test-results:/app/test-results
     command: ["bunx", "playwright", "test"]

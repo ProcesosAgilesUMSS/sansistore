@@ -5,30 +5,26 @@ import Footer from '../components/Footer';
 ---
 
 <Layout title="Mi Cuenta | Sansistore">
-  <Navbar client:only="react" />
-  <main class="min-h-[calc(100vh-8rem)] bg-bg-light pt-28 pb-12 px-4 flex justify-center">
-    <div class="w-full max-w-lg rounded-[1.25rem] shadow-lg border border-border-light bg-[var(--theme-card-bg)] p-8">
-      <header class="flex flex-col items-center mb-8">
-        <div class="w-24 h-24 mb-4 rounded-full overflow-hidden bg-[var(--theme-secondary-bg)] border-4 border-border-light flex items-center justify-center">
-           <img id="user-avatar" src="" alt="" class="w-full h-full object-cover" hidden />
-           <span id="avatar-placeholder" class="text-text-light opacity-50 text-4xl">👤</span>
-        </div>
-        <h1 class="text-2xl font-black text-text-light">Mi Perfil</h1>
-      </header>
+  <Navbar client:load />
+  
+  <main class="flex-1 w-full max-w-xl mx-auto px-4 pt-32 pb-16">
+    <header class="flex flex-col items-center gap-4 mb-8 text-center">
+      <img id="user-avatar" src="" alt="" class="size-24 rounded-full object-cover border-4 border-card-bg-light shadow-sm" hidden />
+      <h1 class="text-[clamp(1.75rem,4vw,3rem)] font-black tracking-[-0.04em] leading-none text-text-light">Mi Perfil</h1>
+    </header>
 
-      <section class="flex flex-col gap-6" id="auth-status-container">
-        <div id="auth-status" class="text-center text-text-light opacity-60">Cargando...</div>
-      </section>
-    </div>
+    <section id="auth-status" class="text-center text-text-light/60 font-medium py-8">
+      Cargando...
+    </section>
   </main>
-  <Footer client:only="react" />
+
+  <Footer client:load />
 
   <script>
     import { onAuthStateChanged } from 'firebase/auth';
     import { auth } from '../lib/firebase';
 
     const container = document.getElementById('auth-status');
-    const placeholder = document.getElementById('avatar-placeholder');
 
     onAuthStateChanged(auth, (user) => {
       if (!container) return;
@@ -41,26 +37,23 @@ import Footer from '../components/Footer';
           avatar.src = user.photoURL;
           avatar.alt = `Foto de perfil de ${escapeHtml(displayName)}`;
           avatar.hidden = false;
-          if (placeholder) placeholder.hidden = true;
         }
-        
         container.outerHTML = `
-          <div class="flex flex-col gap-4">
-            <dl class="p-4 rounded-lg bg-[var(--theme-secondary-bg)] border border-border-light">
-              <dt class="text-xs font-semibold text-primary uppercase tracking-wider">Nombre</dt>
-              <dd class="text-lg font-medium text-text-light mt-1">${escapeHtml(displayName)}</dd>
+          <section class="bg-card-bg-light border border-border-light rounded-[1.25rem] p-6 shadow-sm mx-auto">
+            <dl class="flex flex-col m-0">
+              <dt class="text-[11px] font-bold uppercase tracking-wider text-text-light/50 mb-1">Nombre</dt>
+              <dd class="text-base font-bold text-text-light pb-4 mb-4 border-b border-dotted border-border-light ml-0">${escapeHtml(displayName)}</dd>
+              
+              <dt class="text-[11px] font-bold uppercase tracking-wider text-text-light/50 mb-1">Correo</dt>
+              <dd class="text-base font-bold text-text-light ml-0">${escapeHtml(email)}</dd>
             </dl>
-            <dl class="p-4 rounded-lg bg-[var(--theme-secondary-bg)] border border-border-light">
-              <dt class="text-xs font-semibold text-primary uppercase tracking-wider">Correo</dt>
-              <dd class="text-lg font-medium text-text-light mt-1">${escapeHtml(email)}</dd>
-            </dl>
-          </div>
+          </section>
         `;
       } else {
         container.outerHTML = `
-          <div class="flex flex-col items-center text-center py-6">
-            <p class="text-lg font-medium text-text-light mb-6">No autenticado</p>
-            <a href="/login" class="w-full sm:w-auto py-2 px-8 rounded-full uppercase font-semibold text-sm transition-all active:scale-95 bg-primary text-bg-light hover:bg-primary/90 inline-block">
+          <div class="text-center flex flex-col items-center gap-6 py-6">
+            <p class="text-error font-semibold m-0">No autenticado</p>
+            <a href="/login" class="rounded-full bg-primary-action text-bg-light px-6 py-2.5 text-xs uppercase font-bold tracking-wider hover:opacity-90 hover:scale-105 active:scale-95 transition-all">
               Iniciar sesión
             </a>
           </div>

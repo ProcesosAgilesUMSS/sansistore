@@ -1,11 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar';
+import RouteGuard from '../components/RouteGuard';
 import MyOrdersDashboard from '../features/orders/components/MyOrdersDashboard';
 ---
 <Layout title="Mis Pedidos y Devoluciones | Sansistore">
   <Navbar client:load />
   <main class="pt-20 min-h-screen bg-(--theme-bg)">
-    <MyOrdersDashboard client:only="react" />
+    <RouteGuard client:load allowedRoles={['comprador']} roleName="Comprador">
+      <MyOrdersDashboard client:load />
+    </RouteGuard>
   </main>
 </Layout>

@@ -1,23 +1,21 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import SellerLayout from '../../layouts/SellerLayout.astro';
 import OfferForm from '../../features/offers/components/OfferForm';
 ---
 
-<Layout title="Gestión de Ofertas | Sansistore (Modo Dev)">
-  <Navbar client:load />
-  
-  <main class="min-h-screen transition-colors duration-200 py-24">
-    <div class="max-w-4xl mx-auto px-4 mt-8">
-      
-      <h1 class="text-4xl font-bold text-[#88B04B] mb-2 font-outfit">Módulo de Ofertas</h1>
-      <p class="text-gray-600 dark:text-gray-400 mb-8">Crea y administra los descuentos de tus productos.</p>
-      
-      <OfferForm client:load />
-
+<SellerLayout title="Sansistore | Gestionar Ofertas">
+  <div class="py-6 lg:py-8">
+    <div class="mb-6">
+      <h1 class="font-['Outfit'] font-black text-2xl tracking-tight text-(--theme-text)">
+        Gestionar <span class="text-primary">Ofertas</span>
+      </h1>
+      <p class="mt-1 text-sm text-(--theme-text) opacity-50">
+        Crea y administra los descuentos de tus productos.
+      </p>
     </div>
-  </main>
 
-  <Footer client:load />
-</Layout>
+    <div class="max-w-2xl">
+      <OfferForm client:load />
+    </div>
+  </div>
+</SellerLayout>

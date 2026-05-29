@@ -4,6 +4,10 @@ let emulatorProcess = null;
 
 const FIRESTORE_TEST_HOST = '127.0.0.1:8180';
 const AUTH_TEST_HOST = '127.0.0.1:9199';
+const EMULATOR_STARTUP_TIMEOUT_MS = Number.parseInt(
+  process.env.PLAYWRIGHT_EMULATOR_STARTUP_TIMEOUT_MS ?? '240000',
+  10
+);
 
 process.env.FIRESTORE_EMULATOR_HOST = FIRESTORE_TEST_HOST;
 process.env.FIREBASE_AUTH_EMULATOR_HOST = AUTH_TEST_HOST;
@@ -43,11 +47,11 @@ function stopProcessesOnPorts(ports: number[]) {
 async function waitForEmulator(
   host: string,
   label: string,
-  maxAttempts = 60,
+  timeoutMs = EMULATOR_STARTUP_TIMEOUT_MS,
   delayMs = 500
 ) {
-  let attempts = 0;
-  while (attempts < maxAttempts) {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
     try {
       const response = await fetch(`http://${host}/`, {
         signal: AbortSignal.timeout(2000),
@@ -58,10 +62,11 @@ async function waitForEmulator(
       }
     } catch {
     }
-    attempts++;
     await new Promise((resolve) => setTimeout(resolve, delayMs));
   }
-  throw new Error(`${label} emulator did not start within timeout`);
+  throw new Error(
+    `${label} emulator did not start within ${timeoutMs}ms`
+  );
 }
 
 async function runSeed() {
@@ -101,10 +106,13 @@ export default async function globalSetup() {
   console.log(
     'Starting Firestore and Auth emulators on ports 8180 and 9199...'
   );
+  console.log(
+    `Waiting up to ${EMULATOR_STARTUP_TIMEOUT_MS}ms for emulators to become ready...`
+  );
   emulatorProcess = spawn(
     process.platform === 'win32' ? 'npx.cmd' : 'npx',
     [
-      'firebase',
+      'firebase-tools',
       'emulators:start',
       '--only',
       'firestore,auth',

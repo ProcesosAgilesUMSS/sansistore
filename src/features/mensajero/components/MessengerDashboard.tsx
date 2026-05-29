@@ -1,10 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { Truck } from 'lucide-react';
-import { onAuthStateChanged } from 'firebase/auth';
-import { getSellerLocation } from '../../location/services/locationService';
-
-
 import {
     AlertTriangle,
     CheckCircle2,
@@ -15,9 +10,12 @@ import {
     Package,
     Phone,
     Send,
+    Truck,
     X,
     XCircle,
 } from 'lucide-react';
+import { onAuthStateChanged } from 'firebase/auth';
+import { getSellerLocation } from '../../location/services/locationService';
 import { auth } from '../../../lib/firebase';
 import {
     markMessengerOrderAsCancelledByNoPayment,
@@ -28,7 +26,6 @@ import {
 } from '../services/messengerOrdersService';
 import type { MessengerOrder } from '../types';
 import {
-    getMessengerOrderAgeTimestamp,
     sortAcceptedOrdersByAge,
     type AcceptedOrderSort,
 } from '../utils/acceptedOrderSorting';
@@ -40,17 +37,23 @@ const DEV_COURIER_ID = 'user-nadia';
 
 const formatBolivianos = (amount: number) => `Bs ${amount}`;
 
-const formatOrderAgeDate = (order: MessengerOrder) => {
-    const timestamp = getMessengerOrderAgeTimestamp(order);
+const formatDate = (date: Date | null | undefined) => {
+    if (!date) return 'Fecha no disponible';
+    return new Intl.DateTimeFormat('es-BO', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+    }).format(date);
+};
 
-    if (timestamp === null) return 'Fecha no disponible';
+const formatOrderAgeDate = (order: MessengerOrder) => {
+    const date = order.assignedAt ?? order.createdAt ?? order.updatedAt;
+
+    if (!date) return 'Fecha no disponible';
 
     return new Intl.DateTimeFormat('es-BO', {
-        day: '2-digit',
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-    }).format(new Date(timestamp));
+        dateStyle: 'medium',
+        timeStyle: 'short',
+    }).format(date);
 };
 
 const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']) => {
@@ -63,39 +66,22 @@ const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']) => {
     return 'Entregado';
 };
 const openDeliveryMap = (order: MessengerOrder) => {
-  const mapOrder = {
-    buyerName: order.buyerName || order.customerName,
-    deliveryZone: order.city,
-    deliveryLat: order.deliveryLat ?? order.lat ?? null,
-    deliveryLng: order.deliveryLng ?? order.lng ?? null,
-    total: order.cashToCollect,
-  };
-
-  const panelOrder = {
+  localStorage.setItem('courier_panel_order', JSON.stringify({
     customerName: order.customerName,
     phone: order.phone,
     address: order.address,
     reference: order.reference || order.locationLabel,
-    items: order.items.map((item) => ({
-      name: item.name,
-      quantity: item.quantity,
-    })),
+    items: order.items.map((item) => ({ name: item.name, quantity: item.quantity })),
     cashToCollect: order.cashToCollect,
-  };
+  }));
 
-  localStorage.setItem(
-    'courier_map_order',
-    JSON.stringify(mapOrder)
-  );
-  localStorage.setItem(
-    'courier_panel_order',
-    JSON.stringify(panelOrder)
-  );
-
+  const lat = order.deliveryLat ?? order.lat ?? null;
+  const lng = order.deliveryLng ?? order.lng ?? null;
   const url = new URL('/mapa', window.location.origin);
-  if (mapOrder.deliveryLat != null && mapOrder.deliveryLng != null) {
-    url.searchParams.set('lat', String(mapOrder.deliveryLat));
-    url.searchParams.set('lng', String(mapOrder.deliveryLng));
+
+  if (lat != null && lng != null) {
+    url.searchParams.set('lat', String(lat));
+    url.searchParams.set('lng', String(lng));
   } else {
     url.searchParams.set('location', order.address);
   }
@@ -330,19 +316,18 @@ function PendingOrderCard({
             </div>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                {/* SIEMPRE VISIBLES */}
+                <a
+                        className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+                        href={sellerLocationUrl ?? '#'}
+                        rel="noreferrer"
+                        target="_blank"
+                    >
+                        <Send size={17} />
+                        Ubi. Vendedor
+                    </a>
                 <a
                     className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
                     href={sellerLocationUrl ?? '#'}
-                    rel="noreferrer"
-                    target="_blank"
-                >
-                    <Send size={17} />
-                    Ubi. Vendedor
-                </a>
-                <a
-                    className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-                    href={buildMapsUrl(order)}
                     rel="noreferrer"
                     target="_blank"
                 >
@@ -361,7 +346,6 @@ function PendingOrderCard({
                     </button>
                 )}
 
-                {/* ACEPTAR / RECHAZAR */}
                 {order.deliveryStatus === 'assigned' && (
                     <>
                         <button
@@ -372,7 +356,6 @@ function PendingOrderCard({
                             <CheckCircle2 size={17} />
                             Aceptar pedido
                         </button>
-
                         <button
                             className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
                             onClick={() => onReject(order.id)}
@@ -384,7 +367,6 @@ function PendingOrderCard({
                     </>
                 )}
 
-                {/* INICIAR ENTREGA */}
                 {order.deliveryStatus === 'accepted' && (
                     <button
                         className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 text-sm font-bold text-white shadow-lg transition hover:scale-[1.02] hover:bg-blue-700"
@@ -396,125 +378,42 @@ function PendingOrderCard({
                     </button>
                 )}
 
-        <div>
-          <p className="messenger-muted mb-3 text-xs font-medium">Productos</p>
-          <div className="space-y-3">
-            {order.items.map((item) => (
-              <p
-                className="messenger-copy flex items-center gap-2 text-sm"
-                key={item.id}
-              >
-                <Package size={16} />
-                <span>
-                  {item.quantity}x {item.name} — {formatBolivianos(item.price)}
-                </span>
-              </p>
-            ))}
-          </div>
-
-          <div className="messenger-cash-box mt-5 rounded-2xl border-2 p-5">
-            <p className="text-xs font-medium uppercase">Monto a cobrar</p>
-            <p className="mt-2 text-3xl font-black">
-              {formatBolivianos(order.cashToCollect)}
-            </p>
-            <p className="messenger-copy mt-1 text-xs">en efectivo</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-        <button
-          className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-          onClick={() => openDeliveryMap(order)}
-          type="button"
-        >
-          <Send size={17} />
-          Abrir en Maps
-        </button>
-
-  {order.deliveryStatus !== 'assigned' && (
-    <button
-      className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-      onClick={() => onDetail(order)}
-      type="button"
-    >
-      <Eye size={17} />
-      Ver detalle
-    </button>
-  )}
-
-  {/* ACEPTAR / RECHAZAR */}
-  {order.deliveryStatus === 'assigned' && (
-    <>
-      <button
-        className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
-        onClick={() => onAccept(order.id)}
-        type="button"
-      >
-        <CheckCircle2 size={17} />
-        Aceptar pedido
-      </button>
-
-      <button
-        className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-        onClick={() => onReject(order.id)}
-        type="button"
-      >
-        <XCircle size={17} />
-        Rechazar
-      </button>
-    </>
-  )}
-
-  {/* INICIAR ENTREGA */}
-  {order.deliveryStatus === 'accepted' && (
-    <button
-      className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 text-sm font-bold text-white shadow-lg transition hover:scale-[1.02] hover:bg-blue-700"
-      onClick={() => onInTransit(order.id)}
-      type="button"
-    >
-      <Truck size={17} />
-      Iniciar entrega
-    </button>
-  )}
-
-  {/* CUANDO YA ESTA EN CAMINO */}
-  {order.deliveryStatus === 'in_transit' && (
-    <>
-      <button
-        className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
-        onClick={() => onDelivered(order)}
-        type="button"
-      >
-        <CheckCircle2 size={17} />
-        Registrar pago
-      </button>
-
-<button
-  className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 border-amber-500 bg-amber-950/40 px-6 text-sm font-bold text-amber-300 transition-all duration-300 hover:border-amber-400 hover:shadow-[0_0_12px_rgba(251,191,36,0.65)]"
-  onClick={() => onCancelNoPayment(order)}
-  type="button"
->
-  <DollarSign size={17} />
-  Cancelar por falta de pago
-</button>
-
-<button
-  className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 border-red-500 bg-red-950/40 px-6 text-sm font-bold text-red-300 transition-all duration-300 hover:border-red-400 hover:shadow-[0_0_12px_rgba(248,113,113,0.65)]"
-  onClick={() => onNotDelivered(order)}
-  type="button"
->
-  <AlertTriangle size={17} />
-  No entregado
-</button>
-    </>
-  )}
-</div>
-    </article>
-  );
+                {order.deliveryStatus === 'in_transit' && (
+                    <>
+                        <button
+                            className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
+                            onClick={() => onDelivered(order)}
+                            type="button"
+                        >
+                            <CheckCircle2 size={17} />
+                            Registrar pago
+                        </button>
+                        <button
+                            className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+                            onClick={() => onCancelNoPayment(order)}
+                            type="button"
+                        >
+                            <DollarSign size={17} />
+                            Cancelar por falta de pago
+                        </button>
+                        <button
+                            className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+                            onClick={() => onNotDelivered(order)}
+                            type="button"
+                        >
+                            <AlertTriangle size={17} />
+                            No entregado
+                        </button>
+                    </>
+                )}
+            </div>
+        </article>
+    );
 }
 
+// ✅ MODIFICADO: Se agregó la fecha de entrega
 function DeliveredOrderRow({ order }: { order: MessengerOrder }) {
+    const deliveryDate = order.paymentCollectedAt || order.updatedAt || order.createdAt;
     return (
         <article className="messenger-delivered-row flex items-center justify-between gap-4 rounded-[26px] border p-6 shadow-[0_10px_24px_rgba(18,32,56,0.06)]">
             <div className="flex items-center gap-4">
@@ -522,8 +421,11 @@ function DeliveredOrderRow({ order }: { order: MessengerOrder }) {
                     <CheckCircle2 size={20} />
                 </span>
                 <div>
-                    <h3 className="font-black">#{order.id}</h3>
+                    <h3 className="font-black">#{order.orderCode || order.id}</h3>
                     <p className="messenger-copy text-sm">{order.customerName}</p>
+                    <p className="messenger-muted mt-1 text-xs">
+                        Entregado: {formatDate(deliveryDate)}
+                    </p>
                 </div>
             </div>
             <div className="flex shrink-0 items-center gap-4">
@@ -685,48 +587,50 @@ function OrderDetailModal({
                             </p>
                         </div>
 
-                        {order.deliveryStatus === 'in_transit' && (
-                            <button
-                                className="messenger-deliver-button mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
-                                onClick={() => {
-                                    onDelivered(order);
-                                    onClose();
-                                }}
-                                type="button"
-                            >
-                                <CheckCircle2 size={17} />
-                                Registrar pago
-                            </button>
-                        )}
+                       <div className="mt-6 flex flex-col gap-3">
+  {order.deliveryStatus === 'in_transit' && (
+    <button
+      className="messenger-deliver-button inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition active:scale-95"
+      onClick={() => {
+        onDelivered(order);
+        onClose();
+      }}
+      type="button"
+    >
+      <CheckCircle2 size={18} />
+      <span>Registrar pago</span>
+    </button>
+  )}
 
-                        {canCancelByNoPayment(order) && (
-                            <button
-                                className=" mt-3 inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 border-amber-500 bg-amber-950/40 px-6 text-sm font-bold text-amber-300 transition-all duration-300 hover:border-amber-400 hover:shadow-[0_0_12px_rgba(251,191,36,0.65)]"
-                                onClick={() => {
-                                    onClose();
-                                    onCancelNoPayment(order);
-                                }}
-                                type="button"
-                            >
-                                <DollarSign size={17} />
-                                Cancelar por falta de pago
-                            </button>
-                        )}
+  {canCancelByNoPayment(order) && (
+    <button
+      className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-red-500 bg-red-50 px-6 text-sm font-bold text-red-600 transition hover:bg-red-100 active:scale-95"
+      onClick={() => {
+        onClose();
+        onCancelNoPayment(order);
+      }}
+      type="button"
+    >
+      <DollarSign size={18} />
+      <span>Cancelar por falta de pago</span>
+    </button>
+  )}
 
-                        {(order.deliveryStatus === 'accepted' ||
-                            order.deliveryStatus === 'in_transit') && (
-                                <button
-                                    className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-red-500 bg-red-950/40 px-6 text-sm font-bold text-red-300 transition-all duration-300 hover:border-red-400 hover:shadow-[0_0_12px_rgba(248,113,113,0.65)]"
-                                    onClick={() => {
-                                        onClose();
-                                        onNotDelivered(order);
-                                    }}
-                                    type="button"
-                                >
-                                    <AlertTriangle size={17} />
-                                    No entregado
-                                </button>
-                            )}
+  {(order.deliveryStatus === 'accepted' ||
+    order.deliveryStatus === 'in_transit') && (
+    <button
+      className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-red-500 bg-red-50 px-6 text-sm font-bold text-red-600 transition hover:bg-red-100 active:scale-95"
+      onClick={() => {
+        onClose();
+        onNotDelivered(order);
+      }}
+      type="button"
+    >
+      <AlertTriangle size={18} />
+      <span>No entregado</span>
+    </button>
+  )}
+</div>
 
                     </aside>
                 </div>
@@ -759,6 +663,7 @@ export default function MessengerDashboard({
     const [acceptedSortOrder, setAcceptedSortOrder] =
         useState<AcceptedOrderSort>('oldest-first');
     const notifiedOrderIdsRef = useRef<Set<string>>(new Set());
+    const isFirstLoadRef = useRef(true);
 
     useEffect(() => {
         let unsubscribeOrders: (() => void) | undefined;
@@ -796,6 +701,7 @@ export default function MessengerDashboard({
                 }
             );
         };
+
 
         const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
             const devCourierId =
@@ -836,53 +742,60 @@ export default function MessengerDashboard({
         [assignedOrders]
     );
 
-    useEffect(() => {
-        if (loading || clientSection !== 'assigned') return;
+   useEffect(() => {
+    if (loading || clientSection !== 'assigned') return;
 
-        const currentOrderIds = assignedOrderIdsKey
-            ? assignedOrderIdsKey.split('|')
-            : [];
+    const currentOrderIds = assignedOrderIdsKey
+        ? assignedOrderIdsKey.split('|')
+        : [];
 
-        if (currentOrderIds.length === 0) {
-            setNewOrderCount(0);
-            return;
-        }
+    // Primera carga: mostrar toast si hay pedidos, sin filtrar por sesión previa
+    if (isFirstLoadRef.current) {
+        isFirstLoadRef.current = false;
 
+        if (currentOrderIds.length === 0) return;
+
+        // Marcar todos como notificados para futuras comparaciones
         const storageKey = 'sansistore:messenger:notified-order-ids';
-
-        let storedIds: string[] = [];
-
-        try {
-            storedIds = JSON.parse(
-                sessionStorage.getItem(storageKey) || '[]'
-            ) as string[];
-        } catch {
-            storedIds = [];
-        }
-
-        const alreadyNotifiedIds = new Set([
-            ...storedIds,
-            ...Array.from(notifiedOrderIdsRef.current),
-        ]);
-
-        const newIds = currentOrderIds.filter(
-            (orderId) => !alreadyNotifiedIds.has(orderId)
-        );
-
-        if (newIds.length === 0) return;
-
-        const updatedIds = Array.from(
-            new Set([...storedIds, ...currentOrderIds])
-        );
-
+        const updatedIds = Array.from(new Set(currentOrderIds));
         try {
             sessionStorage.setItem(storageKey, JSON.stringify(updatedIds));
-        } catch {
-
-        }
+        } catch { /* ignorar */ }
         notifiedOrderIdsRef.current = new Set(updatedIds);
-        setNewOrderCount(newIds.length);
-    }, [assignedOrderIdsKey, clientSection, loading]);
+
+        setNewOrderCount(currentOrderIds.length);
+        return;
+    }
+
+    // Cargas posteriores: solo nuevos pedidos que no se habían notificado
+    if (currentOrderIds.length === 0) {
+        setNewOrderCount(0);
+        return;
+    }
+
+    const storageKey = 'sansistore:messenger:notified-order-ids';
+    let storedIds: string[] = [];
+    try {
+        storedIds = JSON.parse(sessionStorage.getItem(storageKey) || '[]') as string[];
+    } catch {
+        storedIds = [];
+    }
+
+    const alreadyNotifiedIds = new Set([
+        ...storedIds,
+        ...Array.from(notifiedOrderIdsRef.current),
+    ]);
+
+    const newIds = currentOrderIds.filter((id) => !alreadyNotifiedIds.has(id));
+    if (newIds.length === 0) return;
+
+    const updatedIds = Array.from(new Set([...storedIds, ...currentOrderIds]));
+    try {
+        sessionStorage.setItem(storageKey, JSON.stringify(updatedIds));
+    } catch { /* ignorar */ }
+    notifiedOrderIdsRef.current = new Set(updatedIds);
+    setNewOrderCount(newIds.length);
+}, [assignedOrderIdsKey, clientSection, loading]);
 
     const acceptedOrders = useMemo(
         () =>
@@ -897,10 +810,20 @@ export default function MessengerDashboard({
         () => sortAcceptedOrdersByAge(acceptedOrders, acceptedSortOrder),
         [acceptedOrders, acceptedSortOrder]
     );
+
+    // ✅ MODIFICADO: Se agregó ordenamiento por fecha descendente
     const deliveredOrders = useMemo(
-        () => orders.filter((order) => order.deliveryStatus === 'delivered'),
+        () => orders
+            .filter((order) => order.deliveryStatus === 'delivered')
+            .sort((a, b) => {
+                const dateA = a.paymentCollectedAt || a.updatedAt || a.createdAt;
+                const dateB = b.paymentCollectedAt || b.updatedAt || b.createdAt;
+                if (!dateA || !dateB) return 0;
+                return dateB.getTime() - dateA.getTime();
+            }),
         [orders]
     );
+
     const notDeliveredOrders = useMemo(
         () => orders.filter((order) => order.deliveryStatus === 'not_delivered'),
         [orders]
@@ -1277,7 +1200,7 @@ export default function MessengerDashboard({
                                     ))
                                 ) : (
                                     <div className="messenger-order-card rounded-[28px] border p-8 text-sm font-semibold">
-                                        No hay entregas completadas hoy.
+                                        No hay entregas completadas.
                                     </div>
                                 )}
                             </div>

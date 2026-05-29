@@ -76,6 +76,17 @@ export const Users = {
     institutionalId: 'SRV-2023-011',
     isActive: true,
   },
+  ROBERTO: {
+    uid: 'user-roberto',
+    email: 'roberto.operador@fcyt.umss.edu',
+    displayName: 'Roberto Sánchez',
+    photoURL:
+      'https://ui-avatars.com/api/?name=Roberto+Sanchez&background=8A2BE2&color=fff',
+    authType: 'email',
+    roles: ['operador_inv'],
+    institutionalId: 'OPR-2021-003',
+    isActive: true,
+  },
   ADMIN: {
     uid: 'user-admin',
     email: 'admin@umss.edu',

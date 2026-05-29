@@ -127,74 +127,12 @@ async function updateTestInventory(productId: string, data: Record<string, unkno
   await mirrorDocumentToDefaultEmulator('inventory', productId, data);
 }
 
-async function seedUserCartItem({
-  userId,
-  productId,
-  quantity = 1,
-  priceAtAdd,
-}: {
-  userId: string;
-  productId: string;
-  quantity?: number;
-  priceAtAdd?: number;
-}) {
-  const cartItemId = `cart-${userId}-${productId}`;
-  const payload: Record<string, unknown> = {
-    cartItemId,
-    userId,
-    productId,
-    quantity,
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-  };
-
-  if (typeof priceAtAdd === 'number') {
-    payload.priceAtAdd = priceAtAdd;
-  }
-
-  await getTestDb()
-    .collection('users')
-    .doc(userId)
-    .collection('cartItems')
-    .doc(cartItemId)
-    .set(payload);
-
-  await mirrorDocumentToDefaultEmulator(`users/${userId}/cartItems`, cartItemId, {
-    cartItemId,
-    userId,
-    productId,
-    quantity,
-    updatedAt: new Date().toISOString(),
-    ...(typeof priceAtAdd === 'number' ? { priceAtAdd } : {}),
-  });
-}
-
 async function seedLocalCart(
   page: Page,
   productId: string,
   priceAtAdd: number,
 ) {
   await page.addInitScript(
-    ({ cartKey, item }) => {
-      window.localStorage.setItem(cartKey, JSON.stringify([item]));
-    },
-    {
-      cartKey: CART_KEY,
-      item: {
-        productId,
-        quantity: 1,
-        updatedAt: Date.now(),
-        priceAtAdd,
-      },
-    },
-  );
-}
-
-async function setLocalCartOnce(
-  page: Page,
-  productId: string,
-  priceAtAdd: number,
-) {
-  await page.evaluate(
     ({ cartKey, item }) => {
       window.localStorage.setItem(cartKey, JSON.stringify([item]));
     },
@@ -224,45 +162,63 @@ test.afterEach(async ({ page }, testInfo) => {
 });
 
 test.describe('Cart - Carrito', () => {
-  test.describe.configure({ mode: 'serial' });
   test.setTimeout(90_000);
 
   async function loginWithEmail(page: Page, email: string) {
     await page.goto('/login');
-    await expect(
-      page.locator('form').getByRole('button', {
-        name: 'Iniciar sesión',
-        exact: true,
-      })
-    ).toBeEnabled({ timeout: 15_000 });
+    const loginButton = page.locator('form').getByRole('button', {
+      name: 'Iniciar sesión',
+      exact: true,
+    });
+
+    await expect(loginButton).toBeEnabled({ timeout: 15_000 });
     await expect(page.getByLabel('Correo electrónico')).toBeEditable();
     await expect(page.locator('#password')).toBeEditable();
-    await page.waitForLoadState('networkidle');
+    await expect
+      .poll(
+        async () => {
+          try {
+            return await page.evaluate(() => {
+              const button = document
+                .querySelector('form')
+                ?.querySelector('button[type="button"]');
+              return Boolean(
+                button &&
+                  Object.keys(button).some((key) => key.startsWith('__reactProps'))
+              );
+            });
+          } catch (e) {
+            return false;
+          }
+        },
+        { timeout: 15_000 }
+      )
+      .toBe(true);
 
     const emailField = page.getByLabel('Correo electrónico');
     const passwordField = page.locator('#password');
 
-    for (let attempt = 0; attempt < 3; attempt++) {
-      await emailField.fill(email);
-      await passwordField.fill('password123');
-      await page.waitForTimeout(250);
+    // Fill right before clicking to minimize autofill interference window
+    await emailField.fill(email);
+    await passwordField.fill('12345678');
 
-      if (
-        (await emailField.inputValue()) === email &&
-        (await passwordField.inputValue()) === 'password123'
-      ) {
-        break;
-      }
+    // Retry if autofill overwrites the values
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const currentEmail = await emailField.inputValue();
+      const currentPass = await passwordField.inputValue();
+      if (currentEmail === email && currentPass === '12345678') break;
+      await emailField.fill(email);
+      await passwordField.fill('12345678');
+      await page.waitForTimeout(150);
     }
 
-    await expect(emailField).toHaveValue(email, { timeout: 10_000 });
-    await expect(passwordField).toHaveValue('password123', { timeout: 10_000 });
     await page
       .locator('form')
       .getByRole('button', { name: 'Iniciar sesión', exact: true })
       .click();
     await expect(page).toHaveURL('/', { timeout: 30_000 });
   }
+
 
   async function expectCartPage(page: Page) {
     await expect(page).toHaveTitle(/Mi Carrito \| SansiStore/);
@@ -283,13 +239,15 @@ test.describe('Cart - Carrito', () => {
     page,
   }) => {
     await loginWithEmail(page, 'juan.paredes@est.umss.edu');
-    await setLocalCartOnce(page, 'leche-pil-natural-900-ml', 9.7);
 
     await page.goto('/carrito');
     await expectFilledCartPage(page);
 
-    await expect(page.locator('a[href="/productos/leche-pil-natural-900-ml"]').filter({ hasText: 'Leche PIL Natural 900 ml' }).first()).toBeVisible();
-    await expect(page.getByText(/Bs\s(9\.70|12\.50)\s*\/ u/).first()).toBeVisible();
+    await expect(page.locator('section').getByText('Leche PIL Natural 900 ml')).toBeVisible();
+    await expect(page.getByText('Bs 9.70 / u')).toBeVisible();
+
+    await expect(page.locator('section').getByText('Pan Integral Bimbo (precio rebajado)')).toBeVisible();
+    await expect(page.getByText('Bs 15.00 Bs 10.00 / u')).toBeVisible();
   });
 
   test('should show empty cart message when user has no items', async ({
