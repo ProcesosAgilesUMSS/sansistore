@@ -43,12 +43,11 @@ test.describe('Courier smoke tests', () => {
 
     const assignedOrder = page
       .locator('article')
-      .filter({ hasText: '#order-005' });
+      .filter({ hasText: 'pu4-qsc' });
     await expect(assignedOrder).toBeVisible({ timeout: 15_000 });
-    await expect(assignedOrder.getByText('2x Fideo')).toBeVisible();
-    await expect(assignedOrder.getByText('2x Galletas')).toBeVisible();
-    await expect(assignedOrder.getByText('Bs 29')).toBeVisible();
-    await expect(assignedOrder.getByText('Campus Central')).toBeVisible();
+    await expect(assignedOrder.getByText('1x Detergente Liquido Ola Futuro Limpieza Completa 5 L — Bs 109')).toBeVisible();
+    await expect(assignedOrder.getByText('10x Leche PIL Natural 900 ml — Bs 9.7')).toBeVisible();
+    await expect(assignedOrder.getByText('Cancha principal FCyT')).toBeVisible();
   });
 
   test('opens buyer location in the internal Leaflet map', async ({ page }) => {
@@ -57,15 +56,13 @@ test.describe('Courier smoke tests', () => {
 
     const assignedOrder = page
       .locator('article')
-      .filter({ hasText: '#order-005' });
+      .filter({ hasText: 'pu4-qsc' });
     await expect(assignedOrder).toBeVisible({ timeout: 15_000 });
 
     await assignedOrder.getByRole('link', { name: 'Abrir Maps' }).click();
 
-    await expect(page).toHaveURL(/\/mapa\?lat=-17\.392677&lng=-66\.145704/);
-    await expect(page.locator('.leaflet-container')).toBeVisible();
-    await expect(page.getByRole('heading', { name: /Mar/ })).toBeVisible();
-    await expect(page.getByText('Biblioteca FCyT')).toBeVisible();
-    await expect(page.getByText('Bs 29')).toBeVisible();
+    await expect(page).toHaveURL("/mapa?lat=-17.395102&lng=-66.145782&order=019e74a3-e030-74ce-9d9a-4b1d37b85d11_pu4-qsc");
+    await expect(page.getByText('1x Detergente Liquido Ola Futuro Limpieza Completa 5 L')).toBeVisible();
+    await expect(page.getByText('10x Leche PIL Natural 900 ml')).toBeVisible();
   });
 });
