@@ -335,3 +335,9 @@
 - **Yesterday:** Trabajé en el bug crítico que consistía en que no podía verse el mapa desde la vista del mensajero, fue corregido y testeado.
 - **Today:** Me comuniqué con un miembro del equipo DMinds para hablar y tratar bugs que se detectaron para este sprint. Trabajaré en la siguiente historia de usuario asignada.
 - **Blockers:** Detección de bugs.
+
+### Adrian
+
+- **Yesterday:** Estuve trabajando en la validación de datos, agregando más detalle a los criterios.
+- **Today:** Terminaré de corregir el bug.
+- **Blockers:** None.
