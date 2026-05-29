@@ -6,6 +6,7 @@ import { auth } from "../../../lib/firebase";
 import RouteGuard from "../../../components/RouteGuard";
 import GridSpinner from "./GridSpinner";
 import LoadingMessage from "./LoadingMessage";
+import { parseOrderId } from "../../cart/services/orderService";
 import {
   ChevronDown,
   Filter,
@@ -242,6 +243,7 @@ function OrderCard({
 }: {
   order: Order;
 }) {
+  const { uuid, friendlyName } = parseOrderId(order.id);
   const handleClick = () => {
     window.location.href = `/orders/${order.id}`;
   };
@@ -253,15 +255,13 @@ function OrderCard({
     >
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-0.5">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-text-light/40">
-              Orden
-            </span>
-            <span className="text-xs font-mono font-bold text-text-light truncate group-hover:text-primary transition-colors">
-              {order.id}
-            </span>
-          </div>
-          <p className="text-sm text-text-light/80 truncate">
+          <span className="font-mono text-[10px] font-bold text-text-light/40 truncate block">
+            {uuid}
+          </span>
+          <span className="font-bold text-text-light group-hover:text-primary transition-colors">
+            {friendlyName.replace(/-/g, ' ')}
+          </span>
+          <p className="text-sm text-text-light/80 truncate mt-0.5">
             {order.delivery.destination}
           </p>
         </div>

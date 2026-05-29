@@ -224,13 +224,11 @@ async function seedOrders() {
       pending_reassignment: 'PENDIENTE',
     };
 
-    const deliveryCode = order.code.replace('order', 'delivery');
-    const paymentCode = order.code.replace('order', 'payment');
-
-    await setDoc('orders', order.code, {
-      orderId: order.code,
+    await setDoc('orders', order.id, {
+      orderId: order.id,
+      secret: order.secret,
       buyerId: order.buyer.uid,
-      sellerId: order.seller.uid,
+      sellerId: order.seller?.uid || null,
       customerName: order.customerName,
       customerPhone: order.customerPhone,
       address: order.address ?? null,
@@ -240,8 +238,8 @@ async function seedOrders() {
       locationId: order.location.id,
       paymentStatus: paymentStatusMap[deliveryStatus] || 'PENDIENTE',
       deliveryStatus,
-      deliveryId: deliveryStatus !== 'created' ? deliveryCode : null,
-      paymentId: paymentCode,
+      deliveryId: null,
+      paymentId: order.id,
       confirmedAt: toTimestamp(order.confirmedAt),
       cancelledAt: null,
       createdAt: toTimestamp(order.createdAt),
@@ -249,12 +247,12 @@ async function seedOrders() {
     });
 
     for (const item of items) {
-      await setDoc(`orders/${order.code}/orderItems`, item.itemId, item);
+      await setDoc(`orders/${order.id}/orderItems`, item.itemId, item);
     }
 
-    await setDoc('payments', paymentCode, {
-      paymentId: paymentCode,
-      orderId: order.code,
+    await setDoc('payments', order.id, {
+      paymentId: order.id,
+      orderId: order.id,
       amount: total,
       method: 'cash_on_delivery',
       status: paymentStatusMap[deliveryStatus] || 'PENDIENTE',

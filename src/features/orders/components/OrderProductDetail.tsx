@@ -3,6 +3,7 @@ import { STATUS_LABELS } from "../types";
 import type { Order } from "../types";
 import GridSpinner from "./GridSpinner";
 import LoadingMessage from "./LoadingMessage";
+import { parseOrderId } from "../../cart/services/orderService";
 
 interface OrderProductDetailProps {
   order: Order;
@@ -18,6 +19,7 @@ export default function OrderProductDetail({
   isReserving,
 }: OrderProductDetailProps) {
   const hasItems = order.items.length > 0;
+  const { uuid, friendlyName } = parseOrderId(order.id);
 
   return (
     <section aria-labelledby="order-detail-title">
@@ -27,11 +29,12 @@ export default function OrderProductDetail({
             <span className="text-primary">/</span>
             Detalle del pedido
           </p>
+          <p className="text-xs font-mono text-text-light/40 mb-1">{uuid}</p>
           <h3
             id="order-detail-title"
             className="text-[clamp(1.75rem,4vw,3rem)] font-black tracking-[-0.04em] leading-none text-text-light"
           >
-            {order.id}
+            {friendlyName.replace(/-/g, ' ')}
           </h3>
           <p className="text-sm text-text-light/80 mt-4">
             Destino: {order.delivery.destination}

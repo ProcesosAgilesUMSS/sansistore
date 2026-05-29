@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 export type OrderStatus = 'pending' | 'preparing' | 'in_transit' | 'delivered' | 'cancelled' | 'CREADO' | 'RESERVADO' | 'PENDIENTE' | 'EMPAQUETADO';
 
 export const STATUS_LABELS: Record<OrderStatus, string> = {
@@ -18,7 +20,7 @@ export interface OrderItem {
   itemId: string;
   productId: string;
   productName: string;
-  price: number;
+  unitPrice: number;
   quantity: number;
   subtotal: number;
   description?: string;
@@ -26,17 +28,18 @@ export interface OrderItem {
 
 export interface Order {
   id: string;
+  secret?: string;
   buyerId: string;
   sellerId?: string;
   status: OrderStatus;
   buyerReceptionConfirmed?: boolean;
-  buyerReceptionConfirmedAt?: FirestoreDateLike;
+  buyerReceptionConfirmedAt: Timestamp | null;
   delivery: {
     destination: string;
   };
   total?: number;
   items: OrderItem[];
-  createdAt: Date | any;
+  createdAt: Timestamp;
 }
 
 export type ReturnStatus = 'pending_review' | 'approved' | 'rejected';
@@ -49,5 +52,5 @@ export interface ReturnRequest {
   productName: string;
   reason: string;
   status: ReturnStatus;
-  createdAt: any;
+  createdAt: Timestamp;
 }

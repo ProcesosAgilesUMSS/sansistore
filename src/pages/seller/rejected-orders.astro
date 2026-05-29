@@ -1,0 +1,8 @@
+---
+import SellerLayout from '../../layouts/SellerLayout.astro';
+import RejectedOrdersPanel from '../../features/seller/components/RejectedOrdersPanel';
+---
+
+<SellerLayout title="Asignar mensajeros">
+  <RejectedOrdersPanel client:load embedded />
+</SellerLayout>

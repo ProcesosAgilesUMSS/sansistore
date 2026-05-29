@@ -37,6 +37,14 @@ const DEV_COURIER_ID = 'user-nadia';
 
 const formatBolivianos = (amount: number) => `Bs ${amount}`;
 
+const formatDate = (date: Date | null | undefined) => {
+    if (!date) return 'Fecha no disponible';
+    return new Intl.DateTimeFormat('es-BO', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+    }).format(date);
+};
+
 const formatOrderAgeDate = (order: MessengerOrder) => {
     const date = order.assignedAt ?? order.createdAt ?? order.updatedAt;
 
@@ -308,14 +316,24 @@ function PendingOrderCard({
             </div>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <button
+                <a
+                        className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+                        href={sellerLocationUrl ?? '#'}
+                        rel="noreferrer"
+                        target="_blank"
+                    >
+                        <Send size={17} />
+                        Ubi. Vendedor
+                    </a>
+                <a
                     className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-                    onClick={() => openDeliveryMap(order)}
-                    type="button"
+                    href={sellerLocationUrl ?? '#'}
+                    rel="noreferrer"
+                    target="_blank"
                 >
                     <Send size={17} />
-                    Abrir en Maps
-                </button>
+                    Abrir Maps
+                </a>
 
                 {order.deliveryStatus !== 'assigned' && (
                     <button
@@ -393,7 +411,9 @@ function PendingOrderCard({
     );
 }
 
+// ✅ MODIFICADO: Se agregó la fecha de entrega
 function DeliveredOrderRow({ order }: { order: MessengerOrder }) {
+    const deliveryDate = order.paymentCollectedAt || order.updatedAt || order.createdAt;
     return (
         <article className="messenger-delivered-row flex items-center justify-between gap-4 rounded-[26px] border p-6 shadow-[0_10px_24px_rgba(18,32,56,0.06)]">
             <div className="flex items-center gap-4">
@@ -401,8 +421,11 @@ function DeliveredOrderRow({ order }: { order: MessengerOrder }) {
                     <CheckCircle2 size={20} />
                 </span>
                 <div>
-                    <h3 className="font-black">#{order.id}</h3>
+                    <h3 className="font-black">#{order.orderCode || order.id}</h3>
                     <p className="messenger-copy text-sm">{order.customerName}</p>
+                    <p className="messenger-muted mt-1 text-xs">
+                        Entregado: {formatDate(deliveryDate)}
+                    </p>
                 </div>
             </div>
             <div className="flex shrink-0 items-center gap-4">
@@ -678,6 +701,7 @@ export default function MessengerDashboard({
                 }
             );
         };
+        
 
         const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
             const devCourierId =
@@ -786,10 +810,20 @@ export default function MessengerDashboard({
         () => sortAcceptedOrdersByAge(acceptedOrders, acceptedSortOrder),
         [acceptedOrders, acceptedSortOrder]
     );
+    
+    // ✅ MODIFICADO: Se agregó ordenamiento por fecha descendente
     const deliveredOrders = useMemo(
-        () => orders.filter((order) => order.deliveryStatus === 'delivered'),
+        () => orders
+            .filter((order) => order.deliveryStatus === 'delivered')
+            .sort((a, b) => {
+                const dateA = a.paymentCollectedAt || a.updatedAt || a.createdAt;
+                const dateB = b.paymentCollectedAt || b.updatedAt || b.createdAt;
+                if (!dateA || !dateB) return 0;
+                return dateB.getTime() - dateA.getTime();
+            }),
         [orders]
     );
+    
     const notDeliveredOrders = useMemo(
         () => orders.filter((order) => order.deliveryStatus === 'not_delivered'),
         [orders]
@@ -1166,7 +1200,7 @@ export default function MessengerDashboard({
                                     ))
                                 ) : (
                                     <div className="messenger-order-card rounded-[28px] border p-8 text-sm font-semibold">
-                                        No hay entregas completadas hoy.
+                                        No hay entregas completadas.
                                     </div>
                                 )}
                             </div>

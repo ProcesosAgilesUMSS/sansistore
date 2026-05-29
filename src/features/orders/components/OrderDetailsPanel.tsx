@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ArrowLeft, MapPin, Package, Calendar, AlertCircle, CheckCircle } from 'lucide-react';
 import type { Order } from '../types';
 import { confirmOrderReception, createReturnRequest } from '../services/ordersService';
+import { Timestamp } from 'firebase/firestore';
+import { parseOrderId } from '../../cart/services/orderService';
 
 interface OrderDetailsPanelProps {
   order: Order;
@@ -29,17 +31,7 @@ const getStatusLabel = (status: string) => {
 
 function formatDateTime(value: Order['buyerReceptionConfirmedAt']) {
   if (!value) return null;
-
-  const date =
-    typeof value === 'string'
-      ? new Date(value)
-      : value instanceof Date
-        ? value
-        : value.toDate();
-
-  if (Number.isNaN(date.getTime())) return null;
-
-  return date.toLocaleString('es-BO', {
+  return value.toDate().toLocaleString('es-BO', {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
@@ -49,6 +41,7 @@ function formatDateTime(value: Order['buyerReceptionConfirmedAt']) {
 }
 
 export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: OrderDetailsPanelProps) {
+  const { uuid, friendlyName } = parseOrderId(order.id);
   const [showReturnForm, setShowReturnForm] = useState(false);
   const [showReceptionConfirm, setShowReceptionConfirm] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState<string>('');
@@ -58,9 +51,9 @@ export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: O
   const [receptionError, setReceptionError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const orderDate = order.createdAt?.toDate ? order.createdAt.toDate() : new Date();
-  const formattedDate = orderDate.toLocaleDateString('es-BO', { 
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit' 
+  const orderDate = order.createdAt.toDate();
+  const formattedDate = orderDate.toLocaleDateString('es-BO', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
   });
 
   const now = new Date();
@@ -82,7 +75,7 @@ export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: O
         ...order,
         status: 'delivered' as const,
         buyerReceptionConfirmed: true,
-        buyerReceptionConfirmedAt: new Date(),
+        buyerReceptionConfirmedAt: Timestamp.fromDate(new Date()),
       };
       onOrderConfirmed?.(updatedOrder);
       setShowReceptionConfirm(false);
@@ -123,18 +116,19 @@ export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: O
 
   return (
     <div className="bg-(--theme-card-bg) border border-(--theme-border) rounded-[1.25rem] p-6 shadow-sm flex flex-col gap-6">
-      
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-(--theme-border) pb-4">
         <div className="flex items-start gap-4">
-          <button 
+          <button
             onClick={onBack}
             className="p-2 hover:bg-(--theme-secondary-bg) rounded-full transition-colors opacity-70 hover:opacity-100"
           >
             <ArrowLeft size={20} />
           </button>
           <div>
+            <p className="text-[10px] font-mono text-text-light/40">{uuid}</p>
             <h2 className="font-display font-extrabold text-xl tracking-tight">
-              Pedido #{order.id.substring(0,8).toUpperCase()}
+              {friendlyName.replace(/-/g, ' ')}
             </h2>
             <p className="text-xs opacity-60 flex items-center gap-1 mt-1">
               <Calendar size={12} /> {formattedDate}
@@ -146,12 +140,25 @@ export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: O
         </span>
       </div>
 
-      <div className="bg-(--theme-secondary-bg) p-4 rounded-xl flex items-start gap-3">
-        <MapPin className="text-primary mt-0.5 shrink-0" size={18} />
-        <div>
-          <h4 className="text-sm font-bold mb-1">Ubicación de entrega</h4>
-          <p className="text-sm opacity-80">{order.delivery.destination}</p>
+      <div className="bg-(--theme-secondary-bg) p-4 rounded-xl flex flex-col gap-3">
+        <div className="flex items-start gap-3">
+          <MapPin className="text-primary mt-0.5 shrink-0" size={18} />
+          <div>
+            <h4 className="text-sm font-bold mb-1">Ubicación de entrega</h4>
+            <p className="text-sm opacity-80">{order.delivery.destination}</p>
+          </div>
         </div>
+        {order.secret && (
+          <div className="flex items-start gap-3 pt-3 border-t border-(--theme-border)">
+            <div className="flex items-center justify-center w-5 h-5 mt-0.5 shrink-0 rounded-full bg-primary/10 text-primary font-bold text-xs">
+              <span>#</span>
+            </div>
+            <div>
+              <h4 className="text-sm font-bold mb-1">Código de seguridad</h4>
+              <p className="text-lg font-mono font-black tracking-widest text-primary">{order.secret}</p>
+            </div>
+          </div>
+        )}
       </div>
 
       <div>
@@ -241,7 +248,7 @@ export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: O
             </div>
           )}
         </div>
-        
+
         {success ? (
           <div className="bg-green-500/10 text-green-600 p-4 rounded-xl flex flex-col items-center justify-center gap-2 text-center">
             <CheckCircle size={24} />
@@ -251,8 +258,8 @@ export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: O
         ) : showReturnForm ? (
           <div className="bg-(--theme-secondary-bg) p-4 rounded-xl flex flex-col gap-4 animate-in fade-in slide-in-from-top-4">
             <h4 className="font-bold text-sm">Detalles de la devolución</h4>
-            
-            <select 
+
+            <select
               value={selectedProductId}
               onChange={(e) => setSelectedProductId(e.target.value)}
               className="w-full p-2.5 rounded-lg border border-(--theme-border) bg-(--theme-bg) text-sm"
@@ -263,7 +270,7 @@ export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: O
               ))}
             </select>
 
-            <textarea 
+            <textarea
               value={returnReason}
               onChange={(e) => setReturnReason(e.target.value)}
               placeholder="Explica brevemente el motivo de la devolución..."
@@ -271,13 +278,13 @@ export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: O
             />
 
             <div className="flex justify-end gap-3 mt-2">
-              <button 
+              <button
                 onClick={() => setShowReturnForm(false)}
                 className="px-4 py-2 text-sm font-bold opacity-60 hover:opacity-100"
               >
                 Cancelar
               </button>
-              <button 
+              <button
                 onClick={handleSubmitReturn}
                 disabled={!selectedProductId || !returnReason.trim() || isSubmitting}
                 className="px-5 py-2 bg-primary text-(--theme-bg) rounded-full text-sm font-bold disabled:opacity-50 transition-all active:scale-95"
@@ -289,7 +296,7 @@ export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: O
         ) : (
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             {canRequestReturn ? (
-              <button 
+              <button
                 onClick={() => setShowReturnForm(true)}
                 className="w-full sm:w-auto flex justify-center items-center gap-2 px-5 py-2.5 rounded-full border border-(--theme-text) text-sm font-bold transition-all hover:bg-(--theme-text) hover:text-(--theme-bg) active:scale-95"
               >
@@ -297,8 +304,8 @@ export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: O
               </button>
             ) : (
               <p className="text-xs opacity-50 italic">
-                {order.status !== 'delivered' 
-                  ? 'Las devoluciones solo están disponibles para pedidos entregados.' 
+                {order.status !== 'delivered'
+                  ? 'Las devoluciones solo están disponibles para pedidos entregados.'
                   : 'El plazo de 72 horas para devolver este pedido ha expirado.'}
               </p>
             )}
