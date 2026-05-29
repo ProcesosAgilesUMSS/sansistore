@@ -330,3 +330,8 @@
 - **Yesterday:** Estube trabajando para añadir la funcionalidad pedida de agregar un boton de pago  para confirmar el cobro del dinero de un pedido en la vista de rendición
 - **Today:** Continue trabajando en esa funcionalidad y espero terminarlo hoy.
 - **Blockers:** None.
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Trabajé en el bug crítico que consistía en que no podía verse el mapa desde la vista del mensajero, fue corregido y testeado.
+- **Today:** Me comuniqué con un miembro del equipo DMinds para hablar y tratar bugs que se detectaron para este sprint. Trabajaré en la siguiente historia de usuario asignada.
+- **Blockers:** Detección de bugs.
