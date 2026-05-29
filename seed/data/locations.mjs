@@ -31,10 +31,10 @@ export const Locations = {
   LOC_MARIA: {
     id: 'loc-maria',
     user: Users.MARIA,
-    label: 'Biblioteca Central UMSS',
-    type: 'oficina',
-    lat: -17.393988,
-    lng: -66.146612,
+    label: 'Biblioteca FCyT',
+    type: 'BIBLIOTECA',
+    lat: -17.392677,
+    lng: -66.145704,
     isDefault: true,
   },
   LOC_JUAN: {

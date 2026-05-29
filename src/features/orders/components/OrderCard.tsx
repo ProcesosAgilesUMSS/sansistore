@@ -57,7 +57,7 @@ export default function OrderCard({ order }: OrderCardProps) {
               </span>
             </div>
             <span className="font-display font-extrabold text-base mt-0.5">
-              {friendlyName.replace(/-/g, ' ')}
+                {friendlyName}
             </span>
           </div>
 

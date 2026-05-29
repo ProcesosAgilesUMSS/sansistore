@@ -128,7 +128,7 @@ export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: O
           <div>
             <p className="text-[10px] font-mono text-text-light/40">{uuid}</p>
             <h2 className="font-display font-extrabold text-xl tracking-tight">
-              {friendlyName.replace(/-/g, ' ')}
+              {friendlyName}
             </h2>
             <p className="text-xs opacity-60 flex items-center gap-1 mt-1">
               <Calendar size={12} /> {formattedDate}
