@@ -32,9 +32,10 @@ import {
     type AcceptedOrderSort,
 } from '../utils/acceptedOrderSorting';
 import UndeliveredModal from '../modals/UndeliveredModal';
-import ConfirmPaymentModal from '../modals/ConfirmPaymentModal';
+
 import CancelNoPaymentModal from '../modals/CancelNoPaymentModal';
 import './MessengerDashboard.css';
+import ConfirmPaymentModal from '../modals/Confirmpaymentmodal';
 
 const DEV_COURIER_ID = 'user-nadia';
 
@@ -459,7 +460,7 @@ function PendingOrderCard({
     );
 }
 
-// ✅ MODIFICADO: Se agregó la fecha de entrega
+// MODIFICADO: Se agregó la fecha de entrega
 function DeliveredOrderRow({ order }: { order: MessengerOrder }) {
     const deliveryDate = order.paymentCollectedAt || order.updatedAt || order.createdAt;
     return (
@@ -958,24 +959,6 @@ const confirmPayment = async (order: MessengerOrder, secret: string) => {
         setConfirmPaymentOrder(null);
     } catch (error) {
         console.error(error);
-    const markAsDelivered = async (order: MessengerOrder) => {
-        if (!currentCourierId) {
-            setMessage('No se pudo identificar al mensajero para registrar el pago.');
-            return;
-        }
-
-        if (order.paymentStatusLabel === 'Cobrado') {
-            setMessage('Este pedido ya tiene el pago registrado.');
-            return;
-        }
-
-        const confirmed = window.confirm(
-            `Confirmar pago en efectivo de ${formatBolivianos(order.cashToCollect)} del pedido ${getOrderDisplayId(order)}.`
-        );
-
-        if (!confirmed) return;
-
-        const previousOrder = order;
         setOrders((currentOrders) =>
             currentOrders.map((currentOrder) =>
                 currentOrder.id === previousOrder.id ? previousOrder : currentOrder

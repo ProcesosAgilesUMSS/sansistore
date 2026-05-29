@@ -44,6 +44,7 @@ export interface MessengerOrderItem {
 export interface MessengerOrder {
   id: string;
   deliveryId: string;
+  secret?: string;  
   paymentId: string | null;
   customerName: string;
   buyerName: string;        
