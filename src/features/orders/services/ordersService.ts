@@ -80,53 +80,90 @@ async function processQuerySnapshot(querySnapshot: QuerySnapshot<DocumentData>):
         .filter((id): id is string => !!id)
     )
   );
+  const uniqueBuyerIds = Array.from(
+    new Set(
+      querySnapshot.docs
+        .map((doc) => (doc.data() as any).buyerId)
+        .filter((id): id is string => !!id)
+    )
+  );
 
   const locationMap = new Map<string, string>();
-  if (uniqueLocationIds.length > 0) {
-    await Promise.all(
-      uniqueLocationIds.map(async (id) => {
-        const locSnap = await getDoc(doc(db, "locations", id));
-        if (locSnap.exists()) {
-          locationMap.set(id, (locSnap.data() as any).label || "Sin etiqueta");
+  const buyerNameMap = new Map<string, string>();
+  const stockMap = new Map<string, number>();
+
+  await Promise.all([
+    ...uniqueLocationIds.map(async (id) => {
+      const locSnap = await getDoc(doc(db, "locations", id));
+      if (locSnap.exists()) {
+        locationMap.set(id, (locSnap.data() as any).label || "Sin etiqueta");
+      }
+    }),
+    ...uniqueBuyerIds.map(async (id) => {
+      const userSnap = await getDoc(doc(db, "users", id));
+      if (userSnap.exists()) {
+        buyerNameMap.set(id, (userSnap.data() as any).displayName || "Sin nombre");
+      } else {
+        buyerNameMap.set(id, "Usuario desconocido");
+      }
+    }),
+  ]);
+
+  const orders = await Promise.all(
+    querySnapshot.docs.map(async (orderDoc) => {
+      const data = orderDoc.data() as Record<string, any>;
+      const destination =
+        (data.locationId && locationMap.get(data.locationId)) ||
+        "Ubicación no encontrada";
+      const buyerName = buyerNameMap.get(data.buyerId) || "Usuario desconocido";
+
+      const itemsSnapshot = await getDocs(collection(orderDoc.ref, "orderItems"));
+      const items = await Promise.all(itemsSnapshot.docs.map(async (itemDoc) => {
+        const item = itemDoc.data();
+        let stockAvailable = 0;
+        
+        if (!stockMap.has(item.productId)) {
+          const invSnap = await getDoc(doc(db, "inventory", item.productId));
+          if (invSnap.exists()) {
+            stockMap.set(item.productId, invSnap.data().stockAvailable || 0);
+          } else {
+            stockMap.set(item.productId, 0);
+          }
         }
-      })
-    );
-  }
+        stockAvailable = stockMap.get(item.productId) || 0;
 
-  const orders = await Promise.all(querySnapshot.docs.map(async (orderDoc) => {
-    const data = orderDoc.data() as Record<string, any>;
-    const destination = (data.locationId && locationMap.get(data.locationId)) || "Ubicación no encontrada";
+        return {
+          itemId: itemDoc.id,
+          productId: item.productId,
+          productName: item.productName,
+          unitPrice: item.unitPrice,
+          quantity: item.quantity,
+          subtotal: item.subtotal,
+          description: item.description,
+          stockAvailable,
+        };
+      })) as OrderItem[];
 
-    const itemsSnapshot = await getDocs(collection(orderDoc.ref, "orderItems"));
-    const items = itemsSnapshot.docs.map(itemDoc => {
-      const item = itemDoc.data();
       return {
-        itemId: itemDoc.id,
-        productId: item.productId,
-        productName: item.productName,
-        unitPrice: item.unitPrice,
-        quantity: item.quantity,
-        subtotal: item.subtotal,
-        description: item.description,
+        id: orderDoc.id,
+        secret: data.secret,
+        buyerId: data.buyerId,
+        buyerName,
+        sellerId: data.sellerId,
+        status: data.status as OrderStatus,
+        buyerReceptionConfirmed:
+          data.buyerReceptionConfirmed || data.customerConfirmed || false,
+        buyerReceptionConfirmedAt:
+          data.buyerReceptionConfirmedAt ?? data.customerConfirmedAt ?? null,
+        delivery: {
+          destination,
+        },
+        items,
+        total: data.total,
+        createdAt: data.createdAt,
       };
-    }) as OrderItem[];
-
-    return {
-      id: orderDoc.id,
-      secret: data.secret,
-      buyerId: data.buyerId,
-      sellerId: data.sellerId,
-      status: data.status as OrderStatus,
-      buyerReceptionConfirmed: data.buyerReceptionConfirmed || data.customerConfirmed || false,
-      buyerReceptionConfirmedAt: data.buyerReceptionConfirmedAt ?? data.customerConfirmedAt ?? null,
-      delivery: {
-        destination
-      },
-      items,
-      total: data.total,
-      createdAt: data.createdAt
-    };
-  }));
+    })
+  );
 
   return orders.sort((a, b) => b.id.localeCompare(a.id));
 }
@@ -148,9 +185,24 @@ export async function getOrderById(orderId: string): Promise<Order | null> {
     }
   }
 
+  let buyerName = "Usuario desconocido";
+  if (data.buyerId) {
+    const userSnap = await getDoc(doc(db, "users", data.buyerId));
+    if (userSnap.exists()) {
+      buyerName = userSnap.data().displayName || "Sin nombre";
+    }
+  }
+
   const itemsSnapshot = await getDocs(collection(orderRef, "orderItems"));
-  const items = itemsSnapshot.docs.map((itemDoc) => {
+  const items = await Promise.all(itemsSnapshot.docs.map(async (itemDoc) => {
     const item = itemDoc.data();
+    let stockAvailable = 0;
+    
+    const invSnap = await getDoc(doc(db, "inventory", item.productId));
+    if (invSnap.exists()) {
+        stockAvailable = invSnap.data().stockAvailable || 0;
+    }
+
     return {
       itemId: itemDoc.id,
       productId: item.productId,
@@ -159,16 +211,19 @@ export async function getOrderById(orderId: string): Promise<Order | null> {
       quantity: item.quantity,
       subtotal: item.subtotal,
       description: item.description,
+      stockAvailable,
     };
-  }) as OrderItem[];
+  })) as OrderItem[];
 
   return {
     id: orderSnap.id,
     secret: data.secret,
     buyerId: data.buyerId,
+    buyerName,
     sellerId: data.sellerId,
     status: data.status as OrderStatus,
-    buyerReceptionConfirmed: data.buyerReceptionConfirmed || data.customerConfirmed || false,
+    buyerReceptionConfirmed:
+      data.buyerReceptionConfirmed || data.customerConfirmed || false,
     buyerReceptionConfirmedAt:
       data.buyerReceptionConfirmedAt ?? data.customerConfirmedAt ?? null,
     delivery: { destination },

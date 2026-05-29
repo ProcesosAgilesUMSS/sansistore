@@ -35,12 +35,14 @@ export interface OrderItem {
   quantity: number;
   subtotal: number;
   description?: string;
+  stockAvailable?: number;
 }
 
 export interface Order {
   id: string;
   secret?: string;
   buyerId: string;
+  buyerName?: string;
   sellerId?: string;
   status: OrderStatus;
   buyerReceptionConfirmed?: boolean;

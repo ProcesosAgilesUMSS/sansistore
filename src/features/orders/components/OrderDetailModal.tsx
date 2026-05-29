@@ -55,7 +55,7 @@ export default function OrderDetailModal({ order, closeModal }: { order: Order, 
         </div>
 
         <div className="col-start-1 col-end-4 truncate text-sm text-black/50 leading-[100%]">Comprador:</div>
-        <div className="col-start-4 col-end-13 leading-[100%]">{order.buyerId}</div>
+        <div className="col-start-4 col-end-13 leading-[100%]">{order.buyerName}</div>
         <div className="col-start-1 col-end-4 truncate text-sm text-black/50">Creación: </div>
         <div className="col-start-4 col-end-13">{date}</div>
         <div className="col-start-1 col-end-4 truncate text-sm text-black/50 leading-[100%]">Ubiación: </div>
@@ -76,6 +76,7 @@ export default function OrderDetailModal({ order, closeModal }: { order: Order, 
                 <div className="col-start-3 col-end-10 truncate ml-4">{item.productName}</div>
                 <div className="col-start-10 col-end-11 text-center">{item.unitPrice}</div>
                 <div className="col-start-13 col-end-14 text-center">{item.subtotal}</div>
+                <div className="col-start-16 col-end-17 text-center">{item.stockAvailable}</div>
               </li>
             ))}
           </ul>
