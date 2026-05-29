@@ -5,7 +5,6 @@ import {
   getDocs,
   doc,
   getDoc,
-  type Query,
   type DocumentData,
   updateDoc,
   onSnapshot,
@@ -18,61 +17,7 @@ import {
 import { db, auth } from "../../../lib/firebase";
 import type { Order, OrderStatus, OrderItem, ReturnRequest } from "../types";
 
-// --- Normalization Helpers (from main) ---
-
-function normalizeStatusValue(value: unknown) {
-  return String(value || '')
-    .trim()
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
-    .replace(/[_\s-]+/g, '_');
-}
-
-function normalizeBuyerOrderStatus(data: Record<string, unknown>): OrderStatus {
-  const deliveryStatus = normalizeStatusValue(data.deliveryStatus);
-  const orderStatus = normalizeStatusValue(data.status);
-
-  if (
-    deliveryStatus === 'delivered' ||
-    deliveryStatus === 'entregado' ||
-    orderStatus === 'completado' ||
-    orderStatus === 'entregado'
-  ) {
-    return 'delivered';
-  }
-  if (deliveryStatus === 'in_transit' || orderStatus === 'en_camino') return 'in_transit';
-  if (
-    deliveryStatus === 'accepted' ||
-    deliveryStatus === 'assigned' ||
-    orderStatus === 'aceptado' ||
-    orderStatus === 'asignado' ||
-    orderStatus === 'listo'
-  ) {
-    return 'preparing';
-  }
-  if (orderStatus === 'cancelado' || orderStatus === 'cancelled') return 'cancelled';
-
-  return (data.status as OrderStatus) || 'pending';
-}
-
-function isDeliveredForReception(data: Record<string, unknown>) {
-  const deliveryStatus = normalizeStatusValue(data.deliveryStatus);
-  const orderStatus = normalizeStatusValue(data.status);
-
-  return (
-    deliveryStatus === 'delivered' ||
-    deliveryStatus === 'entregado' ||
-    orderStatus === 'entregado' ||
-    orderStatus === 'completado'
-  );
-}
-
-function isReceptionConfirmed(data: Record<string, unknown>) {
-  return Boolean(data.buyerReceptionConfirmed || data.customerConfirmed);
-}
-
-// --- Seller Actions (from user branch) ---
+// --- Seller Actions ---
 
 export async function reserveOrder(orderId: string): Promise<void> {
   const user = auth.currentUser;
@@ -82,38 +27,24 @@ export async function reserveOrder(orderId: string): Promise<void> {
   await updateDoc(orderRef, {
     status: "RESERVADO",
     sellerId: user.uid,
-    reservedAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
 }
 
-export async function getSentOrders(): Promise<Order[]> {
-  const user = auth.currentUser;
-  if (!user) return [];
-
-  const q = query(
-    collection(db, "orders"),
-    where("sellerId", "==", user.uid),
-    where("deliveryStatus", "in", ["in_transit", "delivered", "IN_TRANSIT", "DELIVERED", "Entregado"])
-  );
-  return fetchOrdersByQuery(q);
+export async function readyOrder(orderId: string): Promise<void> {
+  const orderRef = doc(db, "orders", orderId);
+  await updateDoc(orderRef, {
+    status: "LISTO",
+    updatedAt: serverTimestamp(),
+  });
 }
 
-export async function getCreatedOrders(): Promise<Order[]> {
-  const q = query(
-    collection(db, "orders"),
-    where("status", "in", ["CREADO", "RESERVADO", "EMPAQUETADO", "PENDIENTE"]),
-    where("deliveryStatus", "==", null)
-  );
-  return fetchOrdersByQuery(q);
-}
-
-// --- Real-time Subscriptions (from user branch) ---
+// --- Real-time Subscriptions ---
 
 export function subscribeToCreatedOrders(onUpdate: (orders: Order[]) => void) {
   const q = query(
     collection(db, "orders"),
-    where("status", "in", ["CREADO", "RESERVADO", "EMPAQUETADO", "PENDIENTE"])
+    where("status", "==", "CREADO")
   );
 
   return onSnapshot(q, async (querySnapshot) => {
@@ -122,15 +53,26 @@ export function subscribeToCreatedOrders(onUpdate: (orders: Order[]) => void) {
   });
 }
 
-// --- Internal Processing Logic (merged) ---
+export function subscribeToSellerOrders(sellerId: string, onUpdate: (orders: Order[]) => void) {
+  const q = query(
+    collection(db, "orders"),
+    where("sellerId", "==", sellerId)
+  );
 
-async function fetchOrdersByQuery(q: Query<DocumentData>): Promise<Order[]> {
-  const querySnapshot = await getDocs(q);
-  return processQuerySnapshot(querySnapshot);
+  return onSnapshot(q, async (querySnapshot) => {
+    const orders = await processQuerySnapshot(querySnapshot);
+    onUpdate(orders);
+  });
 }
 
+export async function getSentOrders(): Promise<Order[]> {
+  return [];
+}
+
+// --- Internal Processing Logic ---
+
+
 async function processQuerySnapshot(querySnapshot: QuerySnapshot<DocumentData>): Promise<Order[]> {
-  // Optimización: Obtener todas las ubicaciones únicas primero para evitar N+1
   const uniqueLocationIds = Array.from(
     new Set(
       querySnapshot.docs
@@ -174,8 +116,8 @@ async function processQuerySnapshot(querySnapshot: QuerySnapshot<DocumentData>):
       secret: data.secret,
       buyerId: data.buyerId,
       sellerId: data.sellerId,
-      status: normalizeBuyerOrderStatus(data),
-      buyerReceptionConfirmed: isReceptionConfirmed(data),
+      status: data.status as OrderStatus,
+      buyerReceptionConfirmed: data.buyerReceptionConfirmed || data.customerConfirmed || false,
       buyerReceptionConfirmedAt: data.buyerReceptionConfirmedAt ?? data.customerConfirmedAt ?? null,
       delivery: {
         destination
@@ -225,8 +167,8 @@ export async function getOrderById(orderId: string): Promise<Order | null> {
     secret: data.secret,
     buyerId: data.buyerId,
     sellerId: data.sellerId,
-    status: normalizeBuyerOrderStatus(data),
-    buyerReceptionConfirmed: isReceptionConfirmed(data),
+    status: data.status as OrderStatus,
+    buyerReceptionConfirmed: data.buyerReceptionConfirmed || data.customerConfirmed || false,
     buyerReceptionConfirmedAt:
       data.buyerReceptionConfirmedAt ?? data.customerConfirmedAt ?? null,
     delivery: { destination },
@@ -262,11 +204,11 @@ export async function confirmOrderReception(orderId: string, buyerId: string) {
       throw new Error("No puedes confirmar la recepción de este pedido.");
     }
 
-    if (!isDeliveredForReception(data)) {
+    if (data.status !== 'ENTREGADO' && data.deliveryStatus !== 'DELIVERED') {
       throw new Error("Solo puedes confirmar pedidos marcados como entregados.");
     }
 
-    if (isReceptionConfirmed(data)) {
+    if (data.buyerReceptionConfirmed || data.customerConfirmed) {
       throw new Error("La recepción de este pedido ya fue confirmada.");
     }
 

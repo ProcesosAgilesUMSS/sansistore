@@ -172,7 +172,7 @@ export default function Navbar() {
             <div className="hidden md:flex items-center gap-8">
               {[
                 { label: 'Productos', href: '/productos', reqComprador: true },
-                { label: 'Ordenes', href: '/seller/reserved-orders', reqVendedor: true },
+                { label: 'Ordenes', href: '/seller/created-orders', reqVendedor: true },
                 { label: 'Inventario', href: '/inventory', reqOperadorInv: true },
                 { label: 'Entregas', href: '/courier', reqMensajero: true },
                 { label: 'Admin', href: '/admin', reqAdmin: true },
@@ -356,7 +356,7 @@ export default function Navbar() {
             <div className="md:hidden py-3 flex flex-col gap-3 border-t border-border-light">
               {[
                 { label: 'Productos', href: '/productos', reqComprador: true },
-                { label: 'Ordenes', href: '/seller/orders', reqVendedor: true },
+                { label: 'Ordenes', href: '/seller/created-orders', reqVendedor: true },
                 { label: 'Inventario', href: '/inventory', reqOperadorInv: true },
                 { label: 'Entregas', href: '/courier', reqMensajero: true },
                 { label: 'Admin', href: '/admin', reqAdmin: true },

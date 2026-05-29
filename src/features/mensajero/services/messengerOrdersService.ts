@@ -138,12 +138,10 @@ const mapMessengerOrder = async (
   const paymentStatus = String(order.paymentStatus || 'PENDIENTE');
   const customerName =
     asString(order.customerName) ||
-    asString(order.buyerName) ||
-    buyerName ||
     'Cliente no registrado';
   const address =
-    customerLocation.label ||
     asString(order.address) ||
+    customerLocation.label ||
     'Direccion no registrada';
   const courierZoneName =
     customerLocation.lat != null && customerLocation.lng != null
@@ -158,16 +156,19 @@ const mapMessengerOrder = async (
     paymentId: typeof order.paymentId === 'string' ? order.paymentId : null,
     orderCode: String(order.orderCode || order.code || legacyOrderCode || orderId || ''),
     customerName,
-    buyerName: customerName,
+    buyerName: asString(order.customerName) || buyerName || 'Comprador invitado',
     phone: String(order.customerPhone || order.phone || 'Sin telefono'),
     address,
     city: String(order.deliveryZone || 'Cochabamba'),
     locationLabel: customerLocation.label ?? undefined,
     deliveryLat: customerLocation.lat,
     deliveryLng: customerLocation.lng,
-    reference: courierZoneName,
+    reference:
+      asString(order.reference) ||
+      asString(order.locationLabel) ||
+      courierZoneName,
     items,
-    cashToCollect: Number(order.total || delivery.amountCollected || 0),
+    cashToCollect: Number(delivery.amountCollected || order.total || 0),
     paymentMethod: 'cash_on_delivery' as const,
     paymentStatus,
     paymentStatusLabel:
@@ -237,6 +238,7 @@ export function subscribeToMessengerOrders(
     }
   );
 }
+
 const getStatusForORder = (status: DeliveryStatus) => {
   switch (status) {
     case 'accepted':
@@ -364,7 +366,6 @@ export async function markMessengerOrderAsNotDelivered({
     });
   }
 
-  //Este es para los no entregados
   await setDoc(doc(db, 'undelivered_orders', order.id), {
     orderId: order.id,
     orderCode: order.orderCode,
@@ -385,6 +386,7 @@ export async function markMessengerOrderAsNotDelivered({
     createdAt: serverTimestamp(),
   });
 }
+
 export async function markMessengerOrderAsCancelledByNoPayment({
   order,
   notes,
@@ -410,18 +412,18 @@ export async function markMessengerOrderAsCancelledByNoPayment({
   });
 
   if (order.id) {
-  batch.update(doc(db, 'orders', order.id), {
-    status: 'CANCELADO',
-    deliveryStatus: 'CANCELLED',
-    paymentStatus: 'CANCELADO',
-    paymentStatusLabel: 'Cancelado por falta de pago',
-    incidentReason: reason,
-    incidentNotes: notes,
-    cancelledAt,
-    cancelledBy: courierId,
-    updatedAt: cancelledAt,
-  });
-}
+    batch.update(doc(db, 'orders', order.id), {
+      status: 'CANCELADO',
+      deliveryStatus: 'CANCELLED',
+      paymentStatus: 'CANCELADO',
+      paymentStatusLabel: 'Cancelado por falta de pago',
+      incidentReason: reason,
+      incidentNotes: notes,
+      cancelledAt,
+      cancelledBy: courierId,
+      updatedAt: cancelledAt,
+    });
+  }
 
   if (order.paymentId) {
     batch.set(

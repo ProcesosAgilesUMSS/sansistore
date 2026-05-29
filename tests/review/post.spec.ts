@@ -22,7 +22,7 @@ export default defineConfig({
   },
 });
 
-test.describe('Post', () => {
+test.describe('Post and Manage Reviews', () => {
   async function waitForLoginForm(page: Page) {
     const loginButton = page.locator('form').getByRole('button', {
       name: 'Iniciar sesión',
@@ -34,7 +34,7 @@ test.describe('Post', () => {
     await expect(page.locator('#password')).toBeEditable();
   }
 
- async function fillLoginCredentials(page: Page, email: string) {
+  async function fillLoginCredentials(page: Page, email: string) {
     const emailField = page.getByLabel('Correo electrónico');
     const passwordField = page.locator('#password');
 
@@ -54,41 +54,74 @@ test.describe('Post', () => {
     return { emailField, passwordField };
   }
 
-  test('should post a review for a product', async ({ page }) => {
+  test.beforeEach(async ({ page }) => {
     await page.goto('/login');
     await waitForLoginForm(page);
-
-    const { emailField, passwordField } = await fillLoginCredentials(
-      page,
-      'juan.paredes@est.umss.edu'
-    );
-
-    expect(await emailField.inputValue()).toBe('juan.paredes@est.umss.edu');
-    expect(await passwordField.inputValue()).toBe('12345678');
-
-    await page
-      .locator('form')
-      .getByRole('button', { name: 'Iniciar sesión', exact: true }).click();
-
+    await fillLoginCredentials(page, 'juan.paredes@est.umss.edu');
+    await page.locator('form').getByRole('button', { name: 'Iniciar sesión', exact: true }).click();
     await expect(page).not.toHaveURL(/.*\/login/);
+  });
 
-    await page.goto('/productos/aceite-fino-vegetal-900-ml');
+  const testProductUrl = '/productos/mocochinchi-soproma-100-gr';
 
-    await expect(
-      page.getByRole('heading', { name: 'Tu opinión' })
-    ).toBeVisible();
+  test('should manage the lifecycle of a product review', async ({ page }) => {
+    await page.goto(testProductUrl);
+    
+    const userOpinionContainer = page.locator('div.rounded-\\[2rem\\]', { hasText: 'Tu opinión' });
+    await expect(userOpinionContainer).toBeVisible();
 
-    const form = page.locator('form').filter({ hasText: 'Publicar comentario' });
-    await expect(form).toBeVisible();
+    const isFormVisible = await userOpinionContainer.getByText('Publicar comentario').isVisible();
+    const optionsButton = userOpinionContainer.locator('button.opacity-50.transition-colors');
 
-    const stars = form.locator('button[type="button"]');
-    await stars.nth(4).click();
+    if (!isFormVisible) {
+      await optionsButton.click();
+      await page.locator('.absolute.right-0').getByRole('button', { name: 'Eliminar' }).click();
+      await page.locator('.fixed.inset-0').getByRole('button', { name: 'Eliminar' }).click();
+      await expect(userOpinionContainer.getByText('Publicar comentario')).toBeVisible();
+    }
+
+    const form = userOpinionContainer.locator('form').filter({ hasText: 'Publicar comentario' });
+    
+    const publishStars = form.locator('button[type="button"]');
+    await publishStars.nth(2).click();
 
     const commentField = form.locator('#comment');
     await expect(commentField).toBeEditable();
-    await commentField.fill('Excelente producto, muy recomendado.');
+    await commentField.fill('Producto de calidad regular, cumple su función.');
 
-    await expect(page.getByText('Excelente producto, muy recomendado.')).toBeVisible();
-    await expect(page.getByText('Juan Paredes')).toBeVisible();
+    await page.getByRole('button', { name: 'Publicar comentario' }).click();
+
+    await expect(userOpinionContainer.getByText('Producto de calidad regular, cumple su función.')).toBeVisible();
+    await expect(userOpinionContainer.getByText('Juan Paredes')).toBeVisible();
+    await expect(form).not.toBeVisible();
+    await optionsButton.click();
+    await page.getByRole('button', { name: 'Editar' }).click();
+
+    const editForm = userOpinionContainer.locator('form').filter({ hasText: 'Guardar' });
+    await expect(editForm).toBeVisible();
+
+    const editStars = editForm.locator('button[type="button"]');
+    await editStars.nth(4).click(); // 5ta estrella (index 4)
+
+    const editCommentField = editForm.locator('textarea');
+    await editCommentField.clear();
+    await editCommentField.fill('Producto excelente, superó mis expectativas.');
+
+    await page.getByRole('button', { name: 'Guardar' }).click();
+
+    await expect(userOpinionContainer.getByText('Producto excelente, superó mis expectativas.')).toBeVisible();
+    await expect(editForm).not.toBeVisible();
+
+    await optionsButton.click();
+    await page.locator('.absolute.right-0').getByRole('button', { name: 'Eliminar' }).click();
+    
+    const modal = page.locator('.fixed.inset-0');
+    await expect(modal).toBeVisible();
+    await modal.getByRole('button', { name: 'Eliminar' }).click();
+
+    await expect(userOpinionContainer.getByText('Producto excelente, superó mis expectativas.')).not.toBeVisible();
+
+    await expect(userOpinionContainer.getByText('Publicar comentario')).toBeVisible();
   });
 });
+
