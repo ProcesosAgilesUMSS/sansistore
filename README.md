@@ -188,6 +188,7 @@ classDiagram
     +string secret
     +string buyerId
     +string sellerId
+    +string customerName
     +string status
     +string incidentReason
     +number total

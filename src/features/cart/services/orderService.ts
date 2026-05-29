@@ -148,7 +148,7 @@ export async function createOrder(params: CreateOrderParams): Promise<CreateOrde
     secret: orderSecret,
     buyerId: user.uid,
     sellerId: null,
-    customerName: user.displayName || user.email || 'Cliente no registrado',
+    customerName: user.displayName || 'Cliente no registrado',
     customerPhone: user.phoneNumber || '',
     address: selectedLocation.label,
     status: 'CREADO',
