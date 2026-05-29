@@ -4,7 +4,7 @@ import { Locations } from './locations.mjs';
 
 export const Orders = {
   ORDER_001: {
-    id: '019e6cd9-e41a-72de-8c6f-3ffefc7233ea_mosca-cruel-patinando',
+    id: '019e74a2-7569-77fe-8968-f25a71cc7356_xte-qsn',
     secret: '2491',
     buyer: Users.ANA,
     seller: Users.PEDRO,
@@ -22,7 +22,7 @@ export const Orders = {
     updatedAt: '2026-04-25T09:00:00.000Z',
   },
   ORDER_002: {
-    id: '019e6cdf-1f94-7381-8c6b-9ae28c5fd635_cabra-especial-buscando',
+    id: '019e74a3-4741-7552-b542-a53c01ca0cf5_wab-4ok',
     secret: '5763',
     buyer: Users.CARLOS,
     seller: Users.PEDRO,
@@ -40,7 +40,7 @@ export const Orders = {
     updatedAt: '2026-04-25T09:30:00.000Z',
   },
   ORDER_003: {
-    id: '019e6cdf-eba0-7032-a8ee-99e2fc0475cb_tiburon-diurno-saliendo',
+    id: '019e74a3-be7e-74b8-9c86-b63582359dbe_b8e-ees',
     secret: '8305',
     buyer: Users.MARIA,
     seller: null,
@@ -57,7 +57,7 @@ export const Orders = {
     updatedAt: '2026-04-24T14:30:00.000Z',
   },
   ORDER_004: {
-    id: '019e6ce0-1b0d-73e5-8bef-ff3d6116660d_nutria-timido-doblando',
+    id: '019e74a3-d006-739e-b281-04a5a451ecca_jm3-udk',
     secret: '6147',
     buyer: Users.JUAN,
     seller: null,
@@ -74,7 +74,7 @@ export const Orders = {
     updatedAt: '2026-04-24T10:45:00.000Z',
   },
   ORDER_005: {
-    id: '019e6ce0-5c23-7388-857d-21e3aa3594e6_cuervo-loco-decidiendo',
+    id: '019e74a3-e030-74ce-9d9a-4b1d37b85d11_pu4-qsc',
     secret: '3927',
     buyer: Users.MARIA,
     seller: Users.PEDRO,
@@ -92,7 +92,7 @@ export const Orders = {
     updatedAt: '2026-04-25T10:10:00.000Z',
   },
   ORDER_006: {
-    id: '019e6ce0-7b2d-73da-8582-37ba80a63ea0_triton-puntual-decidiendo',
+    id: '019e74a3-e030-74ce-9d9a-4b1d37b85d11_pu4-qsc',
     secret: '1582',
     buyer: Users.JUAN,
     seller: Users.PEDRO,
@@ -110,7 +110,7 @@ export const Orders = {
     updatedAt: '2026-04-25T11:15:00.000Z',
   },
   ORDER_007: {
-    id: '019e6ce0-9731-77df-b945-653f727d85fe_perro-camuflado-alimentando',
+    id: '019e74a4-0c66-769e-946b-6a2d98ec9d43_8dr-ani',
     secret: '7048',
     buyer: Users.ANA,
     seller: Users.PEDRO,
@@ -127,7 +127,7 @@ export const Orders = {
     updatedAt: '2026-04-25T08:45:00.000Z',
   },
   ORDER_008: {
-    id: '019e6ce0-b1df-73dc-9c49-871e7eec6be4_impala-rizado-bostezando',
+    id: '019e74a4-245b-77da-a4e3-ac36bfc0926d_p19-trc',
     secret: '4651',
     buyer: Users.ANA,
     seller: Users.PEDRO,
@@ -145,7 +145,7 @@ export const Orders = {
     updatedAt: '2026-04-25T12:05:00.000Z',
   },
   ORDER_009: {
-    id: '019e6ce0-ccb4-70cd-b07a-df3521b677d9_jabali-trabajador-acelerando',
+    id: '019e74a4-3936-77ea-8f13-7b299f44ffc0_c3a-9ge',
     secret: '2836',
     buyer: Users.JUAN,
     seller: Users.PEDRO,
@@ -163,7 +163,7 @@ export const Orders = {
     updatedAt: '2026-04-25T12:45:00.000Z',
   },
   ORDER_010: {
-    id: '019e6ce0-e3ef-70ec-8337-de119412b384_coralillo-famoso-honrando',
+    id: '019e74a4-4d6c-7239-93c8-bb405dedc0da_ref-zxs',
     secret: '9174',
     buyer: Users.MARIA,
     seller: Users.PEDRO,
@@ -181,7 +181,7 @@ export const Orders = {
     updatedAt: '2026-04-25T13:35:00.000Z',
   },
   ORDER_011: {
-    id: '019e6ce0-fbbb-76f1-9d71-de6b5c5436e4_bufalo-rico-acostandose',
+    id: '019e74a4-68de-744d-8282-8390de36160e_5dy-hho',
     secret: '3560',
     buyer: Users.CARLOS,
     seller: Users.PEDRO,
@@ -198,7 +198,7 @@ export const Orders = {
     updatedAt: '2026-04-25T13:45:00.000Z',
   },
   ORDER_012: {
-    id: '019e6ce1-1458-735b-bedb-40a95047b0ec_coralillo-calido-remando',
+    id: '019e74a4-68de-744d-8282-8390de36160e_5dy-hho',
     secret: '6428',
     buyer: Users.MARIA,
     seller: Users.PEDRO,
@@ -215,7 +215,7 @@ export const Orders = {
     updatedAt: '2026-04-25T14:00:00.000Z',
   },
   ORDER_013: {
-    id: '019e6ce1-3746-775f-b1a5-0d041d0de0d7_gallina-triste-leyendo',
+    id: '019e74a4-9326-77be-9a46-23d11413d3f3_waq-cbs',
     secret: '8073',
     buyer: Users.JUAN,
     seller: null,
@@ -230,7 +230,7 @@ export const Orders = {
     updatedAt: '2026-04-25T15:00:00.000Z',
   },
   ORDER_014: {
-    id: '019e6ce1-505a-74f3-b639-217f51ad63ba_merluza-manso-empujando',
+    id: '0019e74a4-a470-722f-a0cc-04f8e08a4e8d_io7-6uj',
     secret: '1290',
     buyer: Users.ANA,
     seller: Users.PEDRO,
@@ -245,7 +245,7 @@ export const Orders = {
     updatedAt: '2026-04-25T15:10:00.000Z',
   },
   ORDER_015: {
-    id: '019e6ce2-0a54-77bd-b9c5-ddf088a38722_reno-amable-quedandose',
+    id: '019e74a4-b45a-754e-b6c3-d4664c7d9733_a8m-jc5',
     secret: '4735',
     buyer: Users.CARLOS,
     seller: Users.PEDRO,
@@ -262,7 +262,7 @@ export const Orders = {
     updatedAt: '2026-04-25T13:45:00.000Z',
   },
   ORDER_016: {
-    id: '019e6ce2-308c-71be-8dac-b44954f82986_narval-anciano-remando',
+    id: '019e74a4-c5e9-70d2-83b8-2757a9d57f82_4dy-e9s',
     secret: '5681',
     buyer: Users.MARIA,
     seller: Users.PEDRO,
@@ -277,7 +277,7 @@ export const Orders = {
     updatedAt: '2026-04-25T15:30:00.000Z',
   },
   ORDER_017: {
-    id: '019e6ce2-4ad8-71f9-a455-4b04edcbf1a3_condor-hibernante-regalando',
+    id: '019e74a4-d9ef-77fa-99c0-eac9ca2bbe40_ke5-w7b',
     secret: '3049',
     buyer: Users.ANA,
     seller: null,
@@ -292,7 +292,7 @@ export const Orders = {
     updatedAt: '2026-05-21T10:00:00.000Z',
   },
   ORDER_018: {
-    id: '019e6ce2-68fc-731e-a413-7aec42cd4b24_ocelote-naranja-respetando',
+    id: '019e74a4-ef17-75aa-94a0-ee6c7975d157_hgx-6gg',
     secret: '7206',
     buyer: Users.CARLOS,
     seller: Users.PEDRO,
@@ -307,7 +307,7 @@ export const Orders = {
     updatedAt: '2026-05-21T10:15:00.000Z',
   },
   ORDER_019: {
-    id: '019e6ce2-8e2b-73e9-bfd1-889577f95227_leopardo-aspero-abriendo',
+    id: '019e74a5-0350-721d-8dc4-b12568644fa2_twq-qcm',
     secret: '8951',
     buyer: Users.MARIA,
     seller: Users.PEDRO,
@@ -322,7 +322,7 @@ export const Orders = {
     updatedAt: '2026-05-21T10:30:00.000Z',
   },
   ORDER_020: {
-    id: '019e6ce2-a379-7658-aa23-563df684e0ec_buho-morado-trotando',
+    id: '019e74a5-1925-7188-ab1b-83a351052185_oxh-thk',
     secret: '1463',
     buyer: Users.JUAN,
     seller: Users.PEDRO,
@@ -338,7 +338,7 @@ export const Orders = {
   },
 
   ORDER_021: {
-    id: '019e6ce2-bb4e-7715-8006-2f62729ee1e0_gorila-helado-hirviendo',
+    id: '019e74a5-2b79-76aa-b8bd-1c153bc8b67b_7qm-uku',
     secret: '6382',
     buyer: Users.JUAN,
     seller: Users.PEDRO,
@@ -356,7 +356,7 @@ export const Orders = {
     updatedAt: '2026-05-21T10:45:00.000Z',
   },
   ORDER_022: {
-    id: '019e6ce2-d169-707e-9938-c7ecc9e278d8_abeja-alegre-pintando',
+    id: '019e74a5-4178-776a-b8dd-72883d62c186_f4i-pkb',
     secret: '4578',
     buyer: Users.MARIA,
     seller: Users.PEDRO,
@@ -374,7 +374,7 @@ export const Orders = {
     updatedAt: '2026-05-21T10:45:00.000Z',
   },
   ORDER_023: {
-    id: '019e6ce2-ece7-70fe-8292-3629bd6a596d_tijereta-seco-pilotando',
+    id: '019e74a5-5b54-7235-8480-ad194bcdbb61_k73-7n5',
     secret: '2914',
     buyer: Users.CARLOS,
     seller: Users.PEDRO,
@@ -391,7 +391,7 @@ export const Orders = {
     updatedAt: '2026-05-21T10:45:00.000Z',
   },
   ORDER_024: {
-    id: '019e6ce3-0471-7683-bdfa-905166289a30_buitre-ronron-volando',
+    id: '019e74a5-6e48-7797-897e-f863b9e09d82_jgr-tq1',
     secret: '8357',
     buyer: Users.ANA,
     seller: Users.PEDRO,
@@ -409,7 +409,7 @@ export const Orders = {
     updatedAt: '2026-05-21T10:45:00.000Z',
   },
   ORDER_025: {
-    id: '019e6ce3-241c-72d8-93f3-e142013c462e_geco-sociable-desordenando',
+    id: '019e74a5-808a-7321-9127-281f098b2d8e_3dg-zjs',
     secret: '5192',
     buyer: Users.ANA,
     seller: Users.PEDRO,
@@ -427,7 +427,7 @@ export const Orders = {
     updatedAt: '2026-04-25T06:00:00.000Z',
   },
   ORDER_026: {
-    id: '019e6ce3-3c2d-74f7-a0fb-13a4b9ca0720_gato-alto-llorando',
+    id: '019e74a5-95ed-73f9-beb2-4c66ad181445_ig5-w3b',
     secret: '6804',
     buyer: Users.JUAN,
     seller: Users.PEDRO,

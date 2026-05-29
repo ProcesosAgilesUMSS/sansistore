@@ -259,7 +259,7 @@ function OrderCard({
             {uuid}
           </span>
           <span className="font-bold text-text-light group-hover:text-primary transition-colors">
-            {friendlyName.replace(/-/g, ' ')}
+            {friendlyName}
           </span>
           <p className="text-sm text-text-light/80 truncate mt-0.5">
             {order.delivery.destination}

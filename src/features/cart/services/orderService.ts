@@ -79,8 +79,15 @@ function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function generateFriendlyId(): string {
+export function generateFriendlyId(): string {
   return `${pick(nouns)}-${pick(adjectives)}-${pick(verbs)}`;
+}
+
+const zBase32Alphabet = 'ybndrfg8ejkmcpqxot1uwisza345h769'.split('');
+
+function generateZBase32Label(): string {
+  const chars = Array.from({ length: 6 }, () => pick(zBase32Alphabet));
+  return `${chars.slice(0, 3).join('')}-${chars.slice(3).join('')}`;
 }
 
 function generateOrderSecret(): string {
@@ -93,7 +100,7 @@ function generateOrderSecret(): string {
 }
 
 export function generateOrderId(): string {
-  return `${uuidv7()}_${generateFriendlyId()}`;
+  return `${uuidv7()}_${generateZBase32Label()}`;
 }
 
 export function parseOrderId(orderId: string): { uuid: string; friendlyName: string } {
@@ -122,8 +129,8 @@ export async function createOrder(params: CreateOrderParams): Promise<CreateOrde
   const { user, selectedLocation, total, includedItems } = params;
 
   const uuid = uuidv7();
-  const friendlyId = generateFriendlyId();
-  const orderId = `${uuid}_${friendlyId}`;
+  const orderLabel = generateZBase32Label();
+  const orderId = `${uuid}_${orderLabel}`;
   const paymentCode = orderId;
   const orderSecret = generateOrderSecret();
 
