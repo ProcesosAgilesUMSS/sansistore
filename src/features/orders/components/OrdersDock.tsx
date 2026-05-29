@@ -106,7 +106,7 @@ export default function OrdersDock() {
 
         {sections.map((section) => {
           // Filtrar las que ya estan en submenus
-          if (['creados', 'empaqutados', 'compra', 'ofertas'].includes(section.id)) return null;
+          if (['creados', 'empaquetados', 'compra', 'ofertas'].includes(section.id)) return null;
 
           const isActive = isCurrentRoute(section.route);
           return (
