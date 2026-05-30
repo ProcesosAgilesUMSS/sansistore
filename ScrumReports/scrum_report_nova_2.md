@@ -257,3 +257,32 @@
 - **Yesterday:** revise las HU que nos quedan para desarollar y proponer las de mayor prioridad.
 - **Today:** Participe de la reunion de equipo para discutir y definir las HUs para este sprint segun la importancia.
 - **Blockers:** Existe HUs confusas que no se logran entender su proposito.
+
+# 28/05/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+* **Yesterday:** nos sorteamos las hus para que se asigne en este 3er sprint
+* **Today:** empece a refinar mi hu que es la #163 y empezar a definir criterios de aceptación y luego realizar sus respectivos mock ups
+* **Blockers:** none.
+
+## Fabricio Javier Cordova Caceres 
+* **Yesterday:** nos sorteamos las hus para que se asigne en este 3er sprint
+* **Today:** empece a refinar mi hu que es la #164 y empezar a definir criterios de aceptación 
+* **Blockers:** none.
+
+## Camila Wara Fernandez Sandoval 
+* **Yesterday:** nos sorteamos las hus para que se asigno en este 3er sprint 
+* **Today:** Comencé revisando mi hu #160, definir los criterios de aceptación y luego realizar sus respectivos mock ups
+* **Blockers:** none.
+
+## Jherlan Marcelo Calero Sardan 
+* **Yesterday:** nos sorteamos las hus para que se asigne en este 3er sprint
+* **Today:** empece a hacer el mockup y los criterios de aceptacion de mi hu #159
+* **Blockers:** none.
+
+## Dylan Coca Beltran
+- **Yesterday:** comence con el frontend de mi hu 178 y ver que necesitaria para el backend
+- **Today:** avance en el frontend y comence a hacer el backend a la par
+- **Blockers:** no se tienen las credenciales del usuario admin
