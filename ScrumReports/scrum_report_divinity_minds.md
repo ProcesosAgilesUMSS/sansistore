@@ -321,8 +321,6 @@
 - **Today:** Realicé una revisión general del sistema enfocada en la identificación de bugs, cubriendo las distintas funcionalidades para asegurar su correcto funcionamiento.
 - **Blockers:** Ninguno.
 
-# 05/30/2026
-
 ## Velasquez Vela Marcos
 
 - **Yesterday:** Implementé la historia "Identificar pedidos con fallos": una pantalla donde el Operador ve los pedidos no entregados o cancelados, abre cada uno para ver el motivo y reponer su stock al inventario con un clic (sin duplicar). Incluí datos de ejemplo y pruebas automáticas.
