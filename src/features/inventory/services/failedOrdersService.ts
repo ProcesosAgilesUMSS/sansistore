@@ -3,12 +3,11 @@ import {
   doc,
   getDoc,
   getDocs,
-  increment,
   onSnapshot,
   query,
+  runTransaction,
   serverTimestamp,
   where,
-  writeBatch,
   type Unsubscribe,
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
@@ -194,7 +193,7 @@ export function subscribeFailedOrders(
 
 /**
  * Devuelve al inventario los productos de un pedido fallido.
- * - Suma las cantidades a stockTotal/stockAvailable de cada producto.
+ * - Libera las cantidades reservadas de cada producto.
  * - Registra un movimiento ENTRADA por producto en inventoryMovements.
  * - Marca el pedido como stockRestored para impedir reposiciones duplicadas.
  */
@@ -202,12 +201,6 @@ export async function restoreStockForOrder(
   order: FailedOrder,
   operatorId: string
 ): Promise<void> {
-  // Relectura de seguridad: evita reponer dos veces si otro tab ya lo hizo.
-  const orderSnap = await getDoc(doc(db, 'orders', order.id));
-  if (orderSnap.exists() && orderSnap.data().stockRestored) {
-    throw new Error('El stock de este pedido ya fue repuesto.');
-  }
-
   const restorable = order.items.filter(
     (item) => item.productId && item.quantity > 0
   );
@@ -215,38 +208,58 @@ export async function restoreStockForOrder(
     throw new Error('El pedido no tiene productos para reponer.');
   }
 
-  const batch = writeBatch(db);
-  const now = serverTimestamp();
+  await runTransaction(db, async (transaction) => {
+    const orderRef = doc(db, 'orders', order.id);
+    const orderSnap = await transaction.get(orderRef);
 
-  for (const item of restorable) {
-    const inventoryRef = doc(db, 'inventory', item.productId);
-    batch.set(
-      inventoryRef,
-      {
-        stockTotal: increment(item.quantity),
-        stockAvailable: increment(item.quantity),
+    if (!orderSnap.exists()) {
+      throw new Error('El pedido no existe.');
+    }
+
+    if (orderSnap.data().stockRestored) {
+      throw new Error('El stock de este pedido ya fue repuesto.');
+    }
+
+    const now = serverTimestamp();
+
+    for (const item of restorable) {
+      const inventoryRef = doc(db, 'inventory', item.productId);
+      const inventorySnap = await transaction.get(inventoryRef);
+
+      if (!inventorySnap.exists()) {
+        throw new Error(`No se encontró inventario para ${item.productName}.`);
+      }
+
+      const inventory = inventorySnap.data();
+      const currentReserved = Number(inventory.stockReserved ?? 0);
+
+      if (currentReserved < item.quantity) {
+        throw new Error(
+          `El producto ${item.productName} no tiene stock reservado suficiente para reponer.`
+        );
+      }
+
+      transaction.update(inventoryRef, {
+        stockReserved: currentReserved - item.quantity,
         updatedAt: now,
-      },
-      { merge: true }
-    );
+      });
 
-    const movementRef = doc(collection(db, 'inventoryMovements'));
-    batch.set(movementRef, {
-      productId: item.productId,
-      type: 'ENTRADA',
-      quantity: item.quantity,
-      operatorId,
-      reason: `Reposición por pedido fallido ${order.id}`,
-      date: now,
+      const movementRef = doc(collection(db, 'inventoryMovements'));
+      transaction.set(movementRef, {
+        productId: item.productId,
+        type: 'ENTRADA',
+        quantity: item.quantity,
+        operatorId,
+        reason: `Reposición por pedido fallido ${order.id}`,
+        date: now,
+      });
+    }
+
+    transaction.update(orderRef, {
+      stockRestored: true,
+      stockRestoredBy: operatorId,
+      stockRestoredAt: now,
+      updatedAt: now,
     });
-  }
-
-  batch.update(doc(db, 'orders', order.id), {
-    stockRestored: true,
-    stockRestoredBy: operatorId,
-    stockRestoredAt: now,
-    updatedAt: now,
   });
-
-  await batch.commit();
 }

@@ -269,6 +269,19 @@ async function seedOrders() {
       await setDoc(`orders/${order.id}/orderItems`, item.itemId, item);
     }
 
+    if (
+      order.status === 'CANCELADO' ||
+      order.status === 'NO ENTREGADO' ||
+      order.deliveryStatus === 'NOT_DELIVERED'
+    ) {
+      for (const item of items) {
+        await setDoc('inventory', item.productId, {
+          stockReserved: admin.firestore.FieldValue.increment(item.quantity),
+          updatedAt: TS(),
+        });
+      }
+    }
+
     await setDoc('payments', order.id, {
       paymentId: order.id,
       orderId: order.id,

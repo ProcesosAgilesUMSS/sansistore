@@ -1,5 +1,40 @@
 import { expect, test, type Page } from '@playwright/test';
 
+const FIRESTORE_DOCUMENTS_URL =
+  'http://127.0.0.1:8180/v1/projects/sansistore/databases/(default)/documents';
+
+const RESTORE_PRODUCT_ID = 'galletas-agua-victoria-120-gr';
+
+const restoreOrderByProject: Record<
+  string,
+  { customer: string; orderId: string }
+> = {
+  chromium: {
+    customer: 'Restore Chromium',
+    orderId: '019e74a6-1001-7000-bbbb-000000000001_restore-chromium',
+  },
+  firefox: {
+    customer: 'Restore Firefox',
+    orderId: '019e74a6-1002-7000-bbbb-000000000002_restore-firefox',
+  },
+  webkit: {
+    customer: 'Restore Webkit',
+    orderId: '019e74a6-1003-7000-bbbb-000000000003_restore-webkit',
+  },
+};
+
+function readNumberField(field: { integerValue?: string; doubleValue?: number }) {
+  if (typeof field.integerValue === 'string') return Number(field.integerValue);
+  if (typeof field.doubleValue === 'number') return field.doubleValue;
+  throw new Error('Campo numerico invalido en Firestore.');
+}
+
+async function readFirestoreDocument(documentPath: string) {
+  const response = await fetch(`${FIRESTORE_DOCUMENTS_URL}/${documentPath}`);
+  expect(response.ok).toBeTruthy();
+  return response.json();
+}
+
 /**
  * E2E de la HU "Identificar pedidos con fallos".
  * Datos sembrados por el seed (tests/global-setup.ts):
@@ -132,16 +167,19 @@ test.describe('Pedidos con fallos', () => {
     await login(page, 'marko@umss.edu');
     await page.goto('/inventory/incidents', { waitUntil: 'domcontentloaded' });
 
-    // Cada navegador usa su pedido dedicado: la reposicion persiste en la DB
-    // compartida, asi evitamos que un proyecto deshabilite al otro.
-    const customerByProject: Record<string, string> = {
-      chromium: 'Restore Chromium',
-      firefox: 'Restore Firefox',
-      webkit: 'Restore Webkit',
-    };
-    const customer = customerByProject[testInfo.project.name] ?? 'Restore Chromium';
+    const restoreOrder =
+      restoreOrderByProject[testInfo.project.name] ?? restoreOrderByProject.chromium;
+    const inventoryBefore = await readFirestoreDocument(
+      `inventory/${RESTORE_PRODUCT_ID}`
+    );
+    const reservedBefore = readNumberField(inventoryBefore.fields.stockReserved);
+    const availableBefore = readNumberField(inventoryBefore.fields.stockAvailable);
+    const totalBefore = readNumberField(inventoryBefore.fields.stockTotal);
 
-    const card = page.locator('button').filter({ hasText: customer }).first();
+    const card = page
+      .locator('button')
+      .filter({ hasText: restoreOrder.customer })
+      .first();
     await expect(card).toBeVisible({ timeout: 15_000 });
     await card.click();
 
@@ -155,5 +193,23 @@ test.describe('Pedidos con fallos', () => {
       page.getByText('El stock de este pedido ya fue repuesto.')
     ).toBeVisible({ timeout: 15_000 });
     await expect(restoreButton).toBeDisabled();
+
+    await expect
+      .poll(async () => {
+        const orderDoc = await readFirestoreDocument(`orders/${restoreOrder.orderId}`);
+        return orderDoc.fields.stockRestored?.booleanValue === true;
+      })
+      .toBe(true);
+
+    const inventoryAfter = await readFirestoreDocument(
+      `inventory/${RESTORE_PRODUCT_ID}`
+    );
+    expect(readNumberField(inventoryAfter.fields.stockReserved)).toBe(
+      reservedBefore - 1
+    );
+    expect(readNumberField(inventoryAfter.fields.stockAvailable)).toBe(
+      availableBefore
+    );
+    expect(readNumberField(inventoryAfter.fields.stockTotal)).toBe(totalBefore);
   });
 });
