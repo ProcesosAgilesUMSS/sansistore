@@ -79,6 +79,10 @@ test.describe('Pedidos con fallos', () => {
       page.locator('button').filter({ hasText: 'Carlos Flores' }).first()
     ).toContainText('Falta de pago del cliente');
 
+    await expect(
+      page.locator('button').filter({ hasText: 'Juan Paredes' }).first()
+    ).toContainText('Direccion incorrecta');
+
     // Tipos de fallo presentes.
     await expect(page.getByText('NO ENTREGADO').first()).toBeVisible();
     await expect(page.getByText('CANCELADO').first()).toBeVisible();

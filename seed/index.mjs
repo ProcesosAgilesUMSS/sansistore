@@ -239,6 +239,7 @@ async function seedOrders() {
     };
 
     const isCancelled = order.status === 'CANCELADO';
+    const delivery = deliveryList.find((item) => item.orderCode === order.id);
 
     await setDoc('orders', order.id, {
       orderId: order.id,
@@ -256,7 +257,7 @@ async function seedOrders() {
       locationId: order.location.id,
       paymentStatus: paymentStatusMap[deliveryStatus] || 'PENDIENTE',
       deliveryStatus,
-      deliveryId: null,
+      deliveryId: delivery?.code ?? null,
       paymentId: order.id,
       confirmedAt: toTimestamp(order.confirmedAt),
       cancelledAt: isCancelled && order.failedAt ? toTimestamp(order.failedAt) : null,
@@ -299,7 +300,10 @@ async function seedDeliveries() {
       status: d.status,
       deliveryCode: d.code.replace('delivery-', 'DEL-2026-'),
       attemptNumber: d.attemptNumber,
-      incidentReason: null,
+      incidentReason: d.incidentReason ?? null,
+      incidentNotes: d.incidentNotes ?? null,
+      cancellationReason: d.cancellationReason ?? null,
+      cancellationNotes: d.cancellationNotes ?? null,
       evidenceUrl: null,
       failureReason: null,
       amountCollected: order ? calculateOrderTotal(order) : null,
@@ -310,6 +314,7 @@ async function seedDeliveries() {
       inTransitAt: toTimestamp(d.inTransitAt),
       deliveredAt: toTimestamp(d.deliveredAt),
       failedAt: toTimestamp(d.failedAt),
+      cancelledAt: toTimestamp(d.cancelledAt),
       reprogrammedAt: toTimestamp(d.reprogrammedAt),
       createdAt: toTimestamp(d.createdAt),
       updatedAt: toTimestamp(d.updatedAt),

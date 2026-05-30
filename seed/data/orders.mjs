@@ -490,12 +490,10 @@ export const Orders = {
     buyer: Users.JUAN,
     seller: Users.PEDRO,
     location: Locations.LOC_JUAN,
-    status: 'NO ENTREGADO',
+    status: 'EN CAMINO',
     deliveryStatus: 'NOT_DELIVERED',
     customerName: 'Juan Paredes',
     customerPhone: '70000004',
-    incidentReason: 'Direccion incorrecta',
-    failedAt: '2026-05-28T09:45:00.000Z',
     items: [
       { product: Products.DETERGENTE_OLA, quantity: 1 },
     ],
