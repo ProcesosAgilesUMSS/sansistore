@@ -157,6 +157,21 @@ export const Deliveries = {
     createdAt: '2026-04-25T13:42:00.000Z',
     updatedAt: '2026-04-25T13:45:00.000Z',
   },
+  DELIVERY_FALLO_03: {
+    code: 'delivery-fallo-03',
+    orderCode: '019e74a6-0003-7000-aaaa-000000000003_fail-003',
+    courier: Users.NADIA,
+    status: 'not_delivered',
+    attemptNumber: 1,
+    customerConfirmed: false,
+    incidentReason: 'Direccion incorrecta',
+    incidentNotes: 'El mensajero no pudo ubicar el punto de entrega.',
+    assignedAt: '2026-05-28T08:40:00.000Z',
+    inTransitAt: '2026-05-28T09:00:00.000Z',
+    failedAt: '2026-05-28T09:45:00.000Z',
+    createdAt: '2026-05-28T08:35:00.000Z',
+    updatedAt: '2026-05-28T09:45:00.000Z',
+  },
 };
 
 export const deliveryList = Object.values(Deliveries);
