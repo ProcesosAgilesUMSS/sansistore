@@ -1,13 +1,10 @@
 import type { ReactNode } from "react";
-import { Package } from "lucide-react";
 import GridSpinner from "./GridSpinner";
 import LoadingMessage from "./LoadingMessage";
 import OrderGridHeader from "./OrderGridHeader";
 
 interface OrderGridSectionProps {
   title: string;
-  count: number;
-  countLabel: string;
   loading: boolean;
   loadingMessage: string;
   ariaLabelledby: string;
@@ -17,8 +14,6 @@ interface OrderGridSectionProps {
 
 export default function OrderGridSection({
   title,
-  count,
-  countLabel,
   loading,
   loadingMessage,
   ariaLabelledby,
@@ -38,13 +33,6 @@ export default function OrderGridSection({
         {title}
       </h2>
 
-      <div className={`col-span-full flex items-center justify-between min-[960px]:col-start-3 ${headerContent ? "mb-2" : "mb-12"} tracking-tight`}>
-        <div className="flex items-center gap-2">
-          <Package strokeWidth={1.5} size={18} />
-          <span>{count} {countLabel}</span>
-        </div>
-      </div>
-
       {headerContent}
 
       {loading ? (
@@ -52,10 +40,8 @@ export default function OrderGridSection({
           <GridSpinner />
           <LoadingMessage text={loadingMessage} />
         </div>
-      ) : count === 0 ? (
-        <div className="col-span-full h-80" />
       ) : (
-        <div className="grid grid-cols-subgrid col-span-full min-[960px]:col-start-4 min-[960px]:col-end-22 min-[760px]:col-start-2 min-[760px]:col-end-16 mb-10">
+        <div className="grid grid-cols-subgrid col-span-full min-[960px]:col-start-4 min-[960px]:col-end-22 min-[760px]:col-start-2 min-[760px]:col-end-16 my-10">
           <OrderGridHeader />
           <ul className="col-span-full grid grid-cols-subgrid">
             {children}
