@@ -1,4 +1,5 @@
 import {
+  AlertTriangle,
   LoaderCircle,
   PackageCheck,
   RotateCcw,
@@ -8,6 +9,7 @@ import type { FailedOrder } from '../services/failedOrdersService';
 
 interface FailedOrderDetailModalProps {
   order: FailedOrder;
+  error: string | null;
   isRestoring: boolean;
   onClose: () => void;
   onRestoreStock: (order: FailedOrder) => void;
@@ -21,6 +23,7 @@ const currency = new Intl.NumberFormat('es-BO', {
 
 export function FailedOrderDetailModal({
   order,
+  error,
   isRestoring,
   onClose,
   onRestoreStock,
@@ -133,6 +136,13 @@ export function FailedOrderDetailModal({
             <div className="flex items-center gap-2 rounded-2xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm font-bold text-primary">
               <PackageCheck size={16} />
               El stock de este pedido ya fue repuesto.
+            </div>
+          )}
+
+          {error && (
+            <div className="flex items-start gap-2 rounded-2xl border border-red-300/60 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 dark:border-red-800/40 dark:bg-red-900/20 dark:text-red-300">
+              <AlertTriangle className="mt-0.5 shrink-0" size={16} />
+              <span>{error}</span>
             </div>
           )}
         </div>

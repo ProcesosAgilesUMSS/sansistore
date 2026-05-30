@@ -3,23 +3,24 @@ import { expect, test, type Page } from '@playwright/test';
 const FIRESTORE_DOCUMENTS_URL =
   'http://127.0.0.1:8180/v1/projects/sansistore/databases/(default)/documents';
 
-const RESTORE_PRODUCT_ID = 'galletas-agua-victoria-120-gr';
-
 const restoreOrderByProject: Record<
   string,
-  { customer: string; orderId: string }
+  { customer: string; orderId: string; productId: string }
 > = {
   chromium: {
     customer: 'Restore Chromium',
     orderId: '019e74a6-1001-7000-bbbb-000000000001_restore-chromium',
+    productId: 'galletas-agua-victoria-120-gr',
   },
   firefox: {
     customer: 'Restore Firefox',
     orderId: '019e74a6-1002-7000-bbbb-000000000002_restore-firefox',
+    productId: 'arroz-grano-de-oro-caisy-1-kg',
   },
   webkit: {
     customer: 'Restore Webkit',
     orderId: '019e74a6-1003-7000-bbbb-000000000003_restore-webkit',
+    productId: 'aceite-fino-vegetal-900-ml',
   },
 };
 
@@ -170,7 +171,7 @@ test.describe('Pedidos con fallos', () => {
     const restoreOrder =
       restoreOrderByProject[testInfo.project.name] ?? restoreOrderByProject.chromium;
     const inventoryBefore = await readFirestoreDocument(
-      `inventory/${RESTORE_PRODUCT_ID}`
+      `inventory/${restoreOrder.productId}`
     );
     const reservedBefore = readNumberField(inventoryBefore.fields.stockReserved);
     const availableBefore = readNumberField(inventoryBefore.fields.stockAvailable);
@@ -202,7 +203,7 @@ test.describe('Pedidos con fallos', () => {
       .toBe(true);
 
     const inventoryAfter = await readFirestoreDocument(
-      `inventory/${RESTORE_PRODUCT_ID}`
+      `inventory/${restoreOrder.productId}`
     );
     expect(readNumberField(inventoryAfter.fields.stockReserved)).toBe(
       reservedBefore - 1

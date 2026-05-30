@@ -27,7 +27,15 @@ function TypeBadge({ type }: { type: FailedOrder['type'] }) {
 }
 
 export function FailedOrdersPanel() {
-  const { orders, loading, error, restoringId, restoreStock } =
+  const {
+    orders,
+    loading,
+    error,
+    restoreError,
+    restoringId,
+    restoreStock,
+    clearRestoreError,
+  } =
     useFailedOrders();
   const [selected, setSelected] = useState<FailedOrder | null>(null);
 
@@ -85,7 +93,10 @@ export function FailedOrdersPanel() {
             <button
               key={order.id}
               type="button"
-              onClick={() => setSelected(order)}
+              onClick={() => {
+                clearRestoreError();
+                setSelected(order);
+              }}
               className="flex flex-col gap-3 rounded-2xl border border-(--theme-border) bg-(--theme-card-bg) p-5 text-left transition hover:border-primary/50 md:flex-row md:items-center md:justify-between"
             >
               <div className="min-w-0">
@@ -128,8 +139,12 @@ export function FailedOrdersPanel() {
       {selectedLive && (
         <FailedOrderDetailModal
           order={selectedLive}
+          error={restoringId === selectedLive.id || restoreError ? restoreError : null}
           isRestoring={restoringId === selectedLive.id}
-          onClose={() => setSelected(null)}
+          onClose={() => {
+            clearRestoreError();
+            setSelected(null);
+          }}
           onRestoreStock={handleRestore}
         />
       )}

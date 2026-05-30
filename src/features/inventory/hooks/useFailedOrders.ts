@@ -10,8 +10,10 @@ interface UseFailedOrdersReturn {
   orders: FailedOrder[];
   loading: boolean;
   error: string | null;
+  restoreError: string | null;
   restoringId: string | null;
   restoreStock: (order: FailedOrder) => Promise<void>;
+  clearRestoreError: () => void;
 }
 
 export function useFailedOrders(): UseFailedOrdersReturn {
@@ -19,6 +21,7 @@ export function useFailedOrders(): UseFailedOrdersReturn {
   const [orders, setOrders] = useState<FailedOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [restoreError, setRestoreError] = useState<string | null>(null);
   const [restoringId, setRestoringId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -42,15 +45,15 @@ export function useFailedOrders(): UseFailedOrdersReturn {
   const restoreStock = useCallback(
     async (order: FailedOrder) => {
       if (!user?.uid) {
-        setError('Debes iniciar sesión para reponer stock.');
+        setRestoreError('Debes iniciar sesión para reponer stock.');
         return;
       }
-      setError(null);
+      setRestoreError(null);
       setRestoringId(order.id);
       try {
         await restoreStockForOrder(order, user.uid);
       } catch (err) {
-        setError(
+        setRestoreError(
           err instanceof Error ? err.message : 'No se pudo reponer el stock.'
         );
       } finally {
@@ -60,5 +63,17 @@ export function useFailedOrders(): UseFailedOrdersReturn {
     [user?.uid]
   );
 
-  return { orders, loading, error, restoringId, restoreStock };
+  const clearRestoreError = useCallback(() => {
+    setRestoreError(null);
+  }, []);
+
+  return {
+    orders,
+    loading,
+    error,
+    restoreError,
+    restoringId,
+    restoreStock,
+    clearRestoreError,
+  };
 }
