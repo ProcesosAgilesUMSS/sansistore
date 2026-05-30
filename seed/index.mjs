@@ -21,6 +21,12 @@ const auth = admin.auth();
 
 const TS = () => admin.firestore.FieldValue.serverTimestamp();
 
+const FAILED_RESTORE_ORDER_IDS = new Set([
+  '019e74a6-1001-7000-bbbb-000000000001_restore-chromium',
+  '019e74a6-1002-7000-bbbb-000000000002_restore-firefox',
+  '019e74a6-1003-7000-bbbb-000000000003_restore-webkit',
+]);
+
 const toTimestamp = (value, fallback = TS()) => {
   if (!value) return fallback;
   return admin.firestore.Timestamp.fromDate(new Date(value));
@@ -269,11 +275,7 @@ async function seedOrders() {
       await setDoc(`orders/${order.id}/orderItems`, item.itemId, item);
     }
 
-    if (
-      order.status === 'CANCELADO' ||
-      order.status === 'NO ENTREGADO' ||
-      order.deliveryStatus === 'NOT_DELIVERED'
-    ) {
+    if (FAILED_RESTORE_ORDER_IDS.has(order.id)) {
       for (const item of items) {
         await setDoc('inventory', item.productId, {
           stockReserved: admin.firestore.FieldValue.increment(item.quantity),
