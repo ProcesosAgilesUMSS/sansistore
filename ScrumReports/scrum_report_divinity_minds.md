@@ -303,6 +303,12 @@
 
 # 05/28/2026
 
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Revisé la issue #179 (HU: Identificar pedidos con fallos) que estaba en Ready for QA para validar su contexto y poder aprobarlo para el Done.
+- **Today:** Iniciaré el proceso de mover todas las HU's Done restantes a Aceptado por el PO. Validaré cada una y, en caso de identificar bugs, crearé nuevas issues y las moveré al estado correspondiente en el tablero.
+- **Blockers:** n/a.
+
 ## Gutierrez Hinojosa Jhon Deymar
 
 - **Yesterday:** Optimicé el workflow de Playwright en GitHub, mejoré la integración de los Pull Requests y completé la historia de usuario para la creación de IDs de órdenes junto con su código secreto
@@ -314,3 +320,15 @@
 - **Yesterday:** Desarrollé y ejecuté las pruebas para la sección de comentarios de los productos, verificando su correcto funcionamiento
 - **Today:** Continuaré con la implementación de pruebas en otras funcionalidades que lo requieran.
 - **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Revisé el sistema en su estado actual para identificar posibles mejoras funcionales y de experiencia, documentando observaciones para su posterior análisis.
+- **Today:** Realicé una revisión general del sistema enfocada en la identificación de bugs, cubriendo las distintas funcionalidades para asegurar su correcto funcionamiento.
+- **Blockers:** Ninguno.
+
+## Velasquez Vela Marcos
+
+- **Yesterday:** Implementé la historia "Identificar pedidos con fallos": una pantalla donde el Operador ve los pedidos no entregados o cancelados, abre cada uno para ver el motivo y reponer su stock al inventario con un clic (sin duplicar). Incluí datos de ejemplo y pruebas automáticas.
+- **Today:** Subir los cambios, abrir el PR y coordinar la validación con el PO.
+- **Blockers:** Necesito que el PO confirme quién es el "Operador" y hasta dónde llega el alcance.
