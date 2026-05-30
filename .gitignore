@@ -38,3 +38,4 @@ pnpm-debug.log*
 /playwright/.auth/
 /AGENTS.md
 /CLAUDE.md
+/.tmp-capture
