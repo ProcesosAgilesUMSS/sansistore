@@ -303,6 +303,12 @@
 
 # 05/28/2026
 
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Revisé la issue #179 (HU: Identificar pedidos con fallos) que estaba en Ready for QA para validar su contexto y poder aprobarlo para el Done.
+- **Today:** Iniciaré el proceso de mover todas las HU's Done restantes a Aceptado por el PO. Validaré cada una y, en caso de identificar bugs, crearé nuevas issues y las moveré al estado correspondiente en el tablero.
+- **Blockers:** n/a.
+
 ## Gutierrez Hinojosa Jhon Deymar
 
 - **Yesterday:** Optimicé el workflow de Playwright en GitHub, mejoré la integración de los Pull Requests y completé la historia de usuario para la creación de IDs de órdenes junto con su código secreto
