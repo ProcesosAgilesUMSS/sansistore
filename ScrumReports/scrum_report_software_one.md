@@ -364,3 +364,45 @@ También realice pruebas funcionales en entorno local sobre el flujo completo de
 - **Yesterday:** Diseño de listas de vendedor (órdenes creadas, mis reservas, órdenes enviadas)
 - **Today:** Rediseño de más detalles de una orden creada, rediseño de más detalles de una orden reservada, rediseño de más detalles de una orden de órdenes [enviadas, en camino].
 - **Blockers:** NONE
+
+
+# 28/05/ 2026
+## Daily Reports - Team 6 SoftwareOne
+
+
+### Llanos Vega Juan Carlos
+
+
+- **Yesterday:** Desarrollo de las Historias de Usuario HU-082, HU-083, HU-084, HU-085 y la HU-407 de los requerimientos asignados del Product Backlog para el Sprint 3 referente al área de las Ventas Online y presencial
+- **Today:** Actualización de mi área local con el proyecto principal main, y creación de la rama del grupo feature/VentasOnline-Presencial_Team06 para desarrollar los requerimientos.
+- **Blockers:** Ninguno
+
+
+### Rodriguez Torrico Arnold Guery
+
+
+- **Yesterday:** Participación en la sesión de Planning y refinamiento de Historias de Usuario (US), definiendo descripciones y estableciendo los criterios de aceptación.
+- **Today:** Revisión de las tareas (tasks) generadas y preparación del entorno para iniciar el desarrollo de las US asignadas.
+- **Blockers:** Ninguno
+
+
+### Pereira Fiorilo Oliver Do Santos
+- **Yesterday:** Análisis y diagnóstico del bug al registrar una compra en /seller/purchase, el cual creaba el documento inventoryMovements con un esquema incorrecto en Firestore.
+- **Today:** Trabajando en el fix para asegurar que inventoryMovements respete el formato definido en el README, garantizando específicamente que el movementId se asigne directamente al doc.id y no se cree como un campo interno.
+- **Blockers:** Ninguno.
+
+
+### Paqui Rojas Aaron David
+
+
+- **Yesterday:** Sprint Planning y refinamiento conjunto de las US, apoyando en la validación de los criterios de aceptación y la asignación final de las responsabilidades.
+- **Today:** Sincronización de repositorios e inicio del desarrollo de las tareas asignadas durante la sesión de refinamiento.
+- **Blockers:** Ninguno.
+
+
+### Gutiérrez Fuentes Alexander Raul
+
+
+- **Yesterday:** Apoyo en el Sprint Planning y refinamiento activo de Historias de Usuario, enfocándose en el desglose detallado de tareas (tasks).
+- **Today:** Organización y asignación de tareas del Sprint para el equipo, junto con la revisión técnica para comenzar el desarrollo.
+- **Blockers:** NONE
