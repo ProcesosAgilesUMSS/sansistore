@@ -105,21 +105,24 @@
 - **Today:** Desarrollo de la historia de usario asignada.
 - **Blockers:** Duda sobre que campo de la colección orders se usara para que el vendedor marque el pedido como "listo para entrega", para que pueda ser asignado a un mensajero
 
-***
+---
 
 ## 07-05-2026
 
 ### José Daniel Virreira Rufino
+
 - **Yesterday:** Realicé la página base para la nueva pantalla de las acciones de delivery en la que todo el grupo colocará sus funciones. Trabajé en la funcionalidad de la HU que me corresponde, completar la integración con las funcionalidades nuevas de main.
-- **Today:** Participaré en la reunión de la demo y terminaré de pulir las funcionalidades pendientes hasta la hora límite del *code freeze*
+- **Today:** Participaré en la reunión de la demo y terminaré de pulir las funcionalidades pendientes hasta la hora límite del _code freeze_
 - **Blockers:** None
 
 ### Efrain Peralta Felipe
+
 - **Yesterday:** Realice la página para el vendedor donde reciben las órdenes que están en estado RESERVADO
 - **Today:** Participaré en la reunión de la demo y termine la historia que se me fue asignado.
 - **Blockers:** None
 
 ### Bruno Salcedo Cadiz
+
 - **Yesterday:** Termine mi historia de usuario 104 para que el repartido pueda aceptar o rechazar un pedido
 - **Today:** Preparar la integracion de mi rama y la presentaicon de la dema
 - **Blockers:** None
@@ -136,11 +139,12 @@
 - **Today:** Implementación del **panel de entregas para el mensajero** y desarrollo de la lógica para **marcar pedidos como "EN CAMINO"** para permitir el seguimiento en tiempo real. Además, se integró el acceso directo al dashboard de mensajería en el Navbar principal y se validó la persistencia de datos en Firebase.
 - **Blockers:** None.
 
-***
+---
 
 ## 12-05-2026
 
 ### José Daniel Virreira Rufino
+
 - **Yesterday:** Trabajé en la integración a nuestro panel de mensajero de las historias de usuario del equipo de Webspire. Mantuve comunicación para que las funcionalidades del otro equipo no se vean alteradas ni eliminadas durante la integración.
 - **Today:** Escogeré una nueva historia de usuario para empezar con el siguiente sprint, participaré en el Sprint de Retrospectiva tal y como indica el protocolo Scrum LeSS.
 - **Blockers:** Trabajo duplicado y falta de coordinación **(solucionado)**.
@@ -152,21 +156,24 @@
 - **Blockers:** None.
 
 ### Bruno Salcedo Cadiz
+
 - **Yesterday:** Realize el sprint retrospective y empeze a trabajar en la preparacion y desarrollo para el segundo sprint
 - **Today:** Escogere una o mas historias de usuario para trabajar en el segundo sprint
 - **Blockers:** None.
 
 ### Efrain Peralta Felipe
+
 - **Yesterday:** Realize el sprint retrospective y empeze a trabajar en las historias de usuario para el segundo sprint
 - **Today:** Elegire las historias de usuario que trabaje para este segundo sprint.
 - **Blockers:** None.
 
 ### Adrian Said Andrade Medina
+
 - **Yesterday:** Participé en el Sprint Retrospective y avancé en el análisis y planificación de las historias de usuario correspondientes al segundo sprint.
 - **Today:** Definiré y priorizaré las historias de usuario en las que trabajaré durante el Sprint 2, además de iniciar su desarrollo.
 - **Blockers:** None.
 
-***
+---
 
 # Sprint 2
 
@@ -185,6 +192,7 @@
 - **Blockers:** None.
 
 ### Jhoel Gustavo Aiza Arce
+
 - **Yesterday:** Cierre de Sprint 1 y participación en la retrospectiva grupal.
 - **Today:** Selección y auto-asignación de la HU #101 "[US] Como mensajero, quiero registrar que el cliente pagó". Se redactó la descripción técnica y los criterios de aceptación en el tablero para iniciar el desarrollo.
 - **Blockers:** None.
@@ -196,6 +204,7 @@
 - **Blockers:** None.
 
 ### Adrian Said Andrade Medina
+
 - **Yesterday:** Seleccione una historia de usuario.
 - **Today:** Definiré todo lo respecto a la historia de usuario
 - **Blockers:** None.
@@ -215,6 +224,7 @@
 - **Blockers:** None.
 
 ### Adrian Said Andrade Medina
+
 - **Yesterday:** Investigué sobre el framework Leaflet para la implementación de mapas.
 - **Today:** Planeo practicar con el framework antes de comenzar la implementación.
 - **Blockers:** None.
@@ -234,26 +244,31 @@
 ## 21-05-2026
 
 ### José Daniel Virreira Rufino
+
 - **Yesterday:** Mantuve contacto con miembros de los equipos SoftwareOne, Flow y WebSpire, con el fin de tratar las historias de usuario en las que tenemos dependencias mutuas. Mantuvimos contacto para aclarar dudas sobre cómo debemos trabajar.
 - **Today:** Terminar la funcionalidad de las historias de usuario asignadas a mi persona para este segundo sprint (la funcionalidad del mensajero ubicando pedido en el mapa).
 - **Blockers:** None.
 
 ### Efrain Peralta Felipe
+
 - **Yesterday:** Termine la hu que se me asigno.
 - **Today:** corregir posibles errores por la integración.
 - **Blockers:** None.
 
 ### Jhoel Gustavo Aiza Arce
+
 - **Yesterday:** Implementación completa de la HU #101 "registrar pago como mensajero", separando la lógica de pago de la entrega. Se habilitó el botón "Registrar pago" en el dashboard del mensajero, con validaciones para no entregar sin pagar. Se creó el PR #326 para revisión del equipo.
 - **Today:** Esperar la aprobación del PR #326 y estar atento a cualquier feedback o corrección solicitada por el equipo para proceder con el merge.
 - **Blockers:** None.
 
 ### Bruno Salcedo Cadiz
+
 - **Yesterday:** Continue trabajando con la implementacion de la HU #108 y preveo terminarla para el final del día.
 - **Today:** Terminar la HU #108 e integrarla correctamente
 - **Blockers:** Leves retrasos por la dependencia de mi HU #108 con la HU #105
 
 ### Adrian Said Andrade Medina
+
 - **Yesterday:** Avancé con la implementación del mapa para la visualización de la ubicación de entrega, revisando límites del área navegable y ajustes de coordenadas con Leaflet.
 - **Today:** Continuaré corrigiendo detalles de integración del mapa y validando que la funcionalidad funcione correctamente dentro del flujo del mensajero.
 - **Blockers:** Dudas puntuales sobre ajustes de Leaflet y manejo de coordenadas.
@@ -261,16 +276,19 @@
 ## 26-05-2026
 
 ### José Daniel Virreira Rufino
+
 - **Yesterday:** Trabajé con diferentes grupos para mantener la integración estable y las funcionalidades que fueron asignadas.
 - **Today:** Prepararé parte de las nuevas historias de usuario para el siguiente sprint, trabajaré en los bugs que nos indicó el ingeniero.
 - **Blockers:** Integraciones érroneas.
 
 ### Bruno Salcedo Cadiz
+
 - **Yesterday:** Trabaje en el retrospective y correcciones de bugs del sistema para repartidor
 - **Today:** Continuare trabajando en el arreglo de bugs y prepararé parte de las nuevas historias de usuario para el siguiente sprint.
 - **Blockers:** None,
 
 ### Efrain Peralta Felipe
+
 - **Yesterday:** Trabaje en el retrospective y correcciones del vendedor.
 - **Today:** Trabajare en los bugs del vendedor.
 - **Blockers:** None,
@@ -285,4 +303,41 @@
 
 - **Yesterday:** Verificacion de bugs reportados y analisis de las historias de usuario.
 - **Today:** Participación en la retrospectiva del equipo.
+- **Blockers:** None.
+
+## 28-05-2026
+
+### Efrain Peralta Felipe
+
+- **Yesterday:** Resolvi bug de la parte de reasignar mensajero, mejorar la visual del panel del vendedor e hice una refactorización.
+- **Today:** Empezare en el desarrollo de mi hu de este sprint.
+- **Blockers:** None.
+
+### Jhoel Gustavo Aiza Arce
+
+- **Yesterday:** 
+  - Se completó el bug de la descripción de ubicación para mensajero, permitiendo que el campo `reference` se muestre correctamente en el dashboard. (PR #410)
+  - Se implementó la HU de historial de entregas, agregando fecha, `orderCode` y ordenamiento descendente. (PR #411)
+
+- **Today:** 
+  - Estar atento a la revisión y aprobación de los PRs.
+  - Análisis del panorama del Sprint 3 para identificar dependencias con otros equipos.
+
+- **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+
+- **Yesterday:** Estube trabajando para añadir la funcionalidad pedida de agregar un boton de pago  para confirmar el cobro del dinero de un pedido en la vista de rendición
+- **Today:** Continue trabajando en esa funcionalidad y espero terminarlo hoy.
+- **Blockers:** None.
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Trabajé en el bug crítico que consistía en que no podía verse el mapa desde la vista del mensajero, fue corregido y testeado.
+- **Today:** Me comuniqué con un miembro del equipo DMinds para hablar y tratar bugs que se detectaron para este sprint. Trabajaré en la siguiente historia de usuario asignada.
+- **Blockers:** Detección de bugs.
+
+### Adrian
+
+- **Yesterday:** Estuve trabajando en la validación de datos, agregando más detalle a los criterios.
+- **Today:** Terminaré de corregir el bug.
 - **Blockers:** None.
