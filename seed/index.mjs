@@ -234,7 +234,11 @@ async function seedOrders() {
       in_transit: 'PENDIENTE',
       delivered: 'COBRADO',
       pending_reassignment: 'PENDIENTE',
+      NOT_DELIVERED: 'PENDIENTE',
+      CANCELLED: 'CANCELADO',
     };
+
+    const isCancelled = order.status === 'CANCELADO';
 
     await setDoc('orders', order.id, {
       orderId: order.id,
@@ -245,7 +249,9 @@ async function seedOrders() {
       customerPhone: order.customerPhone,
       address: order.location?.label ?? null,
       status: order.status,
-      incidentReason: null,
+      incidentReason: order.incidentReason ?? null,
+      failedAt: order.failedAt ? toTimestamp(order.failedAt) : null,
+      stockRestored: false,
       total,
       locationId: order.location.id,
       paymentStatus: paymentStatusMap[deliveryStatus] || 'PENDIENTE',
@@ -253,7 +259,7 @@ async function seedOrders() {
       deliveryId: null,
       paymentId: order.id,
       confirmedAt: toTimestamp(order.confirmedAt),
-      cancelledAt: null,
+      cancelledAt: isCancelled && order.failedAt ? toTimestamp(order.failedAt) : null,
       createdAt: toTimestamp(order.createdAt),
       updatedAt: toTimestamp(order.updatedAt),
     });

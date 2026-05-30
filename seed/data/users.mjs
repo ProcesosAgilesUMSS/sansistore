@@ -98,6 +98,18 @@ export const Users = {
     institutionalId: 'ADM-2020-001',
     isActive: true,
   },
+  // Super usuario de pruebas: tiene TODOS los roles para probar cualquier flujo.
+  MARKO: {
+    uid: 'user-marko',
+    email: 'marko@umss.edu',
+    displayName: 'Marko uwu',
+    photoURL:
+      'https://ui-avatars.com/api/?name=Marko+uwu&background=88B04B&color=fff',
+    authType: 'email',
+    roles: ['admin', 'vendedor', 'mensajero', 'operador_inv', 'comprador'],
+    institutionalId: 'SUP-2026-000',
+    isActive: true,
+  },
 };
 
 export const userList = Object.values(Users);
