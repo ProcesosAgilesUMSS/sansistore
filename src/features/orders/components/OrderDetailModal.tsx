@@ -1,9 +1,20 @@
+import { useState, useEffect } from "react";
 import type { Order } from "../types";
 import { X } from "lucide-react";
 import OrderStatusBadge from "./OrderStatusBadge";
 import OrderActions from "./OrderActions";
+import { getOrderById } from "../services/ordersService";
 
-export default function OrderDetailModal({ order, closeModal }: { order: Order, closeModal: () => void }) {
+export default function OrderDetailModal({ order: initialOrder, closeModal }: { order: Order, closeModal: () => void }) {
+  const [order, setOrder] = useState<Order>(initialOrder);
+
+  const refreshOrder = async () => {
+    const updatedOrder = await getOrderById(order.id);
+    if (updatedOrder) {
+      setOrder(updatedOrder);
+    }
+  };
+
   const formatDate = (value: any) => {
     if (!value) return "N/A";
     let date: Date;
@@ -68,6 +79,12 @@ export default function OrderDetailModal({ order, closeModal }: { order: Order, 
         <div className="col-start-4 col-end-13">{date}</div>
         <div className="col-start-1 col-end-4 truncate text-sm text-black/50 leading-[100%]">Ubiación: </div>
         <div className="col-start-4 col-end-13 leading-[100%] mb-4">{order.delivery.destination}</div>
+        {order.status === "CANCELADO" &&
+          <>
+            <div className="col-start-1 col-end-4 truncate text-sm text-black/50 leading-[100%]">Motivo de cancelación:</div>
+            <div className="col-start-4 col-end-13 leading-[100%] mb-4">{order.incidentReason}</div>
+          </>
+        }
 
         <div className="col-span-full grid grid-cols-subgrid">
           <div className="col-span-full grid grid-cols-subgrid border-y border-dashed py-0.5">
@@ -103,7 +120,7 @@ export default function OrderDetailModal({ order, closeModal }: { order: Order, 
 
 
         <div className="col-span-full flex justify-end mt-6">
-          <OrderActions order={order} onSuccess={closeModal} />
+          <OrderActions order={order} onUpdate={refreshOrder} />
         </div>
       </div>
     </div>

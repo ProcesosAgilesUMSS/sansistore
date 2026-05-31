@@ -19,6 +19,47 @@ import type { Order, OrderStatus, OrderItem, ReturnRequest } from "../types";
 
 // --- Seller Actions ---
 
+export async function paidOrder(orderId: string): Promise<void> {
+  const user = auth.currentUser;
+  if (!user) throw new Error("No autenticado");
+
+  const orderRef = doc(db, "orders", orderId);
+  const itemsSnapshot = await getDocs(collection(orderRef, "orderItems"));
+  const items = itemsSnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...(doc.data() as Omit<OrderItem, "itemId">)
+  }));
+
+  await runTransaction(db, async (transaction) => {
+    // 1. Gather all reads
+    const invRefs = items.map(item => doc(db, "inventory", item.productId));
+    const invSnaps = await Promise.all(invRefs.map(ref => transaction.get(ref)));
+
+    // 2. Perform all writes
+    transaction.update(orderRef, {
+      status: "PAGADO",
+      updatedAt: serverTimestamp(),
+    });
+
+    invSnaps.forEach((invSnap, index) => {
+      if (!invSnap.exists()) {
+        throw new Error(`Inventario no encontrado para el producto: ${items[index].productId}`);
+      }
+
+      const invData = invSnap.data();
+      const currentTotal = invData.stockTotal || 0;
+      const currentReserved = invData.stockReserved || 0;
+      const qty = items[index].quantity || 0;
+
+      transaction.update(invRefs[index], {
+        stockTotal: currentTotal - qty,
+        stockReserved: currentReserved - qty,
+        updatedAt: serverTimestamp(),
+      });
+    });
+  });
+}
+
 export async function reserveOrder(orderId: string): Promise<void> {
   const user = auth.currentUser;
   if (!user) throw new Error("Debe estar autenticado para reservar un pedido.");
@@ -36,6 +77,18 @@ export async function readyOrder(orderId: string): Promise<void> {
   await updateDoc(orderRef, {
     status: "LISTO",
     updatedAt: serverTimestamp(),
+  });
+}
+
+export async function cancelOrder(orderId: string, incidentReason: string): Promise<void> {
+  const orderRef = doc(db, "orders", orderId);
+  
+  await runTransaction(db, async (transaction) => {
+    transaction.update(orderRef, {
+      status: "CANCELADO",
+      incidentReason,
+      updatedAt: serverTimestamp(),
+    });
   });
 }
 
@@ -121,7 +174,7 @@ async function processQuerySnapshot(querySnapshot: QuerySnapshot<DocumentData>):
       const items = await Promise.all(itemsSnapshot.docs.map(async (itemDoc) => {
         const item = itemDoc.data();
         let stockAvailable = 0;
-        
+
         if (!stockMap.has(item.productId)) {
           const invSnap = await getDoc(doc(db, "inventory", item.productId));
           if (invSnap.exists()) {
@@ -161,6 +214,7 @@ async function processQuerySnapshot(querySnapshot: QuerySnapshot<DocumentData>):
         items,
         total: data.total,
         createdAt: data.createdAt,
+        incidentReason: data.incidentReason,
       };
     })
   );
@@ -197,10 +251,10 @@ export async function getOrderById(orderId: string): Promise<Order | null> {
   const items = await Promise.all(itemsSnapshot.docs.map(async (itemDoc) => {
     const item = itemDoc.data();
     let stockAvailable = 0;
-    
+
     const invSnap = await getDoc(doc(db, "inventory", item.productId));
     if (invSnap.exists()) {
-        stockAvailable = invSnap.data().stockAvailable || 0;
+      stockAvailable = invSnap.data().stockAvailable || 0;
     }
 
     return {
@@ -230,6 +284,7 @@ export async function getOrderById(orderId: string): Promise<Order | null> {
     items,
     total: data.total,
     createdAt: data.createdAt,
+    incidentReason: data.incidentReason,
   };
 }
 
@@ -305,3 +360,10 @@ export async function getMyReturns(userId: string): Promise<ReturnRequest[]> {
     ...doc.data()
   })) as ReturnRequest[];
 }
+
+
+//Revisa @src/features/orders/components/OrderActions.tsx implementé un nuevo order.status === "ENTREGADO", actualizo una order con ese estado a "PAGADO",
+//   pero necesito ampliar el metodo que hace eso en @src/features/orders/services/ordersService.ts [el metodo paidOrder()), necesito que si la orden esta
+//   pagada, ademas de actualizar el estado de la orden (de ENTREGADO A PAGADO), necesito actualizar el inventario de los productos que tiene esa orden, por
+//   cada producto, deberia ir al inventario (que tienen el mismo atributo) y cuando actualizar stockTotal -= stockReserved (o tambien puede ser quantity de el
+//   orderItem) y stockReserved -= stockReserved

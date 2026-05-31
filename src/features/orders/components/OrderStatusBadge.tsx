@@ -59,7 +59,7 @@ export default function OrderStatusBadge({ status }: { status: OrderStatus }) {
   }
 
   return (
-    <div className="flex items-center gap-2 border border-black/10 px-2 py-0.5 rounded text-xs uppercase">
+    <div className="text-xs uppercase">
       {status}
     </div>
   );

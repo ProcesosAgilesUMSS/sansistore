@@ -98,7 +98,7 @@ export default function Orders() {
                       >
                         <div className="flex items-center gap-x-2">
                           <Package size={14} />
-                          {label.toUpperCase()}
+                          {label}
                         </div>
                         {selectedStatuses.includes(status as OrderStatus) && <Check size={14} />}
                       </div>
@@ -126,7 +126,7 @@ export default function Orders() {
       >
         {filteredOrders.map((order, index) => (
           <SellerOrderItem
-            selectOrder={handleSelectOrder}
+            selectOrder={() => handleSelectOrder(order)}
             key={order.id + order.status}
             order={order}
             index={index}

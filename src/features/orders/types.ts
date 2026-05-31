@@ -14,17 +14,17 @@ export type OrderStatus =
   'LISTO';
 
 export const STATUS_LABELS: Record<OrderStatus, string> = {
-  CREADO: "Creado",
-  ASIGNADO: "Asignado",
-  'EN CAMINO': "En camino",
-  ENTREGADO: "Entregado",
-  PAGADO: "Pagado",
-  CANCELADO: "Cancelado",
-  'NO ENTREGADO': "No entregado",
-  RESERVADO: "Reservado",
-  PENDIENTE: "Pendiente",
-  EMPAQUETADO: "Empaquetado",
-  LISTO: "Listo"
+  CREADO: "CREADO",
+  ASIGNADO: "ASIGNADO",
+  'EN CAMINO': "EN CAMINO",
+  ENTREGADO: "ENTREGADO",
+  PAGADO: "PAGADO",
+  CANCELADO: "CANCELADO",
+  'NO ENTREGADO': "NO ENTREGADO",
+  RESERVADO: "RESERVADO",
+  PENDIENTE: "PENDIENTE",
+  EMPAQUETADO: "EMPAQUETADO",
+  LISTO: "LISTO"
 };
 
 export interface OrderItem {
@@ -53,6 +53,7 @@ export interface Order {
   total?: number;
   items: OrderItem[];
   createdAt: Timestamp;
+  incidentReason?: string;
 }
 
 export type ReturnStatus = 'pending_review' | 'approved' | 'rejected';
