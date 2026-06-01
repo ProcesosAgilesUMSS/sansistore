@@ -5,11 +5,8 @@ import { parseOrderId } from '@features/cart/services/orderService';
 
 export default function SellerOrderItem({
   order,
-  selectOrder
 }: {
   order: Order;
-  index: number;
-  selectOrder: () => void
 }) {
   const handleReady = async () => {
     try {
@@ -30,8 +27,8 @@ export default function SellerOrderItem({
   };
 
   return (
-    <li
-      onClick={() => selectOrder()}
+    <a
+      href={`/orders/${order.id}`}
       className="grid grid-cols-subgrid col-span-full border-b py-[10px] min-[760px]:py-0 border-black/20 cursor-pointer hover:bg-black/5"
     >
       <div className="col-span-full min-[760px]:col-start-1 min-[760px]:col-end-3 text-sm flex items-center gap-[8px] text-xs">
@@ -73,6 +70,6 @@ export default function SellerOrderItem({
           Pagado
         </button>
       )}
-    </li>
+    </a>
   );
 }
