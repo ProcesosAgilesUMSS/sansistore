@@ -1,0 +1,8 @@
+---
+import InventoryLayout from '../../layouts/InventoryLayout.astro';
+import { FailedOrdersPanel } from '../../features/inventory/components/FailedOrdersPanel.tsx';
+---
+
+<InventoryLayout title="Sansistore | Pedidos con fallos">
+  <FailedOrdersPanel client:load />
+</InventoryLayout>
