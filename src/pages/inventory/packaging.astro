@@ -1,0 +1,29 @@
+---
+import InventoryLayout from '../../layouts/InventoryLayout.astro';
+import { OrderDispatch } from '../../features/inventory/components/OrderDispatch.tsx';
+import { WarehouseHandover } from '../../features/inventory/components/WarehouseHandover.tsx';
+import { StockMovementForm } from '../../features/inventory/components/StockMovementForm.tsx';
+import { MovementHistory } from '../../features/inventory/components/MovementHistory.tsx';
+---
+
+<InventoryLayout title="Sansistore | Movimientos">
+  
+
+  <section class="mb-8">
+    <div class="mb-4">
+    
+      <h2 class="font-['Outfit'] font-black text-2xl tracking-tight text-(--theme-text)">
+      Gestión de <span class="text-primary">Despachos</span>
+      </h2>
+      <p class="text-xs opacity-60 text-(--theme-text)">Preparación de paquetes y entrega física a mostrador.</p>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+      <OrderDispatch client:load />
+      <WarehouseHandover client:load />
+    </div>
+  </section>
+
+  <hr class="border-(--theme-border)/50 my-10" />
+
+</InventoryLayout>
