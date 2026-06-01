@@ -1,10 +1,8 @@
 ---
-import SellerOrdersPanel from '../../features/seller/components/SellerOrderPanel';
-import Orders from '../../features/orders/components/Orders';
-import SellerLayout from '../../layouts/SellerLayout.astro';
+import OrdersComponent from "@features/orders/components/Orders";
+import SellerLayout from '@/layouts/SellerLayout.astro';
 ---
 
 <SellerLayout title="Pedidos">
-  {/* <SellerOrdersPanel client:load embedded />*/} 
-  <Orders client:load />
+  <OrdersComponent client:load />
 </SellerLayout>
