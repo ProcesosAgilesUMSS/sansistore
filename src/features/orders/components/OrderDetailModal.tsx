@@ -1,9 +1,10 @@
 import { useState } from "react";
-import type { Order } from "../types";
+import type { Order } from "@features/orders/types";
 import { X, ChevronDown } from "lucide-react";
-import OrderStatusBadge from "./OrderStatusBadge";
-import OrderActions from "./OrderActions";
-import { getOrderById } from "../services/ordersService";
+import OrderStatusBadge from "@features/orders/components/OrderStatusBadge";
+import OrderActions from "@features/orders/components/OrderActions";
+import { getOrderById } from "@features/orders/services/ordersService";
+import { parseOrderId } from '@features/cart/services/orderService';
 
 export default function OrderDetailModal({ order: initialOrder, closeModal }: { order: Order, closeModal: () => void }) {
   const [order, setOrder] = useState<Order>(initialOrder);
@@ -61,8 +62,12 @@ export default function OrderDetailModal({ order: initialOrder, closeModal }: { 
         onClick={(e) => e.stopPropagation()}
         style={{ animation: 'slideUp 300ms cubic-bezier(0.23, 1, 0.32, 1)' }}
       >
+        <span className="col-span-full w-full block text-xs text-slate-500 truncate">
+          {parseOrderId(order.id).uuid}
+        </span>
+
         <div className="col-span-full grid grid-cols-subgrid items-center mb-6">
-          <span className="uppercase text-lg font-bold tracking-tight truncate col-start-1 col-end-7 max-[760px]:col-end-4">{order.id}</span>
+          <span className="text-lg font-bold tracking-tight truncate col-start-1 col-end-7 max-[760px]:col-end-4">{parseOrderId(order.id).friendlyName}</span>
           <div className="col-start-8 col-end-12 max-[760px]:col-start-4 max-[760px]:col-end-7 w-fit">
             <OrderStatusBadge status={order.status} />
           </div>
