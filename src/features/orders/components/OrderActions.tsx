@@ -7,7 +7,7 @@ export default function OrderActions({ order, onUpdate }: { order: Order; onUpda
   const [showCancelPrompt, setShowCancelPrompt] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
 
-  const handleAction = async (actionFn: () => Promise<void>, closeModal = true) => {
+  const handleAction = async (actionFn: () => Promise<void>) => {
     setLoading(true);
     try {
       await actionFn();
@@ -27,28 +27,22 @@ export default function OrderActions({ order, onUpdate }: { order: Order; onUpda
   const isProtectedStatus = ["CANCELADO", "ENTREGADO", "PAGADO", "CREADO"].includes(order.status);
 
   return (
-    <div className="flex gap-2">
+    <div className={`flex gap-2 ${showCancelPrompt ? 'w-full' : ''}`}>
       {showCancelPrompt ? (
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center w-full">
           <input
             type="text"
             value={cancelReason}
             onChange={(e) => setCancelReason(e.target.value)}
             placeholder="Motivo de cancelación"
-            className="border rounded px-2 py-0.5 text-sm"
+            className="border rounded px-2 py-0.5 text-sm flex-1 outline-none focus:border-red-500/50 transition-colors"
           />
           <button
             disabled={loading || !cancelReason}
-            onClick={() => handleAction(() => cancelOrder(order.id, cancelReason), false)}
-            className="bg-red-600 text-white rounded-lg disabled:opacity-50 transition-opacity tracking-tight px-2 py-0.5 cursor-pointer text-sm"
+            onClick={() => handleAction(() => cancelOrder(order.id, cancelReason))}
+            className="bg-red-600 text-white rounded-lg disabled:opacity-50 transition-opacity tracking-tight px-4 py-0.5 cursor-pointer text-sm whitespace-nowrap"
           >
-            Confirmar
-          </button>
-          <button
-            onClick={() => setShowCancelPrompt(false)}
-            className="bg-gray-400 text-white rounded-lg px-2 py-0.5 cursor-pointer text-sm"
-          >
-            Cancelar
+            {loading ? "Confirmando..." : "Confirmar"}
           </button>
         </div>
       ) : (

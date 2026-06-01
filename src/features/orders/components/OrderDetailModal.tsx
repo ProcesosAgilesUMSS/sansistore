@@ -1,12 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { Order } from "../types";
-import { X } from "lucide-react";
+import { X, ChevronDown } from "lucide-react";
 import OrderStatusBadge from "./OrderStatusBadge";
 import OrderActions from "./OrderActions";
 import { getOrderById } from "../services/ordersService";
 
 export default function OrderDetailModal({ order: initialOrder, closeModal }: { order: Order, closeModal: () => void }) {
   const [order, setOrder] = useState<Order>(initialOrder);
+  const [selectedCol, setSelectedCol] = useState<'precio' | 'monto' | 'stock'>('monto');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const refreshOrder = async () => {
     const updatedOrder = await getOrderById(order.id);
@@ -55,17 +57,17 @@ export default function OrderDetailModal({ order: initialOrder, closeModal }: { 
       style={{ animation: 'fadeIn 200ms ease-out' }}
     >
       <div
-        className="mx-auto w-[65ch] grid grid-cols-[repeat(16,_1fr)] p-4 rounded-xl bg-white z-10 shadow-2xl border border-black/10 transition-all duration-300 ease-out"
+        className="mx-auto w-[95%] max-w-[65ch] max-[760px]:max-w-[480px] grid grid-cols-[repeat(16,_1fr)] max-[760px]:grid-cols-7 p-3 rounded-xl bg-white z-10 shadow-2xl border border-black/10 transition-all duration-300 ease-out"
         onClick={(e) => e.stopPropagation()}
         style={{ animation: 'slideUp 300ms cubic-bezier(0.23, 1, 0.32, 1)' }}
       >
         <div className="col-span-full grid grid-cols-subgrid items-center mb-6">
-          <span className="uppercase text-lg font-bold tracking-tight truncate col-start-1 col-end-7">{order.id}</span>
-          <div className="col-start-8 col-end-12 w-fit">
+          <span className="uppercase text-lg font-bold tracking-tight truncate col-start-1 col-end-7 max-[760px]:col-end-4">{order.id}</span>
+          <div className="col-start-8 col-end-12 max-[760px]:col-start-4 max-[760px]:col-end-7 w-fit">
             <OrderStatusBadge status={order.status} />
           </div>
           <button
-            className="cursor-pointer col-start-16 col-end-17 justify-self-end p-1 hover:bg-black/5 rounded-full transition-all active:scale-90"
+            className="cursor-pointer col-start-16 col-end-17 max-[760px]:col-start-7 max-[760px]:col-end-8 justify-self-end hover:bg-black/5 rounded-full transition-all active:scale-90"
             onClick={closeModal}
             aria-label="Cerrar modal"
           >
@@ -73,35 +75,69 @@ export default function OrderDetailModal({ order: initialOrder, closeModal }: { 
           </button>
         </div>
 
-        <div className="col-start-1 col-end-4 truncate text-sm text-black/50 leading-[100%]">Comprador:</div>
-        <div className="col-start-4 col-end-13 leading-[100%]">{order.buyerName}</div>
-        <div className="col-start-1 col-end-4 truncate text-sm text-black/50">Creación: </div>
-        <div className="col-start-4 col-end-13">{date}</div>
-        <div className="col-start-1 col-end-4 truncate text-sm text-black/50 leading-[100%]">Ubiación: </div>
-        <div className="col-start-4 col-end-13 leading-[100%] mb-4">{order.delivery.destination}</div>
+        <div className="col-start-1 col-end-4 max-[760px]:col-end-3 truncate text-sm text-black/50 leading-[120%]">Comprador:</div>
+        <div className="col-start-4 col-end-13 max-[760px]:col-start-3 max-[760px]:col-end-7 leading-[120%]">{order.buyerName}</div>
+        <div className="col-start-1 col-end-4 max-[760px]:col-end-3 truncate text-sm text-black/50 leading-[120%]">Creación: </div>
+        <div className="col-start-4 col-end-13 max-[760px]:col-start-3 max-[760px]:col-end-7 leading-[120%]">{date}</div>
+        <div className="col-start-1 col-end-4 max-[760px]:col-end-3 truncate text-sm text-black/50 leading-[120%]">Ubicación: </div>
+        <div className={`col-start-4 col-end-13 max-[760px]:col-start-3 max-[760px]:col-end-8 leading-[120%] truncate ${order.status === "CANCELADO" ? "" : "mb-4"}`}>{order.delivery.destination}</div>
         {order.status === "CANCELADO" &&
           <>
-            <div className="col-start-1 col-end-4 truncate text-sm text-black/50 leading-[100%]">Motivo de cancelación:</div>
-            <div className="col-start-4 col-end-13 leading-[100%] mb-4">{order.incidentReason}</div>
+            <div className="col-start-1 col-end-4 max-[760px]:col-end-3 truncate text-sm text-black/50 leading-[120%]">Motivo:</div>
+            <div className="col-start-4 col-end-13 max-[760px]:col-start-3 max-[760px]:col-end-7 leading-[120%] mb-4 ">{order.incidentReason}</div>
           </>
         }
 
         <div className="col-span-full grid grid-cols-subgrid">
-          <div className="col-span-full grid grid-cols-subgrid border-y border-dashed py-0.5">
-            <div className="col-start-1 col-end-3">Cantidad</div>
-            <div className="col-start-3 col-end-9 ml-2">Producto</div>
-            <div className="col-start-11 col-end-13">Precio</div>
-            <div className="col-start-14 col-end-15">Monto</div>
-            <div className="col-start-16 col-end-17">Stock</div>
+          <div className="col-span-full grid grid-cols-subgrid border-y border-dashed py-0.5 items-center">
+            <div className="col-start-1 col-end-3 max-[760px]:col-end-2">Cantidad</div>
+            <div className="col-start-3 col-end-10 max-[760px]:col-start-2 max-[760px]:col-end-5 max-[760px]:ml-6">Producto</div>
+
+            <div className="hidden min-[760px]:block col-start-11 col-end-13">Precio</div>
+            <div className="hidden min-[760px]:block col-start-13 col-end-16 ml-6">Monto</div>
+            <div className="hidden min-[760px]:block col-start-16 col-end-17">Stock</div>
+
+            <div
+              className="min-[760px]:hidden col-start-6 col-end-8 relative cursor-pointer hover:bg-black/5 transition-colors px-1 py-0.5 rounded flex items-center gap-1 justify-end select-none"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              <span className="capitalize">{selectedCol}</span>
+              <ChevronDown size={12} className={`transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`} />
+
+              {isMenuOpen && (
+                <div className="absolute top-full right-0 mt-1 bg-white border border-black/10 shadow-lg rounded-md z-20 py-1 w-24">
+                  {(['precio', 'monto', 'stock'] as const).map((col) => (
+                    <button
+                      key={col}
+                      className={`block w-full text-left px-3 py-1 text-sm hover:bg-black/5 capitalize ${selectedCol === col ? 'font-bold' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedCol(col);
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      {col}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-          <ul className="grid grid-cols-subgrid col-span-full py-2">
+          <ul className="grid grid-cols-subgrid col-span-full py-1">
             {order.items.map((item, index) => (
-              <li key={index} className="grid grid-cols-subgrid col-span-full">
-                <div className="col-start-1 col-end-2 text-center">{item.quantity}</div>
-                <div className="col-start-3 col-end-10 truncate ml-2">{item.productName}</div>
-                <div className="col-start-11 col-end-13">{formatCurrency(item.unitPrice)}</div>
-                <div className="col-start-14 col-end-16">{formatCurrency(item.subtotal)}</div>
-                <div className="col-start-16 col-end-17 justify-self-end">{item.stockAvailable}</div>
+              <li key={index} className="grid grid-cols-subgrid col-span-full items-center leading-[130%]">
+                <div className="col-start-1 col-end-3 max-[760px]:col-end-2 ml-1">{item.quantity}</div>
+                <div className="col-start-3 col-end-10 max-[760px]:col-start-2 max-[760px]:col-end-6 truncate max-[760px]:ml-6">{item.productName}</div>
+
+                <div className="hidden min-[760px]:block col-start-11 col-end-13">{formatCurrency(item.unitPrice)}</div>
+                <div className="hidden min-[760px]:block col-start-13 col-end-16 ml-6">{formatCurrency(item.subtotal)}</div>
+                <div className="hidden min-[760px]:block col-start-16 col-end-17 justify-self-end">{item.stockAvailable}</div>
+
+                <div className="min-[760px]:hidden col-start-6 col-end-8 text-right">
+                  {selectedCol === 'precio' && formatCurrency(item.unitPrice)}
+                  {selectedCol === 'monto' && formatCurrency(item.subtotal)}
+                  {selectedCol === 'stock' && item.stockAvailable}
+                </div>
               </li>
             ))}
           </ul>
@@ -117,7 +153,6 @@ export default function OrderDetailModal({ order: initialOrder, closeModal }: { 
             <span>{formatCurrency(order.total)}</span>
           </div>
         </div>
-
 
         <div className="col-span-full flex justify-end mt-6">
           <OrderActions order={order} onUpdate={refreshOrder} />
