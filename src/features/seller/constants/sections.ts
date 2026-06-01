@@ -1,11 +1,16 @@
 export const sections = [
   {
+    id: 'mis pedidos',
+    label: 'Mis pedidos',
+    route: '/seller/orders',
+  },
+  {
     id: 'creados',
     label: 'Pedidos Creados',
     route: '/seller/created-orders',
   },
   {
-    id: 'empaqutados',
+    id: 'empaquetados',
     label: 'Pedidos Empaquetados',
     route: '/seller/packaged-orders',
   },

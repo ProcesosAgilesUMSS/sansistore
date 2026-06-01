@@ -1,6 +1,6 @@
 import type { Order } from "../types";
 import OrderStatusBadge from "./OrderStatusBadge";
-import { readyOrder } from "../services/ordersService";
+import { paidOrder, readyOrder } from "../services/ordersService";
 
 export default function SellerOrderItem({
   order,
@@ -9,7 +9,7 @@ export default function SellerOrderItem({
 }: {
   order: Order;
   index: number;
-  selectOrder: (order: Order) => void
+  selectOrder: () => void
 }) {
   const displayId = `ord-${(index + 1).toString().padStart(3, "0")}`;
 
@@ -22,9 +22,18 @@ export default function SellerOrderItem({
     }
   };
 
+  const handlePaid = async () => {
+    try {
+      await paidOrder(order.id);
+    } catch (error) {
+      console.error("Error updating order to paid:", error);
+      alert("Error al marcar la orden como pagado. Por favor intenta de nuevo.");
+    }
+  };
+
   return (
     <li
-      onClick={() => selectOrder(order)}
+      onClick={() => selectOrder()}
       className="grid grid-cols-subgrid col-span-full border-b py-[10px] min-[760px]:py-0 border-black/20 cursor-pointer hover:bg-black/5"
     >
       <div className="col-span-full min-[760px]:col-start-1 min-[760px]:col-end-3 text-sm flex items-center gap-[8px] text-xs uppercase">
@@ -45,13 +54,25 @@ export default function SellerOrderItem({
 
       {order.status === "EMPAQUETADO" && (
         <button
-          className="text-left min-[760px]:col-start-16 min-[960px]:col-start-21 min-[960px]:col-end-23 text-sm underline decoration-2 cursor-pointer underline-offset-2"
+          className="min-[760px]:col-start-16 min-[960px]:col-start-21 min-[960px]:col-end-23 text-sm cursor-pointer"
           onClick={(e) => {
             e.stopPropagation();
             handleReady();
           }}
         >
-          Listo
+          <span className="border px-2 py-1 border-black/30 rounded">Listo</span>
+        </button>
+      )}
+
+      {order.status === "ENTREGADO" && (
+        <button
+          className="text-left min-[760px]:col-start-16 min-[960px]:col-start-21 min-[960px]:col-end-23 text-sm underline decoration-2 cursor-pointer underline-offset-2"
+          onClick={(e) => {
+            e.stopPropagation();
+            handlePaid();
+          }}
+        >
+          Pagado
         </button>
       )}
     </li>

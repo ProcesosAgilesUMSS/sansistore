@@ -33,8 +33,6 @@ export default function CreatedOrdersList() {
       )}
       <OrderGridSection
         title="Ordenes creadas"
-        count={orders.length}
-        countLabel="orderenes creadas"
         loading={loading}
         loadingMessage="Receiving created orders"
         ariaLabelledby="orders-created-title"

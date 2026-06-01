@@ -8,8 +8,8 @@ export function CheckBox({ checked }: IconProps) {
 
   return (
     <svg
-      width="15"
-      height="14"
+      width="11"
+      height="11"
       viewBox="0 0 10 9"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
