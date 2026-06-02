@@ -1,5 +1,6 @@
 import { DollarSign, ReceiptText } from 'lucide-react';
-import { useDailyCollections } from '../hooks/useDailyCollections';
+import { useDailyCollections } from '@features/seller/hooks/useDailyCollections';
+import { parseOrderId } from '@features/cart/services/orderService';
 
 const currencyFormatter = new Intl.NumberFormat('es-BO', {
   style: 'currency',
@@ -153,8 +154,11 @@ export default function DailyCollectionsPanel({
                 className="grid gap-3 rounded-2xl border border-(--theme-border) bg-(--theme-secondary-bg)/35 p-4 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center"
               >
                 <div className="min-w-0">
-                  <p className="truncate text-base font-900 text-(--theme-text)">
-                    {order.orderId}
+                  <p className="text-xs text-slate-500 truncate">
+                    {parseOrderId(order.orderId).uuid}
+                  </p>
+                  <p className="text-lg font-bold">
+                    {parseOrderId(order.orderId).friendlyName}
                   </p>
                   <div className="mt-1 flex flex-wrap gap-2">
                     <span className="text-xs font-700 uppercase tracking-[0.16em] text-primary">

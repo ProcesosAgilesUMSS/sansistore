@@ -1,18 +1,13 @@
-import type { Order } from "../types";
-import OrderStatusBadge from "./OrderStatusBadge";
-import { paidOrder, readyOrder } from "../services/ordersService";
+import type { Order } from "@features/orders/types";
+import OrderStatusBadge from "@features/orders/components/OrderStatusBadge";
+import { paidOrder, readyOrder } from "@features/orders/services/ordersService";
+import { parseOrderId } from '@features/cart/services/orderService';
 
 export default function SellerOrderItem({
   order,
-  index,
-  selectOrder
 }: {
   order: Order;
-  index: number;
-  selectOrder: () => void
 }) {
-  const displayId = `ord-${(index + 1).toString().padStart(3, "0")}`;
-
   const handleReady = async () => {
     try {
       await readyOrder(order.id);
@@ -32,13 +27,13 @@ export default function SellerOrderItem({
   };
 
   return (
-    <li
-      onClick={() => selectOrder()}
+    <a
+      href={`/seller/orders/${order.id}`}
       className="grid grid-cols-subgrid col-span-full border-b py-[10px] min-[760px]:py-0 border-black/20 cursor-pointer hover:bg-black/5"
     >
-      <div className="col-span-full min-[760px]:col-start-1 min-[760px]:col-end-3 text-sm flex items-center gap-[8px] text-xs uppercase">
+      <div className="col-span-full min-[760px]:col-start-1 min-[760px]:col-end-3 text-sm flex items-center gap-[8px] text-xs">
         <div className="size-1.5 bg-[#1e1e1e]" />
-        {displayId}
+        {parseOrderId(order.id).friendlyName}
       </div>
       <div className="col-start-1 col-end-9 min-[760px]:col-start-3 min-[760px]:col-end-10 text-[calc(.78125vw+13.5px)] truncate
       min-[960px]:col-end-13 tracking-tight">
@@ -75,6 +70,6 @@ export default function SellerOrderItem({
           Pagado
         </button>
       )}
-    </li>
+    </a>
   );
 }
