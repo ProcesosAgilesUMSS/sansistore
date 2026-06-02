@@ -30,9 +30,9 @@ export default function LoginPage() {
             const result = await signInWithEmailAndPassword(auth, emailValue, passwordValue);
             console.log('[Login] success');
 
-            // ── HU #159: registrar LOGIN ──
-            // Leemos datos del usuario desde Firestore para obtener nombre y roles
-            // Si falla el log, no bloqueamos el login
+            //HU #159: registrar LOGIN 
+            //Leemos datos del usuario desde Firestore para obtener nombre y roles
+            //Si falla el log, no bloqueamos el login
             try {
                 const userSnap = await getDoc(doc(db, 'users', result.user.uid));
                 const userData = userSnap.exists() ? userSnap.data() : null;

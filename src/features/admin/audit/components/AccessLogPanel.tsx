@@ -22,7 +22,7 @@ const formatDateTime = (date: Date): string =>
 const RoleBadge = ({ role }: { role: string }) => {
   const styles: Record<string, string> = {
     vendedor: 'bg-blue-500/10 text-blue-600',
-    operador: 'bg-purple-500/10 text-purple-600',
+    operador_inv: 'bg-purple-500/10 text-purple-600',
     mensajero: 'bg-orange-500/10 text-orange-600',
     admin: 'bg-[rgba(136,176,75,0.15)] text-[#5E7E2F]',
     comprador: 'bg-gray-100 text-gray-500',
@@ -96,16 +96,33 @@ export default function AccessLogPanel() {
   }, []);
 
   const handleFilter = () => {
+    const parseLocalDate = (dateStr: string) => {
+      const [year, month, day] = dateStr.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    };
     void fetchLogs({
-      startDate: startDate ? new Date(startDate) : undefined,
-      endDate: endDate ? new Date(endDate) : undefined,
+      startDate: startDate ? parseLocalDate(startDate) : undefined,
+      endDate: endDate ? parseLocalDate(endDate) : undefined,
       role: roleFilter,
       action: actionFilter,
     });
   };
 
   // Calcular estadísticas rápidas
-  const activeUsers = logs.filter((l) => l.status === 'ACTIVO').length;
+
+  // Sesiones activas: toma el último registro de cada usuario
+  // y verifica si su estado es ACTIVO
+  const activeUsers = (() => {
+    const lastByUser = new Map<string, AccessLog>();
+    logs.forEach((l) => {
+      const existing = lastByUser.get(l.uid);
+      if (!existing || l.timestamp > existing.timestamp) {
+        lastByUser.set(l.uid, l);
+      }
+    });
+    return [...lastByUser.values()].filter((l) => l.status === 'ACTIVO').length;
+  })();
+
   const todayLogins = logs.filter((l) => {
     const logDate = new Date(l.timestamp);
     return (
@@ -113,8 +130,18 @@ export default function AccessLogPanel() {
       logDate.toDateString() === new Date().toDateString()
     );
   }).length;
-  const vendedores = logs.filter((l) => l.roles.includes('vendedor')).length;
-  const operadores = logs.filter((l) => l.roles.includes('operador')).length;
+
+  // Usuarios únicos por rol (no cuenta múltiples registros del mismo usuario)
+  const vendedores = new Set(
+    logs
+      .filter((l) => l.roles.includes('vendedor'))
+      .map((l) => l.uid)
+  ).size;
+  const operadores = new Set(
+    logs
+      .filter((l) => l.roles.includes('operador_inv'))
+      .map((l) => l.uid)
+  ).size;
 
   return (
     <div className="max-w-5xl">
@@ -184,7 +211,7 @@ export default function AccessLogPanel() {
           >
             <option value="todos">Todos los roles</option>
             <option value="vendedor">Vendedor ⭐</option>
-            <option value="operador">Operador ⭐</option>
+            <option value="operador_inv">Operador ⭐</option>
             <option value="mensajero">Mensajero</option>
             <option value="admin">Admin</option>
             <option value="comprador">Comprador</option>

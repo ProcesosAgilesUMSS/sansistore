@@ -10,7 +10,6 @@ import {
   getDocs,
   query,
   where,
-  orderBy,
   serverTimestamp,
   Timestamp,
 } from 'firebase/firestore';
@@ -47,16 +46,14 @@ export const registrarAcceso = async (
 export const getAccessLogs = async (
   filter?: AccessLogFilter
 ): Promise<AccessLog[]> => {
-  // Construir la query base ordenada por timestamp descendente
-  // (los más recientes primero)
-  let q = query(
-    collection(db, COLLECTION),
-    orderBy('timestamp', 'desc')
-  );
+  // Construir la query base sin orderBy para evitar requerir índices compuestos
+  let q = query(collection(db, COLLECTION));
 
   // Aplicar filtro de fechas si se proporcionó
   if (filter?.startDate) {
-    const startTimestamp = Timestamp.fromDate(filter.startDate);
+    const start = new Date(filter.startDate);
+    start.setHours(0, 0, 0, 0);
+    const startTimestamp = Timestamp.fromDate(start);
     q = query(q, where('timestamp', '>=', startTimestamp));
   }
   if (filter?.endDate) {
@@ -82,10 +79,12 @@ export const getAccessLogs = async (
       roles: data.roles ?? [],
       action: data.action ?? 'LOGIN',
       status: data.status ?? 'CERRADO',
-      // Convertir Timestamp de Firestore a Date de JavaScript
       timestamp: data.timestamp?.toDate() ?? new Date(),
     };
   });
+
+  // Ordenar en memoria por timestamp descendente (más recientes primero)
+  logs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 
   // Si se especificó filtro de rol, filtramos en memoria
   // (Firestore no permite where sobre arrays con múltiples condiciones)
