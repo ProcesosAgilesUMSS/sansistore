@@ -112,7 +112,7 @@ export default function LocationCard({
 
                 <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                        <span className="font-outfit text-sm font-extrabold leading-none text-(--theme-text) transition-colors duration-300">
+                        <span className="font-outfit text-sm font-extrabold leading-none text-(--theme-text) transition-colors duration-300  truncate block w-full">
                             {label}
                         </span>
                     </div>
