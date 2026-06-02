@@ -24,6 +24,7 @@ import TopSellingProducts from '../ventas/top-products/components/TopSellingProd
 import ConfigPanel from '../settings/components/ConfigPanel.tsx';
 // ── HU #161: Reportes de ventas ──
 import SalesReport from '../analytics/components/SalesReport.tsx';
+import AccessLogPanel from '../audit/components/AccessLogPanel.tsx';
 
 type Section =
   | 'dashboard'
@@ -34,6 +35,7 @@ type Section =
   | 'mas-vendidos'
   | 'parametros'     // ── HU #152 ──
   | 'reportes'       // ── HU #161 ──
+  | 'bitacora'       
   | null;
 
 interface NavItem {
@@ -89,6 +91,11 @@ export default function AdminLayout() {
           icon: <Settings size={15} />,
           section: 'parametros',
         },
+        {
+          label: 'Bitácora',
+          icon: <Settings size={15} />,
+          section: 'bitacora',
+        },
       ],
     },
     {
@@ -118,6 +125,7 @@ export default function AdminLayout() {
     parametros: { title: 'Parámetros del sistema', subtitle: 'Configura los parámetros globales del sistema' },
     // ── HU #161 ──
     reportes: { title: 'Reportes de ventas', subtitle: 'Genera reportes de ventas por rango de fechas' },
+    bitacora: { title: 'Bitacora', subtitle: 'registra actividad de inicio y cierre de sesion' },
   };
 
   const currentPage = pageTitles[activeSection ?? 'dashboard'];
@@ -326,6 +334,7 @@ export default function AdminLayout() {
           {activeSection === 'parametros' && <ConfigPanel />}
           {/*Reportes de ventas*/}
           {activeSection === 'reportes' && <SalesReport />}
+          {activeSection === 'bitacora' && <AccessLogPanel />}
         </main>
 
       </div>

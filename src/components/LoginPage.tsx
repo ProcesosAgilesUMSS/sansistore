@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { FirebaseError } from 'firebase/app';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../lib/firebase';
 import GoogleLoginButton from '../components/GoogleLoginButton';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { Eye, EyeOff } from 'lucide-react';
+// ── HU #159: registrar LOGIN en bitácora ──
+import { registrarAcceso } from '../features/admin/audit/services/accessLogService';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -24,8 +27,26 @@ export default function LoginPage() {
         setError(null);
 
         try {
-            await signInWithEmailAndPassword(auth, emailValue, passwordValue);
+            const result = await signInWithEmailAndPassword(auth, emailValue, passwordValue);
             console.log('[Login] success');
+
+            // ── HU #159: registrar LOGIN ──
+            // Leemos datos del usuario desde Firestore para obtener nombre y roles
+            // Si falla el log, no bloqueamos el login
+            try {
+                const userSnap = await getDoc(doc(db, 'users', result.user.uid));
+                const userData = userSnap.exists() ? userSnap.data() : null;
+                await registrarAcceso({
+                    uid: result.user.uid,
+                    displayName: userData?.displayName ?? result.user.displayName ?? 'Usuario',
+                    email: result.user.email ?? emailValue,
+                    roles: userData?.roles ?? [],
+                    action: 'LOGIN',
+                });
+            } catch {
+                console.warn('[AccessLog] No se pudo registrar el acceso.');
+            }
+
             setSuccess(true);
             window.location.assign('/');
         } catch (err: unknown) {
