@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { collection, query, where, onSnapshot, getDocs, doc, updateDoc, serverTimestamp, getDoc } from 'firebase/firestore'; // Añadimos getDoc
-import { db } from '../../../lib/firebase';
+import { db } from '@/lib/firebase';
 import { PackageSearch, PackageCheck, AlertCircle, CheckCircle2, Play, X, ListFilter, User } from 'lucide-react';
+import { parseOrderId } from '@/features/cart/services/orderService';
 
 interface OrderItem {
   productId: string;
@@ -31,22 +32,22 @@ export const OrderDispatch: React.FC = () => {
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  
+
   const [activeOrderForModal, setActiveOrderForModal] = useState<Order | null>(null);
 
   useEffect(() => {
     const q = query(collection(db, 'orders'), where('status', 'in', ['RESERVADO', 'PENDIENTE']));
-    
+
     const unsubscribe = onSnapshot(q, async (snapshot) => {
       const fetchedOrders = await Promise.all(snapshot.docs.map(async (orderDoc) => {
         const orderData = orderDoc.data();
-        
+
         // 1. Consultar los items del pedido
         const itemsSnap = await getDocs(collection(db, 'orders', orderDoc.id, 'orderItems'));
         const items = itemsSnap.docs.map(itemDoc => {
           const itemData = itemDoc.data();
           return {
-            productId: itemData.productId || itemDoc.id, 
+            productId: itemData.productId || itemDoc.id,
             productName: itemData.productName || 'Producto sin nombre',
             quantity: itemData.quantity || 1
           };
@@ -93,11 +94,11 @@ export const OrderDispatch: React.FC = () => {
     setError('');
     try {
       const orderRef = doc(db, 'orders', order.id);
-      await updateDoc(orderRef, { 
+      await updateDoc(orderRef, {
         status: 'PENDIENTE',
-        warehouseStartedAt: serverTimestamp() 
+        warehouseStartedAt: serverTimestamp()
       });
-      
+
       setActiveOrderForModal({ ...order, status: 'PENDIENTE' });
     } catch (err: any) {
       setError('Error al iniciar la preparación del pedido.');
@@ -111,11 +112,11 @@ export const OrderDispatch: React.FC = () => {
     setError('');
     try {
       const orderRef = doc(db, 'orders', orderId);
-      await updateDoc(orderRef, { 
+      await updateDoc(orderRef, {
         status: 'EMPAQUETADO',
         warehouseFinishedAt: serverTimestamp()
       });
-      
+
       setActiveOrderForModal(null);
       setSuccess(`Pedido #${orderId.slice(-5).toUpperCase()} empaquetado exitosamente.`);
       setTimeout(() => setSuccess(''), 4000);
@@ -127,7 +128,7 @@ export const OrderDispatch: React.FC = () => {
   };
 
   // Función auxiliar suuper limpia usando los datos reales extraídos de users
-  const getSellerName = (order: Order) => 
+  const getSellerName = (order: Order) =>
     order.seller?.displayName || order.sellerId || 'Vendedor Desconocido';
 
   if (loading) return <div className="animate-pulse h-full min-h-[300px] bg-(--theme-secondary-bg) rounded-3xl"></div>;
@@ -169,13 +170,16 @@ export const OrderDispatch: React.FC = () => {
             {orders.map(order => (
               <div key={order.id} className="border border-(--theme-border) bg-(--theme-secondary-bg) rounded-2xl p-4 flex flex-col justify-between">
                 <div className="mb-4">
+                  <span className="block text-xs text-text-light/50 truncate">
+                    {parseOrderId(order.id).uuid}
+                  </span>
                   <div className="flex justify-between items-start mb-3">
-                    <span className="text-xs font-mono bg-blue-500/20 text-blue-950 px-2 py-1 rounded-md font-bold">
-                      #{order.id.slice(-6).toUpperCase()}
+
+                    <span className="text-md font-bold px-2 py-1 rounded-md font-bold">
+                      {parseOrderId(order.id).friendlyName}
                     </span>
-                    <span className={`text-xs font-bold px-2 py-1 rounded-md ${
-                      order.status === 'PENDIENTE' ? 'bg-amber-500/20 text-amber-500' : 'bg-zinc-500/20 text-zinc-500'
-                    }`}>
+                    <span className={`text-xs font-bold px-2 py-1 rounded-md ${order.status === 'PENDIENTE' ? 'bg-amber-500/20 text-amber-500' : 'bg-zinc-500/20 text-zinc-500'
+                      }`}>
                       {order.status}
                     </span>
                   </div>
@@ -191,7 +195,7 @@ export const OrderDispatch: React.FC = () => {
                     Total {order.items.reduce((acc, item) => acc + item.quantity, 0)} unidad(es).
                   </p>
                 </div>
-                
+
                 <button
                   onClick={() => setActiveOrderForModal(order)}
                   className="w-full bg-green-500 text-white py-2.5 rounded-xl text-sm font-bold transition-all duration-200 hover:bg-green-400 active:scale-[0.98] flex justify-center items-center gap-2"
@@ -209,7 +213,7 @@ export const OrderDispatch: React.FC = () => {
       {activeOrderForModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-center items-center p-4">
           <div className="bg-(--theme-card-bg) border border-(--theme-border) rounded-3xl shadow-2xl max-w-md w-full p-7 relative animate-in fade-in zoom-in duration-200 max-h-[90vh] flex flex-col">
-            
+
             <button
               onClick={() => setActiveOrderForModal(null)}
               className="absolute top-4 right-4 w-9 h-9 rounded-full bg-(--theme-secondary-bg) border border-(--theme-border) flex items-center justify-center text-(--theme-text) opacity-60 hover:opacity-100 transition"
@@ -218,8 +222,11 @@ export const OrderDispatch: React.FC = () => {
             </button>
 
             <div className="mb-4">
-              <span className="text-xs font-mono bg-blue-500/20 text-blue-500 px-2 py-0.5 rounded-md font-bold">
-                ORDEN #{activeOrderForModal.id.slice(-6).toUpperCase()}
+              <span className="block text-xs text-text-light/50 truncate">
+                {parseOrderId(activeOrderForModal.id).uuid}
+              </span>
+              <span className="text-lg font-bold px-2 py-0.5 rounded-md font-bold">
+                {parseOrderId(activeOrderForModal.id).friendlyName}
               </span>
               <h2 className="font-['Outfit'] font-black text-xl text-(--theme-text) mt-2 mb-1">
                 Recolección de Pedido
@@ -228,13 +235,13 @@ export const OrderDispatch: React.FC = () => {
 
             {/* INFOR DEL VENDEDOR */}
             <p className="text-[10px] text-(--theme-text) opacity-50 font-bold uppercase tracking-wider mb-1">
-                Datos del Vendedor
+              Datos del Vendedor
             </p>
             <div className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-2xl p-4 mb-4 flex gap-3 items-center">
-                            
+
               {activeOrderForModal.seller?.photoURL ? (
-                <img 
-                  src={activeOrderForModal.seller.photoURL} 
+                <img
+                  src={activeOrderForModal.seller.photoURL}
                   alt={getSellerName(activeOrderForModal)}
                   className="w-12 h-12 rounded-full object-cover shrink-0 border border-(--theme-border)"
                 />
@@ -243,27 +250,27 @@ export const OrderDispatch: React.FC = () => {
                   <User className="w-6 h-6" />
                 </div>
               )}
-              
+
               <div className="space-y-1 w-full overflow-hidden">
                 <p className="font-bold text-sm text-(--theme-text) truncate">
                   {getSellerName(activeOrderForModal)}
                 </p>
                 {activeOrderForModal.seller?.email && (
-                  <p className="text-[11px] text-(--theme-text) opacity-10 truncate">
+                  <p className="text-[11px] text-(--theme-text) opacity-50 truncate">
                     {activeOrderForModal.seller.email}
                   </p>
                 )}
                 {activeOrderForModal.seller?.institutionalId && (
-                  <p className="text-[11px] text-(--theme-text) opacity-10 truncate">
+                  <p className="text-[11px] text-(--theme-text) opacity-50 truncate">
                     {activeOrderForModal.seller.institutionalId}
                   </p>
                 )}
                 {activeOrderForModal.seller?.phone ? (
-                  <p className="text-[11px] text-(--theme-text) opacity-10 truncate">
+                  <p className="text-[11px] text-(--theme-text) opacity-50 truncate">
                     {activeOrderForModal.seller.phone}
                   </p>
                 ) : (
-                  <p className="text-[11px] text-(--theme-text) opacity-10 italic">
+                  <p className="text-[11px] text-(--theme-text) opacity-50 italic">
                     Sin teléfono registrado
                   </p>
                 )}
@@ -275,10 +282,10 @@ export const OrderDispatch: React.FC = () => {
               <p className="text-[10px] text-(--theme-text) opacity-50 font-bold uppercase tracking-wider mb-1">
                 Lista de verificación ({activeOrderForModal.items.length} items)
               </p>
-              
+
               {activeOrderForModal.items.map((item, idx) => (
-                <div 
-                  key={idx} 
+                <div
+                  key={idx}
                   className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-2xl p-3 flex justify-between items-center"
                 >
                   <div className="flex-1 pr-3">
