@@ -17,18 +17,21 @@ export default function CreatedOrderItem({
   };
 
   return (
-    <a
-      href={`/seller/orders/${order.id}`}
-      className="grid grid-cols-subgrid col-span-full border-b py-[10px] min-[760px]:py-0 border-black/20 cursor-pointer hover:bg-black/5"
-    >
-      <div className="col-span-full min-[760px]:col-start-1 min-[760px]:col-end-3 text-sm flex items-center gap-[8px] text-xs">
+    <div className="grid grid-cols-subgrid col-span-full border-b py-[10px] min-[760px]:py-0 border-black/20 hover:bg-black/5">
+      <a
+        href={`/seller/orders/${order.id}`}
+        className="col-span-full min-[760px]:col-start-1 min-[760px]:col-end-3 text-sm flex items-center gap-[8px] text-xs cursor-pointer"
+      >
         <div className="size-1.5 bg-[#1e1e1e]" />
         {parseOrderId(order.id).friendlyName}
-      </div>
-      <div className="col-start-1 col-end-9 min-[760px]:col-start-3 min-[760px]:col-end-10 text-[calc(.78125vw+13.5px)] truncate
-      min-[960px]:col-end-13 tracking-tight">
+      </a>
+      <a
+        href={`/seller/orders/${order.id}`}
+        className="col-start-1 col-end-9 min-[760px]:col-start-3 min-[760px]:col-end-10 text-[calc(.78125vw+13.5px)] truncate
+        min-[960px]:col-end-13 tracking-tight cursor-pointer"
+      >
         {order.delivery.destination}
-      </div>
+      </a>
 
       <div
         className="min-[960px]:col-start-14 min-[960px]:col-end-16 min-[760px]:col-start-11 min-[760px]:col-end-13 text-[11px] flex
@@ -48,6 +51,6 @@ export default function CreatedOrderItem({
       >
         Reservar
       </button>
-    </a>
+    </div>
   );
 }
