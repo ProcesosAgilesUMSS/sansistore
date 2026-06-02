@@ -5,17 +5,16 @@ import { MovementHistory } from '../../features/inventory/components/MovementHis
 ---
 
 <InventoryLayout title="Sansistore | Movimientos">
-  
-  <section>
+
     <div class="mb-4">
       <h2 class="font-['Outfit'] font-black text-2xl tracking-tight text-(--theme-text)">
-      Historial de <span class="text-primary">Inventario</span>
+      Control de <span class="text-primary">Inventario</span>
       </h2>
-      <p class="text-xs opacity-60 text-(--theme-text)">Aquí podrás ver el registro de todas las salidas y entradas de productos</p>
+      <p class="text-xs opacity-60 text-(--theme-text)">Usa esto solo para abastecimiento de proveedores o ajustes de mermas.</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-1 gap-8 items-stretch">
-      <MovementHistory client:load />
+      <StockMovementForm client:load />
     </div>
   </section>
 </InventoryLayout>

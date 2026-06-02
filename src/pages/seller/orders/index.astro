@@ -1,0 +1,8 @@
+---
+import OrdersComponent from '@features/orders/components/Orders';
+import SellerLayout from '@/layouts/SellerLayout.astro';
+---
+
+<SellerLayout title="Pedidos">
+    <OrdersComponent client:load />
+</SellerLayout>
