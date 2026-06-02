@@ -154,7 +154,7 @@ export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: O
               <span>#</span>
             </div>
             <div>
-              <h4 className="text-sm font-bold mb-1">Código de seguridad</h4>
+              <h4 className="text-sm font-bold mb-1">Código de confirmación</h4>
               <p className="text-lg font-mono font-black tracking-widest text-primary">{order.secret}</p>
             </div>
           </div>
