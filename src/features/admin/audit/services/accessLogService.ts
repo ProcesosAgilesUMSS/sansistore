@@ -62,10 +62,8 @@ export const getAccessLogs = async (
     q = query(q, where('timestamp', '<=', Timestamp.fromDate(endOfDay)));
   }
 
-  // Aplicar filtro de acción (LOGIN/LOGOUT)
-  if (filter?.action && filter.action !== 'ALL') {
-    q = query(q, where('action', '==', filter.action));
-  }
+  // Aplicar filtro de acción (LOGIN/LOGOUT) en memoria
+  // para evitar requerir índices compuestos en Firestore
 
   const snapshot = await getDocs(q);
 
@@ -86,11 +84,16 @@ export const getAccessLogs = async (
   // Ordenar en memoria por timestamp descendente (más recientes primero)
   logs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 
-  // Si se especificó filtro de rol, filtramos en memoria
-  // (Firestore no permite where sobre arrays con múltiples condiciones)
-  if (filter?.role && filter.role !== 'todos') {
-    return logs.filter((log) => log.roles.includes(filter.role!));
+  // Filtrar acción en memoria
+  let filtered = logs;
+  if (filter?.action && filter.action !== 'ALL') {
+    filtered = filtered.filter((log) => log.action === filter.action);
   }
 
-  return logs;
+  // Filtrar por rol en memoria
+  if (filter?.role && filter.role !== 'todos') {
+    filtered = filtered.filter((log) => log.roles.includes(filter.role!));
+  }
+
+  return filtered;
 };

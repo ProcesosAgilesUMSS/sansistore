@@ -229,13 +229,26 @@ export default function AccessLogPanel() {
             <option value="LOGOUT">Solo LOGOUT</option>
           </select>
         </div>
-        <div className="flex items-end">
+        <div className="flex items-end gap-2">
           <button
             onClick={handleFilter}
             disabled={loading}
             className="bg-[#88B04B] text-white text-[13px] font-semibold px-5 py-2 rounded-full hover:bg-[#5E7E2F] transition-colors disabled:opacity-60"
           >
             {loading ? 'Cargando...' : 'Filtrar'}
+          </button>
+          <button
+            onClick={() => void fetchLogs({
+              startDate: startDate ? (() => { const [y,m,d] = startDate.split('-').map(Number); return new Date(y,m-1,d); })() : undefined,
+              endDate: endDate ? (() => { const [y,m,d] = endDate.split('-').map(Number); return new Date(y,m-1,d); })() : undefined,
+              role: roleFilter,
+              action: actionFilter,
+            })}
+            disabled={loading}
+            title="Actualizar registros"
+            className="border border-[var(--theme-border)] text-[var(--theme-text)]/60 text-[13px] font-semibold px-3 py-2 rounded-full hover:border-[#88B04B] hover:text-[#88B04B] transition-colors disabled:opacity-60"
+          >
+            ↻
           </button>
         </div>
       </div>
