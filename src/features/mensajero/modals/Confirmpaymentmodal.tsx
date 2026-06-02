@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { CheckCircle2, KeyRound, X } from 'lucide-react';
 import type { MessengerOrder } from '../types';
+import { parseOrderId } from '../../cart/services/orderService';
 
 interface ConfirmPaymentModalProps {
     order: MessengerOrder;
@@ -75,9 +76,9 @@ export default function ConfirmPaymentModal({
                             <span className="messenger-muted text-xs font-bold uppercase">
                                 Orden
                             </span>
-                            <span className="text-sm font-black">
-                                #{order.orderCode || order.id}
-                            </span>
+                                <span className="text-sm font-black">
+                                    {parseOrderId(order.id).friendlyName}
+                                </span>
                         </div>
                         <div className="flex justify-between items-center">
                             <span className="messenger-muted text-xs font-bold uppercase">
