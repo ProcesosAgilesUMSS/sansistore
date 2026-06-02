@@ -8,14 +8,15 @@ import {
   type DocumentData,
   updateDoc,
   onSnapshot,
+  type Unsubscribe,
   type QuerySnapshot,
   orderBy,
   addDoc,
   serverTimestamp,
   runTransaction,
 } from "firebase/firestore";
-import { db, auth } from "../../../lib/firebase";
-import type { Order, OrderStatus, OrderItem, ReturnRequest } from "../types";
+import { db, auth } from "@/lib/firebase";
+import type { Order, OrderStatus, OrderItem, ReturnRequest } from "@features/orders/types";
 
 // --- Seller Actions ---
 
@@ -116,6 +117,19 @@ export function subscribeToSellerOrders(sellerId: string, onUpdate: (orders: Ord
     const orders = await processQuerySnapshot(querySnapshot);
     onUpdate(orders);
   });
+}
+
+export function subscribeToOrder(
+  orderId: string,
+  onData: (data: Order) => void,
+  onError?: (error: Error) => void
+): Unsubscribe {
+  const orderRef = doc(db, "orders", orderId);
+  return onSnapshot(orderRef, (snap) => {
+    if (!snap.exists()) return;
+    const data = snap.data() as Order;
+    onData(data);
+  }, onError);
 }
 
 export async function getSentOrders(): Promise<Order[]> {
