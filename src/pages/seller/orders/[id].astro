@@ -5,6 +5,8 @@ import Footer from '@/components/Footer';
 import OrderDetailView from '@/features/orders/components/OrderDetailView';
 
 export const prerender = false;
+
+const { id } = Astro.params;
 ---
 
 <Layout title="Pedido | Sansistore">
@@ -12,8 +14,10 @@ export const prerender = false;
     <main class="flex-1">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-32">
             <a
-                href="javascript:history.back()"
+                href="/seller/orders"
+                id="back-btn"
                 class="mb-4 inline-flex items-center gap-1.5 text-sm text-black/50 hover:text-black/80 transition-colors cursor-pointer"
+                aria-label="Volver a pedidos"
             >
                 <svg
                     width="16"
@@ -24,11 +28,28 @@ export const prerender = false;
                     stroke-width="2"
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                    ><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"
-                    ></path></svg
+                    aria-hidden="true"
                 >
-                Volver atras
+                    <path d="M19 12H5"></path>
+                    <path d="M12 19l-7-7 7-7"></path>
+                </svg>
+                Volver a pedidos
             </a>
+            <script>
+                document.addEventListener('astro:page-load', () => {
+                    const backBtn = document.getElementById('back-btn');
+                    backBtn?.addEventListener('click', () => {
+                        if (
+                            document.referrer &&
+                            document.referrer.includes(window.location.host)
+                        ) {
+                            history.back();
+                        } else {
+                            window.location.href = '/';
+                        }
+                    });
+                });
+            </script>
             <div
                 id="order-skeleton"
                 class="animate-pulse mx-auto w-full max-w-[65ch] max-[760px]:max-w-[480px] grid grid-cols-[repeat(16,_1fr)] max-[760px]:grid-cols-7 p-3 rounded-xl bg-white shadow-2xl border border-black/10"
@@ -97,7 +118,7 @@ export const prerender = false;
                     <div class="h-9 w-28 bg-gray-200 rounded-lg"></div>
                 </div>
             </div>
-            <OrderDetailView client:load />
+            <OrderDetailView client:load orderId={id} />
         </div>
     </main>
     <Footer client:load />

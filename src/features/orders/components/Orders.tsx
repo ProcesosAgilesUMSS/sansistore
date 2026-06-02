@@ -39,22 +39,29 @@ export default function Orders() {
   }
 
   useEffect(() => {
+    let unsubscribeOrders: (() => void) | null = null;
     const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+      if (unsubscribeOrders) {
+        unsubscribeOrders();
+        unsubscribeOrders = null;
+      }
       if (!user) {
         setLoading(false);
         setOrders([]);
         return;
       }
 
-      const unsubscribeOrders = subscribeToSellerOrders(user.uid, (data) => {
+      unsubscribeOrders = subscribeToSellerOrders(user.uid, (data) => {
         setOrders(data);
         setLoading(false);
       });
-
-      return () => unsubscribeOrders();
     });
-
-    return () => unsubscribeAuth();
+    return () => {
+      if (unsubscribeOrders) {
+        unsubscribeOrders();
+      }
+      unsubscribeAuth();
+    };
   }, []);
 
   return (

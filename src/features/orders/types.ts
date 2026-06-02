@@ -50,10 +50,10 @@ export interface Order {
   delivery: {
     destination: string;
   };
-  deliveryStatus?: string;
-  deliveryId?: string;
-  paymentId?: string;
-  paymentStatus?: string;
+  deliveryStatus?: string | null;
+  deliveryId?: string | null;
+  paymentId?: string | null;
+  paymentStatus?: string | null;
   total?: number;
   items: OrderItem[];
   createdAt: Timestamp;

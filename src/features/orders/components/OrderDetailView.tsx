@@ -6,15 +6,7 @@ import OrderStatusBadge from "@features/orders/components/OrderStatusBadge";
 import OrderActions from "@features/orders/components/OrderActions";
 import { parseOrderId } from "@features/cart/services/orderService";
 
-function useOrderId(): string {
-  const [id] = useState(() =>
-    typeof window === "undefined" ? "" : window.location.pathname.split("/").pop() ?? ""
-  );
-  return id;
-}
-
-export default function OrderDetailView() {
-  const orderId = useOrderId();
+export default function OrderDetailView({ orderId }: { orderId: string | undefined }) {
   const [order, setOrder] = useState<Order | null>(null);
   const [error, setError] = useState(false);
   const [selectedCol, setSelectedCol] = useState<'precio' | 'monto' | 'stock'>('monto');
@@ -23,14 +15,20 @@ export default function OrderDetailView() {
   useEffect(() => {
     if (!orderId) return;
 
-    getOrderById(orderId).then((data) => {
-      if (!data) {
+    getOrderById(orderId)
+      .then((data) => {
+        if (!data) {
+          setError(true);
+        } else {
+          setOrder(data);
+        }
+        document.getElementById("order-skeleton")?.remove();
+      })
+      .catch((err) => {
+        console.error("Error fetching order:", err);
         setError(true);
-      } else {
-        setOrder(data);
-      }
-      document.getElementById("order-skeleton")?.remove();
-    });
+        document.getElementById("order-skeleton")?.remove();
+      });
 
     const unsub = subscribeToOrder(orderId, (update) => {
       setOrder((prev) => prev && { ...prev, ...update });
@@ -81,10 +79,10 @@ export default function OrderDetailView() {
         {parseOrderId(order.id).uuid}
       </span>
 
-          <div className="col-span-full flex items-center justify-between mb-6">
-            <span className="text-lg font-bold tracking-tight truncate">{parseOrderId(order.id).friendlyName}</span>
-            <OrderStatusBadge status={order.status} />
-          </div>
+      <div className="col-span-full flex items-center justify-between mb-6">
+        <span className="text-lg font-bold tracking-tight truncate">{parseOrderId(order.id).friendlyName}</span>
+        <OrderStatusBadge status={order.status} />
+      </div>
 
       <div className="col-start-1 col-end-4 max-[760px]:col-end-3 truncate text-sm text-black/50 leading-[120%]">Comprador:</div>
       <div className="col-start-4 col-end-13 max-[760px]:col-start-3 max-[760px]:col-end-7 leading-[120%]">{order.buyerName}</div>
