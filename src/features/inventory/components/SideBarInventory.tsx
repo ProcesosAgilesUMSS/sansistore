@@ -34,7 +34,19 @@ const NAV_SECTIONS: NavSection[] = [
       },
       {
         icon: ArrowLeftRight,
-        label: 'Registrar movimiento de stock',
+        label: 'Mis Empaques',
+        href: '/inventory/packaging',
+        sprint: true,
+      },
+      {
+        icon: ArrowLeftRight,
+        label: 'Entrada y Salida Stock',
+        href: '/inventory/entrysExits',
+        sprint: true,
+      },
+      {
+        icon: ArrowLeftRight,
+        label: 'Historial de Movimientos',
         href: '/inventory/movements',
         sprint: true,
       },
