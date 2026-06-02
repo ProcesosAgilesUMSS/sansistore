@@ -18,18 +18,17 @@ export default function ConfirmPaymentModal({
 }: ConfirmPaymentModalProps) {
     const [secret, setSecret] = useState('');
     const [saving, setSaving] = useState(false);
-    const [success, setSuccess] = useState(false);
+
     const [error, setError] = useState('');
 
-    const canSubmit = secret.trim().length > 0 && !saving && !success;
+const canSubmit = secret.trim().length > 0 && !saving;
 
     const handleConfirm = async () => {
         if (!canSubmit) return;
         setError('');
         setSaving(true);
         try {
-            await onConfirm(order, secret.trim());
-            setSuccess(true);
+                await onConfirm(order, secret.trim());
         } catch (err) {
             console.error(err);
             setError('Código incorrecto o no se pudo registrar el pago.');
@@ -94,24 +93,8 @@ export default function ConfirmPaymentModal({
                         </div>
                     </article>
 
-                    {/* Éxito */}
-                    {success ? (
-                        <div className="flex flex-col items-center gap-3 rounded-[20px] border-2 border-green-400 bg-green-50 px-5 py-6 text-center">
-                            <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
-                                <CheckCircle2 size={28} className="text-green-600" />
-                            </span>
-                            <p className="text-base font-black text-green-700">
-                                Orden entregada exitosamente
-                            </p>
-                            <button
-                                className="mt-1 rounded-2xl bg-green-600 px-6 py-2.5 text-sm font-bold text-white transition hover:bg-green-700 active:scale-95"
-                                onClick={onClose}
-                                type="button"
-                            >
-                                Cerrar
-                            </button>
-                        </div>
-                    ) : (
+
+                    
                         <>
                             {/* Input de código secret */}
                             <div className="space-y-2">
@@ -154,7 +137,7 @@ export default function ConfirmPaymentModal({
                                 {saving ? 'Registrando...' : 'Registrar pago'}
                             </button>
                         </>
-                    )}
+                    
                 </div>
             </section>
         </div>
