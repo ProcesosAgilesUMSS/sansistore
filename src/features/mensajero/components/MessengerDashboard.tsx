@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-
+import PaymentSuccessModal from '../modals/PaymentSuccessModal';
 import {
     AlertTriangle,
     CheckCircle2,
@@ -708,6 +708,7 @@ export default function MessengerDashboard({
         useState<MessengerOrder | null>(null);
     const [savingCancelNoPayment, setSavingCancelNoPayment] = useState(false);
     const [confirmPaymentOrder, setConfirmPaymentOrder] = useState<MessengerOrder | null>(null);
+    const [paymentSuccessOrder, setPaymentSuccessOrder] = useState<MessengerOrder | null>(null);
     const [currentCourierId, setCurrentCourierId] = useState<string | null>(null);
     const [newOrderCount, setNewOrderCount] = useState(0);
     const [acceptedSortOrder, setAcceptedSortOrder] =
@@ -954,9 +955,12 @@ const confirmPayment = async (order: MessengerOrder, secret: string) => {
     );
  
     try {
-        await registerMessengerCashPayment(order, currentCourierId);
-        setMessage('Pago en efectivo registrado y venta cerrada correctamente.');
-        setConfirmPaymentOrder(null);
+       await registerMessengerCashPayment(order, currentCourierId);
+
+            setConfirmPaymentOrder(null);
+
+            setPaymentSuccessOrder(order);
+            
     } catch (error) {
         console.error(error);
         setOrders((currentOrders) =>
@@ -1303,6 +1307,11 @@ const confirmPayment = async (order: MessengerOrder, secret: string) => {
                     onConfirm={confirmPayment}
                 />
             )}
+                {paymentSuccessOrder && (
+                    <PaymentSuccessModal
+                        onClose={() => setPaymentSuccessOrder(null)}
+                    />
+                )}
         </main>
     );
 }
