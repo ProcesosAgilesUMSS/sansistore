@@ -229,7 +229,7 @@ export default function Navbar() {
               {/* AUTH */}
               {authReady &&
                 (user ? (
-                  <div className="relative">
+                  <div className="relative hidden md:block">
                     <button
                       type="button"
                       aria-expanded={profileMenuOpen}
@@ -290,7 +290,7 @@ export default function Navbar() {
                           className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light opacity-70 transition-colors hover:bg-border-light/40 hover:text-primary hover:opacity-100"
                         >
                           <Settings size={14} />
-                          Editar Datos Personales
+                          Editar Datos de Contacto
                         </a>
 
                         <button
@@ -306,7 +306,7 @@ export default function Navbar() {
                     )}
                   </div>
                 ) : (
-                  <div className="relative">
+                  <div className="relative hidden md:block">
                     <button
                       type="button"
                       aria-expanded={loginMenuOpen}
@@ -406,6 +406,51 @@ export default function Navbar() {
                     </a>
                   )}
                 </>
+              )}
+              {authReady && (
+                user ? (
+                  <div className="mt-2 pt-2 border-t border-border-light/60 flex flex-col gap-3">
+                    <div className="flex items-center gap-2 px-1 py-1">
+                      {user.photoURL && (
+                        <img src={user.photoURL} alt="" className="w-6 h-6 rounded-full object-cover" />
+                      )}
+                      <span className="text-[12px] font-medium text-text-light opacity-60 truncate">
+                        {user.displayName}
+                      </span>
+                    </div>
+
+                    <a
+                      href="/edit-profile"
+                      className="flex items-center gap-2 text-[13px] font-semibold text-text-light opacity-70 transition-all hover:text-primary hover:opacity-100"
+                    >
+                      <Settings size={14} />
+                      Editar Datos de Contacto
+                    </a>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        handleLogout();
+                      }}
+                      className="flex w-full items-center gap-2 text-left text-[13px] font-semibold text-[#EA4335] opacity-80 transition-all hover:opacity-100"
+                    >
+                      <LogOut size={14} />
+                      Cerrar sesión
+                    </button>
+                  </div>
+                ) : (
+                  <div className="mt-2 pt-2 border-t border-border-light/60 flex flex-col gap-3">
+                    <a
+                      href="/login"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2 text-[13px] font-semibold text-text-light opacity-70 transition-all hover:text-primary hover:opacity-100"
+                    >
+                      <UserIcon size={14} />
+                      Iniciar sesión
+                    </a>
+                  </div>
+                )
               )}
             </div>
           )}
