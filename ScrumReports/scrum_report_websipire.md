@@ -318,3 +318,10 @@ por las dudas que se tienen.
 * **Today:** Comenzaré con el diseño y desarrollo inicial de la HU, tomando en cuenta las dependencias relacionadas.
 * **Blockers:** none
 
+# Daily Reports - Team 3 Webspire 02/06/26
+
+## Dayana Saleth Ortuño Guzman
+
+* **Yesterday:** Terminé de implementar mi HU asignada. Además, estuve analizando y planificando cómo desarrollar la otra HU que me fue asignada.
+* **Today:** Corregí los bugs identificados en funcionalidades desarrolladas anteriormente y realicé las validaciones correspondientes para asegurar su correcto funcionamiento.
+* **Blockers:** None.
