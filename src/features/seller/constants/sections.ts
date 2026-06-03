@@ -34,7 +34,7 @@ export const sections = [
   },
   {
     id: 'rendicion',
-    label: 'Rendicion del dia',
+    label: 'Pagos registrados',
     route: '/seller/daily-collections',
   },
   {
