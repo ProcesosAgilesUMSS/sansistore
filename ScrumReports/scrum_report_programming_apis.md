@@ -353,3 +353,8 @@
 - **Yesterday:** Trabaje en el bug de agregar el modal de confirmacion para rechazar aceptar pedido de mensajero
 - **Today:** Integrar mi rama donde trabaje el bug
 - **Blockers:** None
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday:** Ambos PRs (#410 y #411) fueron aprobados y mergeados a `main` sin contratiempos. Se verificó que las funcionalidades del módulo de mensajero sigan operativas después del merge.
+- **Today:** Reflexión del Sprint 3: las tareas asignadas se completaron en tiempo y forma. Se sugiere para próximos sprints definir mejor los campos compartidos entre equipos para evitar posibles descoordinaciones. Análisis de nuevos bugs reportados.
+- **Blockers:** None.
