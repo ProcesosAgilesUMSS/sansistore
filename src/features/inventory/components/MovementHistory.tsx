@@ -19,7 +19,7 @@ interface Movement {
   type: 'ENTRADA' | 'SALIDA' | 'INICIALIZACION';
   quantity: number;
   reason: string;
-  date: any;
+  createdAt: any;
 }
 
 export const MovementHistory: React.FC = () => {
@@ -40,14 +40,14 @@ export const MovementHistory: React.FC = () => {
     //Consulta base
     let q = query(
       collection(db, 'inventoryMovements'),
-      orderBy('date', 'desc'),
+      orderBy('createdAt', 'desc'),
       limit(MOVEMENTS_PER_PAGE + 1) // Pedimos uno más para saber si hay siguiente página
     );
     // El listener de Firebase sepa dónde empezar
     if (page > 1 && lastVisible) {
       q = query(
         collection(db, 'inventoryMovements'),
-        orderBy('date', 'desc'),
+        orderBy('createdAt', 'desc'),
         startAfter(lastVisible),
         limit(MOVEMENTS_PER_PAGE + 1)
       );

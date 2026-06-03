@@ -331,3 +331,35 @@
 - **Yesterday:** Implementé la historia "Identificar pedidos con fallos": una pantalla donde el Operador ve los pedidos no entregados o cancelados, abre cada uno para ver el motivo y reponer su stock al inventario con un clic (sin duplicar). Incluí datos de ejemplo y pruebas automáticas.
 - **Today:** Subir los cambios, abrir el PR y coordinar la validación con el PO.
 - **Blockers:** Necesito que el PO confirme quién es el "Operador" y hasta dónde llega el alcance.
+
+# 06/02/2026
+
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Aporté en la issue #179 para refinar detalles y hacer el PR. Realicé una auditoría del módulo de Flow usando GitHub CLI e identifiqué, registré y vinculé como sub-issues en el Backlog/Sprint 3 cuatro reportes oficiales de bugs (#452, #454, #455, #456) referentes a validación, responsividad y desbordamiento de texto.
+- **Today:** Crear y presentar la propuesta técnica en Discussions para el rediseño del perfil `/me` basado en roles y coordinar los requerimientos de la US #24 con el equipo de Flow.
+- **Blockers:** n/a.
+
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Reporte bugs en general, del happy path del sistema.
+- **Today:** Algunas pruebas mas del flujo en general, priorizando los criticos.
+- **Blockers:** n/a.
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Reporté los bugs detectados en los roles de operador y mensajero, y revisé el flujo principal del sistema
+- **Today:** Continuaré con el diseño y la ejecución de más flujos para asegurar que los resultados obtenidos sean los correctos.
+- **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Implementé las HUs de alertas de stock (#417, #418): badge "Agotado"/"No disponible" en catálogo y detalle de producto, botón "Avisarme cuando esté disponible" para productos sin stock, y Cloud Function `notificarStockDisponible` que envía correo automático al usuario cuando el stock cambia de 0 a mayor que 0.
+- **Today:** Corrección del bug #463 de categorías inactivas accesibles por URL, validando la categoría contra Firestore al cargar la página y limpiando el parámetro si está inactiva.
+- **Blockers:** Ninguno.
+
+## Velasquez Vela Marcos
+
+- **Yesterday:** Revisé el flujo de ver/editar perfil. Reporté el bug #469 (la vista `/me` existe pero no hay ningún botón que lleve a ella estando logueado) y reabrí el bug #441 (el arreglo del menú móvil se perdió en un merge del PR #468, la falla volvió a reproducir). También definí las HUs #24, #27 y #17 que estaban con la plantilla vacía, agregándoles criterios de aceptación.
+- **Today:** Verifiqué las HUs en Done y dejé observaciones; la HU #20 (ver ubicación) cumple lo funcional pero su restricción de "solo pedidos asignados" está solo en la UI, parte de la deuda de reglas de Firestore abiertas.
+- **Blockers:** n/a.
