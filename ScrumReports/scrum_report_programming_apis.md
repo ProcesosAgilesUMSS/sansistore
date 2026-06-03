@@ -348,3 +348,8 @@
 - **Yesterday:** revisé e integré los cambios del flujo de mensajero/courier, validé que el mapa del comprador use la ubicación correcta, corregí datos de órdenes del comprador y limpié problemas de IDs/datos mostrados.
 - **Today:** Revisar y corregir los bugs asignados a su vez de empezar a trabajar en las US' nuevas.
 - **Blockers:** Nuevos bugs detectados por otros equipos.
+- 
+### Bruno Salcedo Cadiz
+- **Yesterday:** Trabaje en el bug de agregar el modal de confirmacion para rechazar aceptar pedido de mensajero
+- **Today:** Integrar mi rama donde trabaje el bug
+- **Blockers:** None
