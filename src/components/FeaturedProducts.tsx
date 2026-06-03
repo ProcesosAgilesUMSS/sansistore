@@ -10,7 +10,7 @@ import {
   Heart,
 } from 'lucide-react';
 import { FaCartPlus, FaFilter } from 'react-icons/fa';
-import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { getOfferBadgeData, hasValidOffer } from '../lib/productOffers';
 import {
@@ -73,7 +73,6 @@ function saveSearchTerm(term: string) {
     const updated = [term, ...filtered].slice(0, MAX_HISTORY_ITEMS);
     localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(updated));
   } catch {
-    // Ignore storage errors
   }
 }
 
@@ -85,7 +84,6 @@ function deleteSearchTerm(term: string) {
     );
     localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(updated));
   } catch {
-    // Ignore storage errors
   }
 }
 
@@ -187,7 +185,6 @@ function FeaturedProductsInner({
   const sortRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Sync category, offers, sort, and page with URL on mount (after hydration)
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href);
       const pageParamStr = url.searchParams.get('page');
@@ -200,32 +197,43 @@ function FeaturedProductsInner({
         | 'name-desc'
         | null;
 
-      // Validate page is numeric
       const pageNum = pageParamStr ? parseInt(pageParamStr, 10) : 1;
       const isValidPageNumber = !isNaN(pageNum) && pageNum > 0;
 
-      // Remove invalid page param from URL
       if (pageParamStr && !isValidPageNumber) {
         url.searchParams.delete('page');
         window.history.replaceState({}, '', url.toString());
       }
 
-      if (categoryParam !== selectedCategory) {
-        setSelectedCategory(categoryParam);
-      }
-      if (offersParam !== showOffersOnly) {
-        setShowOffersOnly(offersParam);
-      }
-      if (sortParam && sortParam !== sortBy) {
-        setSortBy(sortParam);
-      }
-      if (isValidPageNumber && pageNum !== currentPage) {
-        setCurrentPage(pageNum);
-      }
+      const validateAndSetCategory = async () => {
+        if (!categoryParam) {
+          setSelectedCategory(null);
+          return;
+        }
+        try {
+          const categoryDoc = await getDoc(doc(db, 'categories', categoryParam));
+          if (categoryDoc.exists() && categoryDoc.data().active !== false) {
+            setSelectedCategory(categoryParam);
+          } else {
+            setSelectedCategory(null);
+            url.searchParams.delete('category');
+            window.history.replaceState({}, '', url.toString());
+          }
+        } catch {
+          setSelectedCategory(null);
+          url.searchParams.delete('category');
+          window.history.replaceState({}, '', url.toString());
+        }
+      };
+
+      validateAndSetCategory();
+
+      if (offersParam !== showOffersOnly) setShowOffersOnly(offersParam);
+      if (sortParam && sortParam !== sortBy) setSortBy(sortParam);
+      if (isValidPageNumber && pageNum !== currentPage) setCurrentPage(pageNum);
     }
   }, []);
 
-  // Validate page number when filters change
   useEffect(() => {
     if (typeof window !== 'undefined' && products.length > 0) {
       const url = new URL(window.location.href);
@@ -234,7 +242,6 @@ function FeaturedProductsInner({
       const isValidPageNumber = !isNaN(pageNum) && pageNum > 0;
       const pageParam = isValidPageNumber ? Math.max(1, pageNum) : 1;
 
-      // Calculate totalPages - estimate based on products and filters
       const filtered = products.filter((p) => {
         if (showOffersOnly && !hasValidOffer(p)) return false;
         if (selectedCategory && p.categoryId !== selectedCategory) return false;
@@ -245,7 +252,6 @@ function FeaturedProductsInner({
       const validPage = Math.max(1, Math.min(pageParam, totalPages || 1));
       const isOutOfRange = pageParam > validPage;
 
-      // Remove invalid page param and update URL if needed
       if (pageParamStr && !isValidPageNumber) {
         url.searchParams.delete('page');
         window.history.replaceState({}, '', url.toString());
@@ -255,7 +261,6 @@ function FeaturedProductsInner({
         setCurrentPage(validPage);
         setInvalidPage(isOutOfRange);
 
-        // Remove page param if out of range
         if (isOutOfRange) {
           url.searchParams.delete('page');
           window.history.replaceState({}, '', url.toString());
@@ -345,9 +350,6 @@ function FeaturedProductsInner({
       result = result.filter((product) => favoriteIds.has(product.id));
     }
 
-    // Hide products without stock
-    result = result.filter((product) => (product.stockAvailable ?? 0) > 0);
-
     if (showOffersOnly) {
       result = result.filter((product) => hasValidOffer(product));
     }
@@ -376,7 +378,6 @@ function FeaturedProductsInner({
     const effectiveSortBy =
       sortBy === 'best-sellers' && allSoldCountsAreZero ? 'recent' : sortBy;
 
-    // Apply sorting
     const sorted = [...result];
     switch (effectiveSortBy) {
       case 'best-sellers':
@@ -606,13 +607,7 @@ function FeaturedProductsInner({
                 onCategoryChange={(newCategory) => {
                   setSelectedCategory(newCategory);
                   setCurrentPage(1);
-                  updateUrl(
-                    appliedSearch,
-                    showOffersOnly,
-                    newCategory,
-                    1,
-                    sortBy
-                  );
+                  updateUrl(appliedSearch, showOffersOnly, newCategory, 1, sortBy);
                 }}
               />
             </div>
@@ -622,13 +617,7 @@ function FeaturedProductsInner({
                 const newOffersState = !showOffersOnly;
                 setShowOffersOnly(newOffersState);
                 setCurrentPage(1);
-                updateUrl(
-                  appliedSearch,
-                  newOffersState,
-                  selectedCategory,
-                  1,
-                  sortBy
-                );
+                updateUrl(appliedSearch, newOffersState, selectedCategory, 1, sortBy);
               }}
               aria-pressed={showOffersOnly}
               aria-label={
@@ -705,31 +694,18 @@ function FeaturedProductsInner({
                             }
                             setSearchTerm(term);
                             setAppliedSearch(term);
-                            updateUrl(
-                              term,
-                              showOffersOnly,
-                              selectedCategory,
-                              1,
-                              sortBy
-                            );
+                            updateUrl(term, showOffersOnly, selectedCategory, 1, sortBy);
                             setShowSuggestions(false);
                           }}
                           className="flex flex-1 items-center gap-2 hover:bg-secondary-bg-light rounded py-1 -my-1 cursor-pointer"
                         >
                           {suggestion.type === 'history' && (
-                            <History
-                              size={14}
-                              className="text-primary shrink-0"
-                            />
+                            <History size={14} className="text-primary shrink-0" />
                           )}
                           <span className="line-clamp-1">
                             {suggestion.type === 'history'
                               ? highlightText(suggestion.term, searchTerm, true)
-                              : highlightText(
-                                  suggestion.product.name,
-                                  searchTerm,
-                                  true
-                                )}
+                              : highlightText(suggestion.product.name, searchTerm, true)}
                           </span>
                         </button>
                         {suggestion.type === 'history' && (
@@ -752,33 +728,25 @@ function FeaturedProductsInner({
                   ))}
                 </ul>
               )}
-              {showSuggestions &&
-                searchSuggestions.length === 0 &&
-                searchTerm && (
-                  <ul className="absolute top-full left-0 right-0 z-20 mt-1 rounded-lg border border-border-light bg-card-bg-light py-1 shadow-lg">
-                    <li>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          saveSearchTerm(searchTerm);
-                          setSearchHistory(getSearchHistory());
-                          setAppliedSearch(searchTerm);
-                          updateUrl(
-                            searchTerm,
-                            showOffersOnly,
-                            selectedCategory,
-                            1,
-                            sortBy
-                          );
-                          setShowSuggestions(false);
-                        }}
-                        className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm text-text-light hover:bg-secondary-bg-light"
-                      >
-                        Buscar &quot;{searchTerm}&quot;
-                      </button>
-                    </li>
-                  </ul>
-                )}
+              {showSuggestions && searchSuggestions.length === 0 && searchTerm && (
+                <ul className="absolute top-full left-0 right-0 z-20 mt-1 rounded-lg border border-border-light bg-card-bg-light py-1 shadow-lg">
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        saveSearchTerm(searchTerm);
+                        setSearchHistory(getSearchHistory());
+                        setAppliedSearch(searchTerm);
+                        updateUrl(searchTerm, showOffersOnly, selectedCategory, 1, sortBy);
+                        setShowSuggestions(false);
+                      }}
+                      className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm text-text-light hover:bg-secondary-bg-light"
+                    >
+                      Buscar &quot;{searchTerm}&quot;
+                    </button>
+                  </li>
+                </ul>
+              )}
             </div>
             <div ref={sortRef} className="relative shrink-0">
               <button
@@ -800,13 +768,7 @@ function FeaturedProductsInner({
                       onClick={() => {
                         setSortBy(option.value);
                         setCurrentPage(1);
-                        updateUrl(
-                          appliedSearch,
-                          showOffersOnly,
-                          selectedCategory,
-                          1,
-                          option.value
-                        );
+                        updateUrl(appliedSearch, showOffersOnly, selectedCategory, 1, option.value);
                         setShowSortDropdown(false);
                       }}
                       className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-colors ${
@@ -851,10 +813,7 @@ function FeaturedProductsInner({
           filteredProducts.length === 0 &&
           (appliedSearch || selectedCategory || showOffersOnly) && (
             <div className="py-20 text-center">
-              <Package
-                size={40}
-                className="mx-auto mb-3 text-text-light opacity-40"
-              />
+              <Package size={40} className="mx-auto mb-3 text-text-light opacity-40" />
               <p className="text-sm text-text-light opacity-50">
                 {showOffersOnly
                   ? 'No hay ofertas disponibles en este momento'
@@ -904,23 +863,23 @@ function FeaturedProductsInner({
           <>
             <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
               {filteredProducts
-                .slice(
-                  (currentPage - 1) * ITEMS_PER_PAGE,
-                  currentPage * ITEMS_PER_PAGE
-                )
+                .slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
                 .map((product) => {
                   const showOffer = hasValidOffer(product);
                   const badgeData = getBadgeData(product);
                   const showPopularBadge = isPopularProduct(product);
                   const productIsFavorite = isFavorite(product.id);
-                  const currentPrice = showOffer
-                    ? product.offerPrice!
-                    : product.price;
+                  const currentPrice = showOffer ? product.offerPrice! : product.price;
+                  const isOutOfStock = (product.stockAvailable ?? 0) <= 0;
+                  const isDisabled = product.enabled === false;
+                  const isProductAvailable = !isOutOfStock && !isDisabled;
 
                   return (
                     <article
                       key={product.id}
-                      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border-light bg-card-bg-light transition-all duration-300 hover:-translate-y-1"
+                      className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border-light bg-card-bg-light transition-all duration-300 hover:-translate-y-1 ${
+                        !isProductAvailable ? 'opacity-75' : ''
+                      }`}
                     >
                       <a
                         href={`/productos/${product.slug}`}
@@ -932,7 +891,9 @@ function FeaturedProductsInner({
                         <img
                           src={product.imageUrl || PRODUCT_PLACEHOLDER}
                           alt={product.name}
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 ${
+                            !isProductAvailable ? 'grayscale' : ''
+                          }`}
                           onError={(event) => {
                             event.currentTarget.onerror = null;
                             event.currentTarget.src = PRODUCT_PLACEHOLDER;
@@ -940,19 +901,28 @@ function FeaturedProductsInner({
                         />
 
                         <div className="absolute left-3 top-3 flex flex-wrap gap-2">
-                          {badgeData && (
-                            <span
-                              className={`rounded-full px-2 py-0.5 text-xs font-semibold ${badgeData.className}`}
-                            >
+                          {isOutOfStock && !isDisabled && (
+                            <span className="rounded-full bg-red-600 px-2 py-0.5 text-xs font-semibold text-white">
+                              Agotado
+                            </span>
+                          )}
+                          {isDisabled && (
+                            <span style={{ backgroundColor: '#4b5563' }} className="rounded-full px-2 py-0.5 text-xs font-semibold text-white">
+                              No disponible
+                            </span>
+                          )}
+                          {isProductAvailable && badgeData && (
+                            <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${badgeData.className}`}>
                               {badgeData.label}
                             </span>
                           )}
-                          {showPopularBadge && (
+                          {isProductAvailable && showPopularBadge && (
                             <span className="rounded-full bg-amber-400 px-2 py-0.5 text-xs font-semibold text-amber-950">
                               Popular
                             </span>
                           )}
                         </div>
+
                         <button
                           type="button"
                           aria-label={
@@ -961,11 +931,7 @@ function FeaturedProductsInner({
                               : `Agregar ${product.name} a favoritos`
                           }
                           aria-pressed={productIsFavorite}
-                          title={
-                            productIsFavorite
-                              ? 'Quitar de favoritos'
-                              : 'Agregar a favoritos'
-                          }
+                          title={productIsFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
                           data-testid={`favorite-button-${product.slug}`}
                           onClick={(e) => {
                             e.preventDefault();
@@ -978,10 +944,7 @@ function FeaturedProductsInner({
                               : 'border-border-light bg-card-bg-light/90 text-text-light hover:border-primary hover:text-primary'
                           }`}
                         >
-                          <Heart
-                            size={18}
-                            fill={productIsFavorite ? 'currentColor' : 'none'}
-                          />
+                          <Heart size={18} fill={productIsFavorite ? 'currentColor' : 'none'} />
                         </button>
                       </div>
 
@@ -1016,16 +979,17 @@ function FeaturedProductsInner({
                           </div>
                           <button
                             type="button"
-                            title="Agregar al carrito"
+                            title={isProductAvailable ? 'Agregar al carrito' : 'Sin stock disponible'}
+                            disabled={!isProductAvailable}
                             onClick={(e) => {
                               e.preventDefault();
-                              addToCart(
-                                product.id,
-                                product.stockAvailable ?? 0,
-                                currentPrice
-                              );
+                              addToCart(product.id, product.stockAvailable ?? 0, currentPrice);
                             }}
-                            className="flex items-center justify-center rounded-full p-2.5 sm:p-3 transition-all active:scale-95 text-primary hover:scale-110 hover:drop-shadow-lg shrink-0 relative z-20"
+                            className={`flex items-center justify-center rounded-full p-2.5 sm:p-3 transition-all active:scale-95 shrink-0 relative z-20 ${
+                              isProductAvailable
+                                ? 'text-primary hover:scale-110 hover:drop-shadow-lg'
+                                : 'text-text-light opacity-30 cursor-not-allowed'
+                            }`}
                           >
                             <FaCartPlus className="text-lg sm:text-xl" />
                           </button>
@@ -1044,13 +1008,7 @@ function FeaturedProductsInner({
                   onClick={() => {
                     const newPage = currentPage - 1;
                     setCurrentPage(newPage);
-                    updateUrl(
-                      appliedSearch,
-                      showOffersOnly,
-                      selectedCategory,
-                      newPage,
-                      sortBy
-                    );
+                    updateUrl(appliedSearch, showOffersOnly, selectedCategory, newPage, sortBy);
                     setInvalidPage(false);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
@@ -1061,17 +1019,13 @@ function FeaturedProductsInner({
 
                 <div className="flex gap-1 flex-wrap justify-center items-center">
                   {(() => {
-                    const totalPages = Math.ceil(
-                      filteredProducts.length / ITEMS_PER_PAGE
-                    );
+                    const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
                     const pages: (number | string)[] = [];
                     const showRange = 1;
                     let ellipsisCount = 0;
 
-                    // Always show first page
                     pages.push(1);
 
-                    // Add ellipsis and pages before current
                     const rangeStart = Math.max(2, currentPage - showRange);
                     if (rangeStart > 2) {
                       pages.push(`...left-${ellipsisCount++}`);
@@ -1081,21 +1035,15 @@ function FeaturedProductsInner({
                       pages.push(i);
                     }
 
-                    // Add current page
                     if (currentPage !== 1) {
                       pages.push(currentPage);
                     }
 
-                    // Add pages after current
-                    const rangeEnd = Math.min(
-                      totalPages - 1,
-                      currentPage + showRange
-                    );
+                    const rangeEnd = Math.min(totalPages - 1, currentPage + showRange);
                     for (let i = currentPage + 1; i <= rangeEnd; i++) {
                       pages.push(i);
                     }
 
-                    // Add ellipsis and last page
                     if (rangeEnd < totalPages - 1) {
                       pages.push(`...right-${ellipsisCount++}`);
                     }
@@ -1104,15 +1052,11 @@ function FeaturedProductsInner({
                     }
 
                     return pages.map((page, index) => {
-                      const isEllipsis =
-                        typeof page === 'string' && page.startsWith('...');
+                      const isEllipsis = typeof page === 'string' && page.startsWith('...');
                       const pageNum = typeof page === 'number' ? page : null;
 
                       return isEllipsis ? (
-                        <span
-                          key={`${page}-${index}`}
-                          className="px-2 py-2 text-text-light opacity-50"
-                        >
+                        <span key={`${page}-${index}`} className="px-2 py-2 text-text-light opacity-50">
                           ...
                         </span>
                       ) : (
@@ -1121,13 +1065,7 @@ function FeaturedProductsInner({
                           type="button"
                           onClick={() => {
                             setCurrentPage(pageNum as number);
-                            updateUrl(
-                              appliedSearch,
-                              showOffersOnly,
-                              selectedCategory,
-                              pageNum as number,
-                              sortBy
-                            );
+                            updateUrl(appliedSearch, showOffersOnly, selectedCategory, pageNum as number, sortBy);
                             setInvalidPage(false);
                             window.scrollTo({ top: 0, behavior: 'smooth' });
                           }}
@@ -1146,20 +1084,11 @@ function FeaturedProductsInner({
 
                 <button
                   type="button"
-                  disabled={
-                    currentPage ===
-                    Math.ceil(filteredProducts.length / ITEMS_PER_PAGE)
-                  }
+                  disabled={currentPage === Math.ceil(filteredProducts.length / ITEMS_PER_PAGE)}
                   onClick={() => {
                     const newPage = currentPage + 1;
                     setCurrentPage(newPage);
-                    updateUrl(
-                      appliedSearch,
-                      showOffersOnly,
-                      selectedCategory,
-                      newPage,
-                      sortBy
-                    );
+                    updateUrl(appliedSearch, showOffersOnly, selectedCategory, newPage, sortBy);
                     setInvalidPage(false);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
@@ -1176,12 +1105,8 @@ function FeaturedProductsInner({
           <div className="flex h-96 items-center justify-center rounded-2xl border border-border-light bg-card-bg-light">
             <div className="text-center">
               <Package className="mx-auto h-12 w-12 text-text-light opacity-50 mb-4" />
-              <p className="text-lg font-semibold text-text-light">
-                No hay más productos
-              </p>
-              <p className="text-sm text-text-light opacity-70">
-                La página que buscas no existe
-              </p>
+              <p className="text-lg font-semibold text-text-light">No hay más productos</p>
+              <p className="text-sm text-text-light opacity-70">La página que buscas no existe</p>
             </div>
           </div>
         )}
@@ -1189,6 +1114,7 @@ function FeaturedProductsInner({
     </section>
   );
 }
+
 export default function FeaturedProducts(props: FeaturedProductsProps) {
   return (
     <CartProvider>
