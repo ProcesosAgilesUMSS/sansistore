@@ -332,3 +332,11 @@
 - **Yesterday:** Implementé la historia "Identificar pedidos con fallos": una pantalla donde el Operador ve los pedidos no entregados o cancelados, abre cada uno para ver el motivo y reponer su stock al inventario con un clic (sin duplicar). Incluí datos de ejemplo y pruebas automáticas.
 - **Today:** Subir los cambios, abrir el PR y coordinar la validación con el PO.
 - **Blockers:** Necesito que el PO confirme quién es el "Operador" y hasta dónde llega el alcance.
+
+# 06/02/2026
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Reporté los bugs detectados en los roles de operador y mensajero, y revisé el flujo principal del sistema
+- **Today:** Continuaré con el diseño y la ejecución de más flujos para asegurar que los resultados obtenidos sean los correctos.
+- **Blockers:** n/a.
