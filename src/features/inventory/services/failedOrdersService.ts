@@ -251,7 +251,7 @@ export async function restoreStockForOrder(
         quantity: item.quantity,
         operatorId,
         reason: `Reposición por pedido fallido ${order.id}`,
-        date: now,
+        createdAt: now,
       });
     }
 
