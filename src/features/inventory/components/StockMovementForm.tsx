@@ -79,7 +79,7 @@ export const StockMovementForm: React.FC = () => {
         quantity: quantity, 
         operatorId: 'operador_sansi', // Esto debería venir de la sesión del usuario idealmente
         reason: reason.trim(), // Enviamos el motivo obligatorio limpio de espacios
-        date: serverTimestamp()
+        createdAt: serverTimestamp()
       });
 
       await batch.commit();

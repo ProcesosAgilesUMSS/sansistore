@@ -1,3 +1,72 @@
+# 06/02/2026
+
+## José Ignacio Jaldin Janko
+- **Yesterday:** Implementación de la HU #19. 
+- **Today:** Continuaré con la implementación de la HU #19.
+- **Blockers** : Ninguno.
+## Sergio Maldonado Sejas
+- **Yesterday:** Inicié la implementación de la HU #22, revisando la estructura actual del formulario de edición de perfil y realizando los primeros cambios relacionados con la validación de datos.
+- **Today:** Continuaré con la implementación de la HU #22, completando las validaciones pendientes y verificando el flujo de actualización de información del perfil.
+- **Blockers:** Ninguno
+
+## Valery Dariana Ortuño Panozo
+- **Yesterday:** Implementación de la HU #17, revisando la estructura actual del formulario de edición de perfil y realizando los primeros cambios relacionados con la validación de datos.
+- **Today:** Continuaré con la implementación de la HU #17, completando las validaciones pendientes y verificando el flujo de actualización de información del perfil.
+- **Blockers** : Ninguno.
+## Anahi Sanabria Ugarte
+- **Yesterday:** revise las HUs y bugs e identifique que no existen dependencias en los bugs
+- **Today:** arregle todos los bugs pendientes del sprint
+- **Blockers:** ninguno, esperando revision de codigo
+
+## Leonel Zeballos Aldunate
+- **Yesterday:** Revisión y codificación de la HU correspondiente #19
+- **Today:** Codificación de la HU #19
+- **Blockers:** Posible dependencia, hablar con el equipo correspondiente
+
+# 05/28/2026
+## José Ignacio Jaldin Janko
+
+- **Yesterday:** Sprint Retrospective. 
+- **Today:** Planificación con la implementación de la HU #19.
+- **Blockers** : Ninguno.
+
+## Anahi Sanabria Ugarte
+- **Yesterday:** sprint retrospective
+- **Today:** planificación de las historias de usuario de este nuevo sprint
+- **Blockers:** ninguno
+
+## Valery Dariana Ortuño Panozo
+- **Yesterday:** Participé en la planificación del nuevo sprint, revisando historias de usuario, estimaciones y prioridades junto al equipo.
+- **Today:** Revisaré los criterios de aceptación y tareas de las historias asignadas para organizar el trabajo del sprint.
+- **Blockers:** Ninguno.
+
+## Sergio Maldonado Sejas
+- **Yesterday:** Participé en la planificación del nuevo sprint, revisando historias de usuario, estimaciones y prioridades junto al equipo.
+- **Today:** Revisaré los criterios de aceptación y tareas de las historias asignadas para organizar el trabajo del sprint.
+- **Blockers:** Ninguno.
+
+# 06/26/2026
+
+## José Ignacio Jaldin Janko
+
+- **Yesterday:** Planificación nuevo sprint  
+- **Today:** Sprint Retrospective
+- **Blockers** : Ninguno.
+## Anahi Sanabria Ugarte
+- **Yesterday:** revision de objetivos del nuevo sprint
+- **Today:** sprint retrospective
+- **Blockers:** ninguno
+
+## Sergio Maldonado Sejas
+- **Yesterday:** Participé en la Sprint Review presentando el avance de la HU de ubicaciones y revisando los resultados obtenidos durante el sprint.
+- **Today:** Participaré en la Sprint Retrospective para analizar mejoras del proceso de trabajo y proponer acciones para el siguiente sprint.
+- **Blockers:** Ninguno.
+
+## Valery Dariana Ortuño Panozo
+- **Yesterday:** Participé en la Sprint Review presentando el avance de la HU de ubicaciones y revisando los resultados obtenidos durante el sprint.
+- **Today:** Participaré en la Sprint Retrospective para analizar mejoras del proceso de trabajo y proponer acciones para el siguiente sprint.
+- **Blockers:** Ninguno.
+
 # 05/19/2026
 
 # Daily Report - Team 4
