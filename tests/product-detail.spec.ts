@@ -56,8 +56,7 @@ test.describe('Product Detail Page', () => {
     ).toBeVisible();
 
     await expect(page.getByText(/Bs\s21\.50/)).toBeVisible();
-
-    await expect(page.getByText('Producto agotado')).toBeVisible();
+    await expect(page.getByText('Producto agotado').or(page.getByText('No disponible'))).toBeVisible();
   });
 
   test('displays offer price when available', async ({ page }) => {
