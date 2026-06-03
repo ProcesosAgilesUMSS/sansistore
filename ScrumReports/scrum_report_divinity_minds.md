@@ -358,3 +358,9 @@
 - **Yesterday:** Implementé las HUs de alertas de stock (#417, #418): badge "Agotado"/"No disponible" en catálogo y detalle de producto, botón "Avisarme cuando esté disponible" para productos sin stock, y Cloud Function `notificarStockDisponible` que envía correo automático al usuario cuando el stock cambia de 0 a mayor que 0.
 - **Today:** Corrección del bug #463 de categorías inactivas accesibles por URL, validando la categoría contra Firestore al cargar la página y limpiando el parámetro si está inactiva.
 - **Blockers:** Ninguno.
+
+## Velasquez Vela Marcos
+
+- **Yesterday:** Revisé el flujo de ver/editar perfil. Reporté el bug #469 (la vista `/me` existe pero no hay ningún botón que lleve a ella estando logueado) y reabrí el bug #441 (el arreglo del menú móvil se perdió en un merge del PR #468, la falla volvió a reproducir). También definí las HUs #24, #27 y #17 que estaban con la plantilla vacía, agregándoles criterios de aceptación.
+- **Today:** Verifiqué las HUs en Done y dejé observaciones; la HU #20 (ver ubicación) cumple lo funcional pero su restricción de "solo pedidos asignados" está solo en la UI, parte de la deuda de reglas de Firestore abiertas.
+- **Blockers:** n/a.
