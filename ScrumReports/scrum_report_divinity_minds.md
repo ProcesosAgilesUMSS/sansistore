@@ -335,6 +335,12 @@
 
 # 06/02/2026
 
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Reporte bugs en general, del happy path del sistema.
+- **Today:** Algunas pruebas mas del flujo en general, priorizando los criticos.
+- **Blockers:** n/a.
+
 ## Merudia Calderon Dayeza
 
 - **Yesterday:** Reporté los bugs detectados en los roles de operador y mensajero, y revisé el flujo principal del sistema
