@@ -1,3 +1,14 @@
+/**
+ * Cloud Functions
+ * Área 7: Administración & Analítica — Nova 2.0
+ *
+ * HU #152: Definir tiempo límite de reserva
+ * Esta función corre automáticamente cada 5 minutos y libera
+ * el stock de pedidos RESERVADOS que superaron el tiempo límite.
+ */
+
+// El proyecto usa ES modules (type: "module") por eso usamos import
+// en lugar de require()
 import {onSchedule} from "firebase-functions/v2/scheduler";
 import {onDocumentUpdated} from "firebase-functions/v2/firestore";
 import {initializeApp} from "firebase-admin/app";
@@ -5,6 +16,9 @@ import {getFirestore, FieldValue} from "firebase-admin/firestore";
 import {defineSecret} from "firebase-functions/params";
 import nodemailer from "nodemailer";
 
+// Inicializar Firebase Admin SDK
+// Esto da acceso a Firestore con permisos de administrador
+// (no sujeto a las reglas de seguridad de Firestore)
 initializeApp();
 
 const db = getFirestore();
@@ -99,6 +113,11 @@ export const marcarTiempoReserva = onDocumentUpdated(
       });
     },
 );
+
+// ── FUNCIÓN: liberarReservas ────────────────────────────────────
+// Se ejecuta automáticamente cada 5 minutos
+// Busca pedidos en estado RESERVADO que superaron el tiempo límite
+// y los cancela, liberando el stock correspondiente
 
 export const liberarReservas = onSchedule(
     {
