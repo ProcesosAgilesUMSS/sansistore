@@ -24,6 +24,7 @@ import {
 } from '../features/cart/store/cartStore';
 import { clearLocalCart } from '../features/cart/utils/localCart';
 import { clearLocalFavorites } from '../features/favorites';
+import { registrarAcceso } from '../features/admin/audit/services/accessLogService';
 
 type ThemeMode = 'light' | 'dark';
 
@@ -130,16 +131,40 @@ export default function Navbar() {
     setThemeReady(true);
   }, [theme]);
 
+  //HU #159: registrar LOGOUT antes de cerrar sesión
+  //Solo se agregó el registro del acceso
   const handleLogout = () => {
     setProfileMenuOpen(false);
-    setRoles([]);
-    clearLocalCart();
-    clearLocalFavorites();
-    signOut(auth)
-      .then(() => {
-        window.location.href = '/login';
-      })
-      .catch(console.error);
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      getDoc(doc(db, 'users', currentUser.uid))
+        .then((snap) => {
+          const userData = snap.exists() ? snap.data() : null;
+          return registrarAcceso({
+            uid: currentUser.uid,
+            displayName: userData?.displayName ?? currentUser.displayName ?? 'Usuario',
+            email: currentUser.email ?? '',
+            roles: userData?.roles ?? [],
+            action: 'LOGOUT',
+          });
+        })
+        .catch(() => console.warn('[AccessLog] No se pudo registrar el logout.'))
+        .finally(() => {
+          setRoles([]);
+          clearLocalCart();
+          clearLocalFavorites();
+          signOut(auth)
+            .then(() => { window.location.href = '/login'; })
+            .catch(console.error);
+        });
+    } else {
+      setRoles([]);
+      clearLocalCart();
+      clearLocalFavorites();
+      signOut(auth)
+        .then(() => { window.location.href = '/login'; })
+        .catch(console.error);
+    }
   };
 
   const toggleTheme = () => {
@@ -172,7 +197,7 @@ export default function Navbar() {
             <div className="hidden md:flex items-center gap-8">
               {[
                 { label: 'Productos', href: '/productos', reqComprador: true },
-                { label: 'Pedidos', href: '/seller/created-orders', reqVendedor: true },
+                { label: 'Ordenes', href: '/seller/created-orders', reqVendedor: true },
                 { label: 'Inventario', href: '/inventory', reqOperadorInv: true },
                 { label: 'Entregas', href: '/courier', reqMensajero: true },
                 { label: 'Admin', href: '/admin', reqAdmin: true },
@@ -244,11 +269,9 @@ export default function Navbar() {
                           className="w-7 h-7 rounded-full object-cover"
                         />
                       )}
-
                       <span className="hidden sm:inline text-[13px] text-text-light opacity-70">
                         {user.displayName}
                       </span>
-
                       <ChevronDown
                         size={14}
                         className={`text-text-light opacity-50 transition-transform ${profileMenuOpen ? 'rotate-180' : ''
@@ -267,9 +290,6 @@ export default function Navbar() {
                             href="/mis-pedidos"
                             className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
                           >
-                            {/*
-                            <Package size={14} />
-                          */}
                             Mis pedidos
                           </a>
                         )}
@@ -314,10 +334,7 @@ export default function Navbar() {
                       onClick={() => setLoginMenuOpen((open) => !open)}
                       className="flex items-center gap-2 rounded-full px-2 py-1 transition-all hover:bg-border-light/40"
                     >
-                      <UserIcon
-                        size={18}
-                        className="text-text-light opacity-60"
-                      />
+                      <UserIcon size={18} className="text-text-light opacity-60" />
                       <ChevronDown
                         size={14}
                         className={`text-text-light opacity-50 transition-transform ${loginMenuOpen ? 'rotate-180' : ''}`}
@@ -356,7 +373,7 @@ export default function Navbar() {
             <div className="md:hidden py-3 flex flex-col gap-3 border-t border-border-light">
               {[
                 { label: 'Productos', href: '/productos', reqComprador: true },
-                { label: 'Pedidos', href: '/seller/created-orders', reqVendedor: true },
+                { label: 'Ordenes', href: '/seller/created-orders', reqVendedor: true },
                 { label: 'Inventario', href: '/inventory', reqOperadorInv: true },
                 { label: 'Entregas', href: '/courier', reqMensajero: true },
                 { label: 'Admin', href: '/admin', reqAdmin: true },

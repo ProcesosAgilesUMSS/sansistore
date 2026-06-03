@@ -299,6 +299,17 @@ classDiagram
     +timestamp createdAt
   }
 
+  class accessLogs {
+    +string logId
+    +string uid
+    +string displayName
+    +string email
+    +array roles
+    +string action
+    +string status
+    +timestamp timestamp
+  }
+
   users "1" --> "0..*" locations : owns
   users "1" --> "0..*" orders : places
   users "1" --> "0..*" reviews : writes
@@ -317,6 +328,7 @@ classDiagram
   users "1" --> "1" settings : configures
   users "1" --> "0..*" notifications : receives
   orders "1" --> "0..*" notifications : triggers
+  users "1" --> "0..*" accessLogs : generates
 ```
 
 ## Branching and releases

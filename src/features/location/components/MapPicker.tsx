@@ -56,7 +56,8 @@ export default function MapPicker({ onSave, editingLocation }: MapPickerProps) {
         isEditMode,  
     } = useMapPicker({ editingLocation, onSuccess: onSave });
 
-    const handleSaveAndClose = async () => {
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
         await handleSave();
         onSave?.();
     };
@@ -64,7 +65,7 @@ export default function MapPicker({ onSave, editingLocation }: MapPickerProps) {
     const title = isEditMode ? "Editar Ubicación" : "Nueva Ubicación";
 
     return (
-        <div className="bg-(--theme-card-bg) text-(--theme-text) p-4 rounded-2xl border border-(--theme-border) flex flex-col gap-3.5">
+        <form onSubmit={handleSubmit} className="bg-(--theme-card-bg) text-(--theme-text) p-4 rounded-2xl border border-(--theme-border) flex flex-col gap-3.5">
 
             <h1 className="font-extrabold text-lg">
                 {title}
@@ -94,7 +95,7 @@ export default function MapPicker({ onSave, editingLocation }: MapPickerProps) {
             <MapContainer
                 center={mapCenter}
                 zoom={16}
-                style={{ height: "320px" }}
+                style={{ height: "220px" }}
                 className="rounded-2xl"
             >
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -115,28 +116,6 @@ export default function MapPicker({ onSave, editingLocation }: MapPickerProps) {
                 <Marker position={[lat, lng]} />
                 <MapEvents onLocationChange={handleLocationChange} />
             </MapContainer>
-
-            <div>
-                <h4 className="font-bold mb-1">Ubicacion</h4>
-                <div className="flex gap-2.5">
-                    <div className="flex-1">
-                        <label className="text-xs opacity-70">Latitud</label>
-                        <input
-                            value={lat.toFixed(6)}
-                            readOnly
-                            className="w-full px-2.5 py-2 rounded-xl border border-(--theme-border) bg-(--theme-secondary-bg) text-(--theme-text)"
-                        />
-                    </div>
-                    <div className="flex-1">
-                        <label className="text-xs opacity-70">Longitud</label>
-                        <input
-                            value={lng.toFixed(6)}
-                            readOnly
-                            className="w-full px-2.5 py-2 rounded-xl border border-(--theme-border) bg-(--theme-secondary-bg) text-(--theme-text)"
-                        />
-                    </div>
-                </div>
-            </div>
 
             <div>
                 <h4 className="font-bold mb-1">Tipo de lugar</h4>
@@ -164,20 +143,22 @@ export default function MapPicker({ onSave, editingLocation }: MapPickerProps) {
             <div>
                 <h4 className="font-bold mb-1">Detalles de la ubicacion</h4>
                 <input
+                    required 
                     value={label}
                     onChange={(e) => setLabel(e.target.value)}
                     placeholder="Ej: Aula 962 - Facultad de Tecnología"
+                    maxLength={100}
                     className="w-full px-2.5 py-2 rounded-xl border border-(--theme-border) bg-(--theme-bg) text-(--theme-text)"
                 />
             </div>
 
             <button
-                onClick={handleSaveAndClose}
+                type="submit"
                 disabled={isSaving}
                 className="bg-(--color-primary) text-white py-3 rounded-full font-bold mt-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 {isSaving ? "Guardando..." : (isEditMode ? "Actualizar" : "Guardar")}
             </button>
-        </div>
+        </form>
     );
 }

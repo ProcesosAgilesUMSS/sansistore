@@ -4,8 +4,17 @@ import { adminAuth, adminDb } from '../../../lib/firebase-admin';
 
 interface CollectionOrder {
   orderId: string;
+  paymentId: string | null;
   total: number;
   collectedAt: string | null;
+  paymentStatus: string;
+  paymentStatusLabel: string;
+  paymentMethod: string;
+  courierId: string | null;
+  courierName: string;
+  courierEmail: string | null;
+  customerName: string;
+  deliveryId: string | null;
   buyerReceptionConfirmed: boolean;
   buyerReceptionConfirmedAt: string | null;
 }
@@ -54,6 +63,10 @@ function toDate(value: unknown): Date | null {
 function toAmount(value: unknown) {
   const amount = typeof value === 'number' ? value : Number(value);
   return Number.isFinite(amount) ? amount : 0;
+}
+
+function getString(value: unknown, fallback = '') {
+  return typeof value === 'string' && value.trim() ? value.trim() : fallback;
 }
 
 function getBoliviaDayRange(dateParam: string | null) {
@@ -113,30 +126,89 @@ export const GET: APIRoute = async ({ request, url }) => {
     .get();
 
   const collectedOrders: CollectionOrder[] = [];
+  const courierCache = new Map<
+    string,
+    { name: string; email: string | null }
+  >();
+
+  const readCourier = async (courierId: string | null) => {
+    if (!courierId) return { name: 'Mensajero no identificado', email: null };
+    if (courierCache.has(courierId)) return courierCache.get(courierId)!;
+
+    const courierDoc = await adminDb.collection('users').doc(courierId).get();
+    const courier = courierDoc.data();
+    const value = {
+      name:
+        getString(courier?.displayName) ||
+        getString(courier?.name) ||
+        getString(courier?.email) ||
+        courierId,
+      email: getString(courier?.email) || null,
+    };
+
+    courierCache.set(courierId, value);
+    return value;
+  };
 
   for (const orderDoc of snapshot.docs) {
     const data = orderDoc.data();
-    const paymentStatus = normalizeStatus(data.paymentStatus);
-    const deliveryStatus = normalizeStatus(data.deliveryStatus);
-    const orderStatus = normalizeStatus(data.status);
-    const isCollected =
-      COLLECTED_STATUSES.has(paymentStatus) ||
-      ((deliveryStatus === 'delivered' || orderStatus === 'entregado') &&
-        orderStatus !== 'cancelado');
-
-    if (!isCollected) continue;
+    const paymentId = getString(data.paymentId) || null;
+    const paymentDoc = paymentId
+      ? await adminDb.collection('payments').doc(paymentId).get()
+      : null;
+    const payment = paymentDoc?.exists ? paymentDoc.data() : null;
+    const paymentStatus = normalizeStatus(
+      payment?.status ?? data.paymentStatus
+    );
+    if (!COLLECTED_STATUSES.has(paymentStatus)) continue;
 
     const collectedAt =
+      toDate(payment?.collectedAt) ??
       toDate(data.paymentCollectedAt) ??
       toDate(data.deliveredAt) ??
       toDate(data.updatedAt);
 
     if (!collectedAt || collectedAt < start || collectedAt > end) continue;
 
+    const deliverySnapshot = await adminDb
+      .collection('deliveries')
+      .where('orderId', '==', orderDoc.id)
+      .limit(1)
+      .get();
+    const deliveryDoc = deliverySnapshot.docs[0];
+    const delivery = deliveryDoc?.data();
+    const courierId =
+      getString(payment?.collectedBy) ||
+      getString(data.collectedBy) ||
+      getString(delivery?.courierId) ||
+      null;
+
+    if (!courierId) continue;
+
+    const courier = await readCourier(courierId);
+
     collectedOrders.push({
       orderId: orderDoc.id,
-      total: toAmount(data.total),
+      paymentId,
+      total: toAmount(payment?.amount ?? data.total),
       collectedAt: collectedAt.toISOString(),
+      paymentStatus: getString(payment?.status ?? data.paymentStatus, 'COBRADO'),
+      paymentStatusLabel: getString(
+        payment?.statusLabel ?? data.paymentStatusLabel,
+        'Cobrado',
+      ),
+      paymentMethod: getString(
+        payment?.method ?? data.paymentMethod,
+        'cash_on_delivery',
+      ),
+      courierId,
+      courierName: courier.name,
+      courierEmail: courier.email,
+      customerName: getString(
+        data.customerName ?? data.buyerName,
+        'Cliente no registrado',
+      ),
+      deliveryId: deliveryDoc?.id ?? null,
       buyerReceptionConfirmed: Boolean(data.buyerReceptionConfirmed || data.customerConfirmed),
       buyerReceptionConfirmedAt:
         (toDate(data.buyerReceptionConfirmedAt) ?? toDate(data.customerConfirmedAt))?.toISOString() ??
@@ -153,6 +225,9 @@ export const GET: APIRoute = async ({ request, url }) => {
     date,
     totalCollected,
     orderCount: collectedOrders.length,
+    confirmedByBuyerCount: collectedOrders.filter(
+      (order) => order.buyerReceptionConfirmed,
+    ).length,
     orders: collectedOrders,
   });
 };
