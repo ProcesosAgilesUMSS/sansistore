@@ -325,3 +325,8 @@ por las dudas que se tienen.
 * **Yesterday:** Terminé de implementar mi HU asignada. Además, estuve analizando y planificando cómo desarrollar la otra HU que me fue asignada.
 * **Today:** Corregí los bugs identificados en funcionalidades desarrolladas anteriormente y realicé las validaciones correspondientes para asegurar su correcto funcionamiento.
 * **Blockers:** None.
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Terminé de implementar mi HU asignada, relacionada con la verificación de pagos registrados por mensajeros para el control financiero.
+* **Today:** Realizaré pruebas para identificar posibles bugs y validar que la funcionalidad trabaje correctamente según los criterios definidos.
+* **Blockers:** None.
