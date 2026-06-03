@@ -336,3 +336,9 @@ por las dudas que se tienen.
 * **Yesterday:** Avancé con el diseño y la implementación del código de la HU asignada, tomando en cuenta los requerimientos y el flujo definido para la funcionalidad.
 * **Today:** Continuaré ajustando la implementación, realizando pruebas básicas y corrigiendo posibles detalles para asegurar su correcto funcionamiento.
 * **Blockers:** None
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Avancé con la revisión y validación de la HU asignada, verificando su funcionamiento y realizando ajustes en la implementación.
+* **Today:** Continuaré apoyando en la revisión de funcionalidades y en la corrección de observaciones identificadas durante las pruebas.
+* **Blockers:** None
