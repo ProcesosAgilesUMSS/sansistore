@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, query, where, onSnapshot, getDocs, doc, updateDoc, serverTimestamp, getDoc } from 'firebase/firestore'; // Añadimos getDoc
+import { collection, query, where, onSnapshot, getDocs, doc, updateDoc, serverTimestamp, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { PackageSearch, PackageCheck, AlertCircle, CheckCircle2, Play, X, ListFilter, User } from 'lucide-react';
 import { parseOrderId } from '@/features/cart/services/orderService';
@@ -16,15 +16,17 @@ interface Order {
   status: string;
   items: OrderItem[];
   date?: any;
-  // Agrupamos los datos cruzados del vendedor
   seller?: {
     displayName?: string;
     email?: string;
     institutionalId?: string;
-    phone?: string;
+    phoneNumber?: string;//////////////////////////////////////////////////////////////////////////////
     photoURL?: string;
   };
 }
+
+// Eliminado 'TODOS' de los estados del filtro
+type FilterStatus = 'RESERVADO' | 'PENDIENTE' | 'EMPAQUETADO';
 
 export const OrderDispatch: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -32,17 +34,19 @@ export const OrderDispatch: React.FC = () => {
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  
+  // Inicializa directamente en RESERVADO
+  const [filter, setFilter] = useState<FilterStatus>('RESERVADO');
 
   const [activeOrderForModal, setActiveOrderForModal] = useState<Order | null>(null);
 
   useEffect(() => {
-    const q = query(collection(db, 'orders'), where('status', 'in', ['RESERVADO', 'PENDIENTE']));
+    const q = query(collection(db, 'orders'), where('status', 'in', ['RESERVADO', 'PENDIENTE', 'EMPAQUETADO']));
 
     const unsubscribe = onSnapshot(q, async (snapshot) => {
       const fetchedOrders = await Promise.all(snapshot.docs.map(async (orderDoc) => {
         const orderData = orderDoc.data();
 
-        // 1. Consultar los items del pedido
         const itemsSnap = await getDocs(collection(db, 'orders', orderDoc.id, 'orderItems'));
         const items = itemsSnap.docs.map(itemDoc => {
           const itemData = itemDoc.data();
@@ -53,7 +57,6 @@ export const OrderDispatch: React.FC = () => {
           };
         });
 
-        // 2. CRUCE DE DATOS: Consultar el vendedor en la colección 'users'
         let sellerInfo = {};
         if (orderData.sellerId) {
           try {
@@ -71,15 +74,14 @@ export const OrderDispatch: React.FC = () => {
           id: orderDoc.id,
           ...orderData,
           items,
-          seller: sellerInfo // Inyectamos la data de la colección users aquí
+          seller: sellerInfo
         } as Order;
       }));
 
-      // Ordenar: Primero RESERVADO, luego PENDIENTE
       const sortedOrders = fetchedOrders.sort((a, b) => {
-        if (a.status === 'RESERVADO' && b.status === 'PENDIENTE') return -1;
-        if (a.status === 'PENDIENTE' && b.status === 'RESERVADO') return 1;
-        return 0;
+        const timeA = a.date?.toMillis ? a.date.toMillis() : new Date(a.date || 0).getTime();
+        const timeB = b.date?.toMillis ? b.date.toMillis() : new Date(b.date || 0).getTime();
+        return timeB - timeA;
       });
 
       setOrders(sortedOrders);
@@ -127,16 +129,18 @@ export const OrderDispatch: React.FC = () => {
     }
   };
 
-  // Función auxiliar suuper limpia usando los datos reales extraídos de users
   const getSellerName = (order: Order) =>
     order.seller?.displayName || order.sellerId || 'Vendedor Desconocido';
+
+  // Aplicar filtro directo
+  const displayedOrders = orders.filter(o => o.status === filter);
 
   if (loading) return <div className="animate-pulse h-full min-h-[300px] bg-(--theme-secondary-bg) rounded-3xl"></div>;
 
   return (
     <>
       <div className="bg-(--theme-card-bg) border border-(--theme-border) rounded-3xl p-6 shadow-sm h-full flex flex-col">
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-4">
           <div className="p-2 bg-primary/10 rounded-xl text-primary">
             <PackageSearch className="w-6 h-6" />
           </div>
@@ -144,6 +148,34 @@ export const OrderDispatch: React.FC = () => {
             <h2 className="font-['Outfit'] font-bold text-lg text-(--theme-text)">Pedidos a Empacar</h2>
             <p className="text-xs opacity-60 text-(--theme-text)">Busca, empaca y prepara los pedidos reservados</p>
           </div>
+        </div>
+
+        {/* BOTONES DE FILTRO CON COLORES ASIGNADOS AL ESTAR ACTIVOS */}
+        <div className="flex gap-2 mb-6 overflow-x-auto pb-1 scrollbar-hide">
+          {(['RESERVADO', 'PENDIENTE', 'EMPAQUETADO'] as FilterStatus[]).map((f) => {
+            const isActive = filter === f;
+            let activeStyle = '';
+            
+            if (isActive) {
+              if (f === 'RESERVADO') activeStyle = 'bg-green-500 text-white shadow-md shadow-green-500/20';
+              if (f === 'PENDIENTE') activeStyle = 'bg-amber-500 text-white shadow-md shadow-amber-500/20';
+              if (f === 'EMPAQUETADO') activeStyle = 'bg-purple-600 text-white shadow-md shadow-purple-600/20';
+            }
+
+            return (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`px-5 py-1.5 rounded-full text-[11px] font-bold tracking-wide transition-all ${
+                  isActive 
+                    ? activeStyle 
+                    : 'bg-(--theme-secondary-bg) border border-(--theme-border) text-(--theme-text) opacity-60 hover:opacity-100'
+                }`}
+              >
+                {f}
+              </button>
+            );
+          })}
         </div>
 
         {error && (
@@ -160,29 +192,28 @@ export const OrderDispatch: React.FC = () => {
           </div>
         )}
 
-        {orders.length === 0 ? (
+        {displayedOrders.length === 0 ? (
           <div className="text-center py-12 flex-grow flex flex-col justify-center border-2 border-dashed border-(--theme-border) rounded-2xl opacity-50">
-            <p className="font-bold text-(--theme-text)">No hay tareas pendientes en almacén</p>
-            <p className="text-sm text-(--theme-text) opacity-60">No hay pedidos reservados ni en proceso de empaque.</p>
+            <p className="font-bold text-(--theme-text)">No hay pedidos en esta sección</p>
+            <p className="text-sm text-(--theme-text) opacity-60">Actualmente no existen registros con este estado.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 overflow-y-auto pr-2">
-            {orders.map(order => (
-              <div key={order.id} className="border border-(--theme-border) bg-(--theme-secondary-bg) rounded-2xl p-4 flex flex-col justify-between">
+            {displayedOrders.map(order => (
+              <div key={order.id} className="border border-(--theme-border) bg-(--theme-secondary-bg) rounded-2xl p-4 flex flex-col justify-between transition hover:border-primary/30">
                 <div className="mb-4">
-                  <span className="block text-xs text-text-light/50 truncate">
-                    {parseOrderId(order.id).uuid}
-                  </span>
-                  <div className="flex justify-between items-start mb-3">
-
-                    <span className="text-md font-bold px-2 py-1 rounded-md font-bold">
-                      {parseOrderId(order.id).friendlyName}
-                    </span>
-                    <span className={`text-xs font-bold px-2 py-1 rounded-md ${order.status === 'PENDIENTE' ? 'bg-amber-500/20 text-amber-500' : 'bg-zinc-500/20 text-zinc-500'
-                      }`}>
-                      {order.status}
+                  
+                  {/* CÓDIGO CORTO ESTILIZADO COMO BADGE DE ESTADO */}
+                  <div className="flex justify-between items-start mb-4">
+                    <span className={`text-l font-['Outfit'] font-black px-2.5 py-1 rounded-lg tracking-wider ${
+                      order.status === 'RESERVADO' ? 'bg-green-500 text-white shadow-md shadow-green-500/20' : 
+                      order.status === 'PENDIENTE' ? 'bg-amber-500 text-white ' :
+                      'bg-purple-500 text-white'
+                    }`}>
+                      #{parseOrderId(order.id).friendlyName}
                     </span>
                   </div>
+
                   <div className="flex items-center gap-2">
                     {order.seller?.photoURL && (
                       <img src={order.seller.photoURL} alt={getSellerName(order)} className="w-6 h-6 rounded-full object-cover shrink-0" />
@@ -198,7 +229,11 @@ export const OrderDispatch: React.FC = () => {
 
                 <button
                   onClick={() => setActiveOrderForModal(order)}
-                  className="w-full bg-green-500 text-white py-2.5 rounded-xl text-sm font-bold transition-all duration-200 hover:bg-green-400 active:scale-[0.98] flex justify-center items-center gap-2"
+                  className={`w-full text-white py-2.5 rounded-xl text-sm font-bold transition-all duration-200 active:scale-[0.98] flex justify-center items-center gap-2 shadow-sm ${
+                    order.status === 'RESERVADO' ? 'bg-green-500 hover:bg-green-600' :
+                    order.status === 'PENDIENTE' ? 'bg-amber-500 hover:bg-amber-600' :
+                    'bg-purple-600 hover:bg-purple-700'
+                  }`}
                 >
                   <ListFilter className="w-4 h-4" />
                   VER DETALLES
@@ -222,23 +257,24 @@ export const OrderDispatch: React.FC = () => {
             </button>
 
             <div className="mb-4">
-              <span className="block text-xs text-text-light/50 truncate">
-                {parseOrderId(activeOrderForModal.id).uuid}
+              {/* Estilo unificado también en el modal */}
+              <span className={`text-l font-['Outfit'] font-black px-2.5 py-1 rounded-lg tracking-wider inline-block mb-2 ${
+                activeOrderForModal.status === 'RESERVADO' ? 'bg-green-500/15 text-green-600 dark:text-green-400' : 
+                activeOrderForModal.status === 'PENDIENTE' ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400' :
+                'bg-purple-500/15 text-purple-600 dark:text-purple-400'
+              }`}>
+                #{parseOrderId(activeOrderForModal.id).friendlyName}
               </span>
-              <span className="text-lg font-bold px-2 py-0.5 rounded-md font-bold">
-                {parseOrderId(activeOrderForModal.id).friendlyName}
-              </span>
-              <h2 className="font-['Outfit'] font-black text-xl text-(--theme-text) mt-2 mb-1">
-                Recolección de Pedido
+              <h2 className="font-['Outfit'] font-black text-xl text-(--theme-text) mt-1 mb-1">
+                Detalle del Pedido
               </h2>
             </div>
 
-            {/* INFOR DEL VENDEDOR */}
-            <p className="text-[10px] text-(--theme-text) opacity-50 font-bold uppercase tracking-wider mb-1">
+            {/* INFO DEL VENDEDOR */}
+            <p className="text-[10px] text-(--theme-text) opacity-80 font-bold uppercase tracking-wider mb-1">
               Datos del Vendedor
             </p>
             <div className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-2xl p-4 mb-4 flex gap-3 items-center">
-
               {activeOrderForModal.seller?.photoURL ? (
                 <img
                   src={activeOrderForModal.seller.photoURL}
@@ -250,24 +286,23 @@ export const OrderDispatch: React.FC = () => {
                   <User className="w-6 h-6" />
                 </div>
               )}
-
               <div className="space-y-1 w-full overflow-hidden">
                 <p className="font-bold text-sm text-(--theme-text) truncate">
                   {getSellerName(activeOrderForModal)}
                 </p>
-                {activeOrderForModal.seller?.email && (
-                  <p className="text-[11px] text-(--theme-text) opacity-50 truncate">
-                    {activeOrderForModal.seller.email}
-                  </p>
-                )}
                 {activeOrderForModal.seller?.institutionalId && (
-                  <p className="text-[11px] text-(--theme-text) opacity-50 truncate">
+                  <p className="text-[11px] text-(--theme-text) opacity-100 truncate">
                     {activeOrderForModal.seller.institutionalId}
                   </p>
                 )}
-                {activeOrderForModal.seller?.phone ? (
-                  <p className="text-[11px] text-(--theme-text) opacity-50 truncate">
-                    {activeOrderForModal.seller.phone}
+                {activeOrderForModal.seller?.email && (
+                  <p className="text-[11px] text-(--theme-text) opacity-100 truncate">
+                    {activeOrderForModal.seller.email}
+                  </p>
+                )}
+                {activeOrderForModal.seller?.phoneNumber ? (
+                  <p className="text-[11px] text-(--theme-text) opacity-100 truncate">
+                    {activeOrderForModal.seller.phoneNumber}
                   </p>
                 ) : (
                   <p className="text-[11px] text-(--theme-text) opacity-50 italic">
@@ -279,7 +314,7 @@ export const OrderDispatch: React.FC = () => {
 
             {/* LISTA DE PRODUCTOS */}
             <div className="flex-grow overflow-y-auto my-2 pr-1 space-y-2 max-h-[35vh]">
-              <p className="text-[10px] text-(--theme-text) opacity-50 font-bold uppercase tracking-wider mb-1">
+              <p className="text-[10px] text-(--theme-text) opacity-80 font-bold uppercase tracking-wider mb-1">
                 Lista de verificación ({activeOrderForModal.items.length} items)
               </p>
 
@@ -305,19 +340,21 @@ export const OrderDispatch: React.FC = () => {
               ))}
             </div>
 
-            {/* BOTONERA */}
+            {/* BOTONERA DINÁMICA DEL MODAL */}
             <div className="pt-4 mt-4 border-t border-(--theme-border)/50">
-              {activeOrderForModal.status === 'RESERVADO' ? (
+              {activeOrderForModal.status === 'RESERVADO' && (
                 <button
                   type="button"
                   disabled={processingId === activeOrderForModal.id}
                   onClick={() => handleStartPicking(activeOrderForModal)}
-                  className="w-full px-4 py-3.5 rounded-2xl bg-amber-500 text-white font-['Outfit'] font-bold text-sm shadow-lg shadow-amber-500/20 hover:brightness-110 disabled:opacity-50 transition-all flex justify-center items-center gap-2"
+                  className="w-full px-4 py-3.5 rounded-2xl bg-amber-500 text-white font-['Outfit'] font-bold text-sm shadow-lg hover:brightness-110 disabled:opacity-50 transition-all flex justify-center items-center gap-2"
                 >
                   <Play className="w-4 h-4 fill-white" />
                   {processingId === activeOrderForModal.id ? 'Iniciando...' : 'EMPEZAR A BUSCAR'}
                 </button>
-              ) : (
+              )}
+
+              {activeOrderForModal.status === 'PENDIENTE' && (
                 <div className="flex gap-3">
                   <button
                     type="button"
@@ -333,9 +370,19 @@ export const OrderDispatch: React.FC = () => {
                     className="flex-[1.3] px-4 py-3 rounded-2xl bg-primary text-(--theme-bg) font-['Outfit'] font-bold text-sm shadow-lg shadow-primary/20 hover:brightness-110 disabled:opacity-50 transition-all flex justify-center items-center gap-2"
                   >
                     <PackageCheck className="w-5 h-5" />
-                    {processingId === activeOrderForModal.id ? 'Guardando...' : 'EMPAQUETADO'}
+                    {processingId === activeOrderForModal.id ? 'Guardando...' : 'EMPAQUETAR'}
                   </button>
                 </div>
+              )}
+
+              {activeOrderForModal.status === 'EMPAQUETADO' && (
+                <button
+                  type="button"
+                  onClick={() => setActiveOrderForModal(null)}
+                  className="w-full px-4 py-3 rounded-2xl font-['Outfit'] font-bold text-sm border border-(--theme-border) bg-(--theme-secondary-bg) text-(--theme-text) opacity-80 hover:opacity-100 transition"
+                >
+                  Cerrar
+                </button>
               )}
             </div>
 
