@@ -342,3 +342,9 @@ por las dudas que se tienen.
 * **Yesterday:** Avancé con la revisión y validación de la HU asignada, verificando su funcionamiento y realizando ajustes en la implementación.
 * **Today:** Continuaré apoyando en la revisión de funcionalidades y en la corrección de observaciones identificadas durante las pruebas.
 * **Blockers:** None
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Avancé con la implementación de la HU asignada, desarrollando las funcionalidades principales y verificando su integración con los componentes relacionados.
+* **Today:** Continuaré realizando ajustes en la implementación, ejecutando pruebas y validando que la funcionalidad cumpla con los criterios de aceptación establecidos.
+* **Blockers:** none
