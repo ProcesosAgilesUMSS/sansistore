@@ -330,3 +330,9 @@ por las dudas que se tienen.
 * **Yesterday:** Terminé de implementar mi HU asignada, relacionada con la verificación de pagos registrados por mensajeros para el control financiero.
 * **Today:** Realizaré pruebas para identificar posibles bugs y validar que la funcionalidad trabaje correctamente según los criterios definidos.
 * **Blockers:** None.
+  
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Avancé con el diseño y la implementación del código de la HU asignada, tomando en cuenta los requerimientos y el flujo definido para la funcionalidad.
+* **Today:** Continuaré ajustando la implementación, realizando pruebas básicas y corrigiendo posibles detalles para asegurar su correcto funcionamiento.
+* **Blockers:** None
