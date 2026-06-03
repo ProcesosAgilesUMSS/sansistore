@@ -346,3 +346,9 @@
 - **Yesterday:** Reporté los bugs detectados en los roles de operador y mensajero, y revisé el flujo principal del sistema
 - **Today:** Continuaré con el diseño y la ejecución de más flujos para asegurar que los resultados obtenidos sean los correctos.
 - **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Implementé las HUs de alertas de stock (#417, #418): badge "Agotado"/"No disponible" en catálogo y detalle de producto, botón "Avisarme cuando esté disponible" para productos sin stock, y Cloud Function `notificarStockDisponible` que envía correo automático al usuario cuando el stock cambia de 0 a mayor que 0.
+- **Today:** Corrección del bug #463 de categorías inactivas accesibles por URL, validando la categoría contra Firestore al cargar la página y limpiando el parámetro si está inactiva.
+- **Blockers:** Ninguno.
