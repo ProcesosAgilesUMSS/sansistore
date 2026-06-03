@@ -341,3 +341,10 @@
 - **Yesterday:** Estuve trabajando en la validación de datos, agregando más detalle a los criterios.
 - **Today:** Terminaré de corregir el bug.
 - **Blockers:** None.
+
+## 02-06-2026
+
+### José Daniel Virreira Rufino
+- **Yesterday:** revisé e integré los cambios del flujo de mensajero/courier, validé que el mapa del comprador use la ubicación correcta, corregí datos de órdenes del comprador y limpié problemas de IDs/datos mostrados.
+- **Today:** Revisar y corregir los bugs asignados a su vez de empezar a trabajar en las US' nuevas.
+- **Blockers:** Nuevos bugs detectados por otros equipos.
