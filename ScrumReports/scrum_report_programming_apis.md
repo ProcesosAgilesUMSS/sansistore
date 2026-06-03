@@ -358,3 +358,8 @@
 - **Yesterday:** Ambos PRs (#410 y #411) fueron aprobados y mergeados a `main` sin contratiempos. Se verificó que las funcionalidades del módulo de mensajero sigan operativas después del merge.
 - **Today:** Reflexión del Sprint 3: las tareas asignadas se completaron en tiempo y forma. Se sugiere para próximos sprints definir mejor los campos compartidos entre equipos para evitar posibles descoordinaciones. Análisis de nuevos bugs reportados.
 - **Blockers:** None.
+
+### Efrain Peralta Felipe 
+- **Yesterday:** Trabaje en el bug de asignar mensajero 
+- **Today:** Terminar la Hu de este sprint 
+- **Blockers:** None
