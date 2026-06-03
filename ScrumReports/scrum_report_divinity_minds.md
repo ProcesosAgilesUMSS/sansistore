@@ -335,6 +335,12 @@
 
 # 06/02/2026
 
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Aporté en la issue #179 para refinar detalles y hacer el PR. Realicé una auditoría del módulo de Flow usando GitHub CLI e identifiqué, registré y vinculé como sub-issues en el Backlog/Sprint 3 cuatro reportes oficiales de bugs (#452, #454, #455, #456) referentes a validación, responsividad y desbordamiento de texto.
+- **Today:** Crear y presentar la propuesta técnica en Discussions para el rediseño del perfil `/me` basado en roles y coordinar los requerimientos de la US #24 con el equipo de Flow.
+- **Blockers:** n/a.
+
 ## Gutierrez Hinojosa Jhon Deymar
 
 - **Yesterday:** Reporte bugs en general, del happy path del sistema.
