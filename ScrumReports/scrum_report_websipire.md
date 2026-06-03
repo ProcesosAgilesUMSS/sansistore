@@ -318,3 +318,33 @@ por las dudas que se tienen.
 * **Today:** Comenzaré con el diseño y desarrollo inicial de la HU, tomando en cuenta las dependencias relacionadas.
 * **Blockers:** none
 
+# Daily Reports - Team 3 Webspire 02/06/26
+
+## Dayana Saleth Ortuño Guzman
+
+* **Yesterday:** Terminé de implementar mi HU asignada. Además, estuve analizando y planificando cómo desarrollar la otra HU que me fue asignada.
+* **Today:** Corregí los bugs identificados en funcionalidades desarrolladas anteriormente y realicé las validaciones correspondientes para asegurar su correcto funcionamiento.
+* **Blockers:** None.
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Terminé de implementar mi HU asignada, relacionada con la verificación de pagos registrados por mensajeros para el control financiero.
+* **Today:** Realizaré pruebas para identificar posibles bugs y validar que la funcionalidad trabaje correctamente según los criterios definidos.
+* **Blockers:** None.
+  
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Avancé con el diseño y la implementación del código de la HU asignada, tomando en cuenta los requerimientos y el flujo definido para la funcionalidad.
+* **Today:** Continuaré ajustando la implementación, realizando pruebas básicas y corrigiendo posibles detalles para asegurar su correcto funcionamiento.
+* **Blockers:** None
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Avancé con la revisión y validación de la HU asignada, verificando su funcionamiento y realizando ajustes en la implementación.
+* **Today:** Continuaré apoyando en la revisión de funcionalidades y en la corrección de observaciones identificadas durante las pruebas.
+* **Blockers:** None
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Avancé con la implementación de la HU asignada, desarrollando las funcionalidades principales y verificando su integración con los componentes relacionados.
+* **Today:** Continuaré realizando ajustes en la implementación, ejecutando pruebas y validando que la funcionalidad cumpla con los criterios de aceptación establecidos.
+* **Blockers:** none
