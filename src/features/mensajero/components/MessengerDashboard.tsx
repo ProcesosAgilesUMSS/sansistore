@@ -878,6 +878,18 @@ export default function MessengerDashboard({
             }),
         [orders]
     );
+    const todayCollectedTotal = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return orders
+        .filter((order) => {
+            if (order.deliveryStatus !== 'delivered') return false;
+            const date = order.paymentCollectedAt || order.updatedAt || order.createdAt;
+            return date ? date >= today : false;
+        })
+        .reduce((total, order) => total + order.cashToCollect, 0);
+}, [orders]);
     
     const notDeliveredOrders = useMemo(
         () =>
@@ -1240,6 +1252,11 @@ const confirmPayment = async (order: MessengerOrder, secret: string) => {
                                 label="Cantidad completados"
                                 value={deliveredOrders.length}
                             />
+                          <SummaryCard
+                                icon={<CheckCircle2 size={20} />}
+                                label="Cobrado en la jornada"
+                                value={formatBolivianos(todayCollectedTotal)}
+                            />                
                             <SummaryCard
                                 featured
                                 icon={<DollarSign size={20} />}
@@ -1251,6 +1268,7 @@ const confirmPayment = async (order: MessengerOrder, secret: string) => {
                                     )
                                 )}
                             />
+
                         </section>
 
                         <section className="mt-11">
