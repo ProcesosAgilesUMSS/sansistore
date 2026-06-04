@@ -8,12 +8,19 @@ interface OrderCardProps {
 
 const getStatusStyles = (status: string) => {
   switch (status) {
+    case 'ENTREGADO':
     case 'delivered':
       return 'bg-[#88B04B]/10 text-[#88B04B]';
+    case 'EN CAMINO':
     case 'in_transit':
       return 'bg-blue-500/10 text-blue-500';
+    case 'PENDIENTE':
+    case 'EMPAQUETADO':
+    case 'LISTO':
     case 'preparing':
       return 'bg-amber-500/10 text-amber-500';
+    case 'CANCELADO':
+    case 'NO ENTREGADO':
     case 'cancelled':
       return 'bg-red-500/10 text-red-500';
     default:
@@ -27,7 +34,10 @@ const getStatusLabel = (status: string) => {
     preparing: "Preparando",
     in_transit: "En camino",
     delivered: "Entregado",
-    cancelled: "Cancelado"
+    cancelled: "Cancelado",
+    ENTREGADO: "Entregado",
+    'EN CAMINO': "En camino",
+    CANCELADO: "Cancelado"
   };
   return labels[status] || status;
 };

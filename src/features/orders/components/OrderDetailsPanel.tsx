@@ -13,9 +13,16 @@ interface OrderDetailsPanelProps {
 
 const getStatusStyles = (status: string) => {
   switch (status) {
+    case 'ENTREGADO':
     case 'delivered': return 'bg-[#88B04B]/10 text-[#88B04B] border-[#88B04B]/20';
+    case 'EN CAMINO':
     case 'in_transit': return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+    case 'PENDIENTE':
+    case 'EMPAQUETADO':
+    case 'LISTO':
     case 'preparing': return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
+    case 'CANCELADO':
+    case 'NO ENTREGADO':
     case 'cancelled': return 'bg-red-500/10 text-red-500 border-red-500/20';
     default: return 'bg-gray-500/10 text-gray-500 border-gray-500/20';
   }
@@ -24,10 +31,16 @@ const getStatusStyles = (status: string) => {
 const getStatusLabel = (status: string) => {
   const labels: Record<string, string> = {
     pending: "Pendiente", preparing: "Preparando",
-    in_transit: "En camino", delivered: "Entregado", cancelled: "Cancelado"
+    in_transit: "En camino", delivered: "Entregado", cancelled: "Cancelado",
+    ENTREGADO: "Entregado", 'EN CAMINO': "En camino", CANCELADO: "Cancelado"
   };
   return labels[status] || status;
 };
+
+const isDeliveredOrder = (order: Order) =>
+  order.status === 'ENTREGADO' ||
+  order.deliveryStatus === 'DELIVERED' ||
+  order.deliveryStatus === 'delivered';
 
 function formatDateTime(value: Order['buyerReceptionConfirmedAt']) {
   if (!value) return null;
@@ -59,9 +72,10 @@ export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: O
   const now = new Date();
   const hoursSinceOrder = (now.getTime() - orderDate.getTime()) / (1000 * 60 * 60);
   const isWithinTimeLimit = hoursSinceOrder <= 72;
-  const canRequestReturn = order.status === 'delivered' && isWithinTimeLimit;
+  const isDelivered = isDeliveredOrder(order);
+  const canRequestReturn = isDelivered && isWithinTimeLimit;
   const receptionConfirmedAt = formatDateTime(order.buyerReceptionConfirmedAt);
-  const canConfirmReception = order.status === 'delivered' && !order.buyerReceptionConfirmed;
+  const canConfirmReception = isDelivered && !order.buyerReceptionConfirmed;
 
   const handleConfirmReception = async () => {
     if (!order.buyerId || order.buyerReceptionConfirmed) return;
@@ -73,7 +87,7 @@ export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: O
       await confirmOrderReception(order.id, order.buyerId);
       const updatedOrder = {
         ...order,
-        status: 'delivered' as const,
+        status: 'ENTREGADO' as const,
         buyerReceptionConfirmed: true,
         buyerReceptionConfirmedAt: Timestamp.fromDate(new Date()),
       };
@@ -186,7 +200,7 @@ export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: O
               <p className="mt-1 text-xs opacity-70">
                 {order.buyerReceptionConfirmed
                   ? `Confirmada${receptionConfirmedAt ? ` el ${receptionConfirmedAt}` : ''}.`
-                  : order.status === 'delivered'
+                  : isDelivered
                     ? 'Valida que recibiste el pedido correctamente.'
                     : 'Disponible cuando el mensajero marque el pedido como entregado.'}
               </p>
@@ -304,7 +318,7 @@ export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: O
               </button>
             ) : (
               <p className="text-xs opacity-50 italic">
-                {order.status !== 'delivered'
+                {!isDelivered
                   ? 'Las devoluciones solo están disponibles para pedidos entregados.'
                   : 'El plazo de 72 horas para devolver este pedido ha expirado.'}
               </p>
