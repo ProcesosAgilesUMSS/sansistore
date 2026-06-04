@@ -14,6 +14,7 @@ import {
   X,
   ChevronRight,
   ArrowLeft,
+  ClipboardList,
 } from 'lucide-react';
 import UserManagement from '../users/components/UserManagement.tsx';
 import CategoryList from '../categories/components/CategoryList.tsx';
@@ -25,10 +26,13 @@ import ConfigPanel from '../settings/components/ConfigPanel.tsx';
 // ── HU #161: Reportes de ventas ──
 import SalesReport from '../analytics/components/SalesReport.tsx';
 import AccessLogPanel from '../audit/components/AccessLogPanel.tsx';
+// ── HU #178: Historial de pedido ──
+import OrderHistory from '../pedidos/components/OrderHistory.tsx';
 
 type Section =
   | 'dashboard'
   | 'pedidos'
+  | 'historial'        // ── HU #178 ──
   | 'usuarios'
   | 'categorias'
   | 'ventas-diarias'
@@ -55,6 +59,7 @@ export default function AdminLayout() {
   const [activeSection, setActiveSection] = useState<Section>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [ventasOpen, setVentasOpen] = useState(true);
+  const [pedidosOpen, setPedidosOpen] = useState(true); // ── HU #178 ──
 
   const navSections: NavSection[] = [
     {
@@ -169,6 +174,64 @@ export default function AdminLayout() {
                 {section.title}
               </p>
               {section.items.map((item) => {
+
+                // ── Menú Pedidos con submenú Historial ── HU #178 ──
+                if (item.label === 'Pedidos') {
+                  return (
+                    <div key={item.label} className="mb-1">
+                      <button
+                        onClick={() => setPedidosOpen(!pedidosOpen)}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px]
+                        text-white/50 hover:text-white/80 hover:bg-white/5 transition-colors"
+                      >
+                        <span>{item.icon}</span>
+                        <span className="flex-1 text-left">Pedidos</span>
+                        <ChevronRight
+                          size={12}
+                          className={`transition-transform ${pedidosOpen ? 'rotate-90' : ''}`}
+                        />
+                      </button>
+
+                      {pedidosOpen && (
+                        <div className="ml-7 mt-1 space-y-1">
+                          <button
+                            onClick={() => {
+                              setActiveSection('pedidos');
+                              setSidebarOpen(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
+                            transition-colors ${
+                              activeSection === 'pedidos'
+                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
+                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
+                            }`}
+                          >
+                            Recepción
+                          </button>
+
+                          {/* ── HU #178 ── */}
+                          <button
+                            onClick={() => {
+                              setActiveSection('historial');
+                              setSidebarOpen(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
+                            transition-colors flex items-center gap-1.5 ${
+                              activeSection === 'historial'
+                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
+                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
+                            }`}
+                          >
+                            <ClipboardList size={11} />
+                            Historial
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+
+                // ── Menú Ventas con submenú existente ──
                 if (item.label === 'Ventas') {
                   return (
                     <div key={item.label} className="mb-1">
@@ -295,9 +358,16 @@ export default function AdminLayout() {
                   <ArrowLeft size={16} /> Dashboard
                 </button>
               )}
-              <h1 className="text-xl md:text-3xl font-bold text-white tracking-tight">
-                {currentPage.title}
-              </h1>
+              <div>
+                <h1 className="text-xl md:text-3xl font-bold text-white tracking-tight">
+                  {currentPage?.title}
+                </h1>
+                {currentPage?.subtitle && (
+                  <p className="hidden md:block text-xs text-white/30 mt-0.5">
+                    {currentPage.subtitle}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
 
@@ -335,6 +405,8 @@ export default function AdminLayout() {
           {/*Reportes de ventas*/}
           {activeSection === 'reportes' && <SalesReport />}
           {activeSection === 'bitacora' && <AccessLogPanel />}
+          {/* ── HU #178 ── */}
+          {activeSection === 'historial' && <OrderHistory />}
         </main>
 
       </div>
