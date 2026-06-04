@@ -13,7 +13,7 @@ export const Products = {
     badge: 'Bolivia',
     hasOffer: false,
     stockTotal: 36,
-    stockAvailable: 36,
+    stockAvailable: 24,
     sourceUrl:
       'https://www.hipermaxi.com/la-paz/hipermaxi-el-poeta/producto/786024/leche-pil-natural-900-ml',
     reviews: [
@@ -68,7 +68,7 @@ export const Products = {
     imageUrl:
       'https://hipermaxi.com/tienda-api/marketfile/ImageEcommerce?hashfile=294b7aa_1b79_4bbc_aabe_4a15c769d068.webp&co=5&size=900x900',
     stockTotal: 42,
-    stockAvailable: 41,
+    stockAvailable: 17,
     sourceUrl:
       'https://www.hipermaxi.com/cochabamba/hipermaxi-blanco-galindo/producto/058424/aceite-fino-vegetal-900-ml',
     reviews: [],
@@ -284,7 +284,7 @@ export const Products = {
       'https://images.unsplash.com/photo-1554866585-cd94860890b7?auto=format&fit=crop&w=900&q=80',
     hasOffer: false,
     stockTotal: 50,
-    stockAvailable: 50,
+    stockAvailable: 40,
     sourceUrl: 'https://example.test/price-up',
     reviews: [],
     soldCount: 12,
