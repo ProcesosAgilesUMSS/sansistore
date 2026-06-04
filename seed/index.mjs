@@ -330,7 +330,9 @@ async function seedDeliveries() {
       deliveredAt: toTimestamp(d.deliveredAt),
       failedAt: toTimestamp(d.failedAt),
       cancelledAt: toTimestamp(d.cancelledAt),
-      reprogrammedAt: toTimestamp(d.reprogrammedAt),
+      reprogrammedAt: toTimestamp(d.reprogrammedAt, null),
+      newDeliveryAt: toTimestamp(d.newDeliveryAt, null),
+      reprogramReason: d.reprogramReason ?? null,
       createdAt: toTimestamp(d.createdAt),
       updatedAt: toTimestamp(d.updatedAt),
     });
