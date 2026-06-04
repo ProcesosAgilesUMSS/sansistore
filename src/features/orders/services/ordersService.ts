@@ -25,20 +25,61 @@ export async function paidOrder(orderId: string): Promise<void> {
   if (!user) throw new Error("No autenticado");
 
   const orderRef = doc(db, "orders", orderId);
+  const orderSnap = await getDoc(orderRef);
+  if (!orderSnap.exists()) {
+    throw new Error("El pedido no existe.");
+  }
+
+  const orderData = orderSnap.data() as Record<string, any>;
+  if (orderData.status !== "ENTREGADO") {
+    throw new Error("Solo se puede validar el pago de pedidos entregados.");
+  }
+
+  if (orderData.status === "PAGADO") {
+    throw new Error("El pedido ya fue cerrado como pagado.");
+  }
+
   const itemsSnapshot = await getDocs(collection(orderRef, "orderItems"));
-  const items = itemsSnapshot.docs.map(doc => ({
-    id: doc.id,
-    ...(doc.data() as Omit<OrderItem, "itemId">)
+  const items = itemsSnapshot.docs.map((itemDoc) => ({
+    id: itemDoc.id,
+    ...(itemDoc.data() as Omit<OrderItem, "itemId">),
   }));
 
+  if (items.length === 0) {
+    throw new Error("El pedido no tiene productos asociados.");
+  }
+
+  const paymentRef =
+    typeof orderData.paymentId === "string" && orderData.paymentId.trim()
+      ? doc(db, "payments", orderData.paymentId)
+      : null;
+
   await runTransaction(db, async (transaction) => {
-    // 1. Gather all reads
     const invRefs = items.map(item => doc(db, "inventory", item.productId));
     const invSnaps = await Promise.all(invRefs.map(ref => transaction.get(ref)));
+    const paymentSnap = paymentRef ? await transaction.get(paymentRef) : null;
+    const currentOrderSnap = await transaction.get(orderRef);
 
-    // 2. Perform all writes
+    if (!currentOrderSnap.exists()) {
+      throw new Error("El pedido no existe.");
+    }
+
+    const currentOrder = currentOrderSnap.data();
+    if (currentOrder.status !== "ENTREGADO") {
+      throw new Error("El pedido ya no esta disponible para validar pago.");
+    }
+
+    if (currentOrder.status === "PAGADO") {
+      throw new Error("El pedido ya fue cerrado como pagado.");
+    }
+
     transaction.update(orderRef, {
       status: "PAGADO",
+      paymentStatus: "COBRADO",
+      paymentStatusLabel: "Cobrado",
+      paymentCollectedAt: serverTimestamp(),
+      verifiedAt: serverTimestamp(),
+      verifiedBy: user.uid,
       updatedAt: serverTimestamp(),
     });
 
@@ -52,12 +93,54 @@ export async function paidOrder(orderId: string): Promise<void> {
       const currentReserved = invData.stockReserved || 0;
       const qty = items[index].quantity || 0;
 
+      if (currentReserved < qty) {
+        throw new Error(
+          `Reserva insuficiente para el producto: ${items[index].productId}`
+        );
+      }
+
+      if (currentTotal < qty) {
+        throw new Error(
+          `Stock total insuficiente para el producto: ${items[index].productId}`
+        );
+      }
+
       transaction.update(invRefs[index], {
         stockTotal: currentTotal - qty,
         stockReserved: currentReserved - qty,
         updatedAt: serverTimestamp(),
       });
     });
+
+    if (paymentRef) {
+      if (paymentSnap?.exists()) {
+        transaction.update(paymentRef, {
+          status: "COBRADO",
+          statusLabel: "Cobrado",
+          amount: typeof currentOrder.total === "number" ? currentOrder.total : 0,
+          collectedAt: serverTimestamp(),
+          verifiedAt: serverTimestamp(),
+          collectedBy: user.uid,
+          verifiedBy: user.uid,
+          updatedAt: serverTimestamp(),
+        });
+      } else {
+        transaction.set(paymentRef, {
+          paymentId: orderData.paymentId,
+          orderId,
+          amount: typeof currentOrder.total === "number" ? currentOrder.total : 0,
+          method: currentOrder.paymentMethod ?? "cash_on_delivery",
+          status: "COBRADO",
+          statusLabel: "Cobrado",
+          collectedAt: serverTimestamp(),
+          verifiedAt: serverTimestamp(),
+          collectedBy: user.uid,
+          verifiedBy: user.uid,
+          registeredBy: currentOrder.sellerId ?? user.uid,
+          updatedAt: serverTimestamp(),
+        }, { merge: true });
+      }
+    }
   });
 }
 
