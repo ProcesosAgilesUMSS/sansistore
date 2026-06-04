@@ -33,6 +33,13 @@ const normalizeDeliveryStatus = (status: unknown): DeliveryStatus => {
   if (status === 'not_delivered' || status === 'NOT_DELIVERED') {
     return 'not_delivered';
   }
+  if (
+    status === 'reprogrammed' ||
+    status === 'REPROGRAMMED' ||
+    status === 'REPROGRAMADO'
+  ) {
+    return 'reprogrammed';
+  }
   if (status === 'cancelled' || status === 'CANCELLED' || status === 'CANCELADO') {
     return 'cancelled';
   }
@@ -49,6 +56,7 @@ const normalizeOrderDeliveryStatus = (status: DeliveryStatus) => {
   if (status === 'delivered') return 'DELIVERED';
   if (status === 'not_delivered') return 'NOT_DELIVERED';
   if (status === 'cancelled') return 'CANCELLED';
+  if (status === 'reprogrammed') return 'REPROGRAMMED';
   return 'ASSIGNED';
 };
 
@@ -181,6 +189,15 @@ const mapMessengerOrder = async (
     assignedAt: toDate(delivery.assignedAt),
     createdAt: toDate(delivery.createdAt) ?? toDate(order.createdAt),
     updatedAt: toDate(delivery.updatedAt) ?? toDate(order.updatedAt),
+    reprogrammedAt: toDate(delivery.reprogrammedAt) ?? toDate(order.reprogrammedAt),
+    newDeliveryAt: toDate(delivery.newDeliveryAt) ?? toDate(order.newDeliveryAt),
+    reprogramReason:
+      asString(delivery.reprogramReason) ||
+      asString(delivery.reprogrammingReason) ||
+      asString(delivery.rescheduleReason) ||
+      asString(order.reprogramReason) ||
+      asString(order.reprogrammingReason) ||
+      asString(order.rescheduleReason),
   };
 };
 
@@ -252,6 +269,15 @@ export async function getMessengerOrders(
         assignedAt: toDate(delivery.assignedAt),
         createdAt: toDate(delivery.createdAt) ?? toDate(order.createdAt),
         updatedAt: toDate(delivery.updatedAt) ?? toDate(order.updatedAt),
+        reprogrammedAt: toDate(delivery.reprogrammedAt) ?? toDate(order.reprogrammedAt),
+        newDeliveryAt: toDate(delivery.newDeliveryAt) ?? toDate(order.newDeliveryAt),
+        reprogramReason:
+          asString(delivery.reprogramReason) ||
+          asString(delivery.reprogrammingReason) ||
+          asString(delivery.rescheduleReason) ||
+          asString(order.reprogramReason) ||
+          asString(order.reprogrammingReason) ||
+          asString(order.rescheduleReason),
       };
     })
   );
@@ -340,6 +366,15 @@ export function subscribeToMessengerOrders(
               assignedAt: toDate(delivery.assignedAt),
               createdAt: toDate(delivery.createdAt) ?? toDate(order.createdAt),
               updatedAt: toDate(delivery.updatedAt) ?? toDate(order.updatedAt),
+              reprogrammedAt: toDate(delivery.reprogrammedAt) ?? toDate(order.reprogrammedAt),
+              newDeliveryAt: toDate(delivery.newDeliveryAt) ?? toDate(order.newDeliveryAt),
+              reprogramReason:
+                asString(delivery.reprogramReason) ||
+                asString(delivery.reprogrammingReason) ||
+                asString(delivery.rescheduleReason) ||
+                asString(order.reprogramReason) ||
+                asString(order.reprogrammingReason) ||
+                asString(order.rescheduleReason),
             };
           })
         );
@@ -373,6 +408,8 @@ const getStatusForORder = (status: DeliveryStatus) => {
       return 'NO ENTREGADO';
     case 'cancelled':
       return 'CANCELADO';
+    case 'reprogrammed':
+      return 'REPROGRAMADO';
     default:
       return 'ASIGNADO';
   }
