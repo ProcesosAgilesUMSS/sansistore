@@ -7,6 +7,7 @@ import { locationList } from './data/locations.mjs';
 import { orderList } from './data/orders.mjs';
 import { deliveryList } from './data/deliveries.mjs';
 import { run as seedCartItems } from './data/cart.mjs';
+import { inventoryMovements } from './data/inventoryMovements.mjs';
 
 process.env.FIRESTORE_EMULATOR_HOST =
   process.env.FIRESTORE_EMULATOR_HOST || '127.0.0.1:8080';
@@ -133,6 +134,7 @@ async function seedFirestoreUsers() {
       email: user.email,
       displayName: user.displayName,
       photoURL: user.photoURL,
+      phoneNumber: user.phoneNumber || null,
       roles: user.roles,
       institutionalId: user.institutionalId,
       isActive: user.isActive,
@@ -338,6 +340,17 @@ async function seedDeliveries() {
   console.log('deliveries seeded');
 }
 
+// inventoryMovements.............
+async function seedMovements() {
+  for (const movement of inventoryMovements) {
+    await db.collection('inventoryMovements').add({
+      ...movement,
+      createdAt: toTimestamp(movement.createdAt)
+    });
+  }
+  console.log('inventory movements seeded');
+}
+
 async function main() {
   try {
     await seedAuthUsers();
@@ -348,6 +361,9 @@ async function main() {
     await seedLocations();
     await seedOrders();
     await seedDeliveries();
+    
+    await seedMovements();
+    
   } catch (err) {
     console.error('seed failed:', err);
     process.exit(1);

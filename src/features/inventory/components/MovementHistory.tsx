@@ -5,27 +5,29 @@ import {
   orderBy, 
   limit, 
   onSnapshot, 
-  startAfter, 
-  limitToLast, 
-  endBefore,
+  startAfter,
+  getDoc,
+  doc,
   DocumentSnapshot
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
-import { ArrowDownRight, ArrowUpRight, PlusCircle, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight, PlusCircle, Clock, ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react';
 
 interface Movement {
   id: string;
   productId: string;
-  type: 'ENTRADA' | 'SALIDA' | 'INICIALIZACION';
+  type: 'ENTRADA' | 'SALIDA' | 'INICIALIZACION' | 'VENTA';
   quantity: number;
   reason: string;
+  operatorId?: string;
   createdAt: any;
 }
 
 export const MovementHistory: React.FC = () => {
   const [movements, setMovements] = useState<Movement[]>([]);
+  const [operatorNames, setOperatorNames] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
-  
+
   // Estados para Paginación
   const [page, setPage] = useState(1);
   const [lastVisible, setLastVisible] = useState<DocumentSnapshot | null>(null);
@@ -34,16 +36,44 @@ export const MovementHistory: React.FC = () => {
 
   const MOVEMENTS_PER_PAGE = 10;
 
+  // Resuelve los nombres de operadores que aún no están en caché
+  const resolveOperatorNames = async (movements: Movement[]) => {
+    const idsToFetch = movements
+      .map(m => m.operatorId)
+      .filter((id): id is string => !!id && !operatorNames[id]);
+
+    if (idsToFetch.length === 0) return;
+
+    const uniqueIds = [...new Set(idsToFetch)];
+
+    const fetched: Record<string, string> = {};
+    await Promise.all(
+      uniqueIds.map(async (id) => {
+        try {
+          const snap = await getDoc(doc(db, 'users', id));
+          if (snap.exists()) {
+            fetched[id] = snap.data().displayName ?? 'Sin nombre';
+          } else {
+            fetched[id] = 'Desconocido';
+          }
+        } catch {
+          fetched[id] = 'Desconocido';
+        }
+      })
+    );
+
+    setOperatorNames(prev => ({ ...prev, ...fetched }));
+  };
+
   useEffect(() => {
     setLoading(true);
-    
-    //Consulta base
+
     let q = query(
       collection(db, 'inventoryMovements'),
       orderBy('createdAt', 'desc'),
-      limit(MOVEMENTS_PER_PAGE + 1) // Pedimos uno más para saber si hay siguiente página
+      limit(MOVEMENTS_PER_PAGE + 1)
     );
-    // El listener de Firebase sepa dónde empezar
+
     if (page > 1 && lastVisible) {
       q = query(
         collection(db, 'inventoryMovements'),
@@ -53,27 +83,26 @@ export const MovementHistory: React.FC = () => {
       );
     }
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
       if (!snapshot.empty) {
         const docs = snapshot.docs;
-        
-        // Verificar si hay una página siguiente
+
         const hasNext = docs.length > MOVEMENTS_PER_PAGE;
         setIsNextPageAvailable(hasNext);
 
-        // Los documentos a mostrar (máximo 10)
         const visibleDocs = hasNext ? docs.slice(0, -1) : docs;
-        
+
         const data = visibleDocs.map(doc => ({
           id: doc.id,
           ...doc.data()
         })) as Movement[];
 
         setMovements(data);
-        
-        // Guardamos los bordes para navegar
         setFirstVisible(visibleDocs[0]);
         setLastVisible(visibleDocs[visibleDocs.length - 1]);
+
+        // Resolvemos nombres después de tener los movimientos
+        await resolveOperatorNames(data);
       } else {
         setMovements([]);
         setIsNextPageAvailable(false);
@@ -82,18 +111,42 @@ export const MovementHistory: React.FC = () => {
     });
 
     return () => unsubscribe();
-  }, [page]); // Se vuelve a ejecutar cuando la página cambia
+  }, [page]);
 
   const handleNextPage = () => {
-    if (isNextPageAvailable) {
-      setPage(prev => prev + 1);
-    }
+    if (isNextPageAvailable) setPage(prev => prev + 1);
   };
 
   const handlePrevPage = () => {
-    if (page > 1) {
-      setPage(prev => prev - 1);
-    }
+    if (page > 1) setPage(prev => prev - 1);
+  };
+
+  // Configuración visual por tipo de movimiento
+  const typeConfig = {
+    ENTRADA: {
+      icon: <ArrowDownRight className="w-4 h-4" />,
+      style: 'bg-green-500/15 text-green-500',
+      amountColor: 'text-green-500',
+      sign: '+',
+    },
+    SALIDA: {
+      icon: <ArrowUpRight className="w-4 h-4" />,
+      style: 'bg-red-500/15 text-red-500',
+      amountColor: 'text-red-400',
+      sign: '-',
+    },
+    INICIALIZACION: {
+      icon: <PlusCircle className="w-4 h-4" />,
+      style: 'bg-primary/15 text-primary',
+      amountColor: 'text-green-500',
+      sign: '+',
+    },
+    VENTA: {
+      icon: <ShoppingCart className="w-4 h-4" />,
+      style: 'bg-blue-500/15 text-blue-500',
+      amountColor: 'text-blue-400',
+      sign: '-',
+    },
   };
 
   if (loading && movements.length === 0) {
@@ -109,50 +162,51 @@ export const MovementHistory: React.FC = () => {
         </h2>
       </div>
 
-      {/* Contenedor de lista con scroll si es necesario */}
       <div className="space-y-4 flex-grow overflow-y-auto pr-1 min-h-[400px]">
         {movements.length === 0 ? (
           <p className="text-sm opacity-40 text-center py-10 font-['Outfit']">No hay movimientos registrados.</p>
         ) : (
-          movements.map((mov) => (
-            <div key={mov.id} className="flex items-center justify-between p-3 rounded-2xl bg-(--theme-secondary-bg) border border-(--theme-border)/50 transition-all hover:border-primary/30">
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-xl ${
-                  mov.type === 'ENTRADA' ? 'bg-green-500/15 text-green-500' :
-                  mov.type === 'SALIDA' ? 'bg-red-500/15 text-red-500' :
-                  'bg-primary/15 text-primary'
-                }`}>
-                  {mov.type === 'ENTRADA' && <ArrowDownRight className="w-4 h-4" />}
-                  {mov.type === 'SALIDA' && <ArrowUpRight className="w-4 h-4" />}
-                  {mov.type === 'INICIALIZACION' && <PlusCircle className="w-4 h-4" />}
+          movements.map((mov) => {
+            const config = typeConfig[mov.type] ?? typeConfig.SALIDA;
+            const operatorName = mov.operatorId ? (operatorNames[mov.operatorId] ?? 'Cargando...') : null;
+
+            return (
+              <div key={mov.id} className="flex items-center justify-between p-3 rounded-2xl bg-(--theme-secondary-bg) border border-(--theme-border)/50 transition-all hover:border-primary/30">
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-xl ${config.style}`}>
+                    {config.icon}
+                  </div>
+
+                  <div className="overflow-hidden">
+                    <p className="text-sm font-bold text-(--theme-text) line-clamp-1">
+                      {mov.productId}
+                    </p>
+                    <p className="text-[0.65rem] uppercase tracking-widest opacity-50 font-bold">
+                      {mov.type} • {mov.reason}
+                    </p>
+                    {operatorName && (
+                      <p className="text-[0.65rem] uppercase tracking-widest opacity-50 font-bold">
+                        {mov.type === 'VENTA' ? 'VENDEDOR' : 'OPERADOR'} • {operatorName}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                
-                <div className="overflow-hidden">
-                  <p className="text-sm font-bold text-(--theme-text) line-clamp-1">
-                    {mov.productId}
-                  </p>
-                  <p className="text-[0.65rem] uppercase tracking-widest opacity-50 font-bold">
-                    {mov.type} • {mov.reason}
-                  </p>
+
+                <div className={`font-mono font-bold text-base ${config.amountColor}`}>
+                  {config.sign}{mov.quantity}
                 </div>
               </div>
-              
-              <div className={`font-mono font-bold text-base ${
-                mov.type === 'SALIDA' ? 'text-red-400' : 'text-green-500'
-              }`}>
-                {mov.type === 'SALIDA' ? '-' : '+'}{mov.quantity}
-              </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 
-      {/* PPAGINACIÓN */}
+      {/* PAGINACIÓN */}
       <div className="mt-6 pt-4 border-t border-(--theme-border) flex items-center justify-between">
         <span className="text-xs font-['Outfit'] text-(--theme-text) opacity-50">
           Página <span className="font-bold text-primary">{page}</span>
         </span>
-        
+
         <div className="flex gap-2">
           <button
             onClick={handlePrevPage}
