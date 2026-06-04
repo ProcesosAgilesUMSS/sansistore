@@ -106,9 +106,9 @@ export default function AdminLayout() {
     {
       title: 'Analítica',
       items: [
-        { label: 'Ventas', icon: <BarChart2 size={15} />, section: 'ventas-diarias' },
-        { label: 'Inventario', icon: <Package size={15} />, section: null, disabled: true },
-        { label: 'Mensajeros', icon: <Bike size={15} />, section: null, disabled: true },
+        { label: 'Ventas',     icon: <BarChart2 size={15} />, section: 'ventas-diarias' },
+        { label: 'Inventario', icon: <Package size={15} />,   section: null, disabled: true },
+        { label: 'Mensajeros', icon: <Bike size={15} />,      section: null, disabled: true },
         {
           // ── HU #161: habilitado ──
           label: 'Reportes',
@@ -120,17 +120,16 @@ export default function AdminLayout() {
   ];
 
   const pageTitles: Record<string, { title: string; subtitle: string }> = {
-    dashboard: { title: 'Dashboard', subtitle: 'Panel de administración' },
-    pedidos: { title: 'Pedidos', subtitle: 'Validación de recepción por comprador' },
-    usuarios: { title: 'Gestión de usuarios', subtitle: 'Registra y administra usuarios' },
-    categorias: { title: 'Categorías', subtitle: 'Gestiona las categorías de productos' },
-    'ventas-diarias': { title: 'Ventas diarias', subtitle: 'Monitorea el rendimiento diario de ventas' },
-    'mas-vendidos': { title: 'Más vendidos', subtitle: 'Productos con más unidades vendidas' },
-    // ── HU #152 ──
-    parametros: { title: 'Parámetros del sistema', subtitle: 'Configura los parámetros globales del sistema' },
-    // ── HU #161 ──
-    reportes: { title: 'Reportes de ventas', subtitle: 'Genera reportes de ventas por rango de fechas' },
-    bitacora: { title: 'Bitacora', subtitle: 'registra actividad de inicio y cierre de sesion' },
+    dashboard:       { title: 'Dashboard',              subtitle: 'Panel de administración' },
+    pedidos:         { title: 'Pedidos',                subtitle: 'Validación de recepción por comprador' },
+    historial:       { title: 'Historial de pedido',    subtitle: 'Auditoría completa del pedido' },
+    usuarios:        { title: 'Gestión de usuarios',    subtitle: 'Registra y administra usuarios' },
+    categorias:      { title: 'Categorías',             subtitle: 'Gestiona las categorías de productos' },
+    'ventas-diarias':{ title: 'Ventas diarias',         subtitle: 'Monitorea el rendimiento diario de ventas' },
+    'mas-vendidos':  { title: 'Más vendidos',           subtitle: 'Productos con más unidades vendidas' },
+    parametros:      { title: 'Parámetros del sistema', subtitle: 'Configura los parámetros globales del sistema' },
+    reportes:        { title: 'Reportes de ventas',     subtitle: 'Genera reportes de ventas por rango de fechas' },
+    bitacora:        { title: 'Bitácora',               subtitle: 'Registra actividad de inicio y cierre de sesión' },
   };
 
   const currentPage = pageTitles[activeSection ?? 'dashboard'];
@@ -385,22 +384,11 @@ export default function AdminLayout() {
               Dashboard principal — Próximamente
             </div>
           )}
-          {activeSection === 'usuarios' && (
-            <UserManagement />
-          )}
-          {activeSection === 'pedidos' && (
-            <OrderReceptionPanel />
-          )}
-          {activeSection === 'categorias' && (
-            <CategoryList />
-          )}
-          {activeSection === 'ventas-diarias' && (
-            <DailySales />
-          )}
-          {activeSection === 'mas-vendidos' && (
-            <TopSellingProducts />
-          )}
-          {/*Parámetros del sistema*/}
+          {activeSection === 'usuarios' && <UserManagement />}
+          {activeSection === 'pedidos' && <OrderReceptionPanel />}
+          {activeSection === 'categorias' && <CategoryList />}
+          {activeSection === 'ventas-diarias' && <DailySales />}
+          {activeSection === 'mas-vendidos' && <TopSellingProducts />}
           {activeSection === 'parametros' && <ConfigPanel />}
           {/*Reportes de ventas*/}
           {activeSection === 'reportes' && <SalesReport />}
