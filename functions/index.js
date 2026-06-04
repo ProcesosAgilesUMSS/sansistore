@@ -189,11 +189,16 @@ export const notificarStockDisponible = onDocumentUpdated(
     async (event) => {
       const before = event.data.before.data();
       const after = event.data.after.data();
+      const stockEfectivoAntes = Math.max(
+          0,
+          (before.stockAvailable ?? 0) - (before.stockReserved ?? 0),
+      );
+      const stockEfectivoDespues = Math.max(
+          0,
+          (after.stockAvailable ?? 0) - (after.stockReserved ?? 0),
+      );
 
-      const stockAntes = before.stockAvailable ?? 0;
-      const stockDespues = after.stockAvailable ?? 0;
-
-      if (stockAntes > 0 || stockDespues <= 0) {
+      if (stockEfectivoAntes > 0 || stockEfectivoDespues <= 0) {
         return;
       }
 
@@ -238,7 +243,7 @@ export const notificarStockDisponible = onDocumentUpdated(
           userIds.map((uid) => db.collection("users").doc(uid).get()),
       );
 
-      const baseUrl = "http://localhost:4321/productos";
+      const baseUrl = "https://sansistore-umss.vercel.app/productos";
 
       const emailPromises = usersSnap
           .filter((snap) => snap.exists && snap.data().email)

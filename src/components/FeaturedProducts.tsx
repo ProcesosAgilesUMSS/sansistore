@@ -1,23 +1,10 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
-import {
-  Package,
-  Search,
-  X,
-  History,
-  Trash2,
-  ChevronLeft,
-  ChevronRight,
-  Heart,
-} from 'lucide-react';
+import {Package,Search,X,History,Trash2,ChevronLeft,ChevronRight,Heart,} from 'lucide-react';
 import { FaCartPlus, FaFilter } from 'react-icons/fa';
 import { collection, doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { getOfferBadgeData, hasValidOffer } from '../lib/productOffers';
-import {
-  getCreatedAtTimestamp,
-  getSoldCount,
-  isPopularProduct,
-} from '../lib/productPopularity';
+import {getCreatedAtTimestamp,getSoldCount,isPopularProduct,} from '../lib/productPopularity';
 import CategoryFilter from './CategoryFilter';
 import { useCartContext, CartProvider } from '../features/cart';
 import { useFavorites } from '../features/favorites';
@@ -34,6 +21,7 @@ interface Product {
   description?: string;
   badge?: string;
   stockAvailable?: number;
+  stockReserved?: number;
   stockTotal?: number;
   enabled?: boolean;
   categoryId?: string;
@@ -45,6 +33,7 @@ interface Inventory {
   id: string;
   productId?: string;
   stockAvailable?: number;
+  stockReserved?: number;
   stockTotal?: number;
   enabled?: boolean;
 }
@@ -323,6 +312,7 @@ function FeaturedProductsInner({
               ...product,
               soldCount: getSoldCount(product),
               stockAvailable: inventory?.stockAvailable ?? 0,
+              stockReserved: inventory?.stockReserved ?? 0,
               stockTotal: inventory?.stockTotal ?? 0,
               enabled: inventory?.enabled ?? false,
             };
@@ -870,7 +860,11 @@ function FeaturedProductsInner({
                   const showPopularBadge = isPopularProduct(product);
                   const productIsFavorite = isFavorite(product.id);
                   const currentPrice = showOffer ? product.offerPrice! : product.price;
-                  const isOutOfStock = (product.stockAvailable ?? 0) <= 0;
+                  const effectiveStock = Math.max(
+                    0,
+                    (product.stockAvailable ?? 0) - (product.stockReserved ?? 0)
+                  );
+                  const isOutOfStock = effectiveStock <= 0;
                   const isDisabled = product.enabled === false;
                   const isProductAvailable = !isOutOfStock && !isDisabled;
 
@@ -983,7 +977,7 @@ function FeaturedProductsInner({
                             disabled={!isProductAvailable}
                             onClick={(e) => {
                               e.preventDefault();
-                              addToCart(product.id, product.stockAvailable ?? 0, currentPrice);
+                              addToCart(product.id, effectiveStock, currentPrice);
                             }}
                             className={`flex items-center justify-center rounded-full p-2.5 sm:p-3 transition-all active:scale-95 shrink-0 relative z-20 ${
                               isProductAvailable
