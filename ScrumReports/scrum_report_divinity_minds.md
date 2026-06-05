@@ -378,3 +378,10 @@
 - **Yesterday:**  Ejecuté pruebas de regresión en los roles de operador y mensajero para validar su funcionalidad y flujos de trabajo
 - **Today:** Continuaré con las pruebas en otros roles del sistema para verificar su correcta integración con operador y mensajero.
 - **Blockers:** n/a.
+
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Corregí bugs relacionados con la etiqueta de "Agotado", ajustando el cálculo de stock para reflejar correctamente la disponibilidad de los productos.
+- **Today:** Solucioné problemas de responsividad en las secciones de "Mis pedidos", mejorando la experiencia de usuario en distintos dispositivos. Además, corregí un bug en la funcionalidad de notificaciones al usuario, ajustando el cálculo de stock para que los avisos se envíen correctamente cuando un producto vuelve a estar disponible.
+- **Blockers:** Ninguno.
