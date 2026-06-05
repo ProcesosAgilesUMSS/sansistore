@@ -380,3 +380,7 @@
 - **Today:** Validaré que todas las funcionalidades (bugs e historias de usuario) trabajen correctamente para la presentación demo.
 - **None:** Los bugs corregidos necesitan validación extra para asegurarse de que todo funcione como debería.
 
+### Efrain Peralta Felipe
+- **Yesterday:** En la reunión se quedo de acuerdo que mi hu es un duplicado.
+- **Today:** Hice revisión del bug de asignar mensajero.
+- **None:** None.
