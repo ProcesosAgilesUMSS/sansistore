@@ -1,6 +1,6 @@
 import { collection, deleteDoc, doc, getDoc, getDocs } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
-import type { CartInventory, CartItem, CartProduct } from '../types';
+import type { CartInventory, CartDisplayItem, CartProduct } from '../types';
 
 function toPositiveInteger(value: unknown) {
   const quantity = Number(value);
@@ -50,7 +50,7 @@ function getAvailabilityMessage({
   return '';
 }
 
-export async function getUserCartItems(userId: string): Promise<CartItem[]> {
+export async function getUserCartItems(userId: string): Promise<CartDisplayItem[]> {
   const cartCol = collection(db, 'users', userId, 'cartItems');
   const snap = await getDocs(cartCol);
 

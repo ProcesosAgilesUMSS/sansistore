@@ -26,7 +26,6 @@ export default function MyOrdersDashboard() {
 
     if (!user) {
       setOrders([]);
-      setReturns([]);
       setLoading(false);
       return;
     }
@@ -35,13 +34,6 @@ export default function MyOrdersDashboard() {
     initializedOrders.current = false;
     previousDeliveryState.current = new Map();
     setDeliveredNotification(null);
-
-    getMyReturns(user.uid)
-      .then(setReturns)
-      .catch((err) => {
-        console.error("Error cargando devoluciones:", err);
-        setReturns([]);
-      });
 
     const unsubscribe = subscribeToMyOrders(
       user.uid,
@@ -60,7 +52,6 @@ export default function MyOrdersDashboard() {
 
           if (newlyDelivered) {
             setDeliveredNotification(newlyDelivered);
-            setActiveTab('orders');
           }
 
           previousDeliveryState.current = new Map(
@@ -118,23 +109,17 @@ export default function MyOrdersDashboard() {
         </div>
       )}
 
-      <h1 className="text-3xl font-display font-extrabold mb-6 tracking-tight">
-        Mis Pedidos y Devoluciones
-      </h1>
-
-      <div className="flex gap-4 mb-8 border-b border-(--theme-border)">
-        <button
-          onClick={() => setActiveTab('orders')}
-          className={`pb-2.5 text-sm font-bold transition-all ${activeTab === 'orders' ? 'border-b-2 border-primary text-primary' : 'opacity-60 hover:opacity-100'}`}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <h1 className="text-3xl font-display font-extrabold tracking-tight">
+          Mis Pedidos
+        </h1>
+        <a
+          href="/my-returns"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-(--theme-border) text-sm font-bold opacity-70 hover:opacity-100 transition-all hover:bg-(--theme-secondary-bg)"
         >
-          Pedidos ({orders.length})
-        </button>
-        <button
-          onClick={() => setActiveTab('returns')}
-          className={`pb-2.5 text-sm font-bold transition-all ${activeTab === 'returns' ? 'border-b-2 border-primary text-primary' : 'opacity-60 hover:opacity-100'}`}
-        >
-          Devoluciones ({returns.length})
-        </button>
+          <RotateCcw size={15} />
+          Mis Devoluciones
+        </a>
       </div>
 
       <OrderList orders={orders} />

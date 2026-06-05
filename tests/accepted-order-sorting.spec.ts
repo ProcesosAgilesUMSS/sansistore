@@ -9,7 +9,6 @@ const baseOrder: MessengerOrder = {
   id: 'order-base',
   deliveryId: 'delivery-base',
   paymentId: null,
-  orderCode: 'ORD-BASE',
   customerName: 'Cliente',
   buyerName: 'Cliente',
   phone: '70000000',
@@ -37,7 +36,6 @@ function buildOrder(
     ...baseOrder,
     id,
     deliveryId: `delivery-${id}`,
-    orderCode: `ORD-${id}`,
     ...dates,
   };
 }
