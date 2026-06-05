@@ -1,4 +1,4 @@
-import { Package, Calendar, MapPin, ChevronRight } from 'lucide-react';
+import { Package, Calendar, MapPin, ChevronRight, RotateCcw } from 'lucide-react';
 import type { Order } from '../types';
 import { parseOrderId } from '../../cart/services/orderService';
 
@@ -8,13 +8,27 @@ interface OrderCardProps {
 
 const getStatusStyles = (status: string) => {
   switch (status) {
-    case 'delivered':
+    case 'ENTREGADO':
+    case 'PAGADO':
+    case 'COMPLETADO':
       return 'bg-[#88B04B]/10 text-[#88B04B]';
-    case 'in_transit':
+    case 'EN CAMINO':
+    case 'EN CAMINO':
+    case 'ASIGNADO':
+    case 'LISTO':
       return 'bg-blue-500/10 text-blue-500';
-    case 'preparing':
+    case 'PENDIENTE':
+    case 'EMPAQUETADO':
+    case 'LISTO':
+    case 'RESERVADO':
+    case 'EMPAQUETADO':
+    case 'PENDIENTE':
+    case 'CREADO':
       return 'bg-amber-500/10 text-amber-500';
-    case 'cancelled':
+    case 'CANCELADO':
+    case 'NO ENTREGADO':
+    case 'CANCELADO':
+    case 'NO ENTREGADO':
       return 'bg-red-500/10 text-red-500';
     default:
       return 'bg-gray-500/10 text-gray-500';
@@ -23,19 +37,41 @@ const getStatusStyles = (status: string) => {
 
 const getStatusLabel = (status: string) => {
   const labels: Record<string, string> = {
-    pending: "Pendiente",
-    preparing: "Preparando",
-    in_transit: "En camino",
-    delivered: "Entregado",
-    cancelled: "Cancelado"
+    CREADO: 'Creado',
+    PENDIENTE: 'Pendiente',
+    RESERVADO: 'Reservado',
+    EMPAQUETADO: 'Empaquetado',
+    LISTO: 'Listo',
+    ASIGNADO: 'Asignado',
+    'EN CAMINO': 'En camino',
+    ENTREGADO: 'Entregado',
+    PAGADO: 'Pagado',
+    COMPLETADO: 'Completado',
+    CANCELADO: 'Cancelado',
+    'NO ENTREGADO': 'No entregado',
   };
   return labels[status] || status;
 };
 
+/** Devuelve true si el pedido está dentro del plazo de 7 días para devolución */
+function isWithinReturnWindow(order: Order): boolean {
+  const referenceDate = order.buyerReceptionConfirmedAt
+    ? order.buyerReceptionConfirmedAt.toDate()
+    : order.createdAt.toDate();
+  const daysSince = (Date.now() - referenceDate.getTime()) / (1000 * 60 * 60 * 24);
+  return daysSince <= 7;
+}
+
 export default function OrderCard({ order }: OrderCardProps) {
-  const formattedDate = order.createdAt.toDate().toLocaleDateString('es-BO', { day: 'numeric', month: 'short', year: 'numeric' });
+  const formattedDate = order.createdAt.toDate().toLocaleDateString('es-BO', {
+    day: 'numeric', month: 'short', year: 'numeric',
+  });
   const totalItemsCount = order.items.reduce((acc, item) => acc + item.quantity, 0);
   const { uuid, friendlyName } = parseOrderId(order.id);
+
+  const isDelivered = order.status === 'ENTREGADO' || order.status === 'COMPLETADO';
+  const withinWindow = isDelivered && isWithinReturnWindow(order);
+
   return (
     <a
       href={`/mis-pedidos/${order.id}`}
@@ -57,7 +93,7 @@ export default function OrderCard({ order }: OrderCardProps) {
               </span>
             </div>
             <span className="font-display font-extrabold text-base mt-0.5">
-                {friendlyName}
+              {friendlyName}
             </span>
           </div>
 
@@ -73,6 +109,23 @@ export default function OrderCard({ order }: OrderCardProps) {
           <span className="text-xs mt-1 font-medium opacity-60">
             {totalItemsCount} {totalItemsCount === 1 ? 'producto' : 'productos'}
           </span>
+
+          {isDelivered && (
+            <div className="mt-2">
+              {withinWindow ? (
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold px-3 py-1 rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/20">
+                  <RotateCcw size={12} /> Devolución disponible
+                </span>
+              ) : (
+                <span
+                  title="Han pasado más de 7 días desde la entrega"
+                  className="inline-flex items-center gap-1.5 text-[11px] font-bold px-3 py-1 rounded-full bg-gray-500/10 text-gray-500 border border-gray-500/20 cursor-help"
+                >
+                  <RotateCcw size={12} /> Plazo de devolución vencido
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

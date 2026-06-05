@@ -54,17 +54,20 @@ export default function PerfilForm() {
     setError(null);
     setSuccess(false);
 
-    if (!phone.trim()) {
+    const phoneValue = phone.trim();
+    const mailValue = secondaryMail.trim();
+
+    if (!phoneValue) {
       setError('El teléfono celular es obligatorio.');
       return;
     }
 
     const phoneRegex = /^[67]\d{7}$/;
-    if (!phoneRegex.test(phone.trim())) {
+
+    if (!phoneRegex.test(phoneValue)) {
       setError('El número de celular no es válido. Debe tener 8 dígitos y empezar con 6 o 7.');
       return;
     }
-    const mailValue = secondaryMail.trim();
     
     if (mailValue) {
       if (mailValue.length > 100) {
@@ -84,13 +87,15 @@ export default function PerfilForm() {
     try {
       const userRef = doc(db, 'users', userId);
       await updateDoc(userRef, {
-        phone: phone.trim(),
+        phone: phoneValue,
         secondaryMail: mailValue || '',
         updatedAt: new Date()
       });
 
       setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
+        setTimeout(() => {
+          window.location.href = "/me";
+        }, 1500);
     } catch (err) {
       console.error("Error al guardar:", err);
       setError('Hubo un error al guardar los cambios en la base de datos.');
@@ -131,7 +136,11 @@ export default function PerfilForm() {
               type="tel"
               placeholder="Ej: 76543210"
               value={phone}
-              onChange={(e) => setphone(e.target.value.replace(/\s/g, ''))}
+              onChange={(e) => {
+                const digitsOnly = e.target.value.replace(/\D/g, '');
+                setphone(digitsOnly);
+              }}
+              inputMode="numeric"
               className="w-full px-4 py-2.5 rounded-[0.75rem] border border-border-light bg-bg-light text-text-light text-sm focus:outline-none focus:border-primary transition-all"
               required
             />
@@ -142,11 +151,12 @@ export default function PerfilForm() {
               Correo Electrónico de Respaldo (Opcional)
             </label>
             <input
-              type="email"
+              type="text"
+              autoComplete="email"
               placeholder="ejemplo@gmail.com"
               value={secondaryMail}
               maxLength={100}
-              onChange={(e) => setsecondaryMail(e.target.value.replace(/[\s⌐?]/g, ''))}
+              onChange={(e) => setsecondaryMail(e.target.value)}
               className="w-full px-4 py-2.5 rounded-[0.75rem] border border-border-light bg-bg-light text-text-light text-sm focus:outline-none focus:border-primary transition-all"
             />
           </div>

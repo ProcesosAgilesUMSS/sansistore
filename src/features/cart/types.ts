@@ -17,6 +17,20 @@ export interface CartItem {
   updatedAt: Date;
 }
 
+export interface CartDisplayItem {
+  id: string;
+  productId: string;
+  name: string;
+  imageUrl?: string;
+  quantity: number;
+  unitPrice: number;
+  stockAvailable: number;
+  stockReserved: number;
+  isAvailable: boolean;
+  availabilityMessage: string;
+  subtotal: number;
+}
+
 export interface CartProduct {
   id: string;
   name: string;

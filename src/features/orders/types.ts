@@ -11,7 +11,9 @@ export type OrderStatus =
   'RESERVADO' |
   'PENDIENTE' |
   'EMPAQUETADO' |
-  'LISTO';
+  'LISTO' |
+  'COMPLETADO';
+
 
 export const STATUS_LABELS: Record<OrderStatus, string> = {
   CREADO: "CREADO",
@@ -24,7 +26,8 @@ export const STATUS_LABELS: Record<OrderStatus, string> = {
   RESERVADO: "RESERVADO",
   PENDIENTE: "PENDIENTE",
   EMPAQUETADO: "EMPAQUETADO",
-  LISTO: "LISTO"
+  LISTO: "LISTO",
+  COMPLETADO: "COMPLETADO",
 };
 
 export interface OrderItem {
@@ -60,15 +63,39 @@ export interface Order {
   incidentReason?: string;
 }
 
-export type ReturnStatus = 'pending_review' | 'approved' | 'rejected';
+export type ReturnStatus =
+  | 'pending'
+  | 'approved'
+  | 'rejected'
+  | 'in_transit'
+  | 'completed';
+
+export type ReturnReason = 'damaged' | 'wrong_product' | 'unwanted' | 'other';
+
+export const RETURN_REASON_LABELS: Record<ReturnReason, string> = {
+  damaged: 'Producto dañado',
+  wrong_product: 'Producto incorrecto',
+  unwanted: 'No deseado',
+  other: 'Otro',
+};
+
+export interface ReturnItem {
+  productId: string;
+  productName: string;
+  quantity: number;
+}
 
 export interface ReturnRequest {
   id?: string;
   orderId: string;
   buyerId: string;
-  productId: string;
-  productName: string;
-  reason: string;
+  /** @deprecated use items[] instead */
+  productId?: string;
+  /** @deprecated use items[] instead */
+  productName?: string;
+  items: ReturnItem[];
+  reason: ReturnReason;
+  description?: string;
   status: ReturnStatus;
   createdAt: Timestamp;
 }
