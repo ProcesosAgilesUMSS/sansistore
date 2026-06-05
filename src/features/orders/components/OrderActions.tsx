@@ -58,7 +58,7 @@ function CancelOrderSection({ order, onSuccess }: { order: Order; onSuccess?: ()
 
     setIsSubmitting(true);
     try {
-      await cancelOrder(order.id, "Cancelación de vendedor", incidentNotes);
+      await cancelOrder(order.id, "Reserva cancelada por vendedor", incidentNotes);
       setShowCancelForm(false);
       onSuccess?.();
     } catch (error) {

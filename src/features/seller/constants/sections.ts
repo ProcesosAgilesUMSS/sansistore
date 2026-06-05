@@ -9,11 +9,11 @@ export const sections = [
     label: 'Pedidos Creados',
     route: '/seller/created-orders',
   },
-  {
-    id: 'empaquetados',
-    label: 'Pedidos Empaquetados',
-    route: '/seller/packaged-orders',
-  },
+//  {
+//    id: 'empaquetados',
+//    label: 'Pedidos Empaquetados',
+//    route: '/seller/packaged-orders',
+//  },
   {
     id: 'listos',
     label: 'Pedidos Listos',

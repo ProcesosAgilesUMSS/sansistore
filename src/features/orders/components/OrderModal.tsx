@@ -37,8 +37,8 @@ export default function OrderModal({
       <div onClick={(e) => e.stopPropagation()} className="bg-white w-[75ch] px-4 py-4 rounded-lg flex flex-col max-h-[90vh] overflow-y-auto">
 
         <div className="flex gap-x-8">
-          <span className="tracking-tight">{parseOrderId(order.id).friendlyName}</span>
-          <div className="flex gap-x-2 items-center text-sm">
+          <span className="tracking-tight text-xl">{parseOrderId(order.id).friendlyName}</span>
+          <div className="flex gap-x-2 items-center">
             <OrderStatusBadge status={order.status} />
           </div>
         </div>
@@ -52,15 +52,19 @@ export default function OrderModal({
           <div className="leading-[140%] col-start-7 min-[765px]:col-start-5 col-end-21">{createdAt}</div>
           <div className="leading-[140%] col-start-1 col-end-4 text-black/50">Destino:</div>
           <div className="leading-[140%] col-start-7 min-[765px]:col-start-5 col-end-21 truncate">{order.address}</div>
-          <div className="leading-[140%] col-start-1 col-end-4 text-black/50 capitalize">{formattedStatus}</div>
+          <div className="leading-[140%] col-start-1 col-end-5 text-black/50 capitalize truncate">{formattedStatus}:</div>
           <div className="leading-[140%] col-start-7 min-[765px]:col-start-5 col-end-21 truncate">{updatedAt}</div>
           {order.incidentReason && (
             <>
               <div className="leading-[140%] col-start-1 col-end-4 text-black/50 capitalize">Incidente</div>
               <div className="leading-[140%] col-start-7 min-[765px]:col-start-5 col-end-21 truncate">{order.incidentReason}</div>
 
-              <div className="leading-[140%] col-start-1 col-end-4 text-black/50 capitalize">Nota:</div>
-              <div className="leading-[140%] col-start-7 min-[765px]:col-start-5 col-end-21 truncate">{order.incidentNotes}</div>
+              {order.incidentNotes && (
+                <>
+                  <div className="leading-[140%] col-start-1 col-end-4 text-black/50 capitalize">Nota:</div>
+                  <div className="leading-[140%] col-start-7 min-[765px]:col-start-5 col-end-21 truncate italic">{order.incidentNotes}</div>
+                </>
+              )}
             </>
           )}
 
@@ -74,9 +78,12 @@ export default function OrderModal({
                 <>
                   <div className="leading-[140%] col-start-1 col-end-5 text-black/50">Incidente:</div>
                   <div className="leading-[140%] col-start-7 min-[765px]:col-start-5 col-end-21">{order.delivery.incidentReason}</div>
-
-                  <div className="leading-[140%] col-start-1 col-end-4 text-black/50 capitalize">Nota:</div>
-                  <div className="leading-[140%] col-start-7 min-[765px]:col-start-5 col-end-21 truncate">{order.delivery.incidentNotes}</div>
+                  {order.delivery.incidentNotes && (
+                    <>
+                      <div className="leading-[140%] col-start-1 col-end-4 text-black/50 capitalize">Nota:</div>
+                      <div className="leading-[140%] col-start-7 min-[765px]:col-start-5 col-end-21 truncate">{order.delivery.incidentNotes}</div>
+                    </>
+                  )}
                 </>
               )}
             </>
@@ -178,7 +185,6 @@ export default function OrderModal({
         <div className="mt-2">
           <OrderActions order={order} onSuccess={closeModal} />
         </div>
-
       </div>
     </div >
   )

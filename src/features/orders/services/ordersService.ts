@@ -78,10 +78,38 @@ export async function reserveOrder(orderId: string): Promise<void> {
   if (!user) throw new Error("Debe estar autenticado para reservar un pedido.");
 
   const orderRef = doc(db, "orders", orderId);
-  await updateDoc(orderRef, {
-    status: "RESERVADO",
-    sellerId: user.uid,
-    updatedAt: serverTimestamp(),
+  const itemsSnapshot = await getDocs(collection(orderRef, "orderItems"));
+  const items = itemsSnapshot.docs.map(doc => ({
+    itemId: doc.id,
+    ...(doc.data() as Omit<OrderItem, "itemId">)
+  }));
+
+  await runTransaction(db, async (transaction) => {
+    // 1. Gather all reads
+    const invRefs = items.map(item => doc(db, "inventory", item.productId));
+    const invSnaps = await Promise.all(invRefs.map(ref => transaction.get(ref)));
+
+    // 2. Perform all writes
+    transaction.update(orderRef, {
+      status: "RESERVADO",
+      sellerId: user.uid,
+      updatedAt: serverTimestamp(),
+    });
+
+    invSnaps.forEach((invSnap, index) => {
+      if (!invSnap.exists()) {
+        throw new Error(`Inventario no encontrado para el producto: ${items[index].productId}`);
+      }
+
+      const invData = invSnap.data();
+      const currentAvailable = invData.stockAvailable || 0;
+      const qty = items[index].quantity || 0;
+
+      transaction.update(invRefs[index], {
+        stockAvailable: currentAvailable - qty,
+        updatedAt: serverTimestamp(),
+      });
+    });
   });
 }
 
