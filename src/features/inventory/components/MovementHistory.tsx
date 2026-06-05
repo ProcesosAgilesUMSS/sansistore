@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   collection, 
   query, 
@@ -30,9 +30,10 @@ export const MovementHistory: React.FC = () => {
 
   // Estados para Paginación
   const [page, setPage] = useState(1);
-  const [lastVisible, setLastVisible] = useState<DocumentSnapshot | null>(null);
-  const [firstVisible, setFirstVisible] = useState<DocumentSnapshot | null>(null);
   const [isNextPageAvailable, setIsNextPageAvailable] = useState(false);
+  
+  //useRef para guardar los cursores de cada página sin re-renderizar
+  const cursorsRef = useRef<Record<number, DocumentSnapshot>>({});
 
   const MOVEMENTS_PER_PAGE = 10;
 
@@ -68,17 +69,19 @@ export const MovementHistory: React.FC = () => {
   useEffect(() => {
     setLoading(true);
 
+    // Consulta base para la página 1
     let q = query(
       collection(db, 'inventoryMovements'),
       orderBy('createdAt', 'desc'),
       limit(MOVEMENTS_PER_PAGE + 1)
     );
 
-    if (page > 1 && lastVisible) {
+    //sSi estamos en la pag 2 o mayor, usamos el cursor guardado de la página anterior
+    if (page > 1 && cursorsRef.current[page - 1]) {
       q = query(
         collection(db, 'inventoryMovements'),
         orderBy('createdAt', 'desc'),
-        startAfter(lastVisible),
+        startAfter(cursorsRef.current[page - 1]),
         limit(MOVEMENTS_PER_PAGE + 1)
       );
     }
@@ -98,8 +101,10 @@ export const MovementHistory: React.FC = () => {
         })) as Movement[];
 
         setMovements(data);
-        setFirstVisible(visibleDocs[0]);
-        setLastVisible(visibleDocs[visibleDocs.length - 1]);
+        
+        //guardamos el último documento de la página actual en nuestro diccionario de cursores
+        // Así, cuando queramos ir a la (page + 1), ya sabremos dónde empezar
+        cursorsRef.current[page] = visibleDocs[visibleDocs.length - 1];
 
         // Resolvemos nombres después de tener los movimientos
         await resolveOperatorNames(data);
