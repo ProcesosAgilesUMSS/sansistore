@@ -15,6 +15,7 @@ import {
   ChevronRight,
   ArrowLeft,
   ClipboardList,
+  Activity,
 } from 'lucide-react';
 import UserManagement from '../users/components/UserManagement.tsx';
 import CategoryList from '../categories/components/CategoryList.tsx';
@@ -29,6 +30,8 @@ import SalesReport from '../analytics/components/SalesReport.tsx';
 import AccessLogPanel from '../audit/components/AccessLogPanel.tsx';
 // ── HU #178: Historial de pedido ──
 import OrderHistory from '../pedidos/components/OrderHistory.tsx';
+// ── HU #160: Monitoreo de actividad de vendedores ──
+import SellerActivityPanel from '../monitoring/components/SellerActivityPanel.tsx';
 
 type Section =
   | 'dashboard'
@@ -42,6 +45,7 @@ type Section =
   | 'parametros'     // ── HU #152 ──
   | 'reportes'       // ── HU #161 ──
   | 'bitacora'       
+  | 'monitoreo'      // ── HU #160 ──
   | null;
 
 interface NavItem {
@@ -104,6 +108,12 @@ export default function AdminLayout() {
           icon: <Settings size={15} />,
           section: 'bitacora',
         },
+        {
+          // ── HU #160: Monitoreo de vendedores ──
+          label: 'Monitoreo',
+          icon: <Activity size={15} />,
+          section: 'monitoreo',
+        },
       ],
     },
     {
@@ -136,6 +146,8 @@ export default function AdminLayout() {
     // ── HU #161 ──
     reportes:               { title: 'Reportes de ventas',     subtitle: 'Genera reportes de ventas por rango de fechas' },
     bitacora:               { title: 'Bitácora',               subtitle: 'Registra actividad de inicio y cierre de sesión' },
+    // ── HU #160 ──
+    monitoreo:              { title: 'Monitoreo de vendedores', subtitle: 'Bitácora de actividad y cambios de estado en pedidos' },
   };
 
   const currentPage = pageTitles[activeSection ?? 'dashboard'];
@@ -439,6 +451,8 @@ export default function AdminLayout() {
           {/*Reportes de ventas*/}
           {activeSection === 'reportes' && <SalesReport />}
           {activeSection === 'bitacora' && <AccessLogPanel />}
+          {/* ── HU #160 ── */}
+          {activeSection === 'monitoreo' && <SellerActivityPanel />}
           {/* ── HU #178 ── */}
           {activeSection === 'historial' && <OrderHistory />}
         </main>
