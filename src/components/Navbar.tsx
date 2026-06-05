@@ -9,6 +9,7 @@ import {
   Sun,
   MapPin,
   Settings,
+  Package,
   User as UserIcon,
 } from 'lucide-react';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
@@ -299,8 +300,9 @@ export default function Navbar() {
                           <a
                             role="menuitem"
                             href="/mis-pedidos"
-                            className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
+                            className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light opacity-70 transition-colors hover:bg-border-light/40 hover:text-primary hover:opacity-100"
                           >
+                            <Package size={14} />
                             Mis pedidos
                           </a>
                         )}
@@ -309,7 +311,7 @@ export default function Navbar() {
                           <a
                             role="menuitem"
                             href="/courier"
-                            className="block px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
+                          className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light opacity-70 transition-colors hover:bg-border-light/40 hover:text-primary hover:opacity-100"
                           >
                             Mensajero
                           </a>
@@ -407,7 +409,8 @@ export default function Navbar() {
                   </a>
                 ))}
 
-              {user && showCompradorFeatures && (
+              {/* CORRECCIÓN: Quitamos showCompradorFeatures de aquí */}
+              {user && (
                 <>
                   <a
                     href="/me"
@@ -416,12 +419,15 @@ export default function Navbar() {
                     Mi Perfil
                   </a>
 
-                  <a
-                    href="/location"
-                    className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
-                  >
-                    Mis direcciones
-                  </a>
+                  {/* Restringimos "Mis direcciones" solo a compradores */}
+                  {showCompradorFeatures && (
+                    <a
+                      href="/location"
+                      className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
+                    >
+                      Mis direcciones
+                    </a>
+                  )}
 
                   {showMisPedidos && (
                     <a
