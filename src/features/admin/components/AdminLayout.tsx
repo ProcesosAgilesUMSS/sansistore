@@ -21,6 +21,7 @@ import CategoryList from '../categories/components/CategoryList.tsx';
 import OrderReceptionPanel from '../orders/components/OrderReceptionPanel.tsx';
 import DailySales from '../ventas/components/DailySales.tsx';
 import TopSellingProducts from '../ventas/top-products/components/TopSellingProducts.tsx';
+import MessengerPerformancePage from '../messengers/performance/MessengerPerformancePage.tsx';
 // ── HU #152: Parámetros del sistema ──
 import ConfigPanel from '../settings/components/ConfigPanel.tsx';
 // ── HU #161: Reportes de ventas ──
@@ -37,6 +38,7 @@ type Section =
   | 'categorias'
   | 'ventas-diarias'
   | 'mas-vendidos'
+  | 'mensajeros-desempeno'
   | 'parametros'     // ── HU #152 ──
   | 'reportes'       // ── HU #161 ──
   | 'bitacora'       
@@ -60,6 +62,7 @@ export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [ventasOpen, setVentasOpen] = useState(true);
   const [pedidosOpen, setPedidosOpen] = useState(true); // ── HU #178 ──
+  const [mensajerosOpen, setMensajerosOpen] = useState(true);
 
   const navSections: NavSection[] = [
     {
@@ -120,16 +123,19 @@ export default function AdminLayout() {
   ];
 
   const pageTitles: Record<string, { title: string; subtitle: string }> = {
-    dashboard:       { title: 'Dashboard',              subtitle: 'Panel de administración' },
-    pedidos:         { title: 'Pedidos',                subtitle: 'Validación de recepción por comprador' },
-    historial:       { title: 'Historial de pedido',    subtitle: 'Auditoría completa del pedido' },
-    usuarios:        { title: 'Gestión de usuarios',    subtitle: 'Registra y administra usuarios' },
-    categorias:      { title: 'Categorías',             subtitle: 'Gestiona las categorías de productos' },
-    'ventas-diarias':{ title: 'Ventas diarias',         subtitle: 'Monitorea el rendimiento diario de ventas' },
-    'mas-vendidos':  { title: 'Más vendidos',           subtitle: 'Productos con más unidades vendidas' },
-    parametros:      { title: 'Parámetros del sistema', subtitle: 'Configura los parámetros globales del sistema' },
-    reportes:        { title: 'Reportes de ventas',     subtitle: 'Genera reportes de ventas por rango de fechas' },
-    bitacora:        { title: 'Bitácora',               subtitle: 'Registra actividad de inicio y cierre de sesión' },
+    dashboard:              { title: 'Dashboard',              subtitle: 'Panel de administración' },
+    pedidos:                { title: 'Pedidos',                subtitle: 'Validación de recepción por comprador' },
+    historial:              { title: 'Historial de pedido',    subtitle: 'Auditoría completa del pedido' },
+    usuarios:               { title: 'Gestión de usuarios',    subtitle: 'Registra y administra usuarios' },
+    categorias:             { title: 'Categorías',             subtitle: 'Gestiona las categorías de productos' },
+    'ventas-diarias':       { title: 'Ventas diarias',         subtitle: 'Monitorea el rendimiento diario de ventas' },
+    'mensajeros-desempeno': { title: 'Desempeño de mensajeros', subtitle: 'Métricas de eficiencia por mensajero' },
+    'mas-vendidos':         { title: 'Más vendidos',           subtitle: 'Productos con más unidades vendidas' },
+    // ── HU #152 ──
+    parametros:             { title: 'Parámetros del sistema', subtitle: 'Configura los parámetros globales del sistema' },
+    // ── HU #161 ──
+    reportes:               { title: 'Reportes de ventas',     subtitle: 'Genera reportes de ventas por rango de fechas' },
+    bitacora:               { title: 'Bitácora',               subtitle: 'Registra actividad de inicio y cierre de sesión' },
   };
 
   const currentPage = pageTitles[activeSection ?? 'dashboard'];
@@ -284,6 +290,44 @@ export default function AdminLayout() {
                   );
                 }
 
+                if (item.label === 'Mensajeros') {
+                  return (
+                    <div key={item.label} className="mb-1">
+                      <button
+                        onClick={() => setMensajerosOpen(!mensajerosOpen)}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px]
+                        text-white/50 hover:text-white/80 hover:bg-white/5 transition-colors"
+                      >
+                        <span>{item.icon}</span>
+                        <span className="flex-1 text-left">Mensajeros</span>
+                        <ChevronRight
+                          size={12}
+                          className={`transition-transform ${mensajerosOpen ? 'rotate-90' : ''}`}
+                        />
+                      </button>
+
+                      {mensajerosOpen && (
+                        <div className="ml-7 mt-1 space-y-1">
+                          <button
+                            onClick={() => {
+                              setActiveSection('mensajeros-desempeno');
+                              setSidebarOpen(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
+                            transition-colors ${
+                              activeSection === 'mensajeros-desempeno'
+                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
+                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
+                            }`}
+                          >
+                            Desempeño
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+
                 const isActive = activeSection === item.section;
                 return (
                   <button
@@ -389,6 +433,8 @@ export default function AdminLayout() {
           {activeSection === 'categorias' && <CategoryList />}
           {activeSection === 'ventas-diarias' && <DailySales />}
           {activeSection === 'mas-vendidos' && <TopSellingProducts />}
+          {activeSection === 'mensajeros-desempeno' && <MessengerPerformancePage />}
+          {/*Parámetros del sistema*/}
           {activeSection === 'parametros' && <ConfigPanel />}
           {/*Reportes de ventas*/}
           {activeSection === 'reportes' && <SalesReport />}
