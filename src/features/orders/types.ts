@@ -11,7 +11,9 @@ export type OrderStatus =
   'RESERVADO' |
   'PENDIENTE' |
   'EMPAQUETADO' |
-  'LISTO';
+  'LISTO' |
+  'ACEPTADO' |
+  'PENDIENTE REASIGNACION';
 
 export const STATUS_LABELS: Record<OrderStatus, string> = {
   CREADO: "CREADO",
@@ -24,7 +26,9 @@ export const STATUS_LABELS: Record<OrderStatus, string> = {
   RESERVADO: "RESERVADO",
   PENDIENTE: "PENDIENTE",
   EMPAQUETADO: "EMPAQUETADO",
-  LISTO: "LISTO"
+  LISTO: "LISTO",
+  ACEPTADO: "ACEPTADO",
+  'PENDIENTE REASIGNACION': "RECHAZADO"
 };
 
 export interface OrderItem {
@@ -38,6 +42,31 @@ export interface OrderItem {
   stockAvailable?: number;
 }
 
+export interface Delivery {
+  id: string;
+  orderId: string;
+  courierId?: string;
+  courierName?: string;
+  status: string;
+  deliveryCode?: string;
+  attemptNumber?: number;
+  incidentReason?: string | null;
+  incidentNotes?: string | null;
+  evidenceUrl?: string;
+  failureReason?: string;
+  amountCollected?: number;
+  customerConfirmed?: boolean;
+  customerConfirmedAt?: Timestamp | null;
+  assignedAt?: Timestamp | null;
+  pickedUpAt?: Timestamp | null;
+  deliveredAt?: Timestamp | null;
+  inTransitAt?: Timestamp | null;
+  failedAt?: Timestamp | null;
+  reprogrammedAt?: Timestamp | null;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
+}
+
 export interface Order {
   id: string;
   secret?: string;
@@ -47,17 +76,17 @@ export interface Order {
   status: OrderStatus;
   buyerReceptionConfirmed?: boolean;
   buyerReceptionConfirmedAt: Timestamp | null;
-  delivery: {
-    destination: string;
-  };
+  address: string;
   deliveryStatus?: string | null;
-  deliveryId?: string | null;
+  delivery?: Delivery | null;
   paymentId?: string | null;
   paymentStatus?: string | null;
   total?: number;
   items: OrderItem[];
   createdAt: Timestamp;
+  updatedAt: Timestamp;
   incidentReason?: string;
+  incidentNotes?: string;
 }
 
 export type ReturnStatus = 'pending_review' | 'approved' | 'rejected';

@@ -37,21 +37,18 @@ export default function OrderProductDetail({
             {friendlyName}
           </h3>
           <p className="text-sm text-text-light/80 mt-4">
-            Destino: {order.delivery.destination}
+            Destino: {order.address}
           </p>
           <div className="text-sm flex items-center gap-3 mt-3">
             <span className="text-text-light/60">Estado:</span>
             <div className="inline-flex items-center gap-1.5 rounded border border-border-light px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-text-light">
               <div
-                className={`size-1.5 rounded-full ${
-                  order.status === "CREADO" ? "bg-orange-500" :
+                className={`size-1.5 rounded-full ${order.status === "CREADO" ? "bg-orange-500" :
                   order.status === "RESERVADO" ? "bg-blue-500" :
-                  order.status === "PENDIENTE" ? "bg-yellow-500" :
-                  order.status === "EMPAQUETADO" ? "bg-purple-500" :
-                  order.status === "in_transit" ? "bg-blue-500" :
-                  order.status === "delivered" ? "bg-green-500" :
-                  "bg-current"
-                }`}
+                    order.status === "PENDIENTE" ? "bg-yellow-500" :
+                      order.status === "EMPAQUETADO" ? "bg-purple-500" :
+                        "bg-current"
+                  }`}
               />
               {STATUS_LABELS[order.status]}
             </div>
@@ -70,11 +67,10 @@ export default function OrderProductDetail({
             <button
               onClick={onReserve}
               disabled={isReserving}
-              className={`w-full sm:w-auto rounded-full bg-primary text-white px-5 py-2.5 text-sm uppercase font-bold tracking-wider transition-all duration-200 flex items-center justify-center sm:justify-start gap-2 ${
-                isReserving
-                  ? "opacity-50 cursor-not-allowed"
-                  : "cursor-pointer hover:opacity-90 hover:scale-105 hover:-translate-y-0.5 active:scale-95 active:translate-y-0 hover:shadow-lg"
-              }`}
+              className={`w-full sm:w-auto rounded-full bg-primary text-white px-5 py-2.5 text-sm uppercase font-bold tracking-wider transition-all duration-200 flex items-center justify-center sm:justify-start gap-2 ${isReserving
+                ? "opacity-50 cursor-not-allowed"
+                : "cursor-pointer hover:opacity-90 hover:scale-105 hover:-translate-y-0.5 active:scale-95 active:translate-y-0 hover:shadow-lg"
+                }`}
             >
               {isReserving ? (
                 <>
@@ -119,7 +115,7 @@ export default function OrderProductDetail({
                     {item.productId}
                   </p>
                 </div>
-                
+
                 <div className="flex justify-between sm:block mt-2 sm:mt-0">
                   <span className="sm:hidden text-[11px] font-bold uppercase tracking-wider text-text-light/40">Cantidad</span>
                   <p className="text-sm text-text-light/80">{item.quantity}</p>
@@ -127,7 +123,7 @@ export default function OrderProductDetail({
 
                 <div className="flex justify-between sm:block">
                   <span className="sm:hidden text-[11px] font-bold uppercase tracking-wider text-text-light/40">P. Unitario</span>
-                  <p className="text-sm text-text-light/80">Bs {item.price}</p>
+                  <p className="text-sm text-text-light/80">Bs {item.unitPrice}</p>
                 </div>
 
                 <div className="flex justify-between sm:block">

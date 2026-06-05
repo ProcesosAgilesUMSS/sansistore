@@ -57,7 +57,7 @@ export default function OrderCard({ order }: OrderCardProps) {
               </span>
             </div>
             <span className="font-display font-extrabold text-base mt-0.5">
-                {friendlyName}
+              {friendlyName}
             </span>
           </div>
 
@@ -66,7 +66,7 @@ export default function OrderCard({ order }: OrderCardProps) {
               <Calendar size={14} /> {formattedDate}
             </span>
             <span className="flex items-center gap-1.5 text-xs truncate max-w-[280px] sm:max-w-[400px]">
-              <MapPin size={14} /> {order.delivery.destination}
+              <MapPin size={14} /> {order.address}
             </span>
           </div>
 

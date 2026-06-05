@@ -145,7 +145,7 @@ export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: O
           <MapPin className="text-primary mt-0.5 shrink-0" size={18} />
           <div>
             <h4 className="text-sm font-bold mb-1">Ubicación de entrega</h4>
-            <p className="text-sm opacity-80">{order.delivery.destination}</p>
+            <p className="text-sm opacity-80">{order.address}</p>
           </div>
         </div>
         {order.secret && (
