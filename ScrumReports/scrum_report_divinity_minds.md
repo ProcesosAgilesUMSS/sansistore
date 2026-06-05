@@ -367,6 +367,12 @@
 
 # 06/02/2026
 
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Revise pull request nuevos y reporte bugs de los mismos.
+- **Today:** Revisar si ya se completaron correctamente los bugs reportados previamente.
+- **Blockers:** n/a.
+
 ## Merudia Calderon Dayeza
 
 - **Yesterday:**  Ejecuté pruebas de regresión en los roles de operador y mensajero para validar su funcionalidad y flujos de trabajo
