@@ -49,15 +49,49 @@ export const GET: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'orderId requerido' }), { status: 400, headers });
     }
 
-    // ── Buscar por campo orderId (no por ID de documento) ─────────────────
-    const orderQuery = await adminDb
+    // Buscar primero por orderId completo
+    let orderQuery = await adminDb
       .collection('orders')
       .where('orderId', '==', orderId)
       .limit(1)
       .get();
 
+    // Si no encuentra, buscar por ID amigable (parte después del _)
+    // Firestore no soporta búsqueda por sufijo, así que se pagina y filtra en servidor
     if (orderQuery.empty) {
-      return new Response(JSON.stringify({ error: 'Pedido no encontrado' }), { status: 404, headers });
+      const lowerInput = orderId.toLowerCase();
+      let found: FirebaseFirestore.QueryDocumentSnapshot | null = null;
+      let pageCursor: FirebaseFirestore.QueryDocumentSnapshot | null = null;
+
+      outer: while (true) {
+        let pageQuery: FirebaseFirestore.Query = adminDb
+          .collection('orders')
+          .orderBy('createdAt', 'desc')
+          .limit(200);
+
+        if (pageCursor) pageQuery = pageQuery.startAfter(pageCursor);
+
+        const pageSnap = await pageQuery.get();
+        if (pageSnap.empty) break;
+
+        for (const doc of pageSnap.docs) {
+          const id: string = doc.data().orderId ?? '';
+          const idx = id.indexOf('_');
+          if (idx !== -1 && id.slice(idx + 1).toLowerCase() === lowerInput) {
+            found = doc;
+            break outer;
+          }
+        }
+
+        if (pageSnap.docs.length < 200) break; // última página
+        pageCursor = pageSnap.docs[pageSnap.docs.length - 1];
+      }
+
+      if (!found) {
+        return new Response(JSON.stringify({ error: 'Pedido no encontrado' }), { status: 404, headers });
+      }
+
+      orderQuery = { empty: false, docs: [found] } as any;
     }
 
     const orderDoc = orderQuery.docs[0];
