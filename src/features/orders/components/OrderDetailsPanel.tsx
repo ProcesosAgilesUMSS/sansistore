@@ -16,18 +16,25 @@ interface OrderDetailsPanelProps {
 const getStatusStyles = (status: string) => {
   switch (status) {
     case 'ENTREGADO':
+    case 'ENTREGADO':
     case 'PAGADO':
     case 'COMPLETADO':
       return 'bg-[#88B04B]/10 text-[#88B04B] border-[#88B04B]/20';
     case 'EN CAMINO':
+    case 'EN CAMINO':
     case 'ASIGNADO':
     case 'LISTO':
       return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+    case 'PENDIENTE':
+    case 'EMPAQUETADO':
+    case 'LISTO':
     case 'RESERVADO':
     case 'EMPAQUETADO':
     case 'PENDIENTE':
     case 'CREADO':
       return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
+    case 'CANCELADO':
+    case 'NO ENTREGADO':
     case 'CANCELADO':
     case 'NO ENTREGADO':
       return 'bg-red-500/10 text-red-500 border-red-500/20';
@@ -53,6 +60,11 @@ const getStatusLabel = (status: string) => {
   };
   return labels[status] || status;
 };
+
+const isDeliveredOrder = (order: Order) =>
+  order.status === 'ENTREGADO' ||
+  order.deliveryStatus === 'DELIVERED' ||
+  order.deliveryStatus === 'delivered';
 
 function formatDateTime(value: Order['buyerReceptionConfirmedAt']) {
   if (!value) return null;
@@ -97,9 +109,11 @@ export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: O
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit',
   });
 
-  const isDelivered = order.status === 'ENTREGADO' || order.status === 'COMPLETADO';
-  const daysLeft = getReturnDaysLeft(order);
-  const canRequestReturn = isDelivered && daysLeft > 0;
+  const now = new Date();
+  const hoursSinceOrder = (now.getTime() - orderDate.getTime()) / (1000 * 60 * 60);
+  const isWithinTimeLimit = hoursSinceOrder <= 72;
+  const isDelivered = isDeliveredOrder(order);
+  const canRequestReturn = isDelivered && isWithinTimeLimit;
   const receptionConfirmedAt = formatDateTime(order.buyerReceptionConfirmedAt);
   const canConfirmReception = order.status === 'ENTREGADO' && !order.buyerReceptionConfirmed;
 
@@ -113,6 +127,7 @@ export default function OrderDetailsPanel({ order, onBack, onOrderConfirmed }: O
       await confirmOrderReception(order.id, order.buyerId);
       const updatedOrder = {
         ...order,
+        status: 'ENTREGADO' as const,
         buyerReceptionConfirmed: true,
         buyerReceptionConfirmedAt: Timestamp.fromDate(new Date()),
       };

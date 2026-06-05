@@ -13,14 +13,20 @@ const getStatusStyles = (status: string) => {
     case 'COMPLETADO':
       return 'bg-[#88B04B]/10 text-[#88B04B]';
     case 'EN CAMINO':
+    case 'EN CAMINO':
     case 'ASIGNADO':
     case 'LISTO':
       return 'bg-blue-500/10 text-blue-500';
+    case 'PENDIENTE':
+    case 'EMPAQUETADO':
+    case 'LISTO':
     case 'RESERVADO':
     case 'EMPAQUETADO':
     case 'PENDIENTE':
     case 'CREADO':
       return 'bg-amber-500/10 text-amber-500';
+    case 'CANCELADO':
+    case 'NO ENTREGADO':
     case 'CANCELADO':
     case 'NO ENTREGADO':
       return 'bg-red-500/10 text-red-500';
