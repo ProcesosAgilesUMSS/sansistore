@@ -27,13 +27,10 @@ import ConfigPanel from '../settings/components/ConfigPanel.tsx';
 // ── HU #161: Reportes de ventas ──
 import SalesReport from '../analytics/components/SalesReport.tsx';
 import AccessLogPanel from '../audit/components/AccessLogPanel.tsx';
-<<<<<<< HEAD
 // ── HU #163: Reportes de pedidos cancelados ──
 import CancelledOrdersReport from '../reports/components/CancelledOrdersReport.tsx';
-=======
 // ── HU #178: Historial de pedido ──
 import OrderHistory from '../pedidos/components/OrderHistory.tsx';
->>>>>>> origin/main
 
 type Section =
   | 'dashboard'
@@ -67,12 +64,9 @@ export default function AdminLayout() {
   const [activeSection, setActiveSection] = useState<Section>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [ventasOpen, setVentasOpen] = useState(true);
-<<<<<<< HEAD
   const [reportesOpen, setReportesOpen] = useState(false);
-=======
   const [pedidosOpen, setPedidosOpen] = useState(true); // ── HU #178 ──
   const [mensajerosOpen, setMensajerosOpen] = useState(true);
->>>>>>> origin/main
 
   const navSections: NavSection[] = [
     {
@@ -144,14 +138,9 @@ export default function AdminLayout() {
     // ── HU #152 ──
     parametros:             { title: 'Parámetros del sistema', subtitle: 'Configura los parámetros globales del sistema' },
     // ── HU #161 ──
-<<<<<<< HEAD
     reportes: { title: 'Reportes de ventas', subtitle: 'Genera reportes de ventas por rango de fechas' },
-    bitacora: { title: 'Bitacora', subtitle: 'registra actividad de inicio y cierre de sesion' },
+    bitacora: { title: 'Bitácora', subtitle: 'Registra actividad de inicio y cierre de sesión' },
     'reportes-cancelados': {title: 'Pedidos cancelados', subtitle: 'Reporte de órdenes canceladas por período'},
-=======
-    reportes:               { title: 'Reportes de ventas',     subtitle: 'Genera reportes de ventas por rango de fechas' },
-    bitacora:               { title: 'Bitácora',               subtitle: 'Registra actividad de inicio y cierre de sesión' },
->>>>>>> origin/main
   };
 
   const currentPage = pageTitles[activeSection ?? 'dashboard'];
@@ -306,61 +295,53 @@ export default function AdminLayout() {
                   );
                 }
 
-<<<<<<< HEAD
-                 if (item.label === 'Reportes') {
-  return (
-    <div key={item.label} className="mb-1">
-      <button
-        onClick={() => setReportesOpen(!reportesOpen)}
-        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px]
-        text-white/50 hover:text-white/80 hover:bg-white/5 transition-colors"
-      >
-        <span>{item.icon}</span>
-        <span className="flex-1 text-left">Reportes</span>
-        <ChevronRight
-          size={12}
-          className={`transition-transform ${reportesOpen ? 'rotate-90' : ''}`}
-        />
-      </button>
 
-      {reportesOpen && (
-        <div className="ml-7 mt-1 space-y-1">
-          <button
-            onClick={() => {
-              setActiveSection('reportes');
-              setSidebarOpen(false);
-            }}
-            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
-            transition-colors ${
-              activeSection === 'reportes'
-                ? 'bg-[#88b04b]/15 text-[#88b04b]'
-                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
-            }`}
-          >
-            Ventas por fecha
-          </button>
+                if (item.label === 'Reportes') {
+                  return (
+                    <div key={item.label} className="mb-1">
+                      <button
+                        onClick={() => setReportesOpen(!reportesOpen)}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px]
+                        text-white/50 hover:text-white/80 hover:bg-white/5 transition-colors"
+                      >
+                        <span>{item.icon}</span>
+                        <span className="flex-1 text-left">Reportes</span>
+                        <ChevronRight
+                          size={12}
+                          className={`transition-transform ${reportesOpen ? 'rotate-90' : ''}`}
+                        />
+                      </button>
 
-          <button
-            onClick={() => {
-              setActiveSection('reportes-cancelados');
-              setSidebarOpen(false);
-            }}
-            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
-            transition-colors ${
-              activeSection === 'reportes-cancelados'
-                ? 'bg-[#88b04b]/15 text-[#88b04b]'
-                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
-            }`}
-          >
-            Pedidos cancelados
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
+                      {reportesOpen && (
+                        <div className="ml-7 mt-1 space-y-1">
+                          <button
+                            onClick={() => { setActiveSection('reportes'); setSidebarOpen(false); }}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
+                            transition-colors ${
+                              activeSection === 'reportes'
+                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
+                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
+                            }`}
+                          >
+                            Ventas por fecha
+                          </button>
+                          <button
+                            onClick={() => { setActiveSection('reportes-cancelados'); setSidebarOpen(false); }}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
+                            transition-colors ${
+                              activeSection === 'reportes-cancelados'
+                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
+                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
+                            }`}
+                          >
+                            Pedidos cancelados
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
 
-=======
                 if (item.label === 'Mensajeros') {
                   return (
                     <div key={item.label} className="mb-1">
@@ -380,10 +361,7 @@ export default function AdminLayout() {
                       {mensajerosOpen && (
                         <div className="ml-7 mt-1 space-y-1">
                           <button
-                            onClick={() => {
-                              setActiveSection('mensajeros-desempeno');
-                              setSidebarOpen(false);
-                            }}
+                            onClick={() => { setActiveSection('mensajeros-desempeno'); setSidebarOpen(false); }}
                             className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
                             transition-colors ${
                               activeSection === 'mensajeros-desempeno'
@@ -398,7 +376,6 @@ export default function AdminLayout() {
                     </div>
                   );
                 }
->>>>>>> origin/main
 
                 const isActive = activeSection === item.section;
                 return (
@@ -511,14 +488,11 @@ export default function AdminLayout() {
           {/*Reportes de ventas*/}
           {activeSection === 'reportes' && <SalesReport />}
           {activeSection === 'bitacora' && <AccessLogPanel />}
-<<<<<<< HEAD
           
           {/* Reportes de pedidos cancelados — HU #163 */}
           {activeSection === 'reportes-cancelados' && <CancelledOrdersReport />}
-=======
           {/* ── HU #178 ── */}
           {activeSection === 'historial' && <OrderHistory />}
->>>>>>> origin/main
         </main>
 
       </div>
