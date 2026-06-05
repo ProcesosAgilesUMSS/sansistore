@@ -273,6 +273,10 @@
 - **Today:** Continuaré corrigiendo detalles de integración del mapa y validando que la funcionalidad funcione correctamente dentro del flujo del mensajero.
 - **Blockers:** Dudas puntuales sobre ajustes de Leaflet y manejo de coordenadas.
 
+*** 
+
+# Sprint 3
+
 ## 26-05-2026
 
 ### José Daniel Virreira Rufino
@@ -368,3 +372,11 @@
 - **Yesterday:** Trabaje en el bug de asignado
 - **Today:** Iniciar la HU correspondiente a este sprint.
 - **Blockers:** None
+
+## 04-06-2026
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Trabajé en los bugs asignados a mi persona encontrado por diferentes compañeros del equipo completo.
+- **Today:** Validaré que todas las funcionalidades (bugs e historias de usuario) trabajen correctamente para la presentación demo.
+- **None:** Los bugs corregidos necesitan validación extra para asegurarse de que todo funcione como debería.
+
