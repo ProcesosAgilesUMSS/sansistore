@@ -9,6 +9,7 @@ import {
   Sun,
   MapPin,
   Settings,
+  Package,
   User as UserIcon,
 } from 'lucide-react';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
@@ -27,14 +28,12 @@ import { clearLocalFavorites } from '../features/favorites';
 import { registrarAcceso } from '../features/admin/audit/services/accessLogService';
 
 type ThemeMode = 'light' | 'dark';
-
 const THEME_STORAGE_KEY = 'sansistore-theme';
 const INSTITUTIONAL_DOMAIN = 'umss.edu';
 
 const applyTheme = (theme: ThemeMode) => {
   document.documentElement.dataset.theme = theme;
   document.documentElement.style.colorScheme = theme;
-
   try {
     window.localStorage.setItem(THEME_STORAGE_KEY, theme);
   } catch {
@@ -60,13 +59,15 @@ function CartButton() {
     >
       <ShoppingBag
         size={18}
-        className={`transition-all duration-300 ease-out ${isAnimating ? 'text-primary opacity-100 scale-105' : ''
-          }`}
+        className={`transition-all duration-300 ease-out ${
+          isAnimating ? 'text-primary opacity-100 scale-105' : ''
+        }`}
       />
       <span
         key={totalUnits}
-        className={`absolute -top-1 -right-1 text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold border border-primary bg-primary text-bg-dark transition-transform duration-300 ease-out ${isAnimating ? 'scale-110' : 'scale-100'
-          }`}
+        className={`absolute -top-1 -right-1 text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold border border-primary bg-primary text-bg-dark transition-transform duration-300 ease-out ${
+          isAnimating ? 'scale-110' : 'scale-100'
+        }`}
       >
         {mounted ? (totalUnits > 99 ? '99+' : totalUnits) : 0}
       </span>
@@ -77,15 +78,16 @@ function CartButton() {
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const [userRoles, setUserRoles] = useState<string[]>([]);
   const [authError, setAuthError] = useState<string | null>(null);
   const [authReady, setAuthReady] = useState(false);
   const [theme, setTheme] = useState<ThemeMode>('light');
   const [themeReady, setThemeReady] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [loginMenuOpen, setLoginMenuOpen] = useState(false);
+  // FIX: Un solo estado de roles (eliminado userRoles duplicado)
   const [roles, setRoles] = useState<string[]>([]);
 
+  // FIX: Una sola lectura de Firestore por auth change
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
@@ -100,39 +102,21 @@ export default function Navbar() {
         setRoles([]);
       }
       setAuthReady(true);
-
-      if (!u) {
-        setUserRoles([]);
-        return;
-      }
-
-      getDoc(doc(db, 'users', u.uid))
-        .then((userSnap) => {
-          const roles = userSnap.data()?.roles;
-          setUserRoles(Array.isArray(roles) ? roles : []);
-        })
-        .catch(() => setUserRoles([]));
     });
     return unsub;
   }, []);
 
-  const canAccessCourier = userRoles.includes('mensajero');
-
+  // FIX: dependency array vacío — solo corre al montar, sin loop
   useEffect(() => {
-    const savedTheme = window.localStorage.getItem(
-      THEME_STORAGE_KEY
-    ) as ThemeMode | null;
+    const savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode | null;
     const currentTheme =
       savedTheme ||
       (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
-    if (currentTheme !== theme) {
-      setTheme(currentTheme);
-    }
+    setTheme(currentTheme);
     setThemeReady(true);
-  }, [theme]);
+  }, []);
 
-  //HU #159: registrar LOGOUT antes de cerrar sesión
-  //Solo se agregó el registro del acceso
+  // HU #159: registrar LOGOUT antes de cerrar sesión
   const handleLogout = () => {
     setProfileMenuOpen(false);
     setMenuOpen(false);
@@ -174,58 +158,55 @@ export default function Navbar() {
     setTheme(nextTheme);
   };
 
+  // Visibilidad por roles
   const showCompradorFeatures = !user || roles.length === 0 || roles.includes('comprador');
-  const showVendedorFeatures = user && roles.length > 0 && roles.some(r => ['vendedor', 'admin'].includes(r));
+  const showVendedorFeatures   = user && roles.length > 0 && roles.some(r => ['vendedor', 'admin'].includes(r));
   const showOperadorInvFeatures = user && roles.length > 0 && roles.some(r => ['operador_inv', 'admin'].includes(r));
-  const showMensajeroFeatures = user && roles.length > 0 && roles.some(r => ['mensajero', 'admin'].includes(r));
-  const showAdminFeatures = user && roles.length > 0 && roles.some(r => ['admin'].includes(r));
-  const showMisPedidos = user && roles.length > 0 && roles.some(r => ['comprador', 'admin'].includes(r));
+  const showMensajeroFeatures  = user && roles.length > 0 && roles.some(r => ['mensajero', 'admin'].includes(r));
+  const showAdminFeatures      = user && roles.length > 0 && roles.some(r => ['admin'].includes(r));
+  const showMisPedidos         = user && roles.length > 0 && roles.some(r => ['comprador', 'admin'].includes(r));
+  // FIX: canAccessCourier ahora usa el mismo estado `roles`
+  const canAccessCourier       = roles.includes('mensajero');
+
+  const navItems = [
+    { label: 'Productos',  href: '/productos',             show: showCompradorFeatures },
+    { label: 'Ordenes',    href: '/seller/created-orders', show: showVendedorFeatures },
+    { label: 'Inventario', href: '/inventory',             show: showOperadorInvFeatures },
+    { label: 'Entregas',   href: '/courier',               show: showMensajeroFeatures },
+    { label: 'Admin',      href: '/admin',                 show: showAdminFeatures },
+  ].filter(item => item.show);
 
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-bg-light/85 border-b border-border-light font-sans">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-14">
+
             {/* LOGO */}
-            <a
-              href="/"
-              className="font-black tracking-tight text-[16px] text-text-light"
-            >
+            <a href="/" className="font-black tracking-tight text-[16px] text-text-light">
               sansi<span className="text-primary">store</span>
             </a>
 
-            {/* LINKS */}
+            {/* DESKTOP LINKS */}
             <div className="hidden md:flex items-center gap-8">
-              {[
-                { label: 'Productos', href: '/productos', reqComprador: true },
-                { label: 'Ordenes', href: '/seller/created-orders', reqVendedor: true },
-                { label: 'Inventario', href: '/inventory', reqOperadorInv: true },
-                { label: 'Entregas', href: '/courier', reqMensajero: true },
-                { label: 'Admin', href: '/admin', reqAdmin: true },
-              ]
-                .filter(item => {
-                  if (item.reqComprador && !showCompradorFeatures) return false;
-                  if (item.reqVendedor && !showVendedorFeatures) return false;
-                  if (item.reqOperadorInv && !showOperadorInvFeatures) return false;
-                  if (item.reqMensajero && !showMensajeroFeatures) return false;
-                  if (item.reqAdmin && !showAdminFeatures) return false;
-                  return true;
-                })
-                .map((item) => (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    className="text-[13px] text-text-light opacity-[0.60] font-semibold tracking-[0.02em] transition-all hover:text-primary hover:opacity-100"
-                  >
-                    {item.label}
-                  </a>
-                ))}
+              {navItems.map((item) => (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  className="text-[13px] text-text-light opacity-[0.60] font-semibold tracking-[0.02em] transition-all hover:text-primary hover:opacity-100"
+                >
+                  {item.label}
+                </a>
+              ))}
             </div>
 
             {/* ACTIONS */}
             <div className="flex items-center gap-3">
+
               {/* CART */}
               {showCompradorFeatures && <CartButton />}
+
+              {/* DIRECCIONES (desktop) */}
               {authReady && user && showCompradorFeatures && (
                 <a
                   href="/location"
@@ -236,7 +217,7 @@ export default function Navbar() {
                 </a>
               )}
 
-              {/* THEME */}
+              {/* THEME TOGGLE */}
               <button
                 type="button"
                 aria-label="Cambiar tema"
@@ -252,10 +233,9 @@ export default function Navbar() {
                 </span>
               </button>
 
-              {/* AUTH */}
-              {authReady &&
-                (user ? (
-                  /* CORRECCIÓN DE ZONA MUERTA: Cambiado hidden sm:block por hidden md:block */
+              {/* AUTH — DESKTOP */}
+              {authReady && (
+                user ? (
                   <div className="relative hidden md:block">
                     <button
                       type="button"
@@ -276,8 +256,9 @@ export default function Navbar() {
                       </span>
                       <ChevronDown
                         size={14}
-                        className={`text-text-light opacity-50 transition-transform ${profileMenuOpen ? 'rotate-180' : ''
-                          }`}
+                        className={`text-text-light opacity-50 transition-transform ${
+                          profileMenuOpen ? 'rotate-180' : ''
+                        }`}
                       />
                     </button>
 
@@ -294,17 +275,16 @@ export default function Navbar() {
                           <UserIcon size={14} />
                           Mi Perfil
                         </a>
-
                         {showMisPedidos && (
                           <a
                             role="menuitem"
                             href="/mis-pedidos"
-                            className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
+                            className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light opacity-70 transition-colors hover:bg-border-light/40 hover:text-primary hover:opacity-100"
                           >
+                            <Package size={14} />
                             Mis pedidos
                           </a>
                         )}
-
                         {canAccessCourier && (
                           <a
                             role="menuitem"
@@ -314,7 +294,6 @@ export default function Navbar() {
                             Mensajero
                           </a>
                         )}
-
                         <a
                           role="menuitem"
                           href="/edit-profile"
@@ -323,7 +302,6 @@ export default function Navbar() {
                           <Settings size={14} />
                           Editar Datos Personales
                         </a>
-
                         <button
                           type="button"
                           role="menuitem"
@@ -348,10 +326,11 @@ export default function Navbar() {
                       <UserIcon size={18} className="text-text-light opacity-60" />
                       <ChevronDown
                         size={14}
-                        className={`text-text-light opacity-50 transition-transform ${loginMenuOpen ? 'rotate-180' : ''}`}
+                        className={`text-text-light opacity-50 transition-transform ${
+                          loginMenuOpen ? 'rotate-180' : ''
+                        }`}
                       />
                     </button>
-
                     {loginMenuOpen && (
                       <div
                         role="menu"
@@ -367,9 +346,10 @@ export default function Navbar() {
                       </div>
                     )}
                   </div>
-                ))}
+                )
+              )}
 
-              {/* MOBILE */}
+              {/* HAMBURGER */}
               <button
                 className="md:hidden text-text-light opacity-60 hover:text-primary"
                 onClick={() => setMenuOpen(!menuOpen)}
@@ -382,32 +362,20 @@ export default function Navbar() {
           {/* MOBILE MENU */}
           {menuOpen && (
             <div className="md:hidden py-3 flex flex-col gap-3 border-t border-border-light">
-              {[
-                { label: 'Productos', href: '/productos', reqComprador: true },
-                { label: 'Ordenes', href: '/seller/created-orders', reqVendedor: true },
-                { label: 'Inventario', href: '/inventory', reqOperadorInv: true },
-                { label: 'Entregas', href: '/courier', reqMensajero: true },
-                { label: 'Admin', href: '/admin', reqAdmin: true },
-              ]
-                .filter(item => {
-                  if (item.reqComprador && !showCompradorFeatures) return false;
-                  if (item.reqVendedor && !showVendedorFeatures) return false;
-                  if (item.reqOperadorInv && !showOperadorInvFeatures) return false;
-                  if (item.reqMensajero && !showMensajeroFeatures) return false;
-                  if (item.reqAdmin && !showAdminFeatures) return false;
-                  return true;
-                })
-                .map((item) => (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    className="text-[13px] text-text-light opacity-[0.55] font-semibold tracking-[0.02em] transition-all hover:text-primary hover:opacity-100"
-                  >
-                    {item.label}
-                  </a>
-                ))}
 
-              {user && showCompradorFeatures && (
+              {/* Nav links filtrados por rol */}
+              {navItems.map((item) => (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  className="text-[13px] text-text-light opacity-[0.55] font-semibold tracking-[0.02em] transition-all hover:text-primary hover:opacity-100"
+                >
+                  {item.label}
+                </a>
+              ))}
+
+              {/* FIX: Opciones de perfil visibles para CUALQUIER usuario autenticado en mobile */}
+              {user && (
                 <>
                   <a
                     href="/me"
@@ -415,14 +383,14 @@ export default function Navbar() {
                   >
                     Mi Perfil
                   </a>
-
-                  <a
-                    href="/location"
-                    className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
-                  >
-                    Mis direcciones
-                  </a>
-
+                  {showCompradorFeatures && (
+                    <a
+                      href="/location"
+                      className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
+                    >
+                      Mis direcciones
+                    </a>
+                  )}
                   {showMisPedidos && (
                     <a
                       href="/mis-pedidos"
@@ -431,7 +399,6 @@ export default function Navbar() {
                       Mis pedidos
                     </a>
                   )}
-
                   {canAccessCourier && (
                     <a
                       href="/courier"
@@ -440,16 +407,13 @@ export default function Navbar() {
                       Mensajero
                     </a>
                   )}
-
                   <hr className="border-border-light my-0.5" />
-
                   <a
                     href="/edit-profile"
                     className="text-[13px] font-semibold text-text-light opacity-[0.55] transition-all hover:text-primary hover:opacity-100"
                   >
                     Editar Datos Personales
                   </a>
-
                   <button
                     type="button"
                     onClick={handleLogout}
@@ -458,6 +422,16 @@ export default function Navbar() {
                     Cerrar sesión
                   </button>
                 </>
+              )}
+
+              {/* Login en mobile para no autenticados */}
+              {!user && authReady && (
+                <a
+                  href="/login"
+                  className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
+                >
+                  Iniciar sesión
+                </a>
               )}
             </div>
           )}
