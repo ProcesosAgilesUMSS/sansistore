@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { CheckCircle, X } from 'lucide-react';
 import { useAuthUser } from '../../../hooks/useAuthUser';
-import { getMyReturns, subscribeToMyOrders } from '../services/ordersService';
-import ReturnCard from './ReturnCard';
-import type { Order, ReturnRequest } from '../types';
+import { subscribeToMyOrders } from '../services/ordersService';
+import type { Order } from '../types';
 import OrderList from './OrderList';
 import { RotateCcw } from 'lucide-react';
 import { parseOrderId } from '../../cart/services/orderService';
@@ -30,6 +29,7 @@ export default function MyOrdersDashboard() {
       return;
     }
 
+    
     setLoading(true);
     initializedOrders.current = false;
     previousDeliveryState.current = new Map();
