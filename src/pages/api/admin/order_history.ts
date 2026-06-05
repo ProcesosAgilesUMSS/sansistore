@@ -139,7 +139,7 @@ export const GET: APIRoute = async ({ request }) => {
     if (!payment) {
       const payQuery = await adminDb
         .collection('payments')
-        .where('orderId', '==', orderId)
+        .where('orderId', '==', order.orderId)
         .limit(1)
         .get();
       if (!payQuery.empty) {
@@ -196,7 +196,7 @@ export const GET: APIRoute = async ({ request }) => {
     if (!delivery) {
       const delQuery = await adminDb
         .collection('deliveries')
-        .where('orderId', '==', orderId)
+        .where('orderId', '==', order.orderId)
         .limit(1)
         .get();
       if (!delQuery.empty) delivery = await resolveDelivery(delQuery.docs[0]);
