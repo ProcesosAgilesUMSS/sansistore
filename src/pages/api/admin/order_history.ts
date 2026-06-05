@@ -1,7 +1,6 @@
-// src/pages/api/admin/order_history.ts
-
 import type { APIRoute } from 'astro';
-import { adminDb, adminAuth } from '../../../lib/firebase-admin';
+import { adminDb, adminAuth } from '@/lib/firebase-admin';
+import { paymentMethodLabel } from '@/features/admin/pedidos/utils';
 
 const devBypassEnabled =
   import.meta.env.ENABLE_DEV_ADMIN_BYPASS === 'true' &&
@@ -217,7 +216,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     push('Pedido creado',        toISO(order.createdAt),   `Comprador: ${buyerName}`,            'info');
     push('Pedido confirmado',    toISO(order.confirmedAt), `Vendedor: ${sellerName}`,             'success');
-    push('Pago registrado',      payment?.registeredAt ?? null, payment ? `Método: ${payment.method}` : undefined, 'info');
+    push('Pago registrado',      payment?.registeredAt ?? null, payment ? `Método: ${paymentMethodLabel(payment.method)}` : undefined, 'info');
     push('Asignado a mensajero', delivery?.assignedAt  ?? null, delivery ? `Mensajero: ${delivery.courierName}` : undefined, 'info');
     push('Pedido recogido',      delivery?.pickedUpAt  ?? null, 'Mensajero recogió el pedido',    'info');
     push('En camino',            delivery?.inTransitAt ?? null, 'Mensajero en tránsito',          'info');

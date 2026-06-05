@@ -5,10 +5,10 @@ import {
   Search, Loader2, AlertCircle, CheckCircle2,
   XCircle, AlertTriangle, Info, ChevronDown,
 } from 'lucide-react';
-import { useOrderHistory } from '../hooks/useAdminOrderHistory';
-import { useOrdersList } from '../hooks/useOrdersList';
-import type { OrderHistory as OrderHistoryType, OrderSummary, TimelineEvent } from '../types';
-
+import { useOrderHistory } from '@features/admin/pedidos/hooks/useAdminOrderHistory';
+import { useOrdersList } from '@features/admin/pedidos/hooks/useOrdersList';
+import type { OrderHistory as OrderHistoryType, TimelineEvent } from '@features/admin/pedidos/types';
+import { paymentMethodLabel } from '@/features/admin/pedidos/utils';
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function fmt(iso?: string | null): string {
@@ -47,18 +47,6 @@ function fmtFull(iso?: string | null): string {
 // Siempre 2 decimales: Bs. 19.40
 function formatMoney(n: number): string {
   return `Bs. ${n.toFixed(2)}`;
-}
-
-// Traduce métodos de pago internos a texto legible
-function paymentMethodLabel(method: string): string {
-  const map: Record<string, string> = {
-    cash_on_delivery: 'Contra entrega',
-    cash:             'Efectivo',
-    transfer:         'Transferencia',
-    qr:               'QR',
-    card:             'Tarjeta',
-  };
-  return map[method] ?? method;
 }
 
 // Divide el orderId en uuid + friendlyId
