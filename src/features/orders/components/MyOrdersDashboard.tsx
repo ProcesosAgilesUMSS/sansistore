@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { CheckCircle, X } from 'lucide-react';
 import { useAuthUser } from '../../../hooks/useAuthUser';
-import { getMyReturns, subscribeToMyOrders } from '../services/ordersService';
-import ReturnCard from './ReturnCard';
-import type { Order, ReturnRequest } from '../types';
+import { subscribeToMyOrders } from '../services/ordersService';
+import type { Order } from '../types';
 import OrderList from './OrderList';
+import { RotateCcw } from 'lucide-react';
 import { parseOrderId } from '../../cart/services/orderService';
 
 const isDeliveredOrder = (order: Order) =>
@@ -14,9 +14,7 @@ const isDeliveredOrder = (order: Order) =>
 
 export default function MyOrdersDashboard() {
   const { user, authReady } = useAuthUser();
-  const [activeTab, setActiveTab] = useState<'orders' | 'returns'>('orders');
   const [orders, setOrders] = useState<Order[]>([]);
-  const [returns, setReturns] = useState<ReturnRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [deliveredNotification, setDeliveredNotification] = useState<Order | null>(null);
   const previousDeliveryState = useRef<Map<string, boolean>>(new Map());
@@ -27,22 +25,15 @@ export default function MyOrdersDashboard() {
 
     if (!user) {
       setOrders([]);
-      setReturns([]);
       setLoading(false);
       return;
     }
 
+    
     setLoading(true);
     initializedOrders.current = false;
     previousDeliveryState.current = new Map();
     setDeliveredNotification(null);
-
-    getMyReturns(user.uid)
-      .then(setReturns)
-      .catch((err) => {
-        console.error("Error cargando devoluciones:", err);
-        setReturns([]);
-      });
 
     const unsubscribe = subscribeToMyOrders(
       user.uid,
@@ -61,7 +52,6 @@ export default function MyOrdersDashboard() {
 
           if (newlyDelivered) {
             setDeliveredNotification(newlyDelivered);
-            setActiveTab('orders');
           }
 
           previousDeliveryState.current = new Map(
@@ -119,40 +109,20 @@ export default function MyOrdersDashboard() {
         </div>
       )}
 
-      <h1 className="text-3xl font-display font-extrabold mb-6 tracking-tight">
-        Mis Pedidos y Devoluciones
-      </h1>
-
-      <div className="flex gap-4 mb-8 border-b border-(--theme-border)">
-        <button
-          onClick={() => setActiveTab('orders')}
-          className={`pb-2.5 text-sm font-bold transition-all ${activeTab === 'orders' ? 'border-b-2 border-primary text-primary' : 'opacity-60 hover:opacity-100'}`}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <h1 className="text-3xl font-display font-extrabold tracking-tight">
+          Mis Pedidos
+        </h1>
+        <a
+          href="/my-returns"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-(--theme-border) text-sm font-bold opacity-70 hover:opacity-100 transition-all hover:bg-(--theme-secondary-bg)"
         >
-          Pedidos ({orders.length})
-        </button>
-        <button
-          onClick={() => setActiveTab('returns')}
-          className={`pb-2.5 text-sm font-bold transition-all ${activeTab === 'returns' ? 'border-b-2 border-primary text-primary' : 'opacity-60 hover:opacity-100'}`}
-        >
-          Devoluciones ({returns.length})
-        </button>
+          <RotateCcw size={15} />
+          Mis Devoluciones
+        </a>
       </div>
 
-      {activeTab === 'orders' ? (
-        <OrderList orders={orders} />
-      ) : (
-        <div className="flex flex-col gap-4">
-          {returns.length === 0 ? (
-            <div className="text-center py-12 border border-dashed border-(--theme-border) rounded-2xl opacity-60">
-              No tienes solicitudes de devolución actualmente.
-            </div>
-          ) : (
-            returns.map(ret => (
-              <ReturnCard key={ret.id} returnReq={ret} />
-            ))
-          )}
-        </div>
-      )}
+      <OrderList orders={orders} />
     </div>
   );
 }
