@@ -365,7 +365,11 @@
 - **Today:** Verifiqué las HUs en Done y dejé observaciones; la HU #20 (ver ubicación) cumple lo funcional pero su restricción de "solo pedidos asignados" está solo en la UI, parte de la deuda de reglas de Firestore abiertas.
 - **Blockers:** n/a.
 
-# 06/02/2026
+# 06/04/2026
+
+- **Yesterday:** Coordiné de manera presencial con el equipo de Flow la unificación del perfil `/me` y registré en el backlog la US contenedora (#490) con sus 5 sub-tasks (#491-#495) para el Sprint 4.
+- **Today:** Analicé y deprecé las issues redundantes del backlog (#23, #26 y #190) marcándolas con la etiqueta `duplicate` y editando sus títulos en GitHub.
+- **Blockers:** n/a.
 
 ## Gutierrez Hinojosa Jhon Deymar
 
