@@ -184,45 +184,49 @@ function OrdersList({
         <div className="px-5 py-10 text-center text-sm text-gray-300">No hay pedidos</div>
       ) : (
         <>
-          <div className="grid grid-cols-[1fr_110px_90px_100px_90px] gap-3 px-5 py-2.5
-            bg-gray-50 border-b border-gray-100 text-[10px] font-semibold uppercase
-            tracking-wider text-gray-400">
-            <span>Cliente</span>
-            <span>ID amigable</span>
-            <span className="text-right">Total</span>
-            <span>Estado</span>
-            <span>Fecha</span>
-          </div>
+          <div className="overflow-x-auto">
+            <div className="min-w-[640px]">
+              <div className="grid grid-cols-5 gap-3 px-5 py-2.5
+                bg-gray-50 border-b border-gray-100 text-[10px] font-semibold uppercase
+                tracking-wider text-gray-400">
+                <span>Cliente</span>
+                <span>ID amigable</span>
+                <span>Total</span>
+                <span>Estado</span>
+                <span>Fecha</span>
+              </div>
 
-          {orders.map((order) => {
-            const isSelected = order.orderId === selectedId;
-            const st = statusLabel(order.status);
-            const { friendly } = parseOrderId(order.orderId);
-            return (
-              <button
-                key={order.orderId}
-                onClick={() => onSelect(order.orderId)}
-                className={`w-full grid grid-cols-[1fr_110px_90px_100px_90px] gap-3 px-5 py-3
-                  border-b border-gray-50 last:border-0 text-left transition-colors
-                  ${isSelected
-                    ? 'bg-[#88b04b]/8 border-l-2 border-l-[#88b04b]'
-                    : 'hover:bg-gray-50'
-                  }`}
-              >
-                <span className="text-sm text-gray-800 font-medium truncate">
-                  {order.customerName}
-                </span>
-                <span className="text-xs text-gray-500 font-mono truncate">
-                  {friendly || order.orderId.slice(0, 8) + '…'}
-                </span>
-                <span className="text-sm font-semibold text-gray-700 text-right">
+              {orders.map((order) => {
+                const isSelected = order.orderId === selectedId;
+                const st = statusLabel(order.status);
+                const { friendly } = parseOrderId(order.orderId);
+                return (
+                  <button
+                    key={order.orderId}
+                    onClick={() => onSelect(order.orderId)}
+                    className={`w-full grid grid-cols-5 gap-3 px-5 py-3
+                      border-b border-gray-50 last:border-0 text-left transition-colors
+                      ${isSelected
+                        ? 'bg-[#88b04b]/8 border-l-2 border-l-[#88b04b]'
+                        : 'hover:bg-gray-50'
+                      }`}
+                  >
+                    <span className="text-sm text-gray-800 font-medium truncate">
+                      {order.customerName}
+                    </span>
+                    <span className="text-xs text-gray-500 font-mono truncate">
+                      {friendly || order.orderId.slice(0, 8) + '…'}
+                    </span>
+<span className="text-sm font-semibold text-gray-700">
                   {formatMoney(order.total)}
-                </span>
-                <span><Badge text={st.text} color={st.color} /></span>
-                <span className="text-xs text-gray-400">{fmtDate(order.createdAt)}</span>
-              </button>
-            );
-          })}
+                    </span>
+                    <span><Badge text={st.text} color={st.color} /></span>
+                    <span className="text-xs text-gray-400">{fmtDate(order.createdAt)}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           {hasMore && (
             <div className="px-5 py-3 border-t border-gray-50">
