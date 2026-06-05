@@ -146,10 +146,8 @@ export default function OrderDetailsPanel({
 
   const handleConfirmReception = async () => {
     if (!order.buyerId || order.buyerReceptionConfirmed) return;
-
     setIsConfirmingReception(true);
     setReceptionError(null);
-
     try {
       await confirmOrderReception(order.id, order.buyerId);
       const updatedOrder: Order = {
@@ -198,113 +196,109 @@ export default function OrderDetailsPanel({
   };
 
   const cardClass =
-    'bg-(--theme-card-bg) border border-(--theme-border) rounded-xl p-5 shadow-sm sm:p-6';
+    'bg-(--theme-card-bg) border border-(--theme-border) rounded-xl p-4 shadow-sm sm:p-5';
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
-      <div className="flex flex-col gap-5">
-        <div
-          className={`${cardClass} flex flex-col sm:flex-row sm:items-start justify-between gap-4`}
-        >
-          <div className="min-w-0">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-wider opacity-40">
-              {uuid}
-            </p>
-            <h2 className="mt-1 font-display font-extrabold text-2xl tracking-tight">
-              {friendlyName}
-            </h2>
-            <p className="mt-2 flex items-center gap-1.5 text-xs opacity-60">
-              <Calendar size={13} /> {formattedDate}
-            </p>
-          </div>
-          <span
-            className={`w-fit shrink-0 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${getStatusStyles(order.status)}`}
-          >
-            {getStatusLabel(order.status)}
-          </span>
-        </div>
-
-        <div className={`${cardClass} flex flex-col gap-4`}>
-          <div className="flex items-start gap-3">
-            <MapPin className="text-primary mt-0.5 shrink-0" size={18} />
-            <div>
-              <h4 className="text-sm font-bold mb-1">Ubicación de entrega</h4>
-              <p className="text-sm opacity-80">{order.delivery.destination}</p>
-            </div>
-          </div>
-          {order.secret && (
-            <div className="flex items-start gap-3 pt-4 border-t border-(--theme-border)">
-              <div className="flex items-center justify-center w-6 h-6 mt-0.5 shrink-0 rounded-full bg-primary/10 text-primary font-bold text-xs">
-                <span>#</span>
-              </div>
-              <div>
-                <h4 className="text-sm font-bold mb-1">
-                  Código de confirmación
-                </h4>
-                <p className="text-xl font-mono font-black tracking-widest text-primary">
-                  {order.secret}
+    <div className="w-full overflow-x-hidden">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
+        <div className="flex flex-col gap-4 min-w-0">
+          <div className={`${cardClass} flex flex-col gap-3`}>
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <p className="font-mono text-[10px] font-bold uppercase tracking-wider opacity-40 truncate">
+                  {uuid}
                 </p>
+                <h2 className="mt-1 font-display font-extrabold text-xl tracking-tight">
+                  {friendlyName}
+                </h2>
+              </div>
+              <span
+                className={`shrink-0 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${getStatusStyles(order.status)}`}
+              >
+                {getStatusLabel(order.status)}
+              </span>
+            </div>
+            <p className="flex items-center gap-1.5 text-xs opacity-60 flex-wrap">
+              <Calendar size={13} className="shrink-0" /> {formattedDate}
+            </p>
+          </div>
+
+          <div className={`${cardClass} flex flex-col gap-4`}>
+            <div className="flex items-start gap-3">
+              <MapPin className="text-primary mt-0.5 shrink-0" size={18} />
+              <div className="min-w-0">
+                <h4 className="text-sm font-bold mb-1">Ubicación de entrega</h4>
+                <p className="text-sm opacity-80 break-words">{order.delivery.destination}</p>
               </div>
             </div>
-          )}
-        </div>
+            {order.secret && (
+              <div className="flex items-start gap-3 pt-4 border-t border-(--theme-border)">
+                <div className="flex items-center justify-center w-6 h-6 mt-0.5 shrink-0 rounded-full bg-primary/10 text-primary font-bold text-xs">
+                  <span>#</span>
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold mb-1">
+                    Código de confirmación
+                  </h4>
+                  <p className="text-xl font-mono font-black tracking-widest text-primary">
+                    {order.secret}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
 
-        <div className={cardClass}>
-          <h3 className="font-bold mb-4 flex items-center gap-2">
-            <Package size={18} /> Productos comprados
-          </h3>
-          <div className="flex flex-col gap-2">
-            {order.items.map((item, idx) => (
-              <div
-                key={idx}
-                className="flex justify-between items-center gap-4 rounded-lg bg-(--theme-secondary-bg) px-3 py-3"
-              >
-                <div className="min-w-0 flex items-center gap-3">
+          <div className={cardClass}>
+            <h3 className="font-bold mb-4 flex items-center gap-2">
+              <Package size={18} /> Productos comprados
+            </h3>
+            <div className="flex flex-col gap-2">
+              {order.items.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center gap-3 rounded-lg bg-(--theme-secondary-bg) px-3 py-3 overflow-hidden"
+                >
                   <ProductThumbnail
                     imageUrl={item.imageUrl}
                     productName={item.productName}
                   />
-                  <div className="min-w-0 flex flex-col">
-                    <span className="truncate text-sm font-semibold">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold">
                       {item.productName}
-                    </span>
-                    <span className="text-xs opacity-60">
+                    </p>
+                    <p className="text-xs opacity-60">
                       {item.quantity} x {item.unitPrice?.toFixed(2)} Bs.
-                    </span>
+                    </p>
                   </div>
+                  <span className="shrink-0 text-sm font-bold">
+                    {item.subtotal?.toFixed(2)} Bs.
+                  </span>
                 </div>
-                <span className="shrink-0 text-sm font-bold">
-                  {item.subtotal?.toFixed(2)} Bs.
-                </span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
-      <aside className="flex flex-col gap-5 lg:sticky lg:top-24">
-        <div className={`${cardClass} bg-(--theme-card-bg)`}>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h3 className="font-bold flex items-center gap-2">
-                <CheckCircle size={18} /> Recepción del pedido
-              </h3>
-              <p className="mt-1 text-sm opacity-70">
-                {order.buyerReceptionConfirmed
-                  ? `Confirmada${receptionConfirmedAt ? ` el ${receptionConfirmedAt}` : ''}.`
-                  : isDeliveredOrder(order)
-                    ? 'Valida que recibiste el pedido correctamente.'
-                    : 'Disponible cuando el mensajero marque el pedido como entregado.'}
+        <aside className="flex flex-col gap-4 lg:sticky lg:top-24 min-w-0">
+          <div className={`${cardClass} bg-(--theme-card-bg)`}>
+            <h3 className="font-bold flex items-center gap-2 mb-2">
+              <CheckCircle size={18} /> Recepción del pedido
+            </h3>
+            <p className="text-sm opacity-70 mb-4">
+              {order.buyerReceptionConfirmed
+                ? `Confirmada${receptionConfirmedAt ? ` el ${receptionConfirmedAt}` : ''}.`
+                : isDeliveredOrder(order)
+                  ? 'Valida que recibiste el pedido correctamente.'
+                  : 'Disponible cuando el mensajero marque el pedido como entregado.'}
+            </p>
+            {receptionError && (
+              <p className="mb-3 text-sm font-semibold text-red-600">
+                {receptionError}
               </p>
-              {receptionError && (
-                <p className="mt-2 text-sm font-semibold text-red-600">
-                  {receptionError}
-                </p>
-              )}
-            </div>
+            )}
 
             {order.buyerReceptionConfirmed ? (
-              <span className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-bold text-primary">
+              <span className="flex w-full items-center justify-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-bold text-primary">
                 <CheckCircle size={15} /> Recepción confirmada
               </span>
             ) : canConfirmReception ? (
@@ -314,139 +308,125 @@ export default function OrderDetailsPanel({
                   setShowReceptionConfirm(true);
                   setReceptionError(null);
                 }}
-                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-(--theme-bg) transition-all hover:brightness-105 active:scale-95"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-(--theme-bg) transition-all hover:brightness-105 active:scale-95"
               >
                 <CheckCircle size={16} /> Confirmar recepción
               </button>
             ) : (
-              <span className="shrink-0 rounded-full border border-(--theme-border) px-4 py-2 text-xs font-bold uppercase tracking-wider opacity-55">
+              <span className="flex w-full items-center justify-center rounded-full border border-(--theme-border) px-4 py-2 text-xs font-bold uppercase tracking-wider opacity-55">
                 Pendiente de entrega
               </span>
             )}
+
+            {showReceptionConfirm && (
+              <div className="mt-4 rounded-xl border border-primary/30 bg-primary/10 p-4">
+                <p className="text-sm font-semibold">
+                  ¿Confirmas que recibiste este pedido en buen estado?
+                </p>
+                <p className="mt-1 text-xs opacity-70">
+                  Esta acción registrará la fecha y hora de confirmación y no
+                  podrá repetirse.
+                </p>
+                <div className="mt-4 flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={handleConfirmReception}
+                    disabled={isConfirmingReception}
+                    className="w-full rounded-full bg-primary px-5 py-2 text-sm font-bold text-(--theme-bg) transition hover:brightness-105 disabled:opacity-50"
+                  >
+                    {isConfirmingReception ? 'Confirmando...' : 'Sí, recibí el pedido'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowReceptionConfirm(false)}
+                    disabled={isConfirmingReception}
+                    className="w-full rounded-full border border-(--theme-border) px-4 py-2 text-sm font-bold transition hover:bg-(--theme-card-bg) disabled:opacity-50"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
-          {showReceptionConfirm && (
-            <div className="mt-4 rounded-xl border border-primary/30 bg-primary/10 p-4">
-              <p className="text-sm font-semibold">
-                ¿Confirmas que recibiste este pedido en buen estado?
-              </p>
-              <p className="mt-1 text-xs opacity-70">
-                Esta acción registrará la fecha y hora de confirmación y no
-                podrá repetirse.
-              </p>
-              <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
-                <button
-                  type="button"
-                  onClick={() => setShowReceptionConfirm(false)}
-                  disabled={isConfirmingReception}
-                  className="rounded-full border border-(--theme-border) px-4 py-2 text-sm font-bold transition hover:bg-(--theme-card-bg) disabled:opacity-50"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  onClick={handleConfirmReception}
-                  disabled={isConfirmingReception}
-                  className="rounded-full bg-primary px-5 py-2 text-sm font-bold text-(--theme-bg) transition hover:brightness-105 disabled:opacity-50"
-                >
-                  {isConfirmingReception
-                    ? 'Confirmando...'
-                    : 'Sí, recibí el pedido'}
-                </button>
-              </div>
+          {order.buyerReceptionConfirmed && (
+            <div className={cardClass}>
+              <DeliveryReviewStars order={order} />
             </div>
           )}
-        </div>
 
-        {order.buyerReceptionConfirmed && (
           <div className={cardClass}>
-            <DeliveryReviewStars order={order} />
-          </div>
-        )}
-
-        <div className={cardClass}>
-          {success ? (
-            <div className="bg-green-500/10 text-green-600 p-4 rounded-xl flex flex-col items-center justify-center gap-2 text-center">
-              <CheckCircle size={24} />
-              <span className="font-bold text-sm">
-                ¡Solicitud enviada con éxito!
-              </span>
-              <span className="text-xs opacity-80">
-                El equipo la revisará en breve.
-              </span>
-            </div>
-          ) : showReturnForm ? (
-            <div className="bg-(--theme-secondary-bg) p-4 rounded-xl flex flex-col gap-4 animate-in fade-in slide-in-from-top-4">
-              <h4 className="font-bold text-sm">Detalles de la devolución</h4>
-
-              <select
-                value={selectedProductId}
-                onChange={(e) => setSelectedProductId(e.target.value)}
-                className="w-full p-2.5 rounded-lg border border-(--theme-border) bg-(--theme-bg) text-sm"
-              >
-                <option value="">Selecciona el producto a devolver...</option>
-                {order.items.map((item) => (
-                  <option key={item.productId} value={item.productId}>
-                    {item.productName}
-                  </option>
-                ))}
-              </select>
-
-              <textarea
-                value={returnReason}
-                onChange={(e) => setReturnReason(e.target.value)}
-                placeholder="Explica brevemente el motivo de la devolución..."
-                className="w-full p-2.5 rounded-lg border border-(--theme-border) bg-(--theme-bg) text-sm resize-none h-24"
-              />
-
-              <div className="flex justify-end gap-3 mt-2">
-                <button
-                  onClick={() => setShowReturnForm(false)}
-                  className="px-4 py-2 text-sm font-bold opacity-60 hover:opacity-100"
+            {success ? (
+              <div className="bg-green-500/10 text-green-600 p-4 rounded-xl flex flex-col items-center justify-center gap-2 text-center">
+                <CheckCircle size={24} />
+                <span className="font-bold text-sm">¡Solicitud enviada con éxito!</span>
+                <span className="text-xs opacity-80">El equipo la revisará en breve.</span>
+              </div>
+            ) : showReturnForm ? (
+              <div className="flex flex-col gap-4">
+                <h4 className="font-bold text-sm">Detalles de la devolución</h4>
+                <select
+                  value={selectedProductId}
+                  onChange={(e) => setSelectedProductId(e.target.value)}
+                  className="w-full p-2.5 rounded-lg border border-(--theme-border) bg-(--theme-bg) text-sm"
                 >
-                  Cancelar
-                </button>
+                  <option value="">Selecciona el producto a devolver...</option>
+                  {order.items.map((item) => (
+                    <option key={item.productId} value={item.productId}>
+                      {item.productName}
+                    </option>
+                  ))}
+                </select>
+                <textarea
+                  value={returnReason}
+                  onChange={(e) => setReturnReason(e.target.value)}
+                  placeholder="Explica brevemente el motivo de la devolución..."
+                  className="w-full p-2.5 rounded-lg border border-(--theme-border) bg-(--theme-bg) text-sm resize-none h-24"
+                />
                 <button
                   onClick={handleSubmitReturn}
-                  disabled={
-                    !selectedProductId || !returnReason.trim() || isSubmitting
-                  }
-                  className="px-5 py-2 bg-primary text-(--theme-bg) rounded-full text-sm font-bold disabled:opacity-50 transition-all active:scale-95"
+                  disabled={!selectedProductId || !returnReason.trim() || isSubmitting}
+                  className="w-full px-5 py-2.5 bg-primary text-(--theme-bg) rounded-full text-sm font-bold disabled:opacity-50 transition-all active:scale-95"
                 >
                   {isSubmitting ? 'Enviando...' : 'Confirmar Devolución'}
                 </button>
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-              {canRequestReturn ? (
                 <button
-                  onClick={() => setShowReturnForm(true)}
-                  className="w-full sm:w-auto flex justify-center items-center gap-2 px-5 py-2.5 rounded-full border border-(--theme-text) text-sm font-bold transition-all hover:bg-(--theme-text) hover:text-(--theme-bg) active:scale-95"
+                  onClick={() => setShowReturnForm(false)}
+                  className="w-full px-4 py-2 text-sm font-bold opacity-60 hover:opacity-100 rounded-full border border-(--theme-border)"
                 >
-                  <AlertCircle size={16} /> Solicitar Devolución
+                  Cancelar
                 </button>
-              ) : (
-                <p className="text-xs opacity-50 italic">
-                  {!isDelivered
-                    ? 'Las devoluciones solo están disponibles para pedidos entregados.'
-                    : 'El plazo de 72 horas para devolver este pedido ha expirado.'}
-                </p>
-              )}
-
-              <div className="text-right w-full sm:w-auto mt-4 sm:mt-0">
-                <span className="text-xs uppercase tracking-wider opacity-60 font-bold mr-3">
-                  Total pagado
-                </span>
-                <span className="text-2xl font-display font-black text-primary">
-                  {order.total?.toFixed(2)}{' '}
-                  <small className="text-sm font-normal">Bs.</small>
-                </span>
               </div>
-            </div>
-          )}
-        </div>
-      </aside>
+            ) : (
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs uppercase tracking-wider opacity-60 font-bold">
+                    Total pagado
+                  </span>
+                  <span className="text-2xl font-display font-black text-primary">
+                    {order.total?.toFixed(2)}{' '}
+                    <small className="text-sm font-normal">Bs.</small>
+                  </span>
+                </div>
+                {canRequestReturn ? (
+                  <button
+                    onClick={() => setShowReturnForm(true)}
+                    className="w-full flex justify-center items-center gap-2 px-5 py-2.5 rounded-full border border-(--theme-text) text-sm font-bold transition-all hover:bg-(--theme-text) hover:text-(--theme-bg) active:scale-95"
+                  >
+                    <AlertCircle size={16} /> Solicitar Devolución
+                  </button>
+                ) : (
+                  <p className="text-xs opacity-50 italic">
+                    {!isDelivered
+                      ? 'Las devoluciones solo están disponibles para pedidos entregados.'
+                      : 'El plazo de 72 horas para devolver este pedido ha expirado.'}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }
