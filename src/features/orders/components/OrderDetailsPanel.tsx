@@ -90,6 +90,11 @@ const getStatusLabel = (status: string) => {
   return labels[status] || status;
 };
 
+const isDeliveredOrder = (order: Order) =>
+  order.status === 'ENTREGADO' ||
+  order.deliveryStatus === 'DELIVERED' ||
+  order.deliveryStatus === 'delivered';
+
 function formatDateTime(value: Order['buyerReceptionConfirmedAt']) {
   if (!value) return null;
   return value.toDate().toLocaleString('es-BO', {
@@ -137,7 +142,7 @@ export default function OrderDetailsPanel({
     order.deliveryStatus === 'DELIVERED';
   const canRequestReturn = isDelivered && isWithinTimeLimit;
   const receptionConfirmedAt = formatDateTime(order.buyerReceptionConfirmedAt);
-  const canConfirmReception = isDelivered && !order.buyerReceptionConfirmed;
+  const canConfirmReception = isDeliveredOrder(order) && !order.buyerReceptionConfirmed;
 
   const handleConfirmReception = async () => {
     if (!order.buyerId || order.buyerReceptionConfirmed) return;
@@ -287,7 +292,7 @@ export default function OrderDetailsPanel({
               <p className="mt-1 text-sm opacity-70">
                 {order.buyerReceptionConfirmed
                   ? `Confirmada${receptionConfirmedAt ? ` el ${receptionConfirmedAt}` : ''}.`
-                  : isDelivered
+                  : isDeliveredOrder(order)
                     ? 'Valida que recibiste el pedido correctamente.'
                     : 'Disponible cuando el mensajero marque el pedido como entregado.'}
               </p>

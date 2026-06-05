@@ -23,29 +23,66 @@ import type {
   ReturnRequest,
 } from '@features/orders/types';
 
-// --- Seller Actions ---
-
 export async function paidOrder(orderId: string): Promise<void> {
   const user = auth.currentUser;
   if (!user) throw new Error('No autenticado');
 
-  const orderRef = doc(db, 'orders', orderId);
-  const itemsSnapshot = await getDocs(collection(orderRef, 'orderItems'));
-  const items = itemsSnapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...(doc.data() as Omit<OrderItem, 'itemId'>),
+  const orderRef = doc(db, "orders", orderId);
+  const orderSnap = await getDoc(orderRef);
+  if (!orderSnap.exists()) {
+    throw new Error("El pedido no existe.");
+  }
+
+  const orderData = orderSnap.data() as Record<string, any>;
+  if (orderData.status !== "ENTREGADO") {
+    throw new Error("Solo se puede validar el pago de pedidos entregados.");
+  }
+
+  if (orderData.status === "PAGADO") {
+    throw new Error("El pedido ya fue cerrado como pagado.");
+  }
+
+  const itemsSnapshot = await getDocs(collection(orderRef, "orderItems"));
+  const items = itemsSnapshot.docs.map((itemDoc) => ({
+    id: itemDoc.id,
+    ...(itemDoc.data() as Omit<OrderItem, "itemId">),
   }));
 
-  await runTransaction(db, async (transaction) => {
-    // 1. Gather all reads
-    const invRefs = items.map((item) => doc(db, 'inventory', item.productId));
-    const invSnaps = await Promise.all(
-      invRefs.map((ref) => transaction.get(ref))
-    );
+  if (items.length === 0) {
+    throw new Error("El pedido no tiene productos asociados.");
+  }
 
-    // 2. Perform all writes
+  const paymentRef =
+    typeof orderData.paymentId === "string" && orderData.paymentId.trim()
+      ? doc(db, "payments", orderData.paymentId)
+      : null;
+
+  await runTransaction(db, async (transaction) => {
+    const invRefs = items.map(item => doc(db, "inventory", item.productId));
+    const invSnaps = await Promise.all(invRefs.map(ref => transaction.get(ref)));
+    const paymentSnap = paymentRef ? await transaction.get(paymentRef) : null;
+    const currentOrderSnap = await transaction.get(orderRef);
+
+    if (!currentOrderSnap.exists()) {
+      throw new Error("El pedido no existe.");
+    }
+
+    const currentOrder = currentOrderSnap.data();
+    if (currentOrder.status !== "ENTREGADO") {
+      throw new Error("El pedido ya no esta disponible para validar pago.");
+    }
+
+    if (currentOrder.status === "PAGADO") {
+      throw new Error("El pedido ya fue cerrado como pagado.");
+    }
+
     transaction.update(orderRef, {
-      status: 'PAGADO',
+      status: "PAGADO",
+      paymentStatus: "COBRADO",
+      paymentStatusLabel: "Cobrado",
+      paymentCollectedAt: serverTimestamp(),
+      verifiedAt: serverTimestamp(),
+      verifiedBy: user.uid,
       updatedAt: serverTimestamp(),
     });
 
@@ -61,12 +98,54 @@ export async function paidOrder(orderId: string): Promise<void> {
       const currentReserved = invData.stockReserved || 0;
       const qty = items[index].quantity || 0;
 
+      if (currentReserved < qty) {
+        throw new Error(
+          `Reserva insuficiente para el producto: ${items[index].productId}`
+        );
+      }
+
+      if (currentTotal < qty) {
+        throw new Error(
+          `Stock total insuficiente para el producto: ${items[index].productId}`
+        );
+      }
+
       transaction.update(invRefs[index], {
         stockTotal: currentTotal - qty,
         stockReserved: currentReserved - qty,
         updatedAt: serverTimestamp(),
       });
     });
+
+    if (paymentRef) {
+      if (paymentSnap?.exists()) {
+        transaction.update(paymentRef, {
+          status: "COBRADO",
+          statusLabel: "Cobrado",
+          amount: typeof currentOrder.total === "number" ? currentOrder.total : 0,
+          collectedAt: serverTimestamp(),
+          verifiedAt: serverTimestamp(),
+          collectedBy: user.uid,
+          verifiedBy: user.uid,
+          updatedAt: serverTimestamp(),
+        });
+      } else {
+        transaction.set(paymentRef, {
+          paymentId: orderData.paymentId,
+          orderId,
+          amount: typeof currentOrder.total === "number" ? currentOrder.total : 0,
+          method: currentOrder.paymentMethod ?? "cash_on_delivery",
+          status: "COBRADO",
+          statusLabel: "Cobrado",
+          collectedAt: serverTimestamp(),
+          verifiedAt: serverTimestamp(),
+          collectedBy: user.uid,
+          verifiedBy: user.uid,
+          registeredBy: currentOrder.sellerId ?? user.uid,
+          updatedAt: serverTimestamp(),
+        }, { merge: true });
+      }
+    }
   });
 }
 
@@ -104,8 +183,6 @@ export async function cancelOrder(
     });
   });
 }
-
-// --- Real-time Subscriptions ---
 
 export function subscribeToCreatedOrders(onUpdate: (orders: Order[]) => void) {
   const q = query(collection(db, 'orders'), where('status', '==', 'CREADO'));
@@ -148,8 +225,6 @@ export function subscribeToOrder(
 export async function getSentOrders(): Promise<Order[]> {
   return [];
 }
-
-// --- Internal Processing Logic ---
 
 async function processQuerySnapshot(
   querySnapshot: QuerySnapshot<DocumentData>
@@ -273,8 +348,6 @@ async function processQuerySnapshot(
   return orders.sort((a, b) => b.id.localeCompare(a.id));
 }
 
-// --- Buyer Actions (from main) ---
-
 export async function getOrderById(orderId: string): Promise<Order | null> {
   const orderRef = doc(db, 'orders', orderId);
   const orderSnap = await getDoc(orderRef);
@@ -364,6 +437,31 @@ export async function getMyOrders(userId: string): Promise<Order[]> {
   return processQuerySnapshot(querySnapshot);
 }
 
+export function subscribeToMyOrders(
+  userId: string,
+  onUpdate: (orders: Order[]) => void,
+  onError?: (error: Error) => void
+): Unsubscribe {
+  const q = query(
+    collection(db, "orders"),
+    where("buyerId", "==", userId),
+    orderBy("createdAt", "desc")
+  );
+
+  return onSnapshot(q, async (querySnapshot) => {
+    try {
+      const orders = await processQuerySnapshot(querySnapshot);
+      onUpdate(orders);
+    } catch (error) {
+      onError?.(
+        error instanceof Error
+          ? error
+          : new Error("No se pudieron escuchar tus pedidos.")
+      );
+    }
+  }, onError);
+}
+
 export async function confirmOrderReception(orderId: string, buyerId: string) {
   const orderRef = doc(db, 'orders', orderId);
 
@@ -430,9 +528,3 @@ export async function getMyReturns(userId: string): Promise<ReturnRequest[]> {
     ...doc.data(),
   })) as ReturnRequest[];
 }
-
-//Revisa @src/features/orders/components/OrderActions.tsx implementé un nuevo order.status === "ENTREGADO", actualizo una order con ese estado a "PAGADO",
-//   pero necesito ampliar el metodo que hace eso en @src/features/orders/services/ordersService.ts [el metodo paidOrder()), necesito que si la orden esta
-//   pagada, ademas de actualizar el estado de la orden (de ENTREGADO A PAGADO), necesito actualizar el inventario de los productos que tiene esa orden, por
-//   cada producto, deberia ir al inventario (que tienen el mismo atributo) y cuando actualizar stockTotal -= stockReserved (o tambien puede ser quantity de el
-//   orderItem) y stockReserved -= stockReserved
