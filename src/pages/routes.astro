@@ -1,0 +1,11 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar';
+import RoutesDashboard from '../features/mensajero/components/RoutesDashboard';
+---
+<Layout title="Rutas Disponibles | Sansistore">
+  <Navbar client:load />
+  <main class="pt-20 min-h-screen bg-(--theme-bg)">
+    <RoutesDashboard client:load />
+  </main>
+</Layout>

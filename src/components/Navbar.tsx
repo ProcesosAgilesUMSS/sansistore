@@ -10,6 +10,7 @@ import {
   MapPin,
   Settings,
   Package,
+  Navigation,
   User as UserIcon,
 } from 'lucide-react';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
@@ -202,6 +203,7 @@ export default function Navbar() {
                 { label: 'Ordenes', href: '/seller/created-orders', reqVendedor: true },
                 { label: 'Inventario', href: '/inventory', reqOperadorInv: true },
                 { label: 'Entregas', href: '/courier', reqMensajero: true },
+                { label: 'Rutas', href: '/routes', reqMensajero: true },
                 { label: 'Admin', href: '/admin', reqAdmin: true },
               ]
                 .filter(item => {
@@ -308,13 +310,23 @@ export default function Navbar() {
                         )}
 
                         {canAccessCourier && (
-                          <a
-                            role="menuitem"
-                            href="/courier"
-                          className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light opacity-70 transition-colors hover:bg-border-light/40 hover:text-primary hover:opacity-100"
-                          >
-                            Mensajero
-                          </a>
+                          <>
+                            <a
+                              role="menuitem"
+                              href="/courier"
+                              className="block px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
+                            >
+                              Mensajero
+                            </a>
+                            <a
+                              role="menuitem"
+                              href="/routes"
+                              className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light opacity-70 transition-colors hover:bg-border-light/40 hover:text-primary hover:opacity-100"
+                            >
+                              <Navigation size={14} />
+                              Rutas del Campus
+                            </a>
+                          </>
                         )}
 
                         <a

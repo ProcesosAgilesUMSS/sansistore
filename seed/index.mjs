@@ -7,6 +7,7 @@ import { locationList } from './data/locations.mjs';
 import { orderList } from './data/orders.mjs';
 import { deliveryList } from './data/deliveries.mjs';
 import { run as seedCartItems } from './data/cart.mjs';
+import { routeList } from './data/routes.mjs';
 
 process.env.FIRESTORE_EMULATOR_HOST =
   process.env.FIRESTORE_EMULATOR_HOST || '127.0.0.1:8080';
@@ -338,6 +339,21 @@ async function seedDeliveries() {
   console.log('deliveries seeded');
 }
 
+async function seedRoutes() {
+  for (const route of routeList) {
+    await setDoc('routes', route.id, {
+      zone: route.zone,
+      status: route.status,
+      estimatedTime: route.estimatedTime,
+      courierId: route.courierId,
+      startPoint: route.startPoint,
+      endPoint: route.endPoint,
+      createdAt: TS()
+    });
+  }
+  console.log('routes seeded');
+}
+
 async function main() {
   try {
     await seedAuthUsers();
@@ -348,6 +364,7 @@ async function main() {
     await seedLocations();
     await seedOrders();
     await seedDeliveries();
+    await seedRoutes();
   } catch (err) {
     console.error('seed failed:', err);
     process.exit(1);
