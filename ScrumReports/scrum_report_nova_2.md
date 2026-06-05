@@ -286,3 +286,32 @@
 - **Yesterday:** comence con el frontend de mi hu 178 y ver que necesitaria para el backend
 - **Today:** avance en el frontend y comence a hacer el backend a la par
 - **Blockers:** no se tienen las credenciales del usuario admin
+
+# 02/06/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+* **Yesterday:** estaba haciendo mi mockup de mi hu #163
+* **Today:** empece a hacer el fronted de mi hu #163
+* **Blockers:** none.
+
+## Fabricio Cordova Caceres 
+* **Yesterday:** empezo el desarrollo del frontend UH #164
+* **Today:** terminando detalles del frontend de us#164
+* **Blockers:** none.
+
+## Jherlan Marcelo Calero Sardan
+* **Yesterday:** termine con la parte del fronted de mi HU #159
+* **Today:** empece a hacer el backend de mi HU #159
+* **Blockers:** none.
+
+## Camila Wara Fernandez Sandoval 
+* **Yesterday:**  Revise los requerimientos de mi hu #160 y empecé con el desarrollo del front 
+* **Today:** Refinando últimos detalles del front de mi hu #160
+* **Blockers:** none.
+
+## Dylan Coca Beltran
+- **Yesterday:** termine el frontend de mi hu y revise algunos bugs 
+- **Today:** realice avances en el backend de mi hu y vi detalles con la db
+- **Blockers:** none

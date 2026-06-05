@@ -1,4 +1,4 @@
-import { FileLock, Package, PackageCheck, PackageOpen } from "lucide-react";
+import { FileBox, Package, PackageCheck, PackageOpen, PackageX } from "lucide-react";
 import LoadingMessage from "./LoadingMessage";
 import type { OrderStatus } from "../types";
 
@@ -15,7 +15,7 @@ export default function OrderStatusBadge({ status }: { status: OrderStatus }) {
   if (status === "RESERVADO") {
     return (
       <div className="flex items-center gap-2 text-xs">
-        <FileLock size={16} color="gray" />
+        <FileBox size={16} color="gray" />
         {status}
       </div>
     );
@@ -25,6 +25,15 @@ export default function OrderStatusBadge({ status }: { status: OrderStatus }) {
     return (
       <div className="flex items-center gap-2 text-xs">
         <Package size={18} color="#845C11" />
+        {status}
+      </div>
+    );
+  }
+
+  if (status === "NO ENTREGADO") {
+    return (
+      <div className="flex items-center gap-2 text-xs">
+        <PackageX size={19} color="#B91C1C" />
         {status}
       </div>
     );
@@ -50,7 +59,7 @@ export default function OrderStatusBadge({ status }: { status: OrderStatus }) {
   }
 
   return (
-    <div className="flex items-center gap-2 border border-black/10 px-2 py-0.5 rounded text-xs uppercase">
+    <div className="text-xs uppercase">
       {status}
     </div>
   );

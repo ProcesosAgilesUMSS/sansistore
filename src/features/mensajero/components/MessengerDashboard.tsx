@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-
+import PaymentSuccessModal from '../modals/PaymentSuccessModal';
 import {
     AlertTriangle,
     CheckCircle2,
@@ -31,6 +31,12 @@ import {
     sortAcceptedOrdersByAge,
     type AcceptedOrderSort,
 } from '../utils/acceptedOrderSorting';
+import {
+    getCollectedOrdersForDay,
+    getCollectedTotal,
+    getCollectedTotalForDay,
+    isMessengerOrderCollected,
+} from '../utils/collectionSummary';
 import UndeliveredModal from '../modals/UndeliveredModal';
 
 import CancelNoPaymentModal from '../modals/CancelNoPaymentModal';
@@ -708,6 +714,7 @@ export default function MessengerDashboard({
         useState<MessengerOrder | null>(null);
     const [savingCancelNoPayment, setSavingCancelNoPayment] = useState(false);
     const [confirmPaymentOrder, setConfirmPaymentOrder] = useState<MessengerOrder | null>(null);
+    const [paymentSuccessOrder, setPaymentSuccessOrder] = useState<MessengerOrder | null>(null);
     const [currentCourierId, setCurrentCourierId] = useState<string | null>(null);
     const [newOrderCount, setNewOrderCount] = useState(0);
     const [acceptedSortOrder, setAcceptedSortOrder] =
@@ -868,15 +875,24 @@ export default function MessengerDashboard({
     // ✅ MODIFICADO: Se agregó ordenamiento por fecha descendente
     const deliveredOrders = useMemo(
         () => orders
-            .filter((order) => order.deliveryStatus === 'delivered')
+            .filter(isMessengerOrderCollected)
             .sort((a, b) => {
-                const dateA = a.paymentCollectedAt || a.updatedAt || a.createdAt;
-                const dateB = b.paymentCollectedAt || b.updatedAt || b.createdAt;
+                const dateA = a.paymentCollectedAt;
+                const dateB = b.paymentCollectedAt;
                 if (!dateA || !dateB) return 0;
                 return dateB.getTime() - dateA.getTime();
             }),
         [orders]
     );
+    const todayCollectedOrders = useMemo(
+        () => getCollectedOrdersForDay(orders),
+        [orders]
+    );
+    const todayCollectedTotal = useMemo(
+        () => getCollectedTotalForDay(orders),
+        [orders]
+    );
+    const collectedTotal = useMemo(() => getCollectedTotal(orders), [orders]);
     
     const notDeliveredOrders = useMemo(
         () =>
@@ -954,9 +970,12 @@ const confirmPayment = async (order: MessengerOrder, secret: string) => {
     );
  
     try {
-        await registerMessengerCashPayment(order, currentCourierId);
-        setMessage('Pago en efectivo registrado y venta cerrada correctamente.');
-        setConfirmPaymentOrder(null);
+       await registerMessengerCashPayment(order, currentCourierId);
+
+            setConfirmPaymentOrder(null);
+
+            setPaymentSuccessOrder(order);
+            
     } catch (error) {
         console.error(error);
         setOrders((currentOrders) =>
@@ -1233,20 +1252,21 @@ const confirmPayment = async (order: MessengerOrder, secret: string) => {
                         <section className="messenger-summary-grid grid gap-5">
                             <SummaryCard
                                 icon={<CheckCircle2 size={20} />}
-                                label="Cantidad completados"
-                                value={deliveredOrders.length}
+                                label="Cobrados en la jornada"
+                                value={todayCollectedOrders.length}
                             />
+                          <SummaryCard
+                                icon={<CheckCircle2 size={20} />}
+                                label="Cobrado en la jornada"
+                                value={formatBolivianos(todayCollectedTotal)}
+                            />                
                             <SummaryCard
                                 featured
                                 icon={<DollarSign size={20} />}
                                 label="Total cobrado"
-                                value={formatBolivianos(
-                                    deliveredOrders.reduce(
-                                        (total, order) => total + order.cashToCollect,
-                                        0
-                                    )
-                                )}
+                                value={formatBolivianos(collectedTotal)}
                             />
+
                         </section>
 
                         <section className="mt-11">
@@ -1303,6 +1323,11 @@ const confirmPayment = async (order: MessengerOrder, secret: string) => {
                     onConfirm={confirmPayment}
                 />
             )}
+                {paymentSuccessOrder && (
+                    <PaymentSuccessModal
+                        onClose={() => setPaymentSuccessOrder(null)}
+                    />
+                )}
         </main>
     );
 }

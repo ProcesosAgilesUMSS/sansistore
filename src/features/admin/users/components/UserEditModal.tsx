@@ -73,8 +73,8 @@ export default function UserEditModal({
       setError("Ingrese un correo electrónico válido.");
       return;
     }
-    if (email.trim().split('@')[1] !== 'est.umss.edu') {
-      setError("Solo se permite el dominio @est.umss.edu.");
+    if (!email.trim().split('@')[1]?.endsWith('umss.edu')) {
+      setError("Solo se permite el dominio @umss.edu.");
       return;
     }
     if (phone && (phone.length !== 8 || !/^[67]/.test(phone))) {
