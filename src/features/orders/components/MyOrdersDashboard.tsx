@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { CheckCircle, X } from 'lucide-react';
 import { useAuthUser } from '../../../hooks/useAuthUser';
 import { getMyOrders } from '../services/ordersService';
 import type { Order } from '../types';
@@ -9,6 +10,9 @@ export default function MyOrdersDashboard() {
   const { user, authReady } = useAuthUser();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deliveredNotification, setDeliveredNotification] = useState<Order | null>(null);
+  const previousDeliveryState = useRef<Map<string, boolean>>(new Map());
+  const initializedOrders = useRef(false);
 
   useEffect(() => {
     if (authReady) {
@@ -25,7 +29,9 @@ export default function MyOrdersDashboard() {
       } else {
         setLoading(false);
       }
-    }
+    );
+
+    return unsubscribe;
   }, [user, authReady]);
 
   if (!authReady || loading) {

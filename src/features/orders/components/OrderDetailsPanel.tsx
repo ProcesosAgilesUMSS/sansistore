@@ -54,6 +54,11 @@ const getStatusLabel = (status: string) => {
   return labels[status] || status;
 };
 
+const isDeliveredOrder = (order: Order) =>
+  order.status === 'ENTREGADO' ||
+  order.deliveryStatus === 'DELIVERED' ||
+  order.deliveryStatus === 'delivered';
+
 function formatDateTime(value: Order['buyerReceptionConfirmedAt']) {
   if (!value) return null;
   return value.toDate().toLocaleString('es-BO', {

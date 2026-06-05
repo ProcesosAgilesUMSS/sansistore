@@ -395,6 +395,31 @@ export async function getMyOrders(userId: string): Promise<Order[]> {
   return processQuerySnapshot(querySnapshot);
 }
 
+export function subscribeToMyOrders(
+  userId: string,
+  onUpdate: (orders: Order[]) => void,
+  onError?: (error: Error) => void
+): Unsubscribe {
+  const q = query(
+    collection(db, "orders"),
+    where("buyerId", "==", userId),
+    orderBy("createdAt", "desc")
+  );
+
+  return onSnapshot(q, async (querySnapshot) => {
+    try {
+      const orders = await processQuerySnapshot(querySnapshot);
+      onUpdate(orders);
+    } catch (error) {
+      onError?.(
+        error instanceof Error
+          ? error
+          : new Error("No se pudieron escuchar tus pedidos.")
+      );
+    }
+  }, onError);
+}
+
 export async function confirmOrderReception(orderId: string, buyerId: string) {
   const orderRef = doc(db, "orders", orderId);
 
