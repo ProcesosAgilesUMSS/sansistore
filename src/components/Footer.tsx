@@ -10,7 +10,7 @@ export default function Footer() {
 
         {/* Copyright */}
         <p className="text-text-light opacity-[0.55] text-[12px] tracking-[0.02em]">
-          © 2025 Sansistore. Todos los derechos reservados.
+          © 2026 Sansistore. Todos los derechos reservados.
         </p>
 
         {/* Social links */}

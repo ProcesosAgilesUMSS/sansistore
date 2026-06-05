@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { FaCartPlus } from 'react-icons/fa';
 import { useCartContext } from '../../features/cart';
+import StockAlertButton from './StockAlertButton';
 import type { Product } from './types';
 import {
   formatPrice,
@@ -44,6 +45,9 @@ export default function ProductInfoSection({ product, loading }: ProductInfoSect
     descriptionText,
   } = getProductDerivedData(product);
 
+  const isDisabled = product.enabled === false;
+  const isOutOfStock = !isAvailable && !isDisabled;
+
   useEffect(() => {
     nameExpandedRef.current = nameExpanded;
   }, [nameExpanded]);
@@ -54,7 +58,9 @@ export default function ProductInfoSection({ product, loading }: ProductInfoSect
 
   useEffect(() => {
     const checkTitleTruncation = () => {
-      if (nameExpandedRef.current) return;
+      if (nameExpandedRef.current) {
+        return;
+      }
 
       const trimmedLength = product?.name.trim().length ?? 0;
       let nextNameTruncated = trimmedLength > PRODUCT_NAME_EXPAND_LENGTH;
@@ -87,7 +93,9 @@ export default function ProductInfoSection({ product, loading }: ProductInfoSect
 
   useEffect(() => {
     const checkDescriptionTruncation = () => {
-      if (descriptionExpandedRef.current) return;
+      if (descriptionExpandedRef.current) {
+        return;
+      }
 
       let nextDescriptionTruncated = descriptionText.length > PRODUCT_DESCRIPTION_EXPAND_LENGTH;
 
@@ -161,16 +169,27 @@ export default function ProductInfoSection({ product, loading }: ProductInfoSect
           </span>
         )}
       </div>
+
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <span
-          className={`product-detail-status-badge ${
-            isAvailable
-              ? 'product-detail-status-badge--available'
-              : 'product-detail-status-badge--unavailable'
-          }`}
-        >
-          {isAvailable ? 'Disponible' : 'Producto agotado'}
-        </span>
+        {isAvailable && (
+          <span className="inline-flex items-center rounded-full bg-green-600/15 px-3 py-1 text-xs font-semibold text-green-600 border border-green-600/20">
+            Disponible
+          </span>
+        )}
+        {isOutOfStock && (
+          <span className="inline-flex items-center rounded-full bg-red-600/15 px-3 py-1 text-xs font-semibold text-red-500 border border-red-500/20">
+            Producto agotado
+          </span>
+        )}
+        {isDisabled && (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-gray-600/15 px-3 py-1 text-xs font-semibold text-gray-400 border border-gray-500/20">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+            </svg>
+            No disponible
+          </span>
+        )}
         {isAvailable && (
           <span className="text-sm text-text-light opacity-70">
             Stock: {effectiveStock} disponibles
@@ -187,6 +206,9 @@ export default function ProductInfoSection({ product, loading }: ProductInfoSect
           <FaCartPlus size={16} />
           Agregar al carrito
         </button>
+      )}
+      {isOutOfStock && (
+        <StockAlertButton productId={product.id} />
       )}
 
       <div className="relative mt-6">
