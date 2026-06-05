@@ -37,6 +37,7 @@ import {
     getCollectedTotalForDay,
     isMessengerOrderCollected,
 } from '../utils/collectionSummary';
+import { formatBolivianos } from '../utils/money';
 import UndeliveredModal from '../modals/UndeliveredModal';
 
 import CancelNoPaymentModal from '../modals/CancelNoPaymentModal';
@@ -44,8 +45,6 @@ import './MessengerDashboard.css';
 import ConfirmPaymentModal from '../modals/Confirmpaymentmodal';
 
 const DEV_COURIER_ID = 'user-nadia';
-
-const formatBolivianos = (amount: number) => `Bs ${amount}`;
 
 const formatDate = (date: Date | null | undefined) => {
     if (!date) return 'Fecha no disponible';
