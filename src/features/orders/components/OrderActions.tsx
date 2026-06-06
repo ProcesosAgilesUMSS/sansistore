@@ -60,24 +60,23 @@ export default function OrderActions({
         {isSubmitting ? "Procesando..." : config.label}
       </button>
 
-      {/* Modal de confirmación de pago (Lógica de main) */}
       {showPaymentConfirm && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-[28px] bg-white p-6 shadow-2xl text-left">
+          <div className="w-full max-w-md rounded-[28px] bg-(--theme-card-bg) border border-(--theme-border) p-6 shadow-2xl text-left text-(--theme-text)">
             <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/15 text-primary">
               <span className="text-xl font-bold">$</span>
             </div>
-            <h3 className="text-[1.6rem] font-semibold text-[#222]">Validar pago del pedido</h3>
-            <p className="mt-3 text-[1rem] leading-7 text-[#666]">
+            <h3 className="text-[1.6rem] font-semibold text-(--theme-text)">Validar pago del pedido</h3>
+            <p className="mt-3 text-[1rem] leading-7 text-(--theme-text) opacity-70">
               Este pedido se marcará como pagado y se actualizará el inventario.
             </p>
-            <div className="mt-5 rounded-2xl border border-[#e7e2d8] px-4 py-3 text-sm text-[#777]">
+            <div className="mt-5 rounded-2xl border border-(--theme-border) px-4 py-3 text-sm text-(--theme-text) opacity-60">
               Esta acción no se puede deshacer.
             </div>
             <div className="mt-7 flex gap-3">
               <button
                 onClick={() => setShowPaymentConfirm(false)}
-                className="flex-1 rounded-full border border-[#ddd6c7] px-5 py-3 text-sm font-medium text-[#333] transition hover:bg-[#f7f4ee]"
+                className="flex-1 rounded-full border border-(--theme-border) px-5 py-3 text-sm font-medium text-(--theme-text) transition hover:bg-(--theme-secondary-bg)"
               >
                 Cancelar
               </button>
@@ -132,7 +131,7 @@ function CancelOrderSection({
     return (
       <div className="flex flex-col gap-2 mt-2">
         <textarea
-          className="w-full p-2 border border-black/20 rounded text-sm outline-none focus:border-red-500"
+          className="w-full p-2 border border-(--theme-border) bg-(--theme-bg) text-(--theme-text) rounded text-sm outline-none focus:border-red-500 transition-colors"
           placeholder="Escribe el motivo de la cancelación..."
           value={incidentNotes}
           onChange={(e) => setIncidentNotes(e.target.value)}
@@ -140,7 +139,7 @@ function CancelOrderSection({
         />
         <div className="flex justify-end gap-2">
           <button
-            className="px-3 py-1 text-sm text-black/50 hover:text-black border border-black/20 rounded"
+            className="px-3 py-1 text-sm text-(--theme-text) opacity-70 hover:opacity-100 hover:bg-(--theme-secondary-bg) border border-(--theme-border) rounded transition-colors"
             onClick={() => setShowCancelForm(false)}
             disabled={isSubmitting}
           >
