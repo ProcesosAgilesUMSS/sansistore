@@ -21,7 +21,6 @@ export default function CategoryList() {
   const [toast, setToast] = useState<{ type: 'ok' | 'err'; msg: string } | null>(null);
   const [modal, setModal] = useState<ModalState>({ type: 'none' });
   const [formName, setFormName] = useState('');
-  const [formDescription, setFormDescription] = useState('');
   const [formActive, setFormActive] = useState(true);
   const [formErrors, setFormErrors] = useState<{ name?: string }>({});
   const [formLoading, setFormLoading] = useState(false);
@@ -57,7 +56,6 @@ export default function CategoryList() {
 
   const openCreate = () => {
     setFormName('');
-    setFormDescription('');
     setFormActive(true);
     setFormErrors({});
     setShowDeleteConfirm(false);
@@ -66,7 +64,6 @@ export default function CategoryList() {
 
   const openEdit = (cat: Category) => {
     setFormName(cat.name);
-    setFormDescription(cat.description ?? '');
     setFormActive(cat.active);
     setFormErrors({});
     setShowDeleteConfirm(false);
@@ -91,7 +88,7 @@ export default function CategoryList() {
     if (!validate()) return;
     setFormLoading(true);
     try {
-      await createCategory({ name: formName, description: formDescription, active: formActive });
+      await createCategory({ name: formName, active: formActive });
       showToast('ok', `Categoría "${formName}" creada exitosamente.`);
       closeModal();
       await fetchCategories();
@@ -111,7 +108,6 @@ export default function CategoryList() {
     try {
       await updateCategory(modal.category.categoryId, {
         name: formName,
-        description: formDescription,
         active: formActive,
       });
       showToast('ok', `Categoría "${formName}" actualizada correctamente.`);
@@ -169,17 +165,6 @@ export default function CategoryList() {
     // ── bg-[var(--theme-bg)] reemplaza bg-[#FFFBF4]
     // El fondo de la página ahora responde al tema claro/oscuro
     <div className="min-h-screen bg-[var(--theme-bg)]">
-
-      {/* La nav siempre es oscura — es parte de la identidad de marca, no cambia con el tema */}
-      <nav className="bg-[#0A0B0D] px-4 h-14 flex items-center gap-3">
-        <a href="/admin" className="text-white/50 text-sm hover:text-white transition-colors">
-          &larr; Dashboard
-        </a>
-        <span className="text-white font-semibold text-sm">Categorías</span>
-        <span className="ml-auto text-[11px] font-semibold text-[#88B04B] border border-[#88B04B] px-2 py-0.5 rounded-full">
-          Área 7
-        </span>
-      </nav>
 
       <div className="max-w-2xl mx-auto px-4 py-6">
         <div className="flex items-start justify-between mb-5">
@@ -240,10 +225,6 @@ export default function CategoryList() {
               >
                 <div className="flex-1 min-w-0">
                   <div className="text-[13px] font-semibold text-[var(--theme-text)]">{cat.name}</div>
-                  {cat.description && (
-                    <div className="text-[11px] text-[var(--theme-text)]/60 mt-0.5 truncate">{cat.description}</div>
-                  )}
-                  {/* El ID en mono siempre tenue — es info técnica, no contenido principal */}
                   <div className="text-[9px] text-[var(--theme-text)]/30 font-mono mt-0.5">{cat.categoryId}</div>
                 </div>
 
@@ -332,20 +313,6 @@ export default function CategoryList() {
                 ) : (
                   <p className="text-[10px] text-[var(--theme-text)]/40 mt-1">Debe ser único en Firestore.</p>
                 )}
-              </div>
-
-              {/* Campo descripción */}
-              <div>
-                <label className="block text-[10px] font-semibold text-[var(--theme-text)]/50 uppercase tracking-wide mb-1.5">
-                  Descripción
-                </label>
-                <textarea
-                  value={formDescription}
-                  onChange={(e) => setFormDescription(e.target.value)}
-                  placeholder="Describe brevemente esta categoría..."
-                  rows={3}
-                  className="w-full bg-[var(--theme-secondary-bg)] border border-[var(--theme-border)] rounded-lg px-3 py-2.5 text-[13px] text-[var(--theme-text)] outline-none focus:border-[#88B04B] transition-colors placeholder:text-[var(--theme-text)]/40 resize-none"
-                />
               </div>
 
               {/* Campo estado */}

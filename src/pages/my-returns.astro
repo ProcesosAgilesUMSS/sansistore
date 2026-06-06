@@ -1,0 +1,14 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar';
+import RouteGuard from '../components/RouteGuard';
+import MyReturnsView from '../features/orders/components/MyReturnsView';
+---
+<Layout title="Mis Devoluciones | Sansistore">
+  <Navbar client:load />
+  <main class="pt-20 min-h-screen bg-(--theme-bg)">
+    <RouteGuard client:load allowedRoles={['comprador']} roleName="Comprador">
+      <MyReturnsView client:load />
+    </RouteGuard>
+  </main>
+</Layout>

@@ -2,14 +2,13 @@ import { useState } from 'react';
 import { CheckCircle2, KeyRound, X } from 'lucide-react';
 import type { MessengerOrder } from '../types';
 import { parseOrderId } from '../../cart/services/orderService';
+import { formatBolivianos } from '../utils/money';
 
 interface ConfirmPaymentModalProps {
     order: MessengerOrder;
     onClose: () => void;
     onConfirm: (order: MessengerOrder, secret: string) => Promise<void>;
 }
-
-const formatBolivianos = (amount: number) => `Bs ${amount}`;
 
 export default function ConfirmPaymentModal({
     order,
