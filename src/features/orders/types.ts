@@ -65,15 +65,37 @@ export interface Order {
   incidentReason?: string;
 }
 
-export type ReturnStatus = 'pending_review' | 'approved' | 'rejected';
+export type ReturnStatus =
+  | 'pending'
+  | 'approved'
+  | 'rejected'
+  | 'in_transit'
+  | 'completed';
+
+export type ReturnReason = 'damaged' | 'wrong_product' | 'unwanted' | 'other';
+
+export const RETURN_REASON_LABELS: Record<ReturnReason, string> = {
+  damaged: 'Producto dañado',
+  wrong_product: 'Producto incorrecto',
+  unwanted: 'No deseado',
+  other: 'Otro',
+};
+
+export interface ReturnItem {
+  productId: string;
+  productName: string;
+  quantity: number;
+}
 
 export interface ReturnRequest {
   id?: string;
   orderId: string;
   buyerId: string;
-  productId: string;
-  productName: string;
-  reason: string;
+  productId?: string;
+  productName?: string;
+  items: ReturnItem[];
+  reason: ReturnReason;
+  description?: string;
   status: ReturnStatus;
   createdAt: Timestamp;
 }

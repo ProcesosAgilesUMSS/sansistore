@@ -5,12 +5,13 @@ import {
   Calendar,
   AlertCircle,
   CheckCircle,
+  RotateCcw,
+  Info,
 } from 'lucide-react';
 import type { Order } from '../types';
-import {
-  confirmOrderReception,
-  createReturnRequest,
-} from '../services/ordersService';
+import type { ReturnReason, ReturnItem } from '../types';
+import { RETURN_REASON_LABELS } from '../types';
+import { confirmOrderReception, createReturnRequest } from '../services/ordersService';
 import { Timestamp } from 'firebase/firestore';
 import { parseOrderId } from '../../cart/services/orderService';
 import DeliveryReviewStars from './DeliveryReviewStars';
@@ -112,14 +113,19 @@ export default function OrderDetailsPanel({
   onOrderConfirmed,
 }: OrderDetailsPanelProps) {
   const { uuid, friendlyName } = parseOrderId(order.id);
-  const [showReturnForm, setShowReturnForm] = useState(false);
+
   const [showReceptionConfirm, setShowReceptionConfirm] = useState(false);
-  const [selectedProductId, setSelectedProductId] = useState<string>('');
-  const [returnReason, setReturnReason] = useState<string>('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmingReception, setIsConfirmingReception] = useState(false);
   const [receptionError, setReceptionError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+
+  const [showReturnForm, setShowReturnForm] = useState(false);
+  const [returnReason, setReturnReason] = useState<ReturnReason | ''>('');
+  const [description, setDescription] = useState('');
+  const [selectedItems, setSelectedItems] = useState<Record<string, number>>({});
+  const [quantityErrors, setQuantityErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [returnSuccess, setReturnSuccess] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const orderDate = order.createdAt.toDate();
   const formattedDate = orderDate.toLocaleDateString('es-BO', {
@@ -132,8 +138,7 @@ export default function OrderDetailsPanel({
   });
 
   const now = new Date();
-  const hoursSinceOrder =
-    (now.getTime() - orderDate.getTime()) / (1000 * 60 * 60);
+  const hoursSinceOrder = (now.getTime() - orderDate.getTime()) / (1000 * 60 * 60);
   const isWithinTimeLimit = hoursSinceOrder <= 72;
   const isDelivered =
     order.status === 'ENTREGADO' ||
@@ -160,39 +165,97 @@ export default function OrderDetailsPanel({
       setShowReceptionConfirm(false);
     } catch (error) {
       setReceptionError(
-        error instanceof Error
-          ? error.message
-          : 'No se pudo confirmar la recepción del pedido.'
+        error instanceof Error ? error.message : 'No se pudo confirmar la recepción del pedido.'
       );
     } finally {
       setIsConfirmingReception(false);
     }
   };
 
+  const handleItemQuantityChange = (
+    productId: string,
+    maxQty: number,
+    value: string
+  ) => {
+    const qty = parseInt(value, 10);
+    const newErrors = { ...quantityErrors };
+
+    if (isNaN(qty) || qty < 0) {
+      const next = { ...selectedItems };
+      delete next[productId];
+      setSelectedItems(next);
+      delete newErrors[productId];
+    } else if (qty > maxQty) {
+      newErrors[productId] = `No puedes devolver más de ${maxQty} unidad(es).`;
+      setSelectedItems({ ...selectedItems, [productId]: qty });
+    } else {
+      delete newErrors[productId];
+      if (qty === 0) {
+        const next = { ...selectedItems };
+        delete next[productId];
+        setSelectedItems(next);
+      } else {
+        setSelectedItems({ ...selectedItems, [productId]: qty });
+      }
+    }
+    setQuantityErrors(newErrors);
+  };
+
+  const selectedCount = Object.values(selectedItems).reduce((s, v) => s + v, 0);
+  const hasQuantityErrors = Object.keys(quantityErrors).length > 0;
+  const canSubmit = selectedCount > 0 && returnReason !== '' && !hasQuantityErrors && !isSubmitting;
+
   const handleSubmitReturn = async () => {
-    if (!selectedProductId || !returnReason.trim()) return;
+    if (!canSubmit) return;
     setIsSubmitting(true);
+    setSubmitError(null);
+
+    const items: ReturnItem[] = Object.entries(selectedItems)
+      .filter(([, qty]) => qty > 0)
+      .map(([productId, quantity]) => {
+        const orderItem = order.items.find((i) => i.productId === productId);
+        return {
+          productId,
+          productName: orderItem?.productName ?? 'Producto desconocido',
+          quantity,
+        };
+      });
+
+    for (const item of items) {
+      const ordered = order.items.find((i) => i.productId === item.productId);
+      if (ordered && item.quantity > ordered.quantity) {
+        setSubmitError(
+          `No puedes devolver más productos de los que pediste (${ordered.productName}: máx. ${ordered.quantity}).`
+        );
+        setIsSubmitting(false);
+        return;
+      }
+    }
+
     try {
-      const productToReturn = order.items.find(
-        (item) => item.productId === selectedProductId
-      );
-      await createReturnRequest({
+      const returnId = await createReturnRequest({
         orderId: order.id,
         buyerId: order.buyerId,
-        productId: selectedProductId,
-        productName: productToReturn?.productName || 'Producto desconocido',
-        reason: returnReason,
+        items,
+        reason: returnReason as ReturnReason,
+        description: description.trim() || undefined,
       });
-      setSuccess(true);
-      setTimeout(() => {
-        onBack();
-      }, 2000);
-    } catch (error) {
-      console.error(error);
-      alert('Hubo un error al procesar tu solicitud.');
+      setReturnSuccess(returnId);
+    } catch (err) {
+      console.error(err);
+      setSubmitError('Hubo un error al enviar tu solicitud. Inténtalo de nuevo.');
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleCancelReturnForm = () => {
+    setShowReturnForm(false);
+    setSelectedItems({});
+    setReturnReason('');
+    setDescription('');
+    setQuantityErrors({});
+    setSubmitError(null);
   };
 
   const cardClass =
@@ -237,9 +300,7 @@ export default function OrderDetailsPanel({
                   <span>#</span>
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold mb-1">
-                    Código de confirmación
-                  </h4>
+                  <h4 className="text-sm font-bold mb-1">Código de confirmación</h4>
                   <p className="text-xl font-mono font-black tracking-widest text-primary">
                     {order.secret}
                   </p>
@@ -263,9 +324,7 @@ export default function OrderDetailsPanel({
                     productName={item.productName}
                   />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold">
-                      {item.productName}
-                    </p>
+                    <p className="truncate text-sm font-semibold">{item.productName}</p>
                     <p className="text-xs opacity-60">
                       {item.quantity} x {item.unitPrice?.toFixed(2)} Bs.
                     </p>
@@ -292,9 +351,7 @@ export default function OrderDetailsPanel({
                   : 'Disponible cuando el mensajero marque el pedido como entregado.'}
             </p>
             {receptionError && (
-              <p className="mb-3 text-sm font-semibold text-red-600">
-                {receptionError}
-              </p>
+              <p className="mb-3 text-sm font-semibold text-red-600">{receptionError}</p>
             )}
 
             {order.buyerReceptionConfirmed ? (
@@ -324,8 +381,7 @@ export default function OrderDetailsPanel({
                   ¿Confirmas que recibiste este pedido en buen estado?
                 </p>
                 <p className="mt-1 text-xs opacity-70">
-                  Esta acción registrará la fecha y hora de confirmación y no
-                  podrá repetirse.
+                  Esta acción registrará la fecha y hora de confirmación y no podrá repetirse.
                 </p>
                 <div className="mt-4 flex flex-col gap-2">
                   <button
@@ -356,73 +412,143 @@ export default function OrderDetailsPanel({
           )}
 
           <div className={cardClass}>
-            {success ? (
-              <div className="bg-green-500/10 text-green-600 p-4 rounded-xl flex flex-col items-center justify-center gap-2 text-center">
+            <div className="flex items-center justify-between gap-2 mb-4">
+              <span className="text-xs uppercase tracking-wider opacity-60 font-bold">
+                Total pagado
+              </span>
+              <span className="text-2xl font-display font-black text-primary">
+                {order.total?.toFixed(2)}{' '}
+                <small className="text-sm font-normal">Bs.</small>
+              </span>
+            </div>
+
+            {returnSuccess ? (
+              <div className="bg-green-500/10 border border-green-500/20 text-green-600 p-4 rounded-xl flex flex-col items-center gap-2 text-center">
                 <CheckCircle size={24} />
-                <span className="font-bold text-sm">¡Solicitud enviada con éxito!</span>
-                <span className="text-xs opacity-80">El equipo la revisará en breve.</span>
+                <span className="font-bold text-sm">Tu solicitud ha sido enviada.</span>
+                <span className="text-xs opacity-80">Te contactaremos pronto.</span>
+                <span className="font-mono text-xs opacity-60 mt-1">
+                  ID: #{returnSuccess.substring(0, 8).toUpperCase()}
+                </span>
               </div>
             ) : showReturnForm ? (
               <div className="flex flex-col gap-4">
-                <h4 className="font-bold text-sm">Detalles de la devolución</h4>
-                <select
-                  value={selectedProductId}
-                  onChange={(e) => setSelectedProductId(e.target.value)}
-                  className="w-full p-2.5 rounded-lg border border-(--theme-border) bg-(--theme-bg) text-sm"
-                >
-                  <option value="">Selecciona el producto a devolver...</option>
-                  {order.items.map((item) => (
-                    <option key={item.productId} value={item.productId}>
-                      {item.productName}
-                    </option>
-                  ))}
-                </select>
-                <textarea
-                  value={returnReason}
-                  onChange={(e) => setReturnReason(e.target.value)}
-                  placeholder="Explica brevemente el motivo de la devolución..."
-                  className="w-full p-2.5 rounded-lg border border-(--theme-border) bg-(--theme-bg) text-sm resize-none h-24"
-                />
+                <h4 className="font-bold text-sm flex items-center gap-2">
+                  <RotateCcw size={16} /> Solicitar devolución
+                </h4>
+
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider opacity-60 mb-3">
+                    Productos a devolver
+                  </p>
+                  <div className="flex flex-col gap-3">
+                    {order.items.map((item) => {
+                      const qty = selectedItems[item.productId] ?? 0;
+                      return (
+                        <div
+                          key={item.productId}
+                          className={`flex items-center justify-between gap-3 p-3 rounded-xl border transition-colors ${qty > 0 ? 'border-primary/40 bg-primary/5' : 'border-(--theme-border) bg-(--theme-bg)'}`}
+                        >
+                          <div className="flex flex-col flex-1 min-w-0">
+                            <span className="text-sm font-medium truncate">{item.productName}</span>
+                            <span className="text-xs opacity-60">Comprado: {item.quantity} ud.</span>
+                            {quantityErrors[item.productId] && (
+                              <span className="text-xs text-red-500 mt-0.5">
+                                {quantityErrors[item.productId]}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <label className="text-xs opacity-60">Cant.:</label>
+                            <input
+                              type="number"
+                              min={0}
+                              max={item.quantity}
+                              value={qty === 0 ? '' : qty}
+                              placeholder="0"
+                              onChange={(e) =>
+                                handleItemQuantityChange(item.productId, item.quantity, e.target.value)
+                              }
+                              className="w-14 text-center text-sm font-bold border border-(--theme-border) rounded-lg px-2 py-1 bg-(--theme-bg) focus:outline-none focus:border-primary/50"
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {selectedCount > 0 && (
+                    <p className="text-xs text-primary font-semibold mt-2">
+                      {selectedCount} producto(s) seleccionado(s).
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider opacity-60 mb-2 block">
+                    Motivo <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={returnReason}
+                    onChange={(e) => setReturnReason(e.target.value as ReturnReason)}
+                    className="w-full p-2.5 rounded-lg border border-(--theme-border) bg-(--theme-bg) text-sm"
+                  >
+                    <option value="">Selecciona un motivo...</option>
+                    {(Object.entries(RETURN_REASON_LABELS) as [ReturnReason, string][]).map(
+                      ([val, label]) => (
+                        <option key={val} value={val}>{label}</option>
+                      )
+                    )}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider opacity-60 mb-2 block">
+                    Descripción <span className="opacity-50">(opcional)</span>
+                  </label>
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Describe el problema con más detalle..."
+                    className="w-full p-2.5 rounded-lg border border-(--theme-border) bg-(--theme-bg) text-sm resize-none h-20"
+                  />
+                </div>
+
+                {submitError && (
+                  <div className="flex items-start gap-2 text-red-500 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2.5">
+                    <AlertCircle size={16} className="mt-0.5 shrink-0" />
+                    <span className="text-xs font-semibold">{submitError}</span>
+                  </div>
+                )}
+
                 <button
                   onClick={handleSubmitReturn}
-                  disabled={!selectedProductId || !returnReason.trim() || isSubmitting}
-                  className="w-full px-5 py-2.5 bg-primary text-(--theme-bg) rounded-full text-sm font-bold disabled:opacity-50 transition-all active:scale-95"
+                  disabled={!canSubmit}
+                  className="w-full px-5 py-2.5 bg-primary text-(--theme-bg) rounded-full text-sm font-bold disabled:opacity-40 transition-all active:scale-95"
                 >
                   {isSubmitting ? 'Enviando...' : 'Confirmar Devolución'}
                 </button>
                 <button
-                  onClick={() => setShowReturnForm(false)}
+                  onClick={handleCancelReturnForm}
                   className="w-full px-4 py-2 text-sm font-bold opacity-60 hover:opacity-100 rounded-full border border-(--theme-border)"
                 >
                   Cancelar
                 </button>
               </div>
+            ) : canRequestReturn ? (
+              <button
+                onClick={() => setShowReturnForm(true)}
+                className="w-full flex justify-center items-center gap-2 px-5 py-2.5 rounded-full border border-(--theme-text) text-sm font-bold transition-all hover:bg-(--theme-text) hover:text-(--theme-bg) active:scale-95"
+              >
+                <RotateCcw size={16} /> Solicitar Devolución
+              </button>
+            ) : isDelivered ? (
+              <p className="text-xs opacity-50 italic flex items-center gap-1.5">
+                <Info size={14} /> El plazo para devolver este pedido ha expirado.
+              </p>
             ) : (
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs uppercase tracking-wider opacity-60 font-bold">
-                    Total pagado
-                  </span>
-                  <span className="text-2xl font-display font-black text-primary">
-                    {order.total?.toFixed(2)}{' '}
-                    <small className="text-sm font-normal">Bs.</small>
-                  </span>
-                </div>
-                {canRequestReturn ? (
-                  <button
-                    onClick={() => setShowReturnForm(true)}
-                    className="w-full flex justify-center items-center gap-2 px-5 py-2.5 rounded-full border border-(--theme-text) text-sm font-bold transition-all hover:bg-(--theme-text) hover:text-(--theme-bg) active:scale-95"
-                  >
-                    <AlertCircle size={16} /> Solicitar Devolución
-                  </button>
-                ) : (
-                  <p className="text-xs opacity-50 italic">
-                    {!isDelivered
-                      ? 'Las devoluciones solo están disponibles para pedidos entregados.'
-                      : 'El plazo de 72 horas para devolver este pedido ha expirado.'}
-                  </p>
-                )}
-              </div>
+              <p className="text-xs opacity-50 italic flex items-center gap-1.5">
+                <Info size={14} /> Las devoluciones solo están disponibles para pedidos entregados.
+              </p>
             )}
           </div>
         </aside>

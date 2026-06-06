@@ -92,15 +92,9 @@ export default function MyOrdersDashboard() {
   }
 
   const activeCount = orders.filter((order) =>
-    [
-      'CREADO',
-      'ASIGNADO',
-      'RESERVADO',
-      'PENDIENTE',
-      'EMPAQUETADO',
-      'LISTO',
-      'EN CAMINO',
-    ].includes(order.status)
+    ['CREADO', 'ASIGNADO', 'RESERVADO', 'PENDIENTE', 'EMPAQUETADO', 'LISTO', 'EN CAMINO'].includes(
+      order.status
+    )
   ).length;
 
   return (
@@ -113,9 +107,7 @@ export default function MyOrdersDashboard() {
                 <CheckCircle size={18} />
               </span>
               <div>
-                <p className="font-bold text-[#5f8134]">
-                  Tu pedido fue entregado
-                </p>
+                <p className="font-bold text-[#5f8134]">Tu pedido fue entregado</p>
                 <p className="mt-1 opacity-75">
                   Pedido {parseOrderId(deliveredNotification.id).friendlyName}
                 </p>
@@ -133,14 +125,8 @@ export default function MyOrdersDashboard() {
         </div>
       )}
 
-      <nav
-        aria-label="Ruta de navegación"
-        className="mb-6 flex items-center gap-2 text-sm"
-      >
-        <a
-          href="/"
-          className="font-semibold opacity-70 transition-opacity hover:opacity-100"
-        >
+      <nav aria-label="Ruta de navegación" className="mb-6 flex items-center gap-2 text-sm">
+        <a href="/" className="font-semibold opacity-70 transition-opacity hover:opacity-100">
           Inicio
         </a>
         <ChevronRight size={14} className="opacity-35" aria-hidden="true" />
@@ -152,15 +138,13 @@ export default function MyOrdersDashboard() {
       <section className="mb-5 rounded-xl border border-(--theme-border) bg-(--theme-card-bg) px-5 py-4 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-primary">
-              Compras
-            </p>
+            <p className="text-xs font-bold uppercase tracking-wider text-primary">Compras</p>
             <h1 className="mt-0.5 text-2xl font-display font-extrabold tracking-tight">
               Mis pedidos y devoluciones
             </h1>
             <p className="mt-1 max-w-2xl text-sm opacity-70">
-              Revisa el estado de tus compras, confirma la recepción y gestiona
-              devoluciones cuando corresponda.
+              Revisa el estado de tus compras, confirma la recepción y gestiona devoluciones cuando
+              corresponda.
             </p>
           </div>
 
@@ -168,22 +152,16 @@ export default function MyOrdersDashboard() {
             <div className="rounded-lg border border-(--theme-border) bg-(--theme-secondary-bg) px-3 py-2">
               <PackageCheck size={16} className="mb-1 text-primary" />
               <p className="text-xl font-display font-black">{orders.length}</p>
-              <p className="text-[10px] font-bold uppercase tracking-wider opacity-55">
-                Pedidos
-              </p>
+              <p className="text-[10px] font-bold uppercase tracking-wider opacity-55">Pedidos</p>
             </div>
             <div className="rounded-lg border border-(--theme-border) bg-(--theme-secondary-bg) px-3 py-2">
               <Truck size={16} className="mb-1 text-primary" />
               <p className="text-xl font-display font-black">{activeCount}</p>
-              <p className="text-[10px] font-bold uppercase tracking-wider opacity-55">
-                Activos
-              </p>
+              <p className="text-[10px] font-bold uppercase tracking-wider opacity-55">Activos</p>
             </div>
             <div className="rounded-lg border border-(--theme-border) bg-(--theme-secondary-bg) px-3 py-2">
               <RotateCcw size={16} className="mb-1 text-primary" />
-              <p className="text-2xl font-display font-black">
-                {returns.length}
-              </p>
+              <p className="text-2xl font-display font-black">{returns.length}</p>
               <p className="text-[10px] font-bold uppercase tracking-wider opacity-55">
                 Devoluciones
               </p>

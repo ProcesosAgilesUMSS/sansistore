@@ -502,11 +502,11 @@ export async function confirmOrderReception(orderId: string, buyerId: string) {
 
 export async function createReturnRequest(
   requestData: Omit<ReturnRequest, 'id' | 'createdAt' | 'status'>
-) {
+): Promise<string> {
   try {
     const docRef = await addDoc(collection(db, 'returns'), {
       ...requestData,
-      status: 'pending_review',
+      status: 'pending',
       createdAt: serverTimestamp(),
     });
     return docRef.id;
