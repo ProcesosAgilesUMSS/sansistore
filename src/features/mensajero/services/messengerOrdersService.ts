@@ -380,6 +380,7 @@ export async function markMessengerOrderAsNotDelivered({
 
   if (order.id) {
     await updateDoc(doc(db, 'orders', order.id), {
+      status: getOrderStatusForDeliveryStatus('not_delivered'),
       deliveryStatus: 'NOT_DELIVERED',
       updatedAt: serverTimestamp(),
     });
