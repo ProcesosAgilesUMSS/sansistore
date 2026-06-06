@@ -354,5 +354,5 @@ por las dudas que se tienen.
 ## Dayana Saleth Ortuño Guzman
 
 * **Yesterday:** Terminar mis Hus desigandas y revisar los avances de los otros grupo para ver como esta yendo el flujo.
-* **Today:** Ordene la tabla de github, asigne size y prioridad, tambien andaba revisando un poco los avances de los integrantes de mi grupo.
+* **Today:** Ordene la tabla de github, asigne size y prioridad, tambien andaba revisando un poco los avances de los integrantes de mi grupo y realice una tarea que es de localizar bien el boton de "Cancelar pedido"
 * **Blockers:** None.
