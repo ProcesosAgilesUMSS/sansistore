@@ -17,6 +17,7 @@ import { getCurrentZone } from '../../location/utils/zoneLimits';
 import type { MessengerOrder, MessengerOrderItem } from '../types';
 import { getVisibleMessengerOrders } from '../utils/orderVisibility';
 import {
+  assertCanTransitionDeliveryStatus,
   getOrderDeliveryStatusForDeliveryStatus,
   getOrderStatusForDeliveryStatus,
 } from '../utils/deliveryStatusFlow';
@@ -271,6 +272,8 @@ export async function setMessengerOrderStatus(
   order: MessengerOrder,
   status: DeliveryStatus
 ) {
+  assertCanTransitionDeliveryStatus(order.deliveryStatus, status);
+
   const deliveryRef = doc(db, 'deliveries', order.deliveryId);
   const dataToUpdate: Record<string, unknown> = {
     status,
