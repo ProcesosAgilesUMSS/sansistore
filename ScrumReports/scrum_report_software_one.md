@@ -406,3 +406,45 @@ También realice pruebas funcionales en entorno local sobre el flujo completo de
 - **Yesterday:** Apoyo en el Sprint Planning y refinamiento activo de Historias de Usuario, enfocándose en el desglose detallado de tareas (tasks).
 - **Today:** Organización y asignación de tareas del Sprint para el equipo, junto con la revisión técnica para comenzar el desarrollo.
 - **Blockers:** NONE
+
+
+# 02/06/ 2026
+## Daily Reports - Team 6 SoftwareOne
+
+
+### Llanos Vega Juan Carlos
+
+
+- **Yesterday:** Revisión de los bug presentados en los requerimientos reportados como pendientes para la continuación del desarrollo del proyecto.
+- **Today:** Actualización de los cambios al local desde la rama principal, resolución del issue #426 y realizamos code review grupal.
+- **Blockers:** Ninguno
+
+
+### Rodriguez Torrico Arnold Guery
+
+
+- **Yesterday:** Revisión de la arquitectura y del flujo necesario para implementar el requerimiento asignado.
+- **Today:** Trabajo y resolución del issue #81. Realizamos code review grupal.
+- **Blockers:** Ninguno.
+
+
+### Pereira Fiorilo Oliver Do Santos
+- **Yesterday:** Validación de algunos detalles pendientes en mi módulo y pruebas generales.
+- **Today:** Participación activa y realizamos code review grupal.
+- **Blockers:** Ninguno.
+
+
+### Paqui Rojas Aaron David
+
+
+- **Yesterday:** Análisis técnico y configuración del entorno local para abordar el ticket #84.
+- **Today:** Trabajo y resolución del issue #84. Realizamos code review grupal.
+- **Blockers:** Ninguno.
+
+
+### Gutiérrez Fuentes Alexander Raul
+
+
+- **Yesterday:** Diagnóstico y rastreo de varios bugs visuales que fueron reportados en la plataforma.
+- **Today:** Trabajo y resolución de los issues #425, #407 y #82. Realizamos code review grupal.
+- **Blockers:** NONE

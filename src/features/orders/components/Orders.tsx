@@ -9,6 +9,7 @@ import { ClosedFolderIcon, OpenFolderIcon } from "./Icons";
 import { X } from "lucide-react";
 import OrderStatusBadge from "./OrderStatusBadge";
 import Toast from "@features/admin/users/components/Toast";
+import { SectionHeader } from "../../seller/components/SectionHeader";
 
 export default function Orders() {
   const { user } = useAuthUser();
@@ -80,21 +81,23 @@ export default function Orders() {
           onNotification={showNotification}
         />
       ) : null}
-      <>
-        <ul className="grid grid-cols-18 mx-auto max-w-256 px-2">
-          <div className="relative mb-8 col-span-full">
+      <div className="px-4 pb-10 md:px-8 xl:px-10">
+        <section className="rounded-3xl border border-(--theme-border) bg-(--theme-card-bg) p-5 shadow-sm">
+          <SectionHeader title="Mis pedidos" count={filteredOrders.length} />
+          
+          <div className="relative mb-8 w-full border-b border-dotted border-(--theme-border) pb-4">
             <div ref={filterRef} className="w-fit">
-              <div className="flex items-center gap-x-2 text-sm w-fit cursor-pointer" onClick={() => setShowFilters(!showFilters)}>
+              <div className="flex items-center gap-x-2 text-sm font-medium w-fit cursor-pointer text-(--theme-text) opacity-80 hover:opacity-100 transition-opacity" onClick={() => setShowFilters(!showFilters)}>
                 {showFilters ? <ClosedFolderIcon /> : <OpenFolderIcon />}
-                Estado
+                Filtrar por estado
               </div>
 
               {selectedStatuses.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2 text-xs w-full items-center">
+                <div className="flex flex-wrap gap-2 mt-3 text-xs w-full items-center">
                   {selectedStatuses.map(status => (
                     <div
                       key={status}
-                      className="flex items-center gap-x-2 bg-black/10 hover:bg-black/20 cursor-pointer px-2"
+                      className="flex items-center gap-x-2 bg-(--theme-secondary-bg) border border-(--theme-border) hover:brightness-95 cursor-pointer px-2.5 py-1 rounded-full text-(--theme-text)"
                       onClick={() => toggleStatus(status)}
                     >
                       <X size={13} />
@@ -105,13 +108,13 @@ export default function Orders() {
               )}
 
               {showFilters && (
-                <div className=" bg-white border border-black/10  p-1 absolute z-10 w-[16ch]">
+                <div className="bg-(--theme-card-bg) border border-(--theme-border) shadow-xl rounded-xl p-2 absolute z-10 w-[18ch] top-full mt-2">
                   {(Object.entries(STATUS_LABELS) as [OrderStatus, string][])
                     .filter(([status]) => status !== 'CREADO')
                     .map(([status]) => (
                       <div
                         onClick={() => toggleStatus(status)}
-                        className={`flex text-xs gap-x-2 cursor-pointer hover:bg-black/10 ${selectedStatuses.includes(status) ? 'bg-black/10' : ''}`}
+                        className={`flex text-xs gap-x-2 cursor-pointer p-1.5 rounded-lg transition-colors hover:bg-(--theme-secondary-bg) ${selectedStatuses.includes(status as OrderStatus) ? 'bg-(--theme-secondary-bg)' : ''}`}
                       >
                         <OrderStatusBadge status={status} />
                       </div>
@@ -121,8 +124,8 @@ export default function Orders() {
             </div>
           </div>
 
-
-          <li className="hidden min-[765px]:grid grid-cols-subgrid col-span-full uppercase border-b border-black/20 text-xs py-0.5 mt-2">
+        <ul className="grid grid-cols-18 mx-auto w-full">
+          <li className="hidden min-[765px]:grid grid-cols-subgrid col-span-full uppercase border-b border-dotted border-(--theme-border) pb-3 mb-1 text-[10px] tracking-widest font-normal opacity-50">
             <div className="flex gap-x-2">
               <span>/</span>
               Orden
@@ -156,7 +159,8 @@ export default function Orders() {
             />
           ))}
         </ul>
-      </>
+        </section>
+      </div>
     </>
   );
 }

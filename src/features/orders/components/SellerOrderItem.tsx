@@ -14,14 +14,14 @@ export default function SellerOrderItem({ order, index, selectOrder }: Props) {
   return (
     <li
       onClick={selectOrder}
-      className="grid grid-cols-subgrid col-span-full border-b border-black/20 hover:bg-black/5 cursor-pointer py-0.5"
+      className="grid grid-cols-subgrid col-span-full border-b border-dotted border-(--theme-border) hover:bg-(--theme-secondary-bg) transition-colors cursor-pointer py-3 items-center"
     >
-      <div className="col-span-full min-[765px]:col-start-1 min-[765px]:col-end-3  flex items-center gap-x-2 text-xs">
-        <div className="size-2 bg-[#1e1e1e]" />
+      <div className="col-span-full min-[765px]:col-start-1 min-[765px]:col-end-3 flex items-center gap-x-2 text-sm font-mono">
+        <div className="size-1.5 bg-(--theme-text) opacity-70 shrink-0" />
         ORD-{(index + 1).toString().padStart(3, '0')}
       </div>
 
-      <div className="col-span-full min-[765px]:col-start-3 min-[765px]:col-end-11 truncate min-[965px]:col-end-9 uppercase">{order.address}</div>
+      <div className="col-span-full min-[765px]:col-start-3 min-[765px]:col-end-11 truncate min-[965px]:col-end-9 uppercase text-sm">{order.address}</div>
       <div className="col-span-full min-[765px]:col-start-11 min-[765px]:col-end-16 min-[965px]:col-start-9 min-[965px]:col-end-13 min-[765px]:ml-2 min-[960px]:ml-10  flex gap-x-2 items-center text-sm">
         <OrderStatusBadge status={order.status} />
       </div>
