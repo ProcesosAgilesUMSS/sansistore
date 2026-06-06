@@ -17,9 +17,9 @@ const { title = 'Sansistore | Vendedor' } = Astro.props;
   <Navbar client:load />
   <OrdersDock client:load transition:persist />
   <RouteGuard client:load allowedRoles={['vendedor']} roleName="Vendedor">
-    <main class="bg-(--theme-bg) pt-16 md:pt-20 font-['Inter',sans-serif]">
+    <main class="bg-(--theme-bg) pt-16 md:pt-20 font-['Inter',sans-serif] flex-1 flex flex-col w-full">
       <slot />
     </main>
   </RouteGuard>
-  <Footer client:load />
+  <Footer client:load className="pb-36 lg:pb-24" />
 </Layout>
