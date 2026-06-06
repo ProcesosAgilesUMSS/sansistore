@@ -93,7 +93,7 @@ export default function OrderDetailView({ orderId }: { orderId: string | undefin
       {order.status === "CANCELADO" &&
         <>
           <div className="col-start-1 col-end-4 max-[760px]:col-end-3 truncate text-sm text-text-light/50 leading-[120%]">Motivo:</div>
-          <div className="col-start-4 col-end-13 max-[760px]:col-start-3 max-[760px]:col-end-7 leading-[120%] mb-4 ">{order.incidentReason}</div>
+          <div className="col-start-4 col-end-13 max-[760px]:col-start-3 max-[760px]:col-end-7 leading-[120%] mb-4 ">{order.incidentNotes || order.incidentReason}</div>
         </>
       }
 
