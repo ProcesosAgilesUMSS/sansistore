@@ -7,15 +7,29 @@ import { locationList } from './data/locations.mjs';
 import { orderList } from './data/orders.mjs';
 import { deliveryList } from './data/deliveries.mjs';
 import { run as seedCartItems } from './data/cart.mjs';
+import { inventoryMovements } from './data/inventoryMovements.mjs';
 
-process.env.FIRESTORE_EMULATOR_HOST =
-  process.env.FIRESTORE_EMULATOR_HOST || '127.0.0.1:8080';
-process.env.FIREBASE_AUTH_EMULATOR_HOST =
-  process.env.FIREBASE_AUTH_EMULATOR_HOST || '127.0.0.1:9099';
+const isProduction = process.argv.includes('--production');
 
-admin.initializeApp({
-  projectId: process.env.PUBLIC_FIREBASE_PROJECT_ID || 'sansistore',
-});
+if (isProduction) {
+  if (!process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+    console.error("Missing FIREBASE_SERVICE_ACCOUNT_KEY in .env");
+    process.exit(1);
+  }
+  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+} else {
+  process.env.FIRESTORE_EMULATOR_HOST =
+    process.env.FIRESTORE_EMULATOR_HOST || '127.0.0.1:8080';
+  process.env.FIREBASE_AUTH_EMULATOR_HOST =
+    process.env.FIREBASE_AUTH_EMULATOR_HOST || '127.0.0.1:9099';
+  admin.initializeApp({
+    projectId: process.env.PUBLIC_FIREBASE_PROJECT_ID || 'sansistore',
+  });
+}
+
 const db = admin.firestore();
 const auth = admin.auth();
 
@@ -44,9 +58,14 @@ const clearCollection = async (collectionPath) => {
   const snapshot = await db.collection(collectionPath).get();
   if (snapshot.empty) return;
 
-  const batch = db.batch();
-  snapshot.docs.forEach((doc) => batch.delete(doc.ref));
-  await batch.commit();
+  if (isProduction) {
+    const ref = db.collection(collectionPath);
+    await db.recursiveDelete(ref);
+  } else {
+    const batch = db.batch();
+    snapshot.docs.forEach((doc) => batch.delete(doc.ref));
+    await batch.commit();
+  }
 };
 
 const buildOrderItems = (order) =>
@@ -59,6 +78,7 @@ const buildOrderItems = (order) =>
       itemId: `${order.id}-item-${idx + 1}`,
       productId: item.product.slug,
       productName: item.product.name,
+      imageUrl: item.product.imageUrl,
       unitPrice,
       quantity: item.quantity,
       subtotal,
@@ -68,7 +88,33 @@ const buildOrderItems = (order) =>
 const calculateOrderTotal = (order) =>
   buildOrderItems(order).reduce((sum, item) => sum + item.subtotal, 0);
 
+async function deleteAllAuthUsers() {
+  let totalDeleted = 0;
+  let pageToken;
+
+  try {
+    do {
+      const result = await auth.listUsers(1000, pageToken);
+      const usersToDelete = result.users.map((userRecord) => userRecord.uid);
+
+      if (usersToDelete.length > 0) {
+        await auth.deleteUsers(usersToDelete);
+        totalDeleted += usersToDelete.length;
+      }
+
+      pageToken = result.pageToken;
+    } while (pageToken);
+
+    if (totalDeleted > 0) {
+      console.log(`  ✓ Deleted ${totalDeleted} auth users.`);
+    }
+  } catch (error) {
+    console.error('Error deleting auth users:', error);
+  }
+}
+
 async function seedAuthUsers() {
+  console.log(isProduction ? '  Seeding auth users...' : '');
   for (const user of userList) {
     try {
       const existing = await auth.getUser(user.uid);
@@ -123,7 +169,7 @@ async function seedAuthUsers() {
       }
     }
   }
-  console.log('auth seeded');
+  if (!isProduction) console.log('auth seeded');
 }
 
 async function seedFirestoreUsers() {
@@ -267,7 +313,8 @@ async function seedOrders() {
       deliveryId: delivery?.code ?? null,
       paymentId: order.id,
       confirmedAt: toTimestamp(order.confirmedAt),
-      cancelledAt: isCancelled && order.failedAt ? toTimestamp(order.failedAt) : null,
+      cancelledAt:
+        isCancelled && order.failedAt ? toTimestamp(order.failedAt) : null,
       createdAt: toTimestamp(order.createdAt),
       updatedAt: toTimestamp(order.updatedAt),
     });
@@ -339,20 +386,51 @@ async function seedDeliveries() {
   console.log('deliveries seeded');
 }
 
-async function main() {
-  try {
-    await seedAuthUsers();
-    await seedFirestoreUsers();
-    await seedCategories();
-    await seedProducts();
-    await seedCartItems({ db });
-    await seedLocations();
-    await seedOrders();
-    await seedDeliveries();
-  } catch (err) {
-    console.error('seed failed:', err);
-    process.exit(1);
+async function seedMovements() {
+  for (const movement of inventoryMovements) {
+    await db.collection('inventoryMovements').add({
+      ...movement,
+      createdAt: toTimestamp(movement.createdAt),
+    });
+  }
+  console.log('inventory movements seeded');
+}
+
+async function clearAllData() {
+  console.log('\n Clearing existing data...');
+
+  console.log('  Deleting auth users...');
+  await deleteAllAuthUsers();
+
+  const collections = await db.listCollections();
+  for (const col of collections) {
+    console.log(`  Clearing ${col.id}...`);
+    await db.recursiveDelete(col);
   }
 }
 
-main();
+async function main() {
+  if (isProduction) {
+    console.log(' Starting production seed...\n');
+    await clearAllData();
+  }
+
+  await seedAuthUsers();
+  await seedFirestoreUsers();
+  await seedCategories();
+  await seedProducts();
+  await seedCartItems({ db });
+  await seedLocations();
+  await seedOrders();
+  await seedDeliveries();
+  await seedMovements();
+
+  if (isProduction) {
+    console.log('\n Production seed complete!\n');
+  }
+}
+
+main().catch((err) => {
+  console.error('seed failed:', err);
+  process.exit(1);
+});

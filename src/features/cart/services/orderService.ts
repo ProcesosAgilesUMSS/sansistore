@@ -1,5 +1,5 @@
 import { doc, serverTimestamp, writeBatch, increment } from 'firebase/firestore';
-import { v7 as uuidv7 } from 'uuid';
+import { v4 as uuidv7 } from 'uuid';
 import { db } from '../../../lib/firebase';
 import type { Location } from '../../location/types';
 import type { CartItemWithProduct } from '../types';

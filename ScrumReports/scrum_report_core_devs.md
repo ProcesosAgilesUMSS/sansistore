@@ -178,7 +178,7 @@
   ## Soliz Moya Alejandra
   - **Yesterday:**    Mejorar las US definidas
   - **Today:**        Colaborar en el diseño para visualizacion del stock
-  - **Blockers:**     ninguno
+  - **Blockers:**     Ninguno.
 
  
 
@@ -205,9 +205,9 @@
   - **Blockers:**     
 
   ## Soliz Moya Alejandra
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Revisé las historias de usuario seleccionadas para el Sprint 3.
+  - **Today:**        Analizar los requerimientos y criterios de aceptación de la US #51 (Historial de movimientos).
+  - **Blockers:**     Ninguno.
 
 
 
@@ -215,9 +215,9 @@
 # Daily Report
 # 05/26/2026
   ## Gonza Rojas Willian D.
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Se revisó los bugs reportados sobre la vista del salida de productos
+  - **Today:**        Se terminará de corregir los bugs y elegir y planificar el Sprint 3
+  - **Blockers:**     Modificaciones de ultimo momento, en el flujo con el inventario
 
   ## Llanos Villarroel Vania F.
   - **Yesterday:**  
@@ -235,9 +235,9 @@
   - **Blockers:**     
 
   ## Soliz Moya Alejandra
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Revisé los requerimientos de la US #51 y la información que deberá mostrarse.
+  - **Today:**        Colaborar en la definición de la visualización del historial de movimientos.
+  - **Blockers:**     Ninguno.
 
 
 
@@ -245,9 +245,9 @@
   # Daily Report
 # 05/28/2026
   ## Gonza Rojas Willian D.
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Se definio las US a desarrollar y se coordino con el equipo.
+  - **Today:**        Se tomo un bug reportado recientemente, respecto a la mucha informacion de la seccion de empaques.
+  - **Blockers:**     Se reportaron cambios de ultimo momento, se tardó mas de lo debido.
 
   ## Llanos Villarroel Vania F.
   - **Yesterday:**  
@@ -265,9 +265,9 @@
   - **Blockers:**     
 
   ## Soliz Moya Alejandra
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Colaboré en la revisión de la visualización propuesta para el historial de movimientos.
+  - **Today:**        Revisar posibles mejoras de interfaz y usabilidad en las vistas de inventario.
+  - **Blockers:**     Ninguno.
 
 
 
@@ -275,9 +275,9 @@
   # Daily Report
 # 06/02/2026
   ## Gonza Rojas Willian D.
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Se terminó de realizar el bug sobre la mucha informacion en la seccion de empaques, se estan corrigiendo algunos bugs extra sobre legibilidad de información.
+  - **Today:**        Se terminó de corregir bugs #451 y #453. 
+  - **Blockers:**     Se tardó mas de lo debido, todavia no se definió el flujo de pedidos cancelados o devueltos.
 
   ## Llanos Villarroel Vania F.
   - **Yesterday:**  
@@ -295,6 +295,6 @@
   - **Blockers:**     
 
   ## Soliz Moya Alejandra
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Revisé la presentación de información en las vistas del módulo de inventarios.
+  - **Today:**        Analizar los problemas de legibilidad reportados en los bugs #451 y #453.
+  - **Blockers:**     Ninguno.

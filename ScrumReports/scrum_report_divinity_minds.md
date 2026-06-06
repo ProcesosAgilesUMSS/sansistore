@@ -63,6 +63,7 @@
 - **Blockers:** n/a.
 
 ## Marcos Velasquez Vela
+
 - **Yesterday:** Preparé la base de datos de productos con descripciones, imágenes y reviews; además implementé la HU de detalle de producto con navegación desde el catálogo, vista por `slug`, carga directa desde Firestore y manejo de error.
 - **Today:** Realizar pruebas de la HU de detalle de producto y apoyar en la integración de las siguientes tareas del Sprint 1.
 - **Blockers:** n/a.
@@ -80,6 +81,7 @@
 - **Blockers:** n/a.
 
 ## Merino Vidal Mateo Alejandro
+
 - **Yesterday:** Implementé el filtro de productos por categoría (HU), incluyendo el componente `CategoryFilter` con dropdown de búsqueda, botón para quitar filtro, manejo de errores y mensajes de estado vacío, integrado en `FeaturedProducts` junto al buscador existente.
 - **Today:** Integración y corrección de detalles del filtro por categoría, asegurando que cumple todos los criterios de aceptación de la HU.
 - **Blockers:** n/a.
@@ -102,7 +104,6 @@
 - **Today:** Realizar integración final y correcciones visuales y funcionales en catálogo y detalle de producto, validando ofertas, navegación, estados de error y reseñas antes del merge.
 - **Blockers:** n/a.
 
-
 # 05/07/2026
 
 # Daily Report - Team 1
@@ -121,9 +122,9 @@
 
 ## Merudia Calderon Dayeza
 
- - **Yesterday:** Realicé pruebas para la lista de productos, incluyendo categorías, ofertas y el buscador.
- - **Today:** Me preparo para el siguiente sprint: revisión de pruebas, priorización de historias de usuario y planificación de tareas.
- - **Blockers:** n/a.
+- **Yesterday:** Realicé pruebas para la lista de productos, incluyendo categorías, ofertas y el buscador.
+- **Today:** Me preparo para el siguiente sprint: revisión de pruebas, priorización de historias de usuario y planificación de tareas.
+- **Blockers:** n/a.
 
 ## Merino Vidal Mateo Alejandro
 
@@ -136,7 +137,6 @@
 - **Yesterday:** Corregí los controles de expansión del detalle de producto (título y descripción), estabilicé la detección de overflow, ajusté la visibilidad del botón expandir y el alto de clamp; además actualicé dependencias menores.
 - **Today:** Validar los cambios en `ProductDetail` y apoyar la integración/QA antes del merge.
 - **Blockers:** n/a.
-
 
 # 05/12/2026
 
@@ -156,7 +156,7 @@
 
 ## Merudia Calderon Dayeza
 
-- **Yesterday:** Cerramos el Sprint 1 con la sesión de retrospectiva. Identificamos puntos de mejora grupal y preparamos las Historias de Usuario (HUs) para el siguiente ciclo.    
+- **Yesterday:** Cerramos el Sprint 1 con la sesión de retrospectiva. Identificamos puntos de mejora grupal y preparamos las Historias de Usuario (HUs) para el siguiente ciclo.
 - **Today:** Revisar a detalle las HUs del Sprint 2 e iniciar con el desglose y asignación de tareas para arrancar formalmente las actividades.
 - **Blockers:** n/a.
 
@@ -182,13 +182,13 @@
 
 ## Gutierrez Hinojosa Jhon Deymar
 
- - **Yesterday:** Trabajé en el commit e8cec3d9f9972d46dccdf5cb92b9596191eb927f: reestructuración de los seeders, actualización del setup/teardown del emulador y mejoras en las pruebas automatizadas.
- - **Today:** Definiré nuevas pruebas para la nueva HU y las tareas del Sprint 2.
- - **Blockers:** n/a.
+- **Yesterday:** Trabajé en el commit e8cec3d9f9972d46dccdf5cb92b9596191eb927f: reestructuración de los seeders, actualización del setup/teardown del emulador y mejoras en las pruebas automatizadas.
+- **Today:** Definiré nuevas pruebas para la nueva HU y las tareas del Sprint 2.
+- **Blockers:** n/a.
 
 ## Merudia Calderon Dayeza
 
-- **Yesterday:** Definí la HU "Gestión del carrito de compras" y seleccioné mis tareas asignadas.    
+- **Yesterday:** Definí la HU "Gestión del carrito de compras" y seleccioné mis tareas asignadas.
 - **Today:** Iniciaré el desarrollo de las tareas planificadas.
 - **Blockers:** n/a.
 
@@ -261,7 +261,6 @@
 - **Yesterday:** Finalicé las tareas para mostrar el total del carrito y para eliminar un producto del mismo.
 - **Today:** Realizar pruebas y revisiones en busca de errores previos a la demo.
 - **Blockers:** n/a.
-
 
 ## Velasquez Vela Marcos
 
@@ -364,3 +363,35 @@
 - **Yesterday:** Revisé el flujo de ver/editar perfil. Reporté el bug #469 (la vista `/me` existe pero no hay ningún botón que lleve a ella estando logueado) y reabrí el bug #441 (el arreglo del menú móvil se perdió en un merge del PR #468, la falla volvió a reproducir). También definí las HUs #24, #27 y #17 que estaban con la plantilla vacía, agregándoles criterios de aceptación.
 - **Today:** Verifiqué las HUs en Done y dejé observaciones; la HU #20 (ver ubicación) cumple lo funcional pero su restricción de "solo pedidos asignados" está solo en la UI, parte de la deuda de reglas de Firestore abiertas.
 - **Blockers:** n/a.
+
+# 06/04/2026
+
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Coordiné de manera presencial con el equipo de Flow la unificación del perfil `/me` y registré en el backlog la US contenedora (#490) con sus 5 sub-tasks (#491-#495) para el Sprint 4.
+- **Today:** Analicé y deprecé las issues redundantes del backlog (#23, #26 y #190) marcándolas con la etiqueta `duplicate` y editando sus títulos en GitHub.
+- **Blockers:** n/a.
+
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Revise pull request nuevos y reporte bugs de los mismos.
+- **Today:** Revisar si ya se completaron correctamente los bugs reportados previamente.
+- **Blockers:** n/a.
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:**  Ejecuté pruebas de regresión en los roles de operador y mensajero para validar su funcionalidad y flujos de trabajo
+- **Today:** Continuaré con las pruebas en otros roles del sistema para verificar su correcta integración con operador y mensajero.
+- **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Corregí bugs relacionados con la etiqueta de "Agotado", ajustando el cálculo de stock para reflejar correctamente la disponibilidad de los productos.
+- **Today:** Solucioné problemas de responsividad en las secciones de "Mis pedidos", mejorando la experiencia de usuario en distintos dispositivos. Además, corregí un bug en la funcionalidad de notificaciones al usuario, ajustando el cálculo de stock para que los avisos se envíen correctamente cuando un producto vuelve a estar disponible.
+- **Blockers:** Ninguno.
+
+## Velasquez Vela Marcos
+
+- **Yesterday:**
+- **Today:**
+- **Blockers:**
