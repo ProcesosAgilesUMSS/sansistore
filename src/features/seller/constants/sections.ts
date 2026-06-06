@@ -25,6 +25,11 @@ export const sections = [
     route: '/seller/rejected-orders',
   },
   {
+    id: 'no-entregados',
+    label: 'Pedidos no entregados',
+    route: '/seller/undelivered-orders',
+  },
+  {
     id: 'compra',
     label: 'Registrar Compra',
     route: '/seller/purchase'
