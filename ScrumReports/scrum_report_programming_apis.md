@@ -389,3 +389,9 @@
 - **Yesterday (04/06):** La HU que me asignaron ("Administrador, solo pedidos listos a delivery") resultó ser duplicada. Se reportó al ingeniero y se acordó descartarla del sprint por no aportar valor, ya que el vendedor ya tiene esa funcionalidad. Se realizó el análisis completo y la comunicación correspondiente.
 - **Today (05/06):** Cierre del sprint, preparación de documentación final y estar atento a la retrospectiva.
 - **Blockers:** None.
+
+### Adrian
+
+- **Yesterday:** Estuve trabajando en la hu asignada
+- **Today:** Termine de corregir un bug que salia.
+- **Blockers:** None.
