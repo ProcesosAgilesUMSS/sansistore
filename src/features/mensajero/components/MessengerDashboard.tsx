@@ -31,6 +31,7 @@ import {
     sortAcceptedOrdersByAge,
     type AcceptedOrderSort,
 } from '../utils/acceptedOrderSorting';
+import { getDeliveryStatusLabel } from '../utils/deliveryStatusFlow';
 import {
     getCollectedOrdersForDay,
     getCollectedTotal,
@@ -93,13 +94,17 @@ function CopyableOrderId({
 const getOrderDisplayId = (order: MessengerOrder) => parseOrderId(order.id).friendlyName;
 
 const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']) => {
-    if (status === 'assigned') return 'Asignado';
-    if (status === 'accepted') return 'Aceptado';
-    if (status === 'pending_reassignment') return 'Pendiente de reasignacion';
-    if (status === 'in_transit') return 'En camino';
-    if (status === 'not_delivered') return 'No entregado';
-    if (status === 'cancelled') return 'Cancelado';
-    return 'Entregado';
+    return getDeliveryStatusLabel(status);
+};
+
+const getStatusUpdateMessage = (status: MessengerOrder['deliveryStatus']) => {
+    if (status === 'accepted') return 'Pedido aceptado correctamente.';
+    if (status === 'in_transit') return 'Entrega iniciada correctamente.';
+    if (status === 'pending_reassignment') {
+        return 'Pedido rechazado y enviado a reasignacion.';
+    }
+
+    return `Estado actualizado a ${getDeliveryStatusLabel(status)}.`;
 };
 
 const buildBuyerMapUrl = (order: MessengerOrder) => {
@@ -950,7 +955,7 @@ export default function MessengerDashboard({
 
         try {
             await setMessengerOrderStatus(targetOrder, status);
-            setMessage('Estado actualizado correctamente.');
+            setMessage(getStatusUpdateMessage(status));
         } catch (error) {
             console.error(error);
             setMessage('No se pudo actualizar el estado en Firestore.');
