@@ -368,7 +368,7 @@
 - **Today:** Terminar la Hu de este sprint 
 - **Blockers:** None
 
-## Adrian Said Andrade Medina
+### Adrian Said Andrade Medina
 - **Yesterday:** Trabaje en el bug de asignado
 - **Today:** Iniciar la HU correspondiente a este sprint.
 - **Blockers:** None
