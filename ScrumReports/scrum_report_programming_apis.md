@@ -395,3 +395,9 @@
 - **Yesterday:** Estuve trabajando en la hu asignada
 - **Today:** Termine de corregir un bug que salia.
 - **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+
+- **Yesterday:** Trabaje en mis HU asignadas y mi issue asignado
+- **Today:** Preveo terminar mi HU y bug asignado
+- **Blockers:** None.
