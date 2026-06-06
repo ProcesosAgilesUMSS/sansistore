@@ -8,28 +8,18 @@ type: Bug
 
 ---
 
-## Resumen
-
-<!-- Describe el problema en 1 o 2 frases. -->
+## Pasos para reproducir
+1.
 
 ## Resultado esperado
-
 <!-- ¿Qué debería pasar? -->
 
-## Resultado obtenido
-
+## Resultado actual
 <!-- ¿Qué pasó realmente? Incluye mensajes de error si existen. -->
 
-## Pasos para reproducir
-
-1.
-2.
-3.
+## Evidencia
+<!-- Adjunta capturas, videos, logs o enlaces útiles. -->
 
 ## Entorno
 - Sistema operativo: <!-- Linux (64 bits) -->
 - Navegador: <!--Chrome 148.0.7778.178 (Official Build) (64-bit) -->
-
-## Evidencia
-
-<!-- Adjunta capturas, videos, logs o enlaces útiles. -->
