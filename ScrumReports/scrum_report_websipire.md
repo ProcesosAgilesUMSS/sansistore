@@ -348,3 +348,11 @@ por las dudas que se tienen.
 * **Yesterday:** Avancé con la implementación de la HU asignada, desarrollando las funcionalidades principales y verificando su integración con los componentes relacionados.
 * **Today:** Continuaré realizando ajustes en la implementación, ejecutando pruebas y validando que la funcionalidad cumpla con los criterios de aceptación establecidos.
 * **Blockers:** none
+
+# Daily Reports - Team 3 Webspire 04/06/26
+
+## Dayana Saleth Ortuño Guzman
+
+* **Yesterday:** Terminar mis Hus desigandas y revisar los avances de los otros grupo para ver como esta yendo el flujo.
+* **Today:** Ordene la tabla de github, asigne size y prioridad, tambien andaba revisando un poco los avances de los integrantes de mi grupo.
+* **Blockers:** None.
