@@ -113,6 +113,7 @@ classDiagram
     +string uid
     +string email
     +string displayName
+    +string phoneNumber
     +array roles
     +string institutionalId
     +boolean isActive
