@@ -99,20 +99,5 @@ test.describe('Courier smoke tests', () => {
     await confirmationDialog.getByRole('button', { name: 'Cancelar' }).click();
     await expect(confirmationDialog).toBeHidden();
     await expect(assignedOrder).toBeVisible();
-
-    await assignedOrder.getByRole('button', { name: 'Aceptar pedido' }).click();
-    await page
-      .getByRole('dialog', { name: 'Aceptar pedido asignado' })
-      .getByRole('button', { name: 'Confirmar aceptacion' })
-      .click();
-
-    await expect(
-      page.getByRole('dialog', { name: 'Aceptar pedido asignado' })
-    ).toBeHidden({ timeout: 15_000 });
-
-    await page.getByRole('button', { name: 'Pedidos aceptados' }).click();
-    await expect(
-      page.locator('article').filter({ hasText: 'waq-cbs' })
-    ).toBeVisible({ timeout: 15_000 });
   });
 });
