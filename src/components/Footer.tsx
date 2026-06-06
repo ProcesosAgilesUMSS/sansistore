@@ -1,6 +1,6 @@
-export default function Footer() {
+export default function Footer({ className = '' }: { className?: string }) {
   return (
-    <footer className="border-t border-border-light bg-bg-light font-sans">
+    <footer className={`border-t border-border-light bg-bg-light font-sans ${className}`}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 flex flex-col sm:flex-row items-center justify-between gap-6">
 
         {/* Brand */}
