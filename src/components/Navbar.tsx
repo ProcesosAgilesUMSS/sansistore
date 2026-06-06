@@ -9,6 +9,7 @@ import {
   Sun,
   MapPin,
   Settings,
+  Package,
   User as UserIcon,
 } from 'lucide-react';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
@@ -135,6 +136,7 @@ export default function Navbar() {
   //Solo se agregó el registro del acceso
   const handleLogout = () => {
     setProfileMenuOpen(false);
+    setMenuOpen(false);
     const currentUser = auth.currentUser;
     if (currentUser) {
       getDoc(doc(db, 'users', currentUser.uid))
@@ -254,7 +256,8 @@ export default function Navbar() {
               {/* AUTH */}
               {authReady &&
                 (user ? (
-                  <div className="relative">
+                  /* CORRECCIÓN DE ZONA MUERTA: Cambiado hidden sm:block por hidden md:block */
+                  <div className="relative hidden md:block">
                     <button
                       type="button"
                       aria-expanded={profileMenuOpen}
@@ -284,12 +287,22 @@ export default function Navbar() {
                         role="menu"
                         className="absolute right-0 top-11 w-48 overflow-hidden rounded-lg border border-border-light bg-bg-light shadow-lg"
                       >
+                        <a
+                          role="menuitem"
+                          href="/me"
+                          className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light opacity-70 transition-colors hover:bg-border-light/40 hover:text-primary hover:opacity-100"
+                        >
+                          <UserIcon size={14} />
+                          Mi Perfil
+                        </a>
+
                         {showMisPedidos && (
                           <a
                             role="menuitem"
                             href="/mis-pedidos"
-                            className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
+                            className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light opacity-70 transition-colors hover:bg-border-light/40 hover:text-primary hover:opacity-100"
                           >
+                            <Package size={14} />
                             Mis pedidos
                           </a>
                         )}
@@ -298,7 +311,7 @@ export default function Navbar() {
                           <a
                             role="menuitem"
                             href="/courier"
-                            className="block px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
+                          className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light opacity-70 transition-colors hover:bg-border-light/40 hover:text-primary hover:opacity-100"
                           >
                             Mensajero
                           </a>
@@ -396,14 +409,25 @@ export default function Navbar() {
                   </a>
                 ))}
 
-              {user && showCompradorFeatures && (
+              {/* CORRECCIÓN: Quitamos showCompradorFeatures de aquí */}
+              {user && (
                 <>
                   <a
-                    href="/location"
+                    href="/me"
                     className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
                   >
-                    Mis direcciones
+                    Mi Perfil
                   </a>
+
+                  {/* Restringimos "Mis direcciones" solo a compradores */}
+                  {showCompradorFeatures && (
+                    <a
+                      href="/location"
+                      className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
+                    >
+                      Mis direcciones
+                    </a>
+                  )}
 
                   {showMisPedidos && (
                     <a
@@ -422,6 +446,23 @@ export default function Navbar() {
                       Mensajero
                     </a>
                   )}
+
+                  <hr className="border-border-light my-0.5" />
+
+                  <a
+                    href="/edit-profile"
+                    className="text-[13px] font-semibold text-text-light opacity-[0.55] transition-all hover:text-primary hover:opacity-100"
+                  >
+                    Editar Datos Personales
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="text-left text-[13px] font-semibold text-text-light opacity-[0.55] transition-all hover:text-primary hover:opacity-100"
+                  >
+                    Cerrar sesión
+                  </button>
                 </>
               )}
             </div>

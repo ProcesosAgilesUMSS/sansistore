@@ -5,6 +5,7 @@ export const Users = {
     displayName: 'Ana Mamani',
     photoURL:
       'https://ui-avatars.com/api/?name=Ana+Mamani&background=0D8ABC&color=fff',
+    phoneNumber: '71234567',
     authType: 'google',
     roles: ['comprador'],
     institutionalId: 'EST-2024-001',
@@ -16,6 +17,7 @@ export const Users = {
     displayName: 'Carlos Flores',
     photoURL:
       'https://ui-avatars.com/api/?name=Carlos+Flores&background=FF6B35&color=fff',
+    phoneNumber: '71234568',
     authType: 'email',
     roles: ['comprador'],
     institutionalId: 'DOC-2023-042',
@@ -27,6 +29,7 @@ export const Users = {
     displayName: 'María Álvarez',
     photoURL:
       'https://ui-avatars.com/api/?name=Maria+Alvarez&background=6B5B95&color=fff',
+    phoneNumber: '71234569',
     authType: 'google',
     roles: ['comprador'],
     institutionalId: 'EST-2024-009',
@@ -38,6 +41,7 @@ export const Users = {
     displayName: 'Juan Paredes',
     photoURL:
       'https://ui-avatars.com/api/?name=Juan+Paredes&background=88B04B&color=fff',
+    phoneNumber: '71234570',
     authType: 'email',
     roles: ['comprador'],
     institutionalId: 'EST-2023-015',
@@ -49,9 +53,11 @@ export const Users = {
     displayName: 'Pedro Quiroga',
     photoURL:
       'https://ui-avatars.com/api/?name=Pedro+Quiroga&background=FFA07A&color=fff',
+    phoneNumber: '71234571',
     authType: 'google',
     roles: ['vendedor'],
     institutionalId: 'ADM-2022-010',
+    phoneNumber: '+591 67415299',
     isActive: true,
   },
   LUIS: {
@@ -60,6 +66,7 @@ export const Users = {
     displayName: 'Luis Torrez',
     photoURL:
       'https://ui-avatars.com/api/?name=Luis+Torrez&background=20B2AA&color=fff',
+    phoneNumber: '71234572',
     authType: 'email',
     roles: ['mensajero'],
     institutionalId: 'SRV-2023-007',
@@ -71,6 +78,7 @@ export const Users = {
     displayName: 'Nadia Guzmán',
     photoURL:
       'https://ui-avatars.com/api/?name=Nadia+Guzman&background=FF69B4&color=fff',
+    phoneNumber: '71234573',
     authType: 'google',
     roles: ['mensajero'],
     institutionalId: 'SRV-2023-011',
@@ -82,9 +90,11 @@ export const Users = {
     displayName: 'Roberto Sánchez',
     photoURL:
       'https://ui-avatars.com/api/?name=Roberto+Sanchez&background=8A2BE2&color=fff',
+    phoneNumber: '71234574',
     authType: 'email',
     roles: ['operador_inv'],
     institutionalId: 'OPR-2021-003',
+    phoneNumber: '+591 67415288',
     isActive: true,
   },
   ADMIN: {
@@ -93,6 +103,7 @@ export const Users = {
     displayName: 'Administrador SANSÍ',
     photoURL:
       'https://ui-avatars.com/api/?name=Admin+SANSI&background=2C3E50&color=fff',
+    phoneNumber: '71234575',
     authType: 'email',
     roles: ['admin'],
     institutionalId: 'ADM-2020-001',
@@ -105,6 +116,7 @@ export const Users = {
     displayName: 'Marko uwu',
     photoURL:
       'https://ui-avatars.com/api/?name=Marko+uwu&background=88B04B&color=fff',
+    phoneNumber: '71234576',
     authType: 'email',
     roles: ['admin', 'vendedor', 'mensajero', 'operador_inv', 'comprador'],
     institutionalId: 'SUP-2026-000',

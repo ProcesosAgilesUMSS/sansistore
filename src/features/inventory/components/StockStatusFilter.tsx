@@ -1,3 +1,4 @@
+import React from 'react';
 import { AlertTriangle, CheckCircle, LayoutGrid } from 'lucide-react';
 import type { StockFilter } from '../types';
 
@@ -19,24 +20,28 @@ export const StockStatusFilter = ({
     label: string;
     icon: React.ReactNode;
     activeClass: string;
+    activeBadgeClass: string; //-
   }[] = [
     {
       key: 'all',
       label: 'Todos',
       icon: <LayoutGrid className="w-3.5 h-3.5" />,
-      activeClass: 'bg-(--theme-primary) text-white border-transparent',
+      activeClass: 'bg-white text-black border-transparent shadow-sm shadow-primary/25',
+      activeBadgeClass: 'bg-black/10 text-black',
     },
     {
       key: 'low',
       label: 'Stock Bajo',
       icon: <AlertTriangle className="w-3.5 h-3.5" />,
-      activeClass: 'bg-amber-500/20 text-amber-500 border-amber-500/40',
+      activeClass: 'bg-amber-500 text-white border-transparent shadow-sm shadow-amber-500/25',
+      activeBadgeClass: 'bg-white/25 text-white',
     },
     {
       key: 'normal',
       label: 'Normal',
       icon: <CheckCircle className="w-3.5 h-3.5" />,
-      activeClass: 'bg-green-500/20 text-green-500 border-green-500/40',
+      activeClass: 'bg-green-500 text-white border-transparent shadow-sm shadow-green-500/25',
+      activeBadgeClass: 'bg-white/25 text-white',
     },
   ];
 
@@ -60,12 +65,12 @@ export const StockStatusFilter = ({
             key={opt.key}
             onClick={() => onChange(opt.key)}
             className={`
-              inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
-              border transition-all duration-150 cursor-pointer
+              inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold
+              border transition-all duration-150 cursor-pointer select-none
               ${
                 isActive
                   ? opt.activeClass
-                  : 'border-transparent text-(--theme-text) opacity-50 hover:opacity-80 hover:bg-(--theme-card-bg)'
+                  : 'border-transparent text-(--theme-text) opacity-60 hover:opacity-100 hover:bg-(--theme-card-bg)'
               }
             `}
           >
@@ -74,9 +79,10 @@ export const StockStatusFilter = ({
             {count !== undefined && (
               <span
                 className={`
-                ml-0.5 px-1.5 py-0.5 rounded-full text-[0.6rem] font-bold
-                ${isActive ? 'bg-white/20' : 'bg-(--theme-border)'}
-              `}
+                  ml-1 px-1.5 py-0.5 rounded-full text-[0.6rem] font-black tracking-wide transition-colors
+                  /* Aquí lee dinámicamente la clase correspondiente al badge activo */
+                  ${isActive ? opt.activeBadgeClass : 'bg-(--theme-border) text-(--theme-text) opacity-80'}
+                `}
               >
                 {count}
               </span>

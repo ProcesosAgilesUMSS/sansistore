@@ -5,6 +5,7 @@ import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import { MapContainer, Marker, Polygon, TileLayer, ZoomControl } from 'react-leaflet';
 import { db } from '../../../lib/firebase';
 import { ALLOWED_ZONES } from '../../location/utils/zoneLimits';
+import { formatBolivianos } from '../utils/money';
 import 'leaflet/dist/leaflet.css';
 
 const defaultIcon = L.icon({
@@ -215,7 +216,7 @@ export default function CourierBuyerMap() {
               Cobro
             </p>
             <p className="mt-2 text-3xl font-black">
-              Bs {order?.cashToCollect ?? 0}
+              {formatBolivianos(order?.cashToCollect ?? 0)}
             </p>
           </div>
         </div>

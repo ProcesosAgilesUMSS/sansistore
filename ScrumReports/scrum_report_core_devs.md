@@ -215,9 +215,9 @@
 # Daily Report
 # 05/26/2026
   ## Gonza Rojas Willian D.
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Se revisó los bugs reportados sobre la vista del salida de productos
+  - **Today:**        Se terminará de corregir los bugs y elegir y planificar el Sprint 3
+  - **Blockers:**     Modificaciones de ultimo momento, en el flujo con el inventario
 
   ## Llanos Villarroel Vania F.
   - **Yesterday:**  
@@ -245,9 +245,9 @@
   # Daily Report
 # 05/28/2026
   ## Gonza Rojas Willian D.
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Se definio las US a desarrollar y se coordino con el equipo.
+  - **Today:**        Se tomo un bug reportado recientemente, respecto a la mucha informacion de la seccion de empaques.
+  - **Blockers:**     Se reportaron cambios de ultimo momento, se tardó mas de lo debido.
 
   ## Llanos Villarroel Vania F.
   - **Yesterday:**  
@@ -275,9 +275,9 @@
   # Daily Report
 # 06/02/2026
   ## Gonza Rojas Willian D.
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Se terminó de realizar el bug sobre la mucha informacion en la seccion de empaques, se estan corrigiendo algunos bugs extra sobre legibilidad de información.
+  - **Today:**        Se terminó de corregir bugs #451 y #453. 
+  - **Blockers:**     Se tardó mas de lo debido, todavia no se definió el flujo de pedidos cancelados o devueltos.
 
   ## Llanos Villarroel Vania F.
   - **Yesterday:**  

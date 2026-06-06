@@ -3,7 +3,14 @@ import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { adminAuth, adminDb } from '../../lib/firebase-admin';
 
 const ALLOWED_ROLES = ['admin', 'vendedor', 'mensajero', 'operador_inv', 'comprador'] as const;
+const ALLOWED_INSTITUTIONAL_DOMAINS = [
+  'est.umss.edu',
+  'ms.umss.edu',
+  'umss.edu.bo',
+  'umss.edu',
+] as const;
 type AllowedRole = (typeof ALLOWED_ROLES)[number];
+type AllowedInstitutionalDomain = (typeof ALLOWED_INSTITUTIONAL_DOMAINS)[number];
 const devAdminBypassEnabled =
   import.meta.env.ENABLE_DEV_ADMIN_BYPASS === 'true' &&
   import.meta.env.PUBLIC_APP_ENV !== 'production';
@@ -94,6 +101,19 @@ async function requireAdmin(request: Request): Promise<AdminGuardResult> {
   }
 }
 
+function getEmailDomain(email: string) {
+  return email.split('@')[1] ?? '';
+}
+
+function isAllowedInstitutionalEmail(email: string) {
+  const domain = getEmailDomain(email);
+  return ALLOWED_INSTITUTIONAL_DOMAINS.includes(domain as AllowedInstitutionalDomain);
+}
+
+function isValidPhoneNumber(phoneNumber: string) {
+  return phoneNumber.length === 8 && /^[67]/.test(phoneNumber);
+}
+
 function validateCreateUserPayload(payload: CreateUserRequest) {
   const displayName = payload.displayName?.trim();
   const email = payload.email?.trim().toLowerCase();
@@ -109,7 +129,18 @@ function validateCreateUserPayload(payload: CreateUserRequest) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return { error: 'Ingrese un correo electronico valido.' };
   }
+  if (!isAllowedInstitutionalEmail(email)) {
+    return {
+      error:
+        'Solo se permiten dominios institucionales: @est.umss.edu, @ms.umss.edu, @umss.edu.bo, @umss.edu',
+    };
+  }
   if (!phoneNumber) return { error: 'El telefono es obligatorio.' };
+  if (!isValidPhoneNumber(phoneNumber)) {
+    return {
+      error: 'El telefono debe tener 8 digitos e iniciar con 6 o 7.',
+    };
+  }
   if (roles.length === 0) return { error: 'El rol es obligatorio.' };
   if (roles.some((role) => !ALLOWED_ROLES.includes(role as AllowedRole))) {
     return { error: 'El rol seleccionado no es valido.' };
@@ -133,6 +164,19 @@ function validateUpdateUserPayload(payload: UpdateUserRequest) {
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return { error: 'Ingrese un correo electronico valido.' };
   }
+  if (email && !isAllowedInstitutionalEmail(email)) {
+    return {
+      error:
+        'Solo se permiten dominios institucionales: @est.umss.edu, @ms.umss.edu, @umss.edu.bo, @umss.edu',
+    };
+  }
+
+  const phoneNumber = payload.phoneNumber?.trim();
+  if (phoneNumber && !isValidPhoneNumber(phoneNumber)) {
+    return {
+      error: 'El telefono debe tener 8 digitos e iniciar con 6 o 7.',
+    };
+  }
 
   const roles = payload.roles?.map((r) => r.trim());
   if (roles !== undefined) {
@@ -147,7 +191,7 @@ function validateUpdateUserPayload(payload: UpdateUserRequest) {
       uid,
       ...(payload.displayName?.trim() && { displayName: payload.displayName.trim() }),
       ...(email && { email }),
-      ...(payload.phoneNumber?.trim() && { phoneNumber: payload.phoneNumber.trim() }),
+      ...(phoneNumber && { phoneNumber }),
       ...(roles && { roles: roles as AllowedRole[] }),
       ...(typeof payload.isActive === 'boolean' && { isActive: payload.isActive }),
     },
