@@ -8,6 +8,7 @@ import OrderModal from "./OrderModal";
 import { ClosedFolderIcon, OpenFolderIcon } from "./Icons";
 import { X } from "lucide-react";
 import OrderStatusBadge from "./OrderStatusBadge";
+import Toast from "@features/admin/users/components/Toast";
 
 export default function Orders() {
   const { user } = useAuthUser();
@@ -16,7 +17,14 @@ export default function Orders() {
   const [loading, setLoading] = useState<boolean>(true);
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [selectedStatuses, setSelectedStatuses] = useState<OrderStatus[]>([]);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const filterRef = useRef<HTMLDivElement>(null);
+
+  const showNotification = (type: "success" | "error", message: string) => {
+    const allowedMessages = ["Pedido marcado como listo.", "Pago validado correctamente."];
+    if (type === "success" && !allowedMessages.includes(message)) return;
+    setToast({ message, type });
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -58,10 +66,18 @@ export default function Orders() {
 
   return (
     <>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
       {selectedOrder ? (
         <OrderModal
           order={selectedOrder}
           closeModal={() => setSelectedOrder(null)}
+          onNotification={showNotification}
         />
       ) : null}
       <>
@@ -144,12 +160,3 @@ export default function Orders() {
     </>
   );
 }
-
-// <label key={status} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-black/5 leading-[120%] px-2 py-0.5 whitespace-nowrap">
-//   <input
-//     type="checkbox"
-//     checked={selectedStatuses.includes(status)}
-//     onChange={() => toggleStatus(status)}
-//   />
-//   {label}
-// </label>

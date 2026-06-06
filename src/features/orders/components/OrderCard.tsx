@@ -102,7 +102,7 @@ export default function OrderCard({ order }: OrderCardProps) {
             <span className="flex min-w-0 items-center gap-1.5 text-xs">
               <MapPin size={14} className="shrink-0" />
               <span className="truncate max-w-[240px] sm:max-w-[400px]">
-                {order.delivery.destination}
+                {order.address}
               </span>
             </span>
           </div>

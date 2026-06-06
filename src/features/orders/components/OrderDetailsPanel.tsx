@@ -291,7 +291,7 @@ export default function OrderDetailsPanel({
               <MapPin className="text-primary mt-0.5 shrink-0" size={18} />
               <div className="min-w-0">
                 <h4 className="text-sm font-bold mb-1">Ubicación de entrega</h4>
-                <p className="text-sm opacity-80 break-words">{order.delivery.destination}</p>
+                <p className="text-sm opacity-80 break-words">{order.address}</p>
               </div>
             </div>
             {order.secret && (

@@ -10,10 +10,11 @@ import OrderStatusBadge from "./OrderStatusBadge";
 type DetailColumn = 'precio' | 'monto' | 'stock';
 
 export default function OrderModal({
-  order, closeModal
+  order, closeModal, onNotification
 }: {
   order: Order,
-  closeModal: () => void
+  closeModal: () => void,
+  onNotification?: (type: "success" | "error", message: string) => void
 }) {
   const [selectedCol, setSelectedCol] = useState<DetailColumn>('stock');
   const [showColSelector, setShowColSelector] = useState(false);
@@ -34,7 +35,7 @@ export default function OrderModal({
       onClick={closeModal}
       className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-2"
     >
-      <div onClick={(e) => e.stopPropagation()} className="bg-white w-[75ch] px-4 py-4 rounded-lg flex flex-col max-h-[90vh] overflow-y-auto">
+      <div onClick={(e) => e.stopPropagation()} className="bg-white w-[75ch] px-4 py-4 rounded-lg flex flex-col max-h-[90vh] overflow-y-auto relative">
 
         <div className="flex gap-x-8">
           <span className="tracking-tight text-xl">{parseOrderId(order.id).friendlyName}</span>
@@ -44,7 +45,6 @@ export default function OrderModal({
         </div>
 
         {/*INFORMATION*/}
-
         <div className="grid grid-cols-20 my-4">
           <div className="leading-[140%] col-start-1 col-end-4 text-black/50">Cliente:</div>
           <div className="leading-[140%] col-start-7  min-[765px]:col-start-5 col-end-21">{order.buyerName}</div>
@@ -183,7 +183,7 @@ export default function OrderModal({
 
 
         <div className="mt-2">
-          <OrderActions order={order} onSuccess={closeModal} />
+          <OrderActions order={order} onSuccess={closeModal} onNotification={onNotification} />
         </div>
       </div>
     </div >

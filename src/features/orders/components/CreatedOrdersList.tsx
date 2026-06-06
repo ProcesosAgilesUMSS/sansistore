@@ -3,11 +3,19 @@ import type { Order } from "@features/orders/types";
 import { subscribeToCreatedOrders } from "@features/orders/services/ordersService";
 import CreatedOrderItem from "./CreatedOrderItem";
 import OrderModal from "./OrderModal";
+import Toast from "@features/admin/users/components/Toast";
 
 export default function CreatedOrdersList() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+
+  const showNotification = (type: "success" | "error", message: string) => {
+    const allowedMessages = ["Pedido marcado como listo.", "Pago validado correctamente."];
+    if (type === "success" && !allowedMessages.includes(message)) return;
+    setToast({ message, type });
+  };
 
   useEffect(() => {
     const unsubscribe = subscribeToCreatedOrders((data) => {
@@ -22,10 +30,18 @@ export default function CreatedOrdersList() {
 
   return (
     <>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
       {selectedOrder ? (
         <OrderModal
           order={selectedOrder}
           closeModal={() => setSelectedOrder(null)}
+          onNotification={showNotification}
         />
       ) : null}
       <ul className="grid grid-cols-18 mx-auto max-w-256 px-2">
