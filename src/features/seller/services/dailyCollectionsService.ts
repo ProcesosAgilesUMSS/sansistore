@@ -4,10 +4,20 @@ export interface DailyCollectionsSummary {
   date: string;
   totalCollected: number;
   orderCount: number;
+  confirmedByBuyerCount: number;
   orders: Array<{
     orderId: string;
+    paymentId: string | null;
     total: number;
     collectedAt: string | null;
+    paymentStatus: string;
+    paymentStatusLabel: string;
+    paymentMethod: string;
+    courierId: string | null;
+    courierName: string;
+    courierEmail: string | null;
+    customerName: string;
+    deliveryId: string | null;
     buyerReceptionConfirmed: boolean;
     buyerReceptionConfirmedAt: string | null;
   }>;

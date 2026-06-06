@@ -36,3 +36,6 @@ pnpm-debug.log*
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+/AGENTS.md
+/CLAUDE.md
+/.tmp-capture

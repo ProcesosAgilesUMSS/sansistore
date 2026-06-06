@@ -73,8 +73,15 @@ export default function UserEditModal({
       setError("Ingrese un correo electrónico válido.");
       return;
     }
-    if (email.trim().split('@')[1] !== 'est.umss.edu') {
-      setError("Solo se permite el dominio @est.umss.edu.");
+    const allowedDomains = [
+      'est.umss.edu',
+      'ms.umss.edu',
+      'umss.edu.bo',
+      'umss.edu',
+    ];
+    const domain = email.trim().split('@')[1];
+    if (!domain || !allowedDomains.includes(domain)) {
+      setError("Solo se permiten cuentas institucionales UMSS.");
       return;
     }
     if (phone && (phone.length !== 8 || !/^[67]/.test(phone))) {
@@ -178,11 +185,11 @@ export default function UserEditModal({
               <input
                 className="w-full p-2.5 rounded-xl text-[13px] bg-[var(--theme-bg)] border border-[var(--theme-border)] text-[var(--theme-text)] placeholder:text-[var(--theme-text)]/30 outline-none focus:border-[#88b04b] transition-colors"
                 value={email}
-                placeholder="usuario@est.umss.edu"
+                placeholder="usuario@umss.edu"
                 onChange={(e) => { setEmail(e.target.value); setError(""); }}
               />
               <p className="text-[10px] text-[var(--theme-text)]/30 mt-1">
-                Solo se permite el dominio @est.umss.edu
+                Solo se permiten dominios institucionales: @est.umss.edu, @ms.umss.edu, @umss.edu.bo, @umss.edu
               </p>
             </div>
 

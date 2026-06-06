@@ -1,126 +1,164 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { sections } from '../../seller/constants/sections';
+import { motion, AnimatePresence } from "motion/react"
 
+/**
+ * Este componente es el menú de navegación inferior para el vendedor.
+ * Se divide en dos versiones: Escritorio (horizontal) y Móvil (botón con lista).
+ */
 export default function OrdersDock() {
   const [currentPath, setCurrentPath] = useState('');
-  const [openMenu, setOpenMenu] = useState<'registrar' | 'pedidos' | null>(null);
-  const dockRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    const syncPath = () => {
+    const mediaQuery = window.matchMedia("(max-width: 940px)");
+    const handleMQ = (e: MediaQueryListEvent | MediaQueryList) => setIsMobile(e.matches);
+
+    mediaQuery.addEventListener('change', handleMQ);
+    handleMQ(mediaQuery);
+
+    const sync = () => {
       const pathname = window.location.pathname.replace(/\/$/, '');
       setCurrentPath(pathname || '/');
+
+      setOpenSubmenu(null);
+      setIsMobileMenuOpen(false);
     };
 
-    syncPath();
-    document.addEventListener('astro:page-load', syncPath);
-    document.addEventListener('astro:after-swap', syncPath);
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dockRef.current && !dockRef.current.contains(event.target as Node)) {
-        setOpenMenu(null);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
+    sync();
+    document.addEventListener('astro:page-load', sync);
 
     return () => {
-      document.removeEventListener('astro:page-load', syncPath);
-      document.removeEventListener('astro:after-swap', syncPath);
-      document.removeEventListener('mousedown', handleClickOutside);
+      mediaQuery.removeEventListener('change', handleMQ);
+      document.removeEventListener('astro:page-load', sync);
     };
   }, []);
 
-  const isCurrentRoute = (route: string) =>
+  const isActive = (route: string) =>
     currentPath === route || currentPath.startsWith(`${route}/`);
 
-  const isRegisterActive = isCurrentRoute('/seller/purchase') || isCurrentRoute('/seller/offers');
-  const isOrdersActive = isCurrentRoute('/seller/created-orders') || isCurrentRoute('/seller/orders');
+  if (isMobile) {
+    return (
+      <OrdersDockMobile
+        currentPath={currentPath}
+        isActive={isActive}
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
+      />
+    );
+  }
 
-  const toggleMenu = (menu: 'registrar' | 'pedidos') => {
-    setOpenMenu(prev => prev === menu ? null : menu);
-  };
-
+  // Renderizado para Escritorio
   return (
-    <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-40 font-['Inter',sans-serif] text-sm" ref={dockRef}>
-      <nav className="flex items-center gap-6 whitespace-nowrap bg-[#3E3E3E] py-2 rounded-lg px-6 shadow-xl border border-white/10">
+    <div className="z-50 font-[Inter] fixed bottom-10 left-1/2 -translate-x-1/2 bg-[#3E3E3E] text-white flex gap-6 rounded text-sm">
+      <div className="flex  whitespace-nowrap py-1 px-0.5">
 
-
-        {/* Menu Pedidos */}
+        {/* Grupo Pedidos */}
         <div className="relative">
           <button
-            onClick={() => toggleMenu('pedidos')}
-            className={`text-white tracking-tight cursor-pointer hover:text-white/80 transition-all active:scale-[0.97] ${isOrdersActive ? "underline decoration-2 underline-offset-3" : ""}`}
+            onClick={() => setOpenSubmenu(openSubmenu === 'pedidos' ? null : 'pedidos')}
+            className={`${isActive("/seller/orders") || isActive("/seller/created-orders") ? "bg-white/20" : ""}  cursor-pointer px-3 py-1`}
           >
             Pedidos
           </button>
-          <div
-            className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-4 bg-[#3E3E3E] rounded-lg py-2 px-0.5 flex flex-col gap-1 shadow-2xl border border-white/10 min-w-[180px] transition-all duration-300 origin-bottom ${openMenu === 'pedidos' ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-[0.97] translate-y-1 pointer-events-none'}`}
-            style={{ transitionTimingFunction: 'cubic-bezier(0.32, 0.72, 0, 1)' }}
-          >
-            <a
-              href="/seller/created-orders"
-              className={`text-white px-4 py-2 hover:bg-white/10 rounded-md transition-colors active:bg-white/20 ${isCurrentRoute('/seller/created-orders') ? 'bg-white/5 ' : ''}`}
-              onClick={() => setOpenMenu(null)}
-            >
-              Pedidos Creados
-            </a>
-            <a
-              href="/seller/orders"
-              className={`text-white px-4 py-2 hover:bg-white/10 rounded-md transition-colors active:bg-white/20 ${isCurrentRoute('/seller/orders') ? 'bg-white/5' : ''}`}
-              onClick={() => setOpenMenu(null)}
-            >
-              Mis pedidos
-            </a>
-          </div>
+          <AnimatePresence>
+            {openSubmenu === 'pedidos' && (
+              <motion.div
+                transition={{ duration: 0.1, ease: "easeInOut" }}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 12 }}
+                className="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 bg-[#3E3E3E] p-2 flex flex-col border border-gray-600 rounded-lg w-[12ch]"
+              >
+                <a onClick={() => setOpenSubmenu(null)} href="/seller/created-orders">Creados</a>
+                <a onClick={() => setOpenSubmenu(null)} href="/seller/orders">Mis Pedidos</a>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        {/* Menu Registrar */}
+        {/* Grupo Registrar */}
         <div className="relative">
           <button
-            onClick={() => toggleMenu('registrar')}
-            className={`text-white tracking-tight cursor-pointer hover:text-white/80 transition-all active:scale-[0.97] ${isRegisterActive ? "underline decoration-2 underline-offset-3 " : ""}`}
+            onClick={() => setOpenSubmenu(openSubmenu === 'registrar' ? null : 'registrar')}
+            className={`${isActive("/seller/purchase") || isActive("/seller/offers") ? "bg-white/20" : ""}  cursor-pointer px-3 py-1 rounded`}
           >
             Registrar
           </button>
-          <div
-            className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-4 bg-[#3E3E3E] rounded-lg py-2 px-1 flex flex-col gap-1 shadow-2xl border border-white/10 min-w-[160px] transition-all duration-300 origin-bottom ${openMenu === 'registrar' ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-[0.97] translate-y-1 pointer-events-none'}`}
-            style={{ transitionTimingFunction: 'cubic-bezier(0.32, 0.72, 0, 1)' }}
-          >
-            <a
-              href="/seller/purchase"
-              className={`text-white px-4 py-2 hover:bg-white/10 rounded-md transition-colors active:bg-white/20 ${isCurrentRoute('/seller/purchase') ? 'bg-white/5' : ''}`}
-              onClick={() => setOpenMenu(null)}
-            >
-              Registrar compra
-            </a>
-            <a
-              href="/seller/offers"
-              className={`text-white px-4 py-2 hover:bg-white/10 rounded-md transition-colors active:bg-white/20 ${isCurrentRoute('/seller/offers') ? 'bg-white/5' : ''}`}
-              onClick={() => setOpenMenu(null)}
-            >
-              Registrar oferta
-            </a>
-          </div>
+          <AnimatePresence>
+            {openSubmenu === 'registrar' && (
+              <motion.div
+                transition={{ duration: 0.1, ease: "easeIn" }}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 12 }}
+                className="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 bg-[#3E3E3E] p-2 flex flex-col border border-gray-600 rounded-lg w-[10ch]"
+              >
+                <a onClick={() => setOpenSubmenu(null)} href="/seller/purchase">Compra</a>
+                <a onClick={() => setOpenSubmenu(null)} href="/seller/offers">Oferta</a>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        {sections.map((section) => {
-          // Filtrar las que ya estan en submenus
-          if (['creados', 'empaquetados', 'compra', 'ofertas'].includes(section.id)) return null;
-
-          const isActive = isCurrentRoute(section.route);
+        {/* Otras Secciones Directas */}
+        {sections.map((s) => {
+          if (['creados', 'compra', 'ofertas', 'mis pedidos'].includes(s.id)) return null;
           return (
-            <a
-              key={section.id}
-              href={section.route}
-              aria-current={isActive ? 'page' : undefined}
-              className={`text-white tracking-tight hover:text-white/80 transition-all active:scale-[0.97] ${isActive ? "underline decoration-2 underline-offset-3" : ""}`}
-            >
-              {section.label}
+            <a key={s.id} href={s.route} className={`rounded px-3 py-1 ${isActive(s.route) ? "bg-white/15" : ""}`}>
+              {s.label}
             </a>
           );
         })}
-      </nav>
-    </div >
+      </div>
+    </div>
+  );
+}
+
+interface OrdersDockMobileProps {
+  currentPath: string;
+  isActive: (route: string) => boolean;
+  isMobileMenuOpen: boolean;
+  setIsMobileMenuOpen: (open: boolean) => void;
+}
+
+function OrdersDockMobile({ currentPath, isActive, isMobileMenuOpen, setIsMobileMenuOpen }: OrdersDockMobileProps) {
+  const currentSection = sections.find(s => s.route === currentPath);
+
+  return (
+    <div className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-[#3E3E3E] text-white rounded z-50 font-[inter] text-sm w-[22ch]">
+      <div className="relative w-full">
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ duration: 0.1 }}
+              className="absolute bottom-[105%] rounded p-1  left-0 flex flex-col w-full bg-[#3E3E3E] border border-gray-600 overflow-hidden"
+            >
+              {sections.map(s => (
+                <a
+                  key={s.id}
+                  href={s.route}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex items-center ${isActive(s.route) ? "bg-white/20" : "hover:bg-white/10"}`}
+                >
+                  {s.label}
+                </a>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className={`text-center cursor-pointer py-2  w-full rounded ${isMobileMenuOpen ? "rounded-t-none" : ""}`}
+        >
+          {currentSection ? currentSection.label : 'Menú'}
+        </button>
+      </div>
+    </div>
   );
 }

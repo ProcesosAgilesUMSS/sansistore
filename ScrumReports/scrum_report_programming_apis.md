@@ -273,6 +273,10 @@
 - **Today:** Continuaré corrigiendo detalles de integración del mapa y validando que la funcionalidad funcione correctamente dentro del flujo del mensajero.
 - **Blockers:** Dudas puntuales sobre ajustes de Leaflet y manejo de coordenadas.
 
+*** 
+
+# Sprint 3
+
 ## 26-05-2026
 
 ### José Daniel Virreira Rufino
@@ -335,3 +339,44 @@
 - **Yesterday:** Trabajé en el bug crítico que consistía en que no podía verse el mapa desde la vista del mensajero, fue corregido y testeado.
 - **Today:** Me comuniqué con un miembro del equipo DMinds para hablar y tratar bugs que se detectaron para este sprint. Trabajaré en la siguiente historia de usuario asignada.
 - **Blockers:** Detección de bugs.
+
+### Adrian
+
+- **Yesterday:** Estuve trabajando en la validación de datos, agregando más detalle a los criterios.
+- **Today:** Terminaré de corregir el bug.
+- **Blockers:** None.
+
+## 02-06-2026
+
+### José Daniel Virreira Rufino
+- **Yesterday:** revisé e integré los cambios del flujo de mensajero/courier, validé que el mapa del comprador use la ubicación correcta, corregí datos de órdenes del comprador y limpié problemas de IDs/datos mostrados.
+- **Today:** Revisar y corregir los bugs asignados a su vez de empezar a trabajar en las US' nuevas.
+- **Blockers:** Nuevos bugs detectados por otros equipos.
+- 
+### Bruno Salcedo Cadiz
+- **Yesterday:** Trabaje en el bug de agregar el modal de confirmacion para rechazar aceptar pedido de mensajero
+- **Today:** Integrar mi rama donde trabaje el bug
+- **Blockers:** None
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday:** Ambos PRs (#410 y #411) fueron aprobados y mergeados a `main` sin contratiempos. Se verificó que las funcionalidades del módulo de mensajero sigan operativas después del merge.
+- **Today:** Reflexión del Sprint 3: las tareas asignadas se completaron en tiempo y forma. Se sugiere para próximos sprints definir mejor los campos compartidos entre equipos para evitar posibles descoordinaciones. Análisis de nuevos bugs reportados.
+- **Blockers:** None.
+
+### Efrain Peralta Felipe 
+- **Yesterday:** Trabaje en el bug de asignar mensajero 
+- **Today:** Terminar la Hu de este sprint 
+- **Blockers:** None
+
+## Adrian Said Andrade Medina
+- **Yesterday:** Trabaje en el bug de asignado
+- **Today:** Iniciar la HU correspondiente a este sprint.
+- **Blockers:** None
+
+## 04-06-2026
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Trabajé en los bugs asignados a mi persona encontrado por diferentes compañeros del equipo completo.
+- **Today:** Validaré que todas las funcionalidades (bugs e historias de usuario) trabajen correctamente para la presentación demo.
+- **None:** Los bugs corregidos necesitan validación extra para asegurarse de que todo funcione como debería.
+

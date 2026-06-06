@@ -14,26 +14,34 @@ import {
   X,
   ChevronRight,
   ArrowLeft,
+  ClipboardList,
 } from 'lucide-react';
 import UserManagement from '../users/components/UserManagement.tsx';
 import CategoryList from '../categories/components/CategoryList.tsx';
 import OrderReceptionPanel from '../orders/components/OrderReceptionPanel.tsx';
 import DailySales from '../ventas/components/DailySales.tsx';
 import TopSellingProducts from '../ventas/top-products/components/TopSellingProducts.tsx';
+import MessengerPerformancePage from '../messengers/performance/MessengerPerformancePage.tsx';
 // ── HU #152: Parámetros del sistema ──
 import ConfigPanel from '../settings/components/ConfigPanel.tsx';
 // ── HU #161: Reportes de ventas ──
 import SalesReport from '../analytics/components/SalesReport.tsx';
+import AccessLogPanel from '../audit/components/AccessLogPanel.tsx';
+// ── HU #178: Historial de pedido ──
+import OrderHistory from '../pedidos/components/OrderHistory.tsx';
 
 type Section =
   | 'dashboard'
   | 'pedidos'
+  | 'historial'        // ── HU #178 ──
   | 'usuarios'
   | 'categorias'
   | 'ventas-diarias'
   | 'mas-vendidos'
+  | 'mensajeros-desempeno'
   | 'parametros'     // ── HU #152 ──
   | 'reportes'       // ── HU #161 ──
+  | 'bitacora'       
   | null;
 
 interface NavItem {
@@ -53,6 +61,8 @@ export default function AdminLayout() {
   const [activeSection, setActiveSection] = useState<Section>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [ventasOpen, setVentasOpen] = useState(true);
+  const [pedidosOpen, setPedidosOpen] = useState(true); // ── HU #178 ──
+  const [mensajerosOpen, setMensajerosOpen] = useState(true);
 
   const navSections: NavSection[] = [
     {
@@ -89,14 +99,19 @@ export default function AdminLayout() {
           icon: <Settings size={15} />,
           section: 'parametros',
         },
+        {
+          label: 'Bitácora',
+          icon: <Settings size={15} />,
+          section: 'bitacora',
+        },
       ],
     },
     {
       title: 'Analítica',
       items: [
-        { label: 'Ventas', icon: <BarChart2 size={15} />, section: 'ventas-diarias' },
-        { label: 'Inventario', icon: <Package size={15} />, section: null, disabled: true },
-        { label: 'Mensajeros', icon: <Bike size={15} />, section: null, disabled: true },
+        { label: 'Ventas',     icon: <BarChart2 size={15} />, section: 'ventas-diarias' },
+        { label: 'Inventario', icon: <Package size={15} />,   section: null, disabled: true },
+        { label: 'Mensajeros', icon: <Bike size={15} />,      section: null, disabled: true },
         {
           // ── HU #161: habilitado ──
           label: 'Reportes',
@@ -108,16 +123,19 @@ export default function AdminLayout() {
   ];
 
   const pageTitles: Record<string, { title: string; subtitle: string }> = {
-    dashboard: { title: 'Dashboard', subtitle: 'Panel de administración' },
-    pedidos: { title: 'Pedidos', subtitle: 'Validación de recepción por comprador' },
-    usuarios: { title: 'Gestión de usuarios', subtitle: 'Registra y administra usuarios' },
-    categorias: { title: 'Categorías', subtitle: 'Gestiona las categorías de productos' },
-    'ventas-diarias': { title: 'Ventas diarias', subtitle: 'Monitorea el rendimiento diario de ventas' },
-    'mas-vendidos': { title: 'Más vendidos', subtitle: 'Productos con más unidades vendidas' },
+    dashboard:              { title: 'Dashboard',              subtitle: 'Panel de administración' },
+    pedidos:                { title: 'Pedidos',                subtitle: 'Validación de recepción por comprador' },
+    historial:              { title: 'Historial de pedido',    subtitle: 'Auditoría completa del pedido' },
+    usuarios:               { title: 'Gestión de usuarios',    subtitle: 'Registra y administra usuarios' },
+    categorias:             { title: 'Categorías',             subtitle: 'Gestiona las categorías de productos' },
+    'ventas-diarias':       { title: 'Ventas diarias',         subtitle: 'Monitorea el rendimiento diario de ventas' },
+    'mensajeros-desempeno': { title: 'Desempeño de mensajeros', subtitle: 'Métricas de eficiencia por mensajero' },
+    'mas-vendidos':         { title: 'Más vendidos',           subtitle: 'Productos con más unidades vendidas' },
     // ── HU #152 ──
-    parametros: { title: 'Parámetros del sistema', subtitle: 'Configura los parámetros globales del sistema' },
+    parametros:             { title: 'Parámetros del sistema', subtitle: 'Configura los parámetros globales del sistema' },
     // ── HU #161 ──
-    reportes: { title: 'Reportes de ventas', subtitle: 'Genera reportes de ventas por rango de fechas' },
+    reportes:               { title: 'Reportes de ventas',     subtitle: 'Genera reportes de ventas por rango de fechas' },
+    bitacora:               { title: 'Bitácora',               subtitle: 'Registra actividad de inicio y cierre de sesión' },
   };
 
   const currentPage = pageTitles[activeSection ?? 'dashboard'];
@@ -161,6 +179,64 @@ export default function AdminLayout() {
                 {section.title}
               </p>
               {section.items.map((item) => {
+
+                // ── Menú Pedidos con submenú Historial ── HU #178 ──
+                if (item.label === 'Pedidos') {
+                  return (
+                    <div key={item.label} className="mb-1">
+                      <button
+                        onClick={() => setPedidosOpen(!pedidosOpen)}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px]
+                        text-white/50 hover:text-white/80 hover:bg-white/5 transition-colors"
+                      >
+                        <span>{item.icon}</span>
+                        <span className="flex-1 text-left">Pedidos</span>
+                        <ChevronRight
+                          size={12}
+                          className={`transition-transform ${pedidosOpen ? 'rotate-90' : ''}`}
+                        />
+                      </button>
+
+                      {pedidosOpen && (
+                        <div className="ml-7 mt-1 space-y-1">
+                          <button
+                            onClick={() => {
+                              setActiveSection('pedidos');
+                              setSidebarOpen(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
+                            transition-colors ${
+                              activeSection === 'pedidos'
+                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
+                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
+                            }`}
+                          >
+                            Recepción
+                          </button>
+
+                          {/* ── HU #178 ── */}
+                          <button
+                            onClick={() => {
+                              setActiveSection('historial');
+                              setSidebarOpen(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
+                            transition-colors flex items-center gap-1.5 ${
+                              activeSection === 'historial'
+                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
+                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
+                            }`}
+                          >
+                            <ClipboardList size={11} />
+                            Historial
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+
+                // ── Menú Ventas con submenú existente ──
                 if (item.label === 'Ventas') {
                   return (
                     <div key={item.label} className="mb-1">
@@ -207,6 +283,44 @@ export default function AdminLayout() {
                             }`}
                           >
                             Más vendidos
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+
+                if (item.label === 'Mensajeros') {
+                  return (
+                    <div key={item.label} className="mb-1">
+                      <button
+                        onClick={() => setMensajerosOpen(!mensajerosOpen)}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px]
+                        text-white/50 hover:text-white/80 hover:bg-white/5 transition-colors"
+                      >
+                        <span>{item.icon}</span>
+                        <span className="flex-1 text-left">Mensajeros</span>
+                        <ChevronRight
+                          size={12}
+                          className={`transition-transform ${mensajerosOpen ? 'rotate-90' : ''}`}
+                        />
+                      </button>
+
+                      {mensajerosOpen && (
+                        <div className="ml-7 mt-1 space-y-1">
+                          <button
+                            onClick={() => {
+                              setActiveSection('mensajeros-desempeno');
+                              setSidebarOpen(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
+                            transition-colors ${
+                              activeSection === 'mensajeros-desempeno'
+                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
+                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
+                            }`}
+                          >
+                            Desempeño
                           </button>
                         </div>
                       )}
@@ -287,9 +401,16 @@ export default function AdminLayout() {
                   <ArrowLeft size={16} /> Dashboard
                 </button>
               )}
-              <h1 className="text-xl md:text-3xl font-bold text-white tracking-tight">
-                {currentPage.title}
-              </h1>
+              <div>
+                <h1 className="text-xl md:text-3xl font-bold text-white tracking-tight">
+                  {currentPage?.title}
+                </h1>
+                {currentPage?.subtitle && (
+                  <p className="hidden md:block text-xs text-white/30 mt-0.5">
+                    {currentPage.subtitle}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
 
@@ -307,25 +428,19 @@ export default function AdminLayout() {
               Dashboard principal — Próximamente
             </div>
           )}
-          {activeSection === 'usuarios' && (
-            <UserManagement />
-          )}
-          {activeSection === 'pedidos' && (
-            <OrderReceptionPanel />
-          )}
-          {activeSection === 'categorias' && (
-            <CategoryList />
-          )}
-          {activeSection === 'ventas-diarias' && (
-            <DailySales />
-          )}
-          {activeSection === 'mas-vendidos' && (
-            <TopSellingProducts />
-          )}
+          {activeSection === 'usuarios' && <UserManagement />}
+          {activeSection === 'pedidos' && <OrderReceptionPanel />}
+          {activeSection === 'categorias' && <CategoryList />}
+          {activeSection === 'ventas-diarias' && <DailySales />}
+          {activeSection === 'mas-vendidos' && <TopSellingProducts />}
+          {activeSection === 'mensajeros-desempeno' && <MessengerPerformancePage />}
           {/*Parámetros del sistema*/}
           {activeSection === 'parametros' && <ConfigPanel />}
           {/*Reportes de ventas*/}
           {activeSection === 'reportes' && <SalesReport />}
+          {activeSection === 'bitacora' && <AccessLogPanel />}
+          {/* ── HU #178 ── */}
+          {activeSection === 'historial' && <OrderHistory />}
         </main>
 
       </div>

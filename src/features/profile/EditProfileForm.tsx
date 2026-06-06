@@ -5,7 +5,7 @@ import { db, auth } from '../../lib/firebase';
 import { CheckCircle, AlertCircle } from 'lucide-react';
 
 export default function PerfilForm() { 
-  const [userId, setUserId] = useState<string | null>(null); // <-- Estado para el ID del usuario
+  const [userId, setUserId] = useState<string | null>(null);
   const [phone, setphone] = useState('');
   const [secondaryMail, setsecondaryMail] = useState('');
   const [loading, setLoading] = useState(true);
@@ -13,7 +13,6 @@ export default function PerfilForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  // 1. Escuchar la sesión de Firebase para obtener el userId
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -27,7 +26,6 @@ export default function PerfilForm() {
     return unsub;
   }, []);
 
-  // 2. Cargar datos existentes cuando ya tengamos el userId confirmado
   useEffect(() => {
     if (!userId) return;
 
@@ -51,20 +49,37 @@ export default function PerfilForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userId) return; // Protección extra
+    if (!userId) return;
     
     setError(null);
     setSuccess(false);
 
-    if (!phone.trim()) {
+    const phoneValue = phone.trim();
+    const mailValue = secondaryMail.trim();
+
+    if (!phoneValue) {
       setError('El teléfono celular es obligatorio.');
       return;
     }
 
     const phoneRegex = /^[67]\d{7}$/;
-    if (!phoneRegex.test(phone.trim())) {
+
+    if (!phoneRegex.test(phoneValue)) {
       setError('El número de celular no es válido. Debe tener 8 dígitos y empezar con 6 o 7.');
       return;
+    }
+    
+    if (mailValue) {
+      if (mailValue.length > 100) {
+        setError('El correo electrónico de respaldo no puede exceder los 100 caracteres.');
+        return;
+      }
+
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(mailValue)) {
+        setError('El formato del correo electrónico de respaldo es inválido (Ej: usuario@dominio.com).');
+        return;
+      }
     }
 
     setSaving(true);
@@ -72,13 +87,15 @@ export default function PerfilForm() {
     try {
       const userRef = doc(db, 'users', userId);
       await updateDoc(userRef, {
-        phone: phone.trim(),
-        secondaryMail: secondaryMail.trim(),
+        phone: phoneValue,
+        secondaryMail: mailValue || '',
         updatedAt: new Date()
       });
 
       setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
+        setTimeout(() => {
+          window.location.href = "/me";
+        }, 1500);
     } catch (err) {
       console.error("Error al guardar:", err);
       setError('Hubo un error al guardar los cambios en la base de datos.');
@@ -91,7 +108,6 @@ export default function PerfilForm() {
     return <div className="text-center py-20 font-sans text-text-light/60 font-medium">Cargando datos de contacto...</div>;
   }
 
-  // Si no hay usuario y ya terminó de cargar, mostramos el aviso
   if (!userId && !loading) {
     return (
       <div className="text-center py-20 font-sans text-error font-semibold">
@@ -120,7 +136,11 @@ export default function PerfilForm() {
               type="tel"
               placeholder="Ej: 76543210"
               value={phone}
-              onChange={(e) => setphone(e.target.value.replace(/\s/g, ''))}
+              onChange={(e) => {
+                const digitsOnly = e.target.value.replace(/\D/g, '');
+                setphone(digitsOnly);
+              }}
+              inputMode="numeric"
               className="w-full px-4 py-2.5 rounded-[0.75rem] border border-border-light bg-bg-light text-text-light text-sm focus:outline-none focus:border-primary transition-all"
               required
             />
@@ -131,9 +151,11 @@ export default function PerfilForm() {
               Correo Electrónico de Respaldo (Opcional)
             </label>
             <input
-              type="email"
+              type="text"
+              autoComplete="email"
               placeholder="ejemplo@gmail.com"
               value={secondaryMail}
+              maxLength={100}
               onChange={(e) => setsecondaryMail(e.target.value)}
               className="w-full px-4 py-2.5 rounded-[0.75rem] border border-border-light bg-bg-light text-text-light text-sm focus:outline-none focus:border-primary transition-all"
             />

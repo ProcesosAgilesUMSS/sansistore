@@ -3,6 +3,7 @@ import { ClipboardList, DollarSign, ReceiptText } from 'lucide-react';
 import { useOrderHistory } from '../hooks/useOrderHistory';
 import { formatCurrency } from '../utils/currency';
 import { formatDate } from '../utils/formatDate';
+import { parseOrderId } from '@features/cart/services/orderService';
 
 function StatusBadge({ label }: { label: string }) {
   return (
@@ -143,8 +144,11 @@ export default function OrderHistoryPanel({
               >
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div className="min-w-0">
-                    <p className="truncate text-lg font-900 text-(--theme-text)">
-                      {order.orderId}
+                    <p className="text-xs text-slate-500 truncate">
+                      {parseOrderId(order.orderId).uuid}
+                    </p>
+                    <p className="text-lg font-bold">
+                      {parseOrderId(order.orderId).friendlyName}
                     </p>
                     <p className="mt-1 text-sm font-700 text-(--theme-text) opacity-75">
                       {order.buyerName ?? 'Comprador desconocido'}

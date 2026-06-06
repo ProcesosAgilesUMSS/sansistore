@@ -48,11 +48,14 @@ export default function ReadyOrdersPanel({ embedded = false }: { embedded?: bool
   const handleCloseAssignModal = () => setAssigningOrder(null);
 
   const handleConfirmAssign = async () => {
+    console.log('Confirmar asignación', { assigningOrder, selectedCourier });
     if (!assigningOrder) return;
     const courierId = selectedCourier[assigningOrder.orderId];
-    if (!courierId || !assigningOrder.deliveryId) return;
+    console.log('Courier seleccionado:', courierId);
+    if (!courierId) return;
+    console.log('Asignando a delivery...', { orderId: assigningOrder.orderId, courierId });
 
-    await assingToDelivery(assigningOrder.deliveryId, assigningOrder.orderId, courierId, false);
+    await assingToDelivery(assigningOrder.orderId, courierId);
     setAssigningOrder(null);
     reset();
   };

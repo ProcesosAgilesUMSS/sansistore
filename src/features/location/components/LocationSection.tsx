@@ -1,6 +1,6 @@
 // src/features/location/components/LocationSection.tsx
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { MapPin, X, CheckCircle } from 'lucide-react';
 import LocationsModal from './LocationsModal';
 import MapPicker from './MapPicker';
@@ -15,24 +15,24 @@ export default function LocationSection() {
     const { locations, loading } = useUserLocation(user?.uid ?? null);
 
     const [modalView, setModalView] = useState<ModalView>('none');
-    const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
+    const [manualSelectedId, setManualSelectedId] = useState<string | null>(null);
     const [toast, setToast] = useState(false);
     
     const [editingLocation, setEditingLocation] = useState<Location | null>(null);
 
-    useEffect(() => {
-        if (loading) return;
+    const selectedLocation = (() => {
+        if (loading || locations.length === 0) return null;
 
-        if (locations.length === 0) {
-            setSelectedLocation(null);
-            return;
+        if (manualSelectedId) {
+            const found = locations.find(l => l.id === manualSelectedId);
+            if (found) return found;
         }
 
-        if (selectedLocation === null) {
-            const def = locations.find(l => l.isDefault);
-            if (def) setSelectedLocation(def);
-        }
-    }, [loading, locations]);
+        const defaultLoc = locations.find(l => l.isDefault);
+        if (defaultLoc) return defaultLoc;
+
+        return locations[0] || null;
+    })();
 
     const showToast = () => {
         setToast(true);
@@ -55,13 +55,10 @@ export default function LocationSection() {
             <div className="flex items-center gap-3">
 
                 {selectedLocation ? (
-                    <div className="flex items-center gap-2.5 rounded-full border border-[#88B04B]/30 bg-[#88B04B]/5 px-4 py-2.5 transition-colors duration-300">
+                    <div className="flex items-center gap-2.5 rounded-full border border-[#88B04B]/30 bg-[#88B04B]/5 px-4 py-2.5 transition-colors duration-300 min-w-0 max-w-xs sm:max-w-md">
                         <MapPin size={14} className="shrink-0 text-[#88B04B]" />
-                        <span className="font-outfit text-sm font-bold text-(--theme-text) transition-colors duration-300">
+                        <span className="font-outfit text-sm font-bold text-(--theme-text) transition-colors duration-300 truncate">
                             {selectedLocation.label}
-                        </span>
-                        <span className="font-mono text-[11px] text-(--theme-text)/50 transition-colors duration-300">
-                            {selectedLocation.lat.toFixed(4)}, {selectedLocation.lng.toFixed(4)}
                         </span>
                     </div>
                 ) : (
@@ -94,7 +91,7 @@ export default function LocationSection() {
                     initialSelectedId={selectedLocation?.id}
                     onClose={() => setModalView('none')}
                     onConfirm={(loc) => {
-                        setSelectedLocation(loc);
+                        setManualSelectedId(loc.id ?? null);
                         setModalView('none');
                     }}
                     onAddNew={() => {
@@ -108,17 +105,17 @@ export default function LocationSection() {
 
             {modalView === 'map' && (
                 <div
-                    className="fixed inset-0 z-[100] flex items-center justify-center bg-(--theme-bg)/60 px-4 backdrop-blur-md"
+                    className="fixed inset-0 z-[100] flex items-center justify-center bg-(--theme-bg)/60 px-4 py-6 backdrop-blur-md"
                     onClick={() => {
                         setModalView('list');
                         setEditingLocation(null);  
                     }}
                 >
                     <div
-                        className="w-full max-w-lg overflow-hidden rounded-[2.5rem] border border-[#88B04B]/20 bg-(--theme-card-bg) shadow-2xl transition-colors duration-300"
+                        className="w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden rounded-[2.5rem] border border-[#88B04B]/20 bg-(--theme-card-bg) shadow-2xl transition-colors duration-300"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="flex items-center justify-between border-b border-[#88B04B]/10 px-7 py-5">
+                        <div className="flex flex-shrink-0 items-center justify-between border-b border-[#88B04B]/10 px-7 py-5">
                             {/* editando o creando */}
                             <h2 className="font-outfit text-lg font-black tracking-tight text-(--theme-text) transition-colors duration-300">
                                 {editingLocation ? "Editar Ubicación" : "Nueva Ubicación"}
@@ -138,7 +135,7 @@ export default function LocationSection() {
                                 <X size={18} />
                             </button>
                         </div>
-                        <div className="p-5">
+                        <div className="p-5 overflow-y-auto flex-1 text-(--theme-text)">
                             <MapPicker 
                                 onSave={handleSaveSuccess}  
                                 editingLocation={editingLocation}  

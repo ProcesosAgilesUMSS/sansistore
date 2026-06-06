@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { collection, query, where, onSnapshot, getDocs, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../../../lib/firebase';
-import { PackageSearch, PackageCheck, AlertCircle, CheckCircle2, Play, X, ListFilter } from 'lucide-react';
+import { collection, query, where, onSnapshot, getDocs, doc, updateDoc, serverTimestamp, getDoc } from 'firebase/firestore'; // Añadimos getDoc
+import { db } from '@/lib/firebase';
+import { PackageSearch, PackageCheck, AlertCircle, CheckCircle2, Play, X, ListFilter, User } from 'lucide-react';
+import { parseOrderId } from '@/features/cart/services/orderService';
 
 interface OrderItem {
   productId: string;
-  productName: string; // Mapeado exactamente como está en tu Firestore
+  productName: string;
   quantity: number;
 }
 
@@ -15,6 +16,14 @@ interface Order {
   status: string;
   items: OrderItem[];
   date?: any;
+  // Agrupamos los datos cruzados del vendedor
+  seller?: {
+    displayName?: string;
+    email?: string;
+    institutionalId?: string;
+    phone?: string;
+    photoURL?: string;
+  };
 }
 
 export const OrderDispatch: React.FC = () => {
@@ -23,40 +32,53 @@ export const OrderDispatch: React.FC = () => {
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  
-  // Estado para el control del modal de empaque
+
   const [activeOrderForModal, setActiveOrderForModal] = useState<Order | null>(null);
 
   useEffect(() => {
-    // Escuchar pedidos con estado RESERVADO y PENDIENTE
     const q = query(collection(db, 'orders'), where('status', 'in', ['RESERVADO', 'PENDIENTE']));
-    
+
     const unsubscribe = onSnapshot(q, async (snapshot) => {
       const fetchedOrders = await Promise.all(snapshot.docs.map(async (orderDoc) => {
         const orderData = orderDoc.data();
-        
-        // Consultar la subcolección orderItems
+
+        // 1. Consultar los items del pedido
         const itemsSnap = await getDocs(collection(db, 'orders', orderDoc.id, 'orderItems'));
         const items = itemsSnap.docs.map(itemDoc => {
           const itemData = itemDoc.data();
           return {
-            productId: itemData.productId || itemDoc.id, 
-            productName: itemData.productName || 'Producto sin nombre', // Corregido a productName
+            productId: itemData.productId || itemDoc.id,
+            productName: itemData.productName || 'Producto sin nombre',
             quantity: itemData.quantity || 1
           };
         });
 
+        // 2. CRUCE DE DATOS: Consultar el vendedor en la colección 'users'
+        let sellerInfo = {};
+        if (orderData.sellerId) {
+          try {
+            const sellerRef = doc(db, 'users', orderData.sellerId);
+            const sellerSnap = await getDoc(sellerRef);
+            if (sellerSnap.exists()) {
+              sellerInfo = sellerSnap.data();
+            }
+          } catch (err) {
+            console.error("Error al obtener datos del vendedor:", err);
+          }
+        }
+
         return {
           id: orderDoc.id,
           ...orderData,
-          items
+          items,
+          seller: sellerInfo // Inyectamos la data de la colección users aquí
         } as Order;
       }));
 
-      // Ordenar para que los PENDIENTE salgan primero en la lista
+      // Ordenar: Primero RESERVADO, luego PENDIENTE
       const sortedOrders = fetchedOrders.sort((a, b) => {
-        if (a.status === 'PENDIENTE' && b.status === 'RESERVADO') return -1;
-        if (a.status === 'RESERVADO' && b.status === 'PENDIENTE') return 1;
+        if (a.status === 'RESERVADO' && b.status === 'PENDIENTE') return -1;
+        if (a.status === 'PENDIENTE' && b.status === 'RESERVADO') return 1;
         return 0;
       });
 
@@ -67,22 +89,17 @@ export const OrderDispatch: React.FC = () => {
     return () => unsubscribe();
   }, []);
 
-  // Función para cambiar de RESERVADO -> PENDIENTE y abrir el modal inmediatamente
   const handleStartPicking = async (order: Order) => {
     setProcessingId(order.id);
     setError('');
     try {
       const orderRef = doc(db, 'orders', order.id);
-      await updateDoc(orderRef, { 
+      await updateDoc(orderRef, {
         status: 'PENDIENTE',
-        warehouseStartedAt: serverTimestamp() 
+        warehouseStartedAt: serverTimestamp()
       });
-      
-      // Abre el modal automáticamente cambiando el estado local de forma síncrona
-      setActiveOrderForModal({
-        ...order,
-        status: 'PENDIENTE'
-      });
+
+      setActiveOrderForModal({ ...order, status: 'PENDIENTE' });
     } catch (err: any) {
       setError('Error al iniciar la preparación del pedido.');
     } finally {
@@ -90,19 +107,18 @@ export const OrderDispatch: React.FC = () => {
     }
   };
 
-  // Función para cambiar de PENDIENTE -> EMPAQUETADO y cerrar el modal
   const handleFinishPacking = async (orderId: string) => {
     setProcessingId(orderId);
     setError('');
     try {
       const orderRef = doc(db, 'orders', orderId);
-      await updateDoc(orderRef, { 
+      await updateDoc(orderRef, {
         status: 'EMPAQUETADO',
         warehouseFinishedAt: serverTimestamp()
       });
-      
-      setActiveOrderForModal(null); // Cierra el modal tras el éxito
-      setSuccess(`Pedido #${orderId.slice(-5).toUpperCase()} empaquetado y listo para el vendedor.`);
+
+      setActiveOrderForModal(null);
+      setSuccess(`Pedido #${orderId.slice(-5).toUpperCase()} empaquetado exitosamente.`);
       setTimeout(() => setSuccess(''), 4000);
     } catch (err: any) {
       setError('Error al marcar el pedido como empaquetado.');
@@ -110,6 +126,10 @@ export const OrderDispatch: React.FC = () => {
       setProcessingId(null);
     }
   };
+
+  // Función auxiliar suuper limpia usando los datos reales extraídos de users
+  const getSellerName = (order: Order) =>
+    order.seller?.displayName || order.sellerId || 'Vendedor Desconocido';
 
   if (loading) return <div className="animate-pulse h-full min-h-[300px] bg-(--theme-secondary-bg) rounded-3xl"></div>;
 
@@ -150,53 +170,50 @@ export const OrderDispatch: React.FC = () => {
             {orders.map(order => (
               <div key={order.id} className="border border-(--theme-border) bg-(--theme-secondary-bg) rounded-2xl p-4 flex flex-col justify-between">
                 <div className="mb-4">
+                  <span className="block text-xs text-text-light/50 truncate">
+                    {parseOrderId(order.id).uuid}
+                  </span>
                   <div className="flex justify-between items-start mb-3">
-                    <span className="text-xs font-mono bg-blue-500/20 text-blue-500 px-2 py-1 rounded-md font-bold">
-                      #{order.id.slice(-6).toUpperCase()}
+
+                    <span className="text-md font-bold px-2 py-1 rounded-md font-bold">
+                      {parseOrderId(order.id).friendlyName}
                     </span>
-                    <span className={`text-xs font-bold px-2 py-1 rounded-md ${
-                      order.status === 'PENDIENTE' ? 'bg-amber-500/20 text-amber-500' : 'bg-zinc-500/20 text-zinc-500'
-                    }`}>
+                    <span className={`text-xs font-bold px-2 py-1 rounded-md ${order.status === 'PENDIENTE' ? 'bg-amber-500/20 text-amber-500' : 'bg-zinc-500/20 text-zinc-500'
+                      }`}>
                       {order.status}
                     </span>
                   </div>
-                  <h3 className="font-bold text-sm text-(--theme-text)">Vendedor: {order.sellerId || 'Desconocido'}</h3>
+                  <div className="flex items-center gap-2">
+                    {order.seller?.photoURL && (
+                      <img src={order.seller.photoURL} alt={getSellerName(order)} className="w-6 h-6 rounded-full object-cover shrink-0" />
+                    )}
+                    <h3 className="font-bold text-sm text-(--theme-text)">
+                      {getSellerName(order)}
+                    </h3>
+                  </div>
                   <p className="text-xs text-(--theme-text) opacity-50 mt-1">
-                    Contiene {order.items.reduce((acc, item) => acc + item.quantity, 0)} unidades de productos.
+                    Total {order.items.reduce((acc, item) => acc + item.quantity, 0)} unidad(es).
                   </p>
                 </div>
-                
-                {/* BOTONES DE ACCIÓN PRINCIPAL */}
-                {order.status === 'RESERVADO' ? (
-                  <button
-                    onClick={() => handleStartPicking(order)}
-                    disabled={processingId === order.id}
-                    className="w-full bg-(--theme-border) hover:bg-primary/20 text-(--theme-text) py-2.5 rounded-xl text-sm font-bold transition-all duration-200 active:scale-[0.98] flex justify-center items-center gap-2 disabled:opacity-50 border border-(--theme-border)"
-                  >
-                    <Play className="w-4 h-4 text-primary" />
-                    {processingId === order.id ? 'Iniciando...' : 'EMPEZAR A BUSCAR'}
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => setActiveOrderForModal(order)}
-                    className="w-full bg-primary text-(--theme-bg) py-2.5 rounded-xl text-sm font-bold transition-all duration-200 hover:brightness-110 active:scale-[0.98] flex justify-center items-center gap-2"
-                  >
-                    <ListFilter className="w-4 h-4" />
-                    VER LISTA / EMPACAR
-                  </button>
-                )}
+
+                <button
+                  onClick={() => setActiveOrderForModal(order)}
+                  className="w-full bg-green-500 text-white py-2.5 rounded-xl text-sm font-bold transition-all duration-200 hover:bg-green-400 active:scale-[0.98] flex justify-center items-center gap-2"
+                >
+                  <ListFilter className="w-4 h-4" />
+                  VER DETALLES
+                </button>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* MODAL DE CONTEO Y EMPAQUE (Estilo exacto de tu ProductModal) */}
+      {/* MODAL DE DETALLE Y EMPAQUE */}
       {activeOrderForModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-center items-center p-4">
           <div className="bg-(--theme-card-bg) border border-(--theme-border) rounded-3xl shadow-2xl max-w-md w-full p-7 relative animate-in fade-in zoom-in duration-200 max-h-[90vh] flex flex-col">
-            
-            {/* Botón X de cerrar */}
+
             <button
               onClick={() => setActiveOrderForModal(null)}
               className="absolute top-4 right-4 w-9 h-9 rounded-full bg-(--theme-secondary-bg) border border-(--theme-border) flex items-center justify-center text-(--theme-text) opacity-60 hover:opacity-100 transition"
@@ -205,31 +222,77 @@ export const OrderDispatch: React.FC = () => {
             </button>
 
             <div className="mb-4">
-              <span className="text-xs font-mono bg-blue-500/20 text-blue-500 px-2 py-0.5 rounded-md font-bold">
-                #{activeOrderForModal.id.slice(-6).toUpperCase()}
+              <span className="block text-xs text-text-light/50 truncate">
+                {parseOrderId(activeOrderForModal.id).uuid}
+              </span>
+              <span className="text-lg font-bold px-2 py-0.5 rounded-md font-bold">
+                {parseOrderId(activeOrderForModal.id).friendlyName}
               </span>
               <h2 className="font-['Outfit'] font-black text-xl text-(--theme-text) mt-2 mb-1">
                 Recolección de Pedido
               </h2>
-              <p className="text-xs text-(--theme-text) opacity-50">
-                Verifica físicamente los productos listados antes de empaquetar la caja.
-              </p>
             </div>
 
-            {/* Lista escaneable de productos con scroll interno */}
-            <div className="flex-grow overflow-y-auto my-2 pr-1 space-y-2 max-h-[45vh]">
-              <p className="text-[10px] text-(--theme-text) opacity-50 font-bold uppercase tracking-wider mb-1">Lista de verificación</p>
-              
+            {/* INFOR DEL VENDEDOR */}
+            <p className="text-[10px] text-(--theme-text) opacity-50 font-bold uppercase tracking-wider mb-1">
+              Datos del Vendedor
+            </p>
+            <div className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-2xl p-4 mb-4 flex gap-3 items-center">
+
+              {activeOrderForModal.seller?.photoURL ? (
+                <img
+                  src={activeOrderForModal.seller.photoURL}
+                  alt={getSellerName(activeOrderForModal)}
+                  className="w-12 h-12 rounded-full object-cover shrink-0 border border-(--theme-border)"
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center shrink-0 text-primary">
+                  <User className="w-6 h-6" />
+                </div>
+              )}
+
+              <div className="space-y-1 w-full overflow-hidden">
+                <p className="font-bold text-sm text-(--theme-text) truncate">
+                  {getSellerName(activeOrderForModal)}
+                </p>
+                {activeOrderForModal.seller?.email && (
+                  <p className="text-[11px] text-(--theme-text) opacity-50 truncate">
+                    {activeOrderForModal.seller.email}
+                  </p>
+                )}
+                {activeOrderForModal.seller?.institutionalId && (
+                  <p className="text-[11px] text-(--theme-text) opacity-50 truncate">
+                    {activeOrderForModal.seller.institutionalId}
+                  </p>
+                )}
+                {activeOrderForModal.seller?.phone ? (
+                  <p className="text-[11px] text-(--theme-text) opacity-50 truncate">
+                    {activeOrderForModal.seller.phone}
+                  </p>
+                ) : (
+                  <p className="text-[11px] text-(--theme-text) opacity-50 italic">
+                    Sin teléfono registrado
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* LISTA DE PRODUCTOS */}
+            <div className="flex-grow overflow-y-auto my-2 pr-1 space-y-2 max-h-[35vh]">
+              <p className="text-[10px] text-(--theme-text) opacity-50 font-bold uppercase tracking-wider mb-1">
+                Lista de verificación ({activeOrderForModal.items.length} items)
+              </p>
+
               {activeOrderForModal.items.map((item, idx) => (
-                <div 
-                  key={idx} 
+                <div
+                  key={idx}
                   className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-2xl p-3 flex justify-between items-center"
                 >
                   <div className="flex-1 pr-3">
                     <p className="font-['Outfit'] font-bold text-sm text-(--theme-text) line-clamp-2">
-                      {item.productName} {/* Campo corregido según tu db */}
+                      {item.productName}
                     </p>
-                    <p className="text-[11px] font-mono text-(--theme-text) opacity-40 mt-0.5">
+                    <p className="text-[11px] font-mono text-(--theme-text) opacity-90 mt-0.5">
                       ID: {item.productId}
                     </p>
                   </div>
@@ -242,24 +305,38 @@ export const OrderDispatch: React.FC = () => {
               ))}
             </div>
 
-            {/* Botonera de control inferior idéntica a tu estándar */}
-            <div className="pt-4 flex gap-3 border-t border-(--theme-border)/50 mt-4">
-              <button
-                type="button"
-                onClick={() => setActiveOrderForModal(null)}
-                className="flex-1 px-4 py-3 rounded-2xl font-['Outfit'] font-bold text-sm border border-(--theme-border) text-(--theme-text) opacity-70 hover:opacity-100 hover:bg-(--theme-secondary-bg) transition"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                disabled={processingId === activeOrderForModal.id}
-                onClick={() => handleFinishPacking(activeOrderForModal.id)}
-                className="flex-[1.3] px-4 py-3 rounded-2xl bg-primary text-(--theme-bg) font-['Outfit'] font-bold text-sm shadow-lg shadow-primary/20 hover:brightness-110 disabled:opacity-50 transition-all flex justify-center items-center gap-1"
-              >
-                <PackageCheck className="w-4 h-4" />
-                {processingId === activeOrderForModal.id ? 'Guardando...' : 'EMPAQUETADO'}
-              </button>
+            {/* BOTONERA */}
+            <div className="pt-4 mt-4 border-t border-(--theme-border)/50">
+              {activeOrderForModal.status === 'RESERVADO' ? (
+                <button
+                  type="button"
+                  disabled={processingId === activeOrderForModal.id}
+                  onClick={() => handleStartPicking(activeOrderForModal)}
+                  className="w-full px-4 py-3.5 rounded-2xl bg-amber-500 text-white font-['Outfit'] font-bold text-sm shadow-lg shadow-amber-500/20 hover:brightness-110 disabled:opacity-50 transition-all flex justify-center items-center gap-2"
+                >
+                  <Play className="w-4 h-4 fill-white" />
+                  {processingId === activeOrderForModal.id ? 'Iniciando...' : 'EMPEZAR A BUSCAR'}
+                </button>
+              ) : (
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setActiveOrderForModal(null)}
+                    className="flex-1 px-4 py-3 rounded-2xl font-['Outfit'] font-bold text-sm border border-(--theme-border) text-(--theme-text) opacity-70 hover:opacity-100 hover:bg-(--theme-secondary-bg) transition"
+                  >
+                    Cerrar
+                  </button>
+                  <button
+                    type="button"
+                    disabled={processingId === activeOrderForModal.id}
+                    onClick={() => handleFinishPacking(activeOrderForModal.id)}
+                    className="flex-[1.3] px-4 py-3 rounded-2xl bg-primary text-(--theme-bg) font-['Outfit'] font-bold text-sm shadow-lg shadow-primary/20 hover:brightness-110 disabled:opacity-50 transition-all flex justify-center items-center gap-2"
+                  >
+                    <PackageCheck className="w-5 h-5" />
+                    {processingId === activeOrderForModal.id ? 'Guardando...' : 'EMPAQUETADO'}
+                  </button>
+                </div>
+              )}
             </div>
 
           </div>

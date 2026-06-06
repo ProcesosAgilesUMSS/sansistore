@@ -21,6 +21,12 @@ const auth = admin.auth();
 
 const TS = () => admin.firestore.FieldValue.serverTimestamp();
 
+const FAILED_RESTORE_ORDER_IDS = new Set([
+  '019e74a6-1001-7000-bbbb-000000000001_restore-chromium',
+  '019e74a6-1002-7000-bbbb-000000000002_restore-firefox',
+  '019e74a6-1003-7000-bbbb-000000000003_restore-webkit',
+]);
+
 const toTimestamp = (value, fallback = TS()) => {
   if (!value) return fallback;
   return admin.firestore.Timestamp.fromDate(new Date(value));
@@ -127,6 +133,7 @@ async function seedFirestoreUsers() {
       email: user.email,
       displayName: user.displayName,
       photoURL: user.photoURL,
+      phoneNumber: user.phoneNumber ?? null,
       roles: user.roles,
       institutionalId: user.institutionalId,
       isActive: user.isActive,
@@ -234,7 +241,12 @@ async function seedOrders() {
       in_transit: 'PENDIENTE',
       delivered: 'COBRADO',
       pending_reassignment: 'PENDIENTE',
+      NOT_DELIVERED: 'PENDIENTE',
+      CANCELLED: 'CANCELADO',
     };
+
+    const isCancelled = order.status === 'CANCELADO';
+    const delivery = deliveryList.find((item) => item.orderCode === order.id);
 
     await setDoc('orders', order.id, {
       orderId: order.id,
@@ -245,21 +257,32 @@ async function seedOrders() {
       customerPhone: order.customerPhone,
       address: order.location?.label ?? null,
       status: order.status,
-      incidentReason: null,
+      incidentReason: order.incidentReason ?? null,
+      failedAt: order.failedAt ? toTimestamp(order.failedAt) : null,
+      stockRestored: false,
       total,
       locationId: order.location.id,
       paymentStatus: paymentStatusMap[deliveryStatus] || 'PENDIENTE',
       deliveryStatus,
-      deliveryId: null,
+      deliveryId: delivery?.code ?? null,
       paymentId: order.id,
       confirmedAt: toTimestamp(order.confirmedAt),
-      cancelledAt: null,
+      cancelledAt: isCancelled && order.failedAt ? toTimestamp(order.failedAt) : null,
       createdAt: toTimestamp(order.createdAt),
       updatedAt: toTimestamp(order.updatedAt),
     });
 
     for (const item of items) {
       await setDoc(`orders/${order.id}/orderItems`, item.itemId, item);
+    }
+
+    if (FAILED_RESTORE_ORDER_IDS.has(order.id)) {
+      for (const item of items) {
+        await setDoc('inventory', item.productId, {
+          stockReserved: admin.firestore.FieldValue.increment(item.quantity),
+          updatedAt: TS(),
+        });
+      }
     }
 
     await setDoc('payments', order.id, {
@@ -293,7 +316,10 @@ async function seedDeliveries() {
       status: d.status,
       deliveryCode: d.code.replace('delivery-', 'DEL-2026-'),
       attemptNumber: d.attemptNumber,
-      incidentReason: null,
+      incidentReason: d.incidentReason ?? null,
+      incidentNotes: d.incidentNotes ?? null,
+      cancellationReason: d.cancellationReason ?? null,
+      cancellationNotes: d.cancellationNotes ?? null,
       evidenceUrl: null,
       failureReason: null,
       amountCollected: order ? calculateOrderTotal(order) : null,
@@ -304,6 +330,7 @@ async function seedDeliveries() {
       inTransitAt: toTimestamp(d.inTransitAt),
       deliveredAt: toTimestamp(d.deliveredAt),
       failedAt: toTimestamp(d.failedAt),
+      cancelledAt: toTimestamp(d.cancelledAt),
       reprogrammedAt: toTimestamp(d.reprogrammedAt),
       createdAt: toTimestamp(d.createdAt),
       updatedAt: toTimestamp(d.updatedAt),
