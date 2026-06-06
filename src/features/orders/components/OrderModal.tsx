@@ -33,36 +33,36 @@ export default function OrderModal({
   return (
     <div
       onClick={closeModal}
-      className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-2"
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center px-2"
     >
-      <div onClick={(e) => e.stopPropagation()} className="bg-white w-[75ch] px-4 py-4 rounded-lg flex flex-col max-h-[90vh] overflow-y-auto relative">
+      <div onClick={(e) => e.stopPropagation()} className="bg-(--theme-card-bg) border border-(--theme-border) text-(--theme-text) w-[75ch] px-6 py-6 rounded-3xl flex flex-col max-h-[90vh] overflow-y-auto relative shadow-2xl">
 
-        <div className="flex gap-x-8">
-          <span className="tracking-tight text-xl">{parseOrderId(order.id).friendlyName}</span>
+        <div className="flex gap-x-8 items-center mb-2">
+          <span className="tracking-tight text-3xl font-900" style={{ fontFamily: 'Outfit, sans-serif' }}>{parseOrderId(order.id).friendlyName}</span>
           <div className="flex gap-x-2 items-center">
             <OrderStatusBadge status={order.status} />
           </div>
         </div>
 
         {/*INFORMATION*/}
-        <div className="grid grid-cols-20 my-4">
-          <div className="leading-[140%] col-start-1 col-end-4 text-black/50">Cliente:</div>
+        <div className="grid grid-cols-20 my-4 gap-y-1 text-sm">
+          <div className="leading-[140%] col-start-1 col-end-4 text-(--theme-text) opacity-50">Cliente:</div>
           <div className="leading-[140%] col-start-7  min-[765px]:col-start-5 col-end-21">{order.buyerName}</div>
-          <div className="leading-[140%] col-start-1 col-end-4 text-black/50">Creado:</div>
+          <div className="leading-[140%] col-start-1 col-end-4 text-(--theme-text) opacity-50">Creado:</div>
           <div className="leading-[140%] col-start-7 min-[765px]:col-start-5 col-end-21">{createdAt}</div>
-          <div className="leading-[140%] col-start-1 col-end-4 text-black/50">Destino:</div>
+          <div className="leading-[140%] col-start-1 col-end-4 text-(--theme-text) opacity-50">Destino:</div>
           <div className="leading-[140%] col-start-7 min-[765px]:col-start-5 col-end-21 truncate">{order.address}</div>
-          <div className="leading-[140%] col-start-1 col-end-5 text-black/50 capitalize truncate">{formattedStatus}:</div>
+          <div className="leading-[140%] col-start-1 col-end-5 text-(--theme-text) opacity-50 capitalize truncate">{formattedStatus}:</div>
           <div className="leading-[140%] col-start-7 min-[765px]:col-start-5 col-end-21 truncate">{updatedAt}</div>
           {order.incidentReason && (
             <>
-              <div className="leading-[140%] col-start-1 col-end-4 text-black/50 capitalize">Incidente</div>
-              <div className="leading-[140%] col-start-7 min-[765px]:col-start-5 col-end-21 truncate">{order.incidentReason}</div>
+              <div className="leading-[140%] col-start-1 col-end-4 text-(--theme-text) opacity-50 capitalize mt-2">Incidente</div>
+              <div className="leading-[140%] col-start-7 min-[765px]:col-start-5 col-end-21 truncate text-red-500 mt-2">{order.incidentReason}</div>
 
               {order.incidentNotes && (
                 <>
-                  <div className="leading-[140%] col-start-1 col-end-4 text-black/50 capitalize">Nota:</div>
-                  <div className="leading-[140%] col-start-7 min-[765px]:col-start-5 col-end-21 truncate italic">{order.incidentNotes}</div>
+                  <div className="leading-[140%] col-start-1 col-end-4 text-(--theme-text) opacity-50 capitalize">Nota:</div>
+                  <div className="leading-[140%] col-start-7 min-[765px]:col-start-5 col-end-21 truncate italic opacity-80">{order.incidentNotes}</div>
                 </>
               )}
             </>
@@ -70,18 +70,18 @@ export default function OrderModal({
 
           {order.delivery && (
             <>
-              <div className="leading-[140%] col-start-1 col-end-5 text-black/50">Repartidor:</div>
-              <div className="leading-[140%] col-start-7 min-[765px]:col-start-5 col-end-21">{order.delivery.courierName}</div>
-              <div className="leading-[140%] col-start-1 col-end-5 text-black/50">Asignado:</div>
+              <div className="leading-[140%] col-start-1 col-end-5 text-(--theme-text) opacity-50 mt-2">Repartidor:</div>
+              <div className="leading-[140%] col-start-7 min-[765px]:col-start-5 col-end-21 mt-2">{order.delivery.courierName}</div>
+              <div className="leading-[140%] col-start-1 col-end-5 text-(--theme-text) opacity-50">Asignado:</div>
               <div className="leading-[140%] col-start-7 min-[765px]:col-start-5 col-end-21">{timeAgo(order.delivery.assignedAt)}</div>
               {order.delivery.incidentReason && (
                 <>
-                  <div className="leading-[140%] col-start-1 col-end-5 text-black/50">Incidente:</div>
-                  <div className="leading-[140%] col-start-7 min-[765px]:col-start-5 col-end-21">{order.delivery.incidentReason}</div>
+                  <div className="leading-[140%] col-start-1 col-end-5 text-(--theme-text) opacity-50 mt-2">Incidente:</div>
+                  <div className="leading-[140%] col-start-7 min-[765px]:col-start-5 col-end-21 text-red-500 mt-2">{order.delivery.incidentReason}</div>
                   {order.delivery.incidentNotes && (
                     <>
-                      <div className="leading-[140%] col-start-1 col-end-4 text-black/50 capitalize">Nota:</div>
-                      <div className="leading-[140%] col-start-7 min-[765px]:col-start-5 col-end-21 truncate">{order.delivery.incidentNotes}</div>
+                      <div className="leading-[140%] col-start-1 col-end-4 text-(--theme-text) opacity-50 capitalize">Nota:</div>
+                      <div className="leading-[140%] col-start-7 min-[765px]:col-start-5 col-end-21 truncate italic opacity-80">{order.delivery.incidentNotes}</div>
                     </>
                   )}
                 </>
@@ -92,15 +92,7 @@ export default function OrderModal({
 
 
         <div className="grid grid-cols-20">
-          <div
-            className="col-span-full grid grid-cols-subgrid py-1.5"
-            style={{
-              backgroundImage: 'linear-gradient(to right, black 70%, transparent 70%), linear-gradient(to right, black 70%, transparent 70%)',
-              backgroundPosition: 'top, bottom',
-              backgroundSize: '20px 1px',
-              backgroundRepeat: 'repeat-x'
-            }}
-          >
+          <div className="col-span-full grid grid-cols-subgrid py-3 border-y border-dotted border-(--theme-border) mt-2 text-[10px] uppercase tracking-widest opacity-50">
             <div className="col-start-1 col-end-3">Cant.</div>
             <div className="col-start-4 col-end-13 min-[570px]:col-start-3 min-[570px]:col-end-10">Producto</div>
 
@@ -120,18 +112,18 @@ export default function OrderModal({
               </button>
 
               {showColSelector && (
-                <div className="absolute right-0 top-full border border-black/20 shadow-2xl rounded-md z-[100] min-w-[150px] bg-white">
+                <div className="absolute right-0 top-full border border-(--theme-border) shadow-xl rounded-xl z-[100] min-w-[150px] bg-(--theme-card-bg) mt-1 p-1">
                   {columns.map(col => (
                     <button
                       key={col.id}
-                      className={`flex items-center justify-between block w-full text-left px-2 py-0.5 hover:bg-gray-100 ${selectedCol === col.id ? "bg-blue-100" : "bg-white"}`}
+                      className={`flex items-center justify-between w-full text-left px-3 py-2 text-sm rounded-lg transition-colors hover:bg-(--theme-secondary-bg) ${selectedCol === col.id ? "bg-(--theme-secondary-bg) text-primary" : "text-(--theme-text)"}`}
                       onClick={() => {
                         setSelectedCol(col.id);
                         setShowColSelector(false);
                       }}
                     >
                       {col.label}
-                      {selectedCol === col.id && <Check size={12} color="blue" />}
+                      {selectedCol === col.id && <Check size={14} className="text-primary" />}
                     </button>
                   ))}
                 </div>
@@ -161,23 +153,15 @@ export default function OrderModal({
           </ul>
         </div>
 
-        <div
-          className="py-2"
-          style={{
-            backgroundImage: 'linear-gradient(to right, black 70%, transparent 70%), linear-gradient(to right, black 70%, transparent 70%)',
-            backgroundPosition: 'top, bottom',
-            backgroundSize: '20px 1px',
-            backgroundRepeat: 'repeat-x',
-          }}
-        >
-          <div className="flex justify-between items-center leading-[130%]">
-            <div>Número de artículos:</div>
-            <div>{totalQuantity}</div>
+        <div className="py-4 border-y border-dotted border-(--theme-border) mt-2 text-sm">
+          <div className="flex justify-between items-center leading-[130%] mb-2">
+            <div className="text-(--theme-text) opacity-60">Número de artículos:</div>
+            <div className="font-medium">{totalQuantity}</div>
           </div>
 
           <div className="flex justify-between items-baseline leading-[130%]">
-            <div>Total:</div>
-            <div className="tracking-tight">{formatCurrency(order.total)}</div>
+            <div className="text-(--theme-text) opacity-60">Total:</div>
+            <div className="tracking-tight text-xl font-800">{formatCurrency(order.total)}</div>
           </div>
         </div>
 
