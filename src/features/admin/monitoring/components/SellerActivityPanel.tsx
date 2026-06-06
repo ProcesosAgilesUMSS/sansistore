@@ -182,13 +182,6 @@ export default function SellerActivityPanel() {
         </p>
       </div>
 
-      {/* Demo banner */}
-      {USE_MOCK_DATA && (
-        <div className="flex items-center gap-2 px-4 py-3 rounded-xl text-[12px] font-medium bg-amber-500/10 border border-amber-500/20 text-amber-700 mb-4">
-          <span className="w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center text-white text-[10px] font-bold">!</span>
-          Modo demo activo — Cambia <code className="bg-amber-100 px-1 py-0.5 rounded text-[11px] mx-1">USE_MOCK_DATA</code> a <code className="bg-amber-100 px-1 py-0.5 rounded text-[11px] mx-1">false</code> para usar Firestore.
-        </div>
-      )}
 
       {/* Filtros */}
       <p className="text-[10px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-widest mb-3 pb-2 border-b border-[var(--theme-border)]">

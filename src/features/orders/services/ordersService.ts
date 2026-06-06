@@ -18,6 +18,9 @@ import {
 import { db, auth } from "@/lib/firebase";
 import type { Order, OrderStatus, OrderItem, ReturnRequest } from "@features/orders/types";
 
+// ── HU #160: Monitoreo de actividad de vendedores ──
+import { registrarActividadVendedor } from '../../admin/monitoring/services/sellerActivityService';
+
 // --- Seller Actions ---
 
 export async function paidOrder(orderId: string): Promise<void> {
@@ -142,6 +145,19 @@ export async function paidOrder(orderId: string): Promise<void> {
       }
     }
   });
+
+  // ── HU #160: Registrar actividad del vendedor ──
+  const sellerSnap = await getDoc(doc(db, 'users', user.uid));
+  const sellerData = sellerSnap.exists() ? sellerSnap.data() : {};
+  registrarActividadVendedor({
+    sellerId: user.uid,
+    sellerName: sellerData.displayName ?? 'Vendedor',
+    sellerEmail: sellerData.email ?? '',
+    actionType: 'MARCAR_PAGADA',
+    orderId,
+    previousStatus: 'ENTREGADO',
+    newStatus: 'PAGADO',
+  }).catch((err) => console.error('❌ ERROR al registrar actividad:', err));
 }
 
 export async function reserveOrder(orderId: string): Promise<void> {
@@ -154,17 +170,49 @@ export async function reserveOrder(orderId: string): Promise<void> {
     sellerId: user.uid,
     updatedAt: serverTimestamp(),
   });
+
+  // ── HU #160: Registrar actividad del vendedor ──
+  const sellerSnap = await getDoc(doc(db, 'users', user.uid));
+  const sellerData = sellerSnap.exists() ? sellerSnap.data() : {};
+  registrarActividadVendedor({
+    sellerId: user.uid,
+    sellerName: sellerData.displayName ?? 'Vendedor',
+    sellerEmail: sellerData.email ?? '',
+    actionType: 'RESERVAR',
+    orderId,
+    previousStatus: 'CREADO',
+    newStatus: 'RESERVADO',
+  }).catch((err) => console.error('No se pudo registrar la actividad:', err));
 }
 
 export async function readyOrder(orderId: string): Promise<void> {
+  //camila-160
+  const user = auth.currentUser;
   const orderRef = doc(db, "orders", orderId);
   await updateDoc(orderRef, {
     status: "LISTO",
     updatedAt: serverTimestamp(),
   });
+
+  // ── HU #160: Registrar actividad del vendedor ──
+  if (user) {
+    const sellerSnap = await getDoc(doc(db, 'users', user.uid));
+    const sellerData = sellerSnap.exists() ? sellerSnap.data() : {};
+    registrarActividadVendedor({
+      sellerId: user.uid,
+      sellerName: sellerData.displayName ?? 'Vendedor',
+      sellerEmail: sellerData.email ?? '',
+      actionType: 'MARCAR_LISTO',
+      orderId,
+      previousStatus: 'EMPAQUETADO',
+      newStatus: 'LISTO',
+    }).catch((err) => console.error('No se pudo registrar actividad:', err));
+  }
 }
 
 export async function cancelOrder(orderId: string, incidentReason: string): Promise<void> {
+  //camila-160
+  const user = auth.currentUser;
   const orderRef = doc(db, "orders", orderId);
   
   await runTransaction(db, async (transaction) => {
@@ -174,6 +222,21 @@ export async function cancelOrder(orderId: string, incidentReason: string): Prom
       updatedAt: serverTimestamp(),
     });
   });
+
+  // ── HU #160: Registrar actividad del vendedor ──
+  if (user) {
+    const sellerSnap = await getDoc(doc(db, 'users', user.uid));
+    const sellerData = sellerSnap.exists() ? sellerSnap.data() : {};
+    registrarActividadVendedor({
+      sellerId: user.uid,
+      sellerName: sellerData.displayName ?? 'Vendedor',
+      sellerEmail: sellerData.email ?? '',
+      actionType: 'CANCELAR',
+      orderId,
+      previousStatus: 'RESERVADO',
+      newStatus: 'CANCELADO',
+    }).catch((err) => console.error('No se pudo registrar la actividad:', err));
+  }
 }
 
 // --- Real-time Subscriptions ---
