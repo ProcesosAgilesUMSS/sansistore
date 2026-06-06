@@ -307,6 +307,19 @@ export default function OrderDetailsPanel({
                 </div>
               </div>
             )}
+            {order.status === 'CANCELADO' && (order.incidentNotes || order.incidentReason) && (
+              <div className="flex items-start gap-3 pt-4 border-t border-(--theme-border)">
+                <div className="flex items-center justify-center w-6 h-6 mt-0.5 shrink-0 rounded-full bg-red-500/10 text-red-500 font-bold text-xs">
+                  <AlertCircle size={14} />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold mb-1 text-red-500">Motivo de cancelación</h4>
+                  <p className="text-sm opacity-80 break-words">
+                    {order.incidentNotes || order.incidentReason}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className={cardClass}>
