@@ -25,6 +25,11 @@ export const sections = [
     route: '/seller/rejected-orders',
   },
   {
+    id: 'incidencias',
+    label: 'Incidencias',
+    route: '/seller/incidents',
+  },
+  {
     id: 'no-entregados',
     label: 'Pedidos no entregados',
     route: '/seller/undelivered-orders',
