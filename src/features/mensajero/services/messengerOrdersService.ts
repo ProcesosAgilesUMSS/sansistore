@@ -15,6 +15,7 @@ import {
 import { db } from '../../../lib/firebase';
 import { getCurrentZone } from '../../location/utils/zoneLimits';
 import type { MessengerOrder, MessengerOrderItem } from '../types';
+import { getVisibleMessengerOrders } from '../utils/orderVisibility';
 
 type DeliveryStatus = MessengerOrder['deliveryStatus'];
 type OrderData = Record<string, unknown>;
@@ -234,7 +235,7 @@ export async function getMessengerOrders(
     )
   );
 
-  return orders.sort((a, b) => a.id.localeCompare(b.id));
+  return getVisibleMessengerOrders(orders);
 }
 
 export function subscribeToMessengerOrders(
@@ -257,7 +258,7 @@ export function subscribeToMessengerOrders(
           )
         );
 
-        onChange(orders.sort((a, b) => a.id.localeCompare(b.id)));
+        onChange(getVisibleMessengerOrders(orders));
       } catch (error) {
         onError?.(
           error instanceof Error
