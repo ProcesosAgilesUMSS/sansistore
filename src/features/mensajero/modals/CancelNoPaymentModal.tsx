@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { DollarSign, LoaderCircle, X, XCircle } from 'lucide-react';
 import type { MessengerOrder } from '../types';
+import { formatBolivianos } from '../utils/money';
 
 interface CancelNoPaymentModalProps {
   order: MessengerOrder;
@@ -74,7 +75,7 @@ export default function CancelNoPaymentModal({
 
             <div>
               <p className="text-xs font-bold uppercase opacity-50">Monto</p>
-              <p className="mt-1 text-sm font-bold">Bs {order.cashToCollect}</p>
+              <p className="mt-1 text-sm font-bold">{formatBolivianos(order.cashToCollect)}</p>
             </div>
 
             <div>

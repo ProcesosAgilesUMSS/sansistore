@@ -10,14 +10,14 @@ import { EmptyOrders } from './EmptyOrders';
 import { SkeletonRows } from './SkeletonRows';
 import { ErrorMessage } from './ErrorMessage';
 import { useGetMessengers } from '../hooks/useGetMessengers';
-import { useAssignOrdersToDelivery } from '../hooks/useAssignOrdersToDelivery';
+import { useRessignOrdersToDelivery } from '../hooks/useAssignOrdersToDelivery';
 
 export default function RejectedOrdersPanel({ embedded = false }: { embedded?: boolean }) {
   const {
     orders: rejected,
     loading,
     error
-  } = useGetOrders({ status: 'PENDIENTE REASIGNACION', ordby: 'desc' });
+  } = useGetOrders({ status: 'PENDIENTE REASIGNACION', ordby: 'asc' });
 
 
   const {
@@ -27,11 +27,11 @@ export default function RejectedOrdersPanel({ embedded = false }: { embedded?: b
   } = useGetMessengers()
 
   const {
-    assingToDelivery,
+    reassingToDelivery,
     isLoading: assignLoading,
     error: assignError,
     reset
-  } = useAssignOrdersToDelivery()
+  } = useRessignOrdersToDelivery()
 
   const [selectedCourier, setSelectedCourier] = useState<Record<string, string>>({});
 
@@ -59,7 +59,7 @@ export default function RejectedOrdersPanel({ embedded = false }: { embedded?: b
     const courierId = selectedCourier[reassigningOrder.orderId];
     if (!courierId || !reassigningOrder.deliveryId) return;
 
-    await assingToDelivery(reassigningOrder.deliveryId, reassigningOrder.orderId, courierId, true)
+    await reassingToDelivery(reassigningOrder.deliveryId, reassigningOrder.orderId, courierId)
     setReassigningOrder(null);
     reset();
 

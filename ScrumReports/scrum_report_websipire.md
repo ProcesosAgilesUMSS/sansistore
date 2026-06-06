@@ -286,3 +286,65 @@ por las dudas que se tienen.
 * **Yesterday:** Realizar pruebas y validaciones de las funcionalidades implementadas en las últimas HUs.
 * **Today:** Colaborar en la integración de la opción “Pagar contra entrega” y verificar posibles errores en el flujo.
 * **Blockers:** none
+
+# Daily Reports - Team 3 Webspire 28/05/26
+
+## Dayana Saleth Ortuño Guzman
+
+ * **Yesterday:** Hice el mockup de la HU que me tocó en Figma.
+* **Today:** Revisé algunas dependencias relacionadas con mi HU y empecé a desarrollarla.
+* **Blockers:** none
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Avancé en el diseño del mockup correspondiente a mi HU, definiendo la estructura visual y el flujo principal.
+* **Today:** Revisé las posibles dependencias de mi HU y comencé con su desarrollo, tomando en cuenta los ajustes necesarios para su implementación.
+* **Blockers:** none
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Avancé con el mockup de mi HU y revisé algunos detalles relacionados con el flujo.
+* **Today:** Continuaré revisando dependencias relacionadas con la HU y comenzaré con su desarrollo.
+* **Blockers:** none
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Avancé con el mockup de mi HU, definiendo la estructura visual y algunos detalles del flujo principal.
+* **Today:** Continuaré con el desarrollo de la HU y verificaré posibles ajustes necesarios para su implementación.
+* **Blockers:** none
+
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Revisé los requerimientos y el flujo de la HU asignada para identificar las funcionalidades necesarias.
+* **Today:** Comenzaré con el diseño y desarrollo inicial de la HU, tomando en cuenta las dependencias relacionadas.
+* **Blockers:** none
+
+# Daily Reports - Team 3 Webspire 02/06/26
+
+## Dayana Saleth Ortuño Guzman
+
+* **Yesterday:** Terminé de implementar mi HU asignada. Además, estuve analizando y planificando cómo desarrollar la otra HU que me fue asignada.
+* **Today:** Corregí los bugs identificados en funcionalidades desarrolladas anteriormente y realicé las validaciones correspondientes para asegurar su correcto funcionamiento.
+* **Blockers:** None.
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Terminé de implementar mi HU asignada, relacionada con la verificación de pagos registrados por mensajeros para el control financiero.
+* **Today:** Realizaré pruebas para identificar posibles bugs y validar que la funcionalidad trabaje correctamente según los criterios definidos.
+* **Blockers:** None.
+  
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Avancé con el diseño y la implementación del código de la HU asignada, tomando en cuenta los requerimientos y el flujo definido para la funcionalidad.
+* **Today:** Continuaré ajustando la implementación, realizando pruebas básicas y corrigiendo posibles detalles para asegurar su correcto funcionamiento.
+* **Blockers:** None
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Avancé con la revisión y validación de la HU asignada, verificando su funcionamiento y realizando ajustes en la implementación.
+* **Today:** Continuaré apoyando en la revisión de funcionalidades y en la corrección de observaciones identificadas durante las pruebas.
+* **Blockers:** None
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Avancé con la implementación de la HU asignada, desarrollando las funcionalidades principales y verificando su integración con los componentes relacionados.
+* **Today:** Continuaré realizando ajustes en la implementación, ejecutando pruebas y validando que la funcionalidad cumpla con los criterios de aceptación establecidos.
+* **Blockers:** none

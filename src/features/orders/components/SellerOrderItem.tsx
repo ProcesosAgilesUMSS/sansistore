@@ -1,59 +1,33 @@
-import type { Order } from "../types";
+import type { Order } from "@features/orders/types";
+import { timeAgo } from "../utils/formatDate";
 import OrderStatusBadge from "./OrderStatusBadge";
-import { readyOrder } from "../services/ordersService";
 
-export default function SellerOrderItem({
-  order,
-  index,
-  selectOrder
-}: {
+interface Props {
   order: Order;
   index: number;
-  selectOrder: (order: Order) => void
-}) {
-  const displayId = `ord-${(index + 1).toString().padStart(3, "0")}`;
+  selectOrder: () => void
+}
 
-  const handleReady = async () => {
-    try {
-      await readyOrder(order.id);
-    } catch (error) {
-      console.error("Error updating order to ready:", error);
-      alert("Error al marcar la orden como lista. Por favor intenta de nuevo.");
-    }
-  };
+export default function SellerOrderItem({ order, index, selectOrder }: Props) {
+  const updatedAt = timeAgo(order.updatedAt);
 
   return (
     <li
-      onClick={() => selectOrder(order)}
-      className="grid grid-cols-subgrid col-span-full border-b py-[10px] min-[760px]:py-0 border-black/20 cursor-pointer hover:bg-black/5"
+      onClick={selectOrder}
+      className="grid grid-cols-subgrid col-span-full border-b border-dotted border-(--theme-border) hover:bg-(--theme-secondary-bg) transition-colors cursor-pointer py-3 items-center"
     >
-      <div className="col-span-full min-[760px]:col-start-1 min-[760px]:col-end-3 text-sm flex items-center gap-[8px] text-xs uppercase">
-        <div className="size-1.5 bg-[#1e1e1e]" />
-        {displayId}
-      </div>
-      <div className="col-start-1 col-end-9 min-[760px]:col-start-3 min-[760px]:col-end-10 text-[calc(.78125vw+13.5px)] truncate
-      min-[960px]:col-end-13 tracking-tight">
-        {order.delivery.destination}
+      <div className="col-span-full min-[765px]:col-start-1 min-[765px]:col-end-3 flex items-center gap-x-2 text-sm font-mono">
+        <div className="size-1.5 bg-(--theme-text) opacity-70 shrink-0" />
+        ORD-{(index + 1).toString().padStart(3, '0')}
       </div>
 
-      <div
-        className="min-[960px]:col-start-14 min-[960px]:col-end-18 min-[760px]:col-start-10 min-[760px]:col-end-14 text-[11px] flex
-        items-center col-span-full tracking-tight min-[760px]:ml-4 min-[960px]:ml-0"
-      >
+      <div className="col-span-full min-[765px]:col-start-3 min-[765px]:col-end-11 truncate min-[965px]:col-end-9 uppercase text-sm">{order.address}</div>
+      <div className="col-span-full min-[765px]:col-start-11 min-[765px]:col-end-16 min-[965px]:col-start-9 min-[965px]:col-end-13 min-[765px]:ml-2 min-[960px]:ml-10  flex gap-x-2 items-center text-sm">
         <OrderStatusBadge status={order.status} />
       </div>
 
-      {order.status === "EMPAQUETADO" && (
-        <button
-          className="text-left min-[760px]:col-start-16 min-[960px]:col-start-21 min-[960px]:col-end-23 text-sm underline decoration-2 cursor-pointer underline-offset-2"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleReady();
-          }}
-        >
-          Listo
-        </button>
-      )}
+      <div className="hidden min-[965px]:inline col-start-13 col-end-16 ml-4 text-sm">{updatedAt}</div>
+      <div className="hidden min-[765px]:inline min-[765px]:col-start-16 min-[765px]:col-end-19 min-[965px]:ml-4">{order.delivery?.courierName || "-"}</div>
     </li>
-  );
+  )
 }

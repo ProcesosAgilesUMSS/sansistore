@@ -2,6 +2,7 @@ import type { Order } from '../types';
 import { formatCurrency } from '../utils/currency';
 import { formatDate } from '../utils/formatDate';
 import { StatusPill } from './StatusPill';
+import { parseOrderId } from '@/features/cart/services/orderService';
 
 interface Props {
   order: Order;
@@ -35,8 +36,11 @@ export const CardOrder = ({
           <div className="min-w-0">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
-                <h3 className="mt-1 text-xl font-900 tracking-tight text-(--theme-text)" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                  #{order.orderId.slice(-10).toUpperCase()}
+                <p className="text-xs text-(--theme-text) opacity-50">
+                   {parseOrderId(order.orderId).uuid}
+                </p>
+                <h3 className="mt-1 text-xl font-bold tracking-tight text-(--theme-text)" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                  {parseOrderId(order.orderId).friendlyName}
                 </h3>
                 <p className="mt-2 text-sm font-700 text-(--theme-text) opacity-80">
                   {order.buyerName ?? 'Comprador desconocido'}

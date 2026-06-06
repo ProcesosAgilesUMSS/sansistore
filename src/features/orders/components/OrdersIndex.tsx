@@ -23,8 +23,8 @@ const ALL_STATUSES: OrderStatus[] = [
   "RESERVADO",
   "PENDIENTE",
   "EMPAQUETADO",
-  "in_transit",
-  "delivered",
+  "EN CAMINO",
+  "ENTREGADO",
 ];
 
 const STATUS_DOT_COLOR: Record<string, string> = {
@@ -32,8 +32,8 @@ const STATUS_DOT_COLOR: Record<string, string> = {
   RESERVADO: "bg-blue-500",
   PENDIENTE: "bg-yellow-500",
   EMPAQUETADO: "bg-purple-500",
-  in_transit: "bg-blue-500",
-  delivered: "bg-green-500",
+  "EN CAMINO": "bg-blue-500",
+  ENTREGADO: "bg-green-500",
 };
 
 export default function OrdersIndex() {
@@ -95,7 +95,7 @@ export default function OrdersIndex() {
     displayOrders = displayOrders.filter((o) => !o.sellerId);
   }
 
-  const deliveredOrders = allOrders.filter((o) => o.status === "delivered");
+  const deliveredOrders = allOrders.filter((o) => o.status === "ENTREGADO");
   const deliveredTotal = deliveredOrders.reduce((t, o) => t + (o.total ?? 0), 0);
 
   return (
@@ -259,7 +259,7 @@ function OrderCard({
             {uuid}
           </span>
           <span className="font-bold text-text-light group-hover:text-primary transition-colors">
-            {friendlyName.replace(/-/g, ' ')}
+            {friendlyName}
           </span>
           <p className="text-sm text-text-light/80 truncate mt-0.5">
             {order.delivery.destination}

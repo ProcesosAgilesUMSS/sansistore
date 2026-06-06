@@ -8,26 +8,108 @@ import {
   type DocumentData,
   updateDoc,
   onSnapshot,
+  type Unsubscribe,
   type QuerySnapshot,
   orderBy,
   addDoc,
   serverTimestamp,
   runTransaction,
 } from "firebase/firestore";
-import { db, auth } from "../../../lib/firebase";
-import type { Order, OrderStatus, OrderItem, ReturnRequest } from "../types";
+import { db, auth } from "@/lib/firebase";
+import type { Order, OrderItem, ReturnRequest, Delivery } from "@features/orders/types";
 
 // --- Seller Actions ---
+
+export async function paidOrder(orderId: string): Promise<void> {
+  const user = auth.currentUser;
+  if (!user) throw new Error("No autenticado");
+
+  const orderRef = doc(db, "orders", orderId);
+  const itemsSnapshot = await getDocs(collection(orderRef, "orderItems"));
+  const items = itemsSnapshot.docs.map(doc => ({
+    itemId: doc.id,
+    ...(doc.data() as Omit<OrderItem, "itemId">)
+  }));
+
+  await runTransaction(db, async (transaction) => {
+    // 1. Gather all reads
+    const invRefs = items.map(item => doc(db, "inventory", item.productId));
+    const invSnaps = await Promise.all(invRefs.map(ref => transaction.get(ref)));
+
+    // 2. Perform all writes
+    transaction.update(orderRef, {
+      status: "PAGADO",
+      updatedAt: serverTimestamp(),
+    });
+
+    invSnaps.forEach((invSnap, index) => {
+      if (!invSnap.exists()) {
+        throw new Error(`Inventario no encontrado para el producto: ${items[index].productId}`);
+      }
+
+      const invData = invSnap.data();
+      const currentTotal = invData.stockTotal || 0;
+      const currentReserved = invData.stockReserved || 0;
+      const qty = items[index].quantity || 0;
+
+      transaction.update(invRefs[index], {
+        stockTotal: currentTotal - qty,
+        stockReserved: currentReserved - qty,
+        updatedAt: serverTimestamp(),
+      });
+    });
+  });
+}
+
+export async function returnOrder(orderId: string): Promise<void> {
+  const user = auth.currentUser;
+  if (!user) throw new Error("Debe estar autenticado para reservar un pedido.");
+
+  const orderRef = doc(db, "orders", orderId);
+  await updateDoc(orderRef, {
+    status: "DEVUELTO",
+    updatedAt: serverTimestamp(),
+  });
+}
+
 
 export async function reserveOrder(orderId: string): Promise<void> {
   const user = auth.currentUser;
   if (!user) throw new Error("Debe estar autenticado para reservar un pedido.");
 
   const orderRef = doc(db, "orders", orderId);
-  await updateDoc(orderRef, {
-    status: "RESERVADO",
-    sellerId: user.uid,
-    updatedAt: serverTimestamp(),
+  const itemsSnapshot = await getDocs(collection(orderRef, "orderItems"));
+  const items = itemsSnapshot.docs.map(doc => ({
+    itemId: doc.id,
+    ...(doc.data() as Omit<OrderItem, "itemId">)
+  }));
+
+  await runTransaction(db, async (transaction) => {
+    // 1. Gather all reads
+    const invRefs = items.map(item => doc(db, "inventory", item.productId));
+    const invSnaps = await Promise.all(invRefs.map(ref => transaction.get(ref)));
+
+    // 2. Perform all writes
+    transaction.update(orderRef, {
+      status: "RESERVADO",
+      sellerId: user.uid,
+      updatedAt: serverTimestamp(),
+    });
+
+    invSnaps.forEach((invSnap, index) => {
+      if (!invSnap.exists()) {
+        throw new Error(`Inventario no encontrado para el producto: ${items[index].productId}`);
+      }
+
+      const invData = invSnap.data();
+      const currentAvailable = invData.stockAvailable || 0;
+      const qty = items[index].quantity || 0;
+
+      transaction.update(invRefs[index], {
+        stockAvailable: currentAvailable - qty,
+        updatedAt: serverTimestamp(),
+      });
+    });
   });
 }
 
@@ -36,6 +118,47 @@ export async function readyOrder(orderId: string): Promise<void> {
   await updateDoc(orderRef, {
     status: "LISTO",
     updatedAt: serverTimestamp(),
+  });
+}
+
+export async function cancelOrder(orderId: string, incidentReason: string, incidentNotes?: string): Promise<void> {
+  const orderRef = doc(db, "orders", orderId);
+  const itemsSnapshot = await getDocs(collection(orderRef, "orderItems"));
+  const items = itemsSnapshot.docs.map(doc => ({
+    itemId: doc.id,
+    ...(doc.data() as Omit<OrderItem, "itemId">)
+  }));
+
+  await runTransaction(db, async (transaction) => {
+    // 1. Gather all reads
+    const invRefs = items.map(item => doc(db, "inventory", item.productId));
+    const invSnaps = await Promise.all(invRefs.map(ref => transaction.get(ref)));
+
+    // 2. Perform all writes
+    transaction.update(orderRef, {
+      status: "CANCELADO",
+      incidentReason,
+      incidentNotes: incidentNotes || null,
+      updatedAt: serverTimestamp(),
+      cancelledAt: serverTimestamp(),
+    });
+
+    invSnaps.forEach((invSnap, index) => {
+      if (!invSnap.exists()) {
+        throw new Error(`Inventario no encontrado para el producto: ${items[index].productId}`);
+      }
+
+      const invData = invSnap.data();
+      const currentAvailable = invData.stockAvailable || 0;
+      const currentReserved = invData.stockReserved || 0;
+      const qty = items[index].quantity || 0;
+
+      transaction.update(invRefs[index], {
+        stockAvailable: currentAvailable + qty,
+        stockReserved: Math.max(0, currentReserved - qty),
+        updatedAt: serverTimestamp(),
+      });
+    });
   });
 }
 
@@ -65,6 +188,19 @@ export function subscribeToSellerOrders(sellerId: string, onUpdate: (orders: Ord
   });
 }
 
+export function subscribeToOrder(
+  orderId: string,
+  onData: (data: Order) => void,
+  onError?: (error: Error) => void
+): Unsubscribe {
+  const orderRef = doc(db, "orders", orderId);
+  return onSnapshot(orderRef, (snap) => {
+    if (!snap.exists()) return;
+    const data = snap.data() as Order;
+    onData(data);
+  }, onError);
+}
+
 export async function getSentOrders(): Promise<Order[]> {
   return [];
 }
@@ -73,33 +209,73 @@ export async function getSentOrders(): Promise<Order[]> {
 
 
 async function processQuerySnapshot(querySnapshot: QuerySnapshot<DocumentData>): Promise<Order[]> {
-  const uniqueLocationIds = Array.from(
-    new Set(
-      querySnapshot.docs
-        .map((doc) => (doc.data() as any).locationId)
-        .filter((id): id is string => !!id)
-    )
-  );
+  const docs = querySnapshot.docs;
+  if (docs.length === 0) return [];
+
+  const locationIds = new Set<string>();
+  const buyerIds = new Set<string>();
+  const deliveryIds = new Set<string>();
+
+  docs.forEach(doc => {
+    const data = doc.data() as any;
+    if (data.locationId) locationIds.add(data.locationId);
+    if (data.buyerId) buyerIds.add(data.buyerId);
+    if (data.deliveryId) deliveryIds.add(data.deliveryId);
+  });
 
   const locationMap = new Map<string, string>();
-  if (uniqueLocationIds.length > 0) {
-    await Promise.all(
-      uniqueLocationIds.map(async (id) => {
-        const locSnap = await getDoc(doc(db, "locations", id));
-        if (locSnap.exists()) {
-          locationMap.set(id, (locSnap.data() as any).label || "Sin etiqueta");
-        }
-      })
-    );
-  }
+  const userMap = new Map<string, any>();
+  const deliveryMap = new Map<string, any>();
 
-  const orders = await Promise.all(querySnapshot.docs.map(async (orderDoc) => {
-    const data = orderDoc.data() as Record<string, any>;
-    const destination = (data.locationId && locationMap.get(data.locationId)) || "Ubicación no encontrada";
+  // Parallel fetch of top-level entities
+  await Promise.all([
+    ...Array.from(locationIds).map(async id => {
+      const snap = await getDoc(doc(db, "locations", id));
+      if (snap.exists()) locationMap.set(id, (snap.data() as any).label || "Sin etiqueta");
+    }),
+    ...Array.from(buyerIds).map(async id => {
+      const snap = await getDoc(doc(db, "users", id));
+      if (snap.exists()) userMap.set(id, snap.data());
+    }),
+    ...Array.from(deliveryIds).map(async id => {
+      const snap = await getDoc(doc(db, "deliveries", id));
+      if (snap.exists()) deliveryMap.set(id, snap.data());
+    })
+  ]);
+
+  // Now fetch couriers for deliveries
+  const courierIds = new Set<string>();
+  deliveryMap.forEach(del => {
+    if (del.courierId) courierIds.add(del.courierId);
+  });
+
+  await Promise.all(
+    Array.from(courierIds).map(async id => {
+      if (!userMap.has(id)) {
+        const snap = await getDoc(doc(db, "users", id));
+        if (snap.exists()) userMap.set(id, snap.data());
+      }
+    })
+  );
+
+  const stockMap = new Map<string, number>();
+
+  const orders = await Promise.all(docs.map(async orderDoc => {
+    const data = orderDoc.data() as any;
+    const buyer = userMap.get(data.buyerId);
+    const delData = data.deliveryId ? deliveryMap.get(data.deliveryId) : null;
+    let courierName = null;
+    if (delData?.courierId) {
+      courierName = userMap.get(delData.courierId)?.displayName || "Mensajero sin nombre";
+    }
 
     const itemsSnapshot = await getDocs(collection(orderDoc.ref, "orderItems"));
-    const items = itemsSnapshot.docs.map(itemDoc => {
+    const items = await Promise.all(itemsSnapshot.docs.map(async (itemDoc) => {
       const item = itemDoc.data();
+      if (!stockMap.has(item.productId)) {
+        const invSnap = await getDoc(doc(db, "inventory", item.productId));
+        stockMap.set(item.productId, invSnap.exists() ? invSnap.data().stockAvailable || 0 : 0);
+      }
       return {
         itemId: itemDoc.id,
         productId: item.productId,
@@ -108,24 +284,25 @@ async function processQuerySnapshot(querySnapshot: QuerySnapshot<DocumentData>):
         quantity: item.quantity,
         subtotal: item.subtotal,
         description: item.description,
+        stockAvailable: stockMap.get(item.productId),
       };
-    }) as OrderItem[];
+    })) as OrderItem[];
+
+    const delivery: Delivery | null = delData ? {
+      id: data.deliveryId,
+      ...delData,
+      courierName
+    } : null;
 
     return {
       id: orderDoc.id,
-      secret: data.secret,
-      buyerId: data.buyerId,
-      sellerId: data.sellerId,
-      status: data.status as OrderStatus,
-      buyerReceptionConfirmed: data.buyerReceptionConfirmed || data.customerConfirmed || false,
-      buyerReceptionConfirmedAt: data.buyerReceptionConfirmedAt ?? data.customerConfirmedAt ?? null,
-      delivery: {
-        destination
-      },
+      ...data,
+      buyerName: buyer?.displayName || "Usuario desconocido",
+      delivery,
       items,
-      total: data.total,
-      createdAt: data.createdAt
-    };
+      incidentReason: data.incidentReason,
+      incidentNotes: data.incidentNotes,
+    } as Order;
   }));
 
   return orders.sort((a, b) => b.id.localeCompare(a.id));
@@ -138,44 +315,13 @@ export async function getOrderById(orderId: string): Promise<Order | null> {
   const orderSnap = await getDoc(orderRef);
   if (!orderSnap.exists()) return null;
 
-  const data = orderSnap.data() as Record<string, any>;
+  const data = orderSnap.data() as any;
 
-  let destination = "Ubicación no encontrada";
-  if (data.locationId) {
-    const locSnap = await getDoc(doc(db, "locations", data.locationId));
-    if (locSnap.exists()) {
-      destination = (locSnap.data() as any).label || "Sin etiqueta";
-    }
-  }
-
-  const itemsSnapshot = await getDocs(collection(orderRef, "orderItems"));
-  const items = itemsSnapshot.docs.map((itemDoc) => {
-    const item = itemDoc.data();
-    return {
-      itemId: itemDoc.id,
-      productId: item.productId,
-      productName: item.productName,
-      unitPrice: item.unitPrice,
-      quantity: item.quantity,
-      subtotal: item.subtotal,
-      description: item.description,
-    };
-  }) as OrderItem[];
-
-  return {
-    id: orderSnap.id,
-    secret: data.secret,
-    buyerId: data.buyerId,
-    sellerId: data.sellerId,
-    status: data.status as OrderStatus,
-    buyerReceptionConfirmed: data.buyerReceptionConfirmed || data.customerConfirmed || false,
-    buyerReceptionConfirmedAt:
-      data.buyerReceptionConfirmedAt ?? data.customerConfirmedAt ?? null,
-    delivery: { destination },
-    items,
-    total: data.total,
-    createdAt: data.createdAt,
-  };
+  // We can use a trick to reuse processQuerySnapshot by creating a mock QuerySnapshot
+  // but it's cleaner to just call it if we have a list. 
+  // For now, let's just use it to fetch this single order's details efficiently.
+  const orders = await processQuerySnapshot({ docs: [orderSnap] } as any);
+  return orders[0] || null;
 }
 
 export async function getMyOrders(userId: string): Promise<Order[]> {
@@ -238,6 +384,31 @@ export async function createReturnRequest(requestData: Omit<ReturnRequest, 'id' 
   }
 }
 
+export function subscribeToMyOrders(
+  userId: string,
+  onUpdate: (orders: Order[]) => void,
+  onError?: (error: Error) => void
+): Unsubscribe {
+  const q = query(
+    collection(db, "orders"),
+    where("buyerId", "==", userId),
+    orderBy("createdAt", "desc")
+  );
+
+  return onSnapshot(q, async (querySnapshot) => {
+    try {
+      const orders = await processQuerySnapshot(querySnapshot);
+      onUpdate(orders);
+    } catch (error) {
+      onError?.(
+        error instanceof Error
+          ? error
+          : new Error("No se pudieron escuchar tus pedidos.")
+      );
+    }
+  }, onError);
+}
+
 export async function getMyReturns(userId: string): Promise<ReturnRequest[]> {
   const q = query(
     collection(db, "returns"),
@@ -250,3 +421,4 @@ export async function getMyReturns(userId: string): Promise<ReturnRequest[]> {
     ...doc.data()
   })) as ReturnRequest[];
 }
+

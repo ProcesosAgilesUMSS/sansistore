@@ -11,20 +11,27 @@ export type OrderStatus =
   'RESERVADO' |
   'PENDIENTE' |
   'EMPAQUETADO' |
-  'LISTO';
+  'LISTO' |
+  'ACEPTADO' |
+  'PENDIENTE REASIGNACION' |
+  'DEVUELTO';
+
 
 export const STATUS_LABELS: Record<OrderStatus, string> = {
-  CREADO: "Creado",
-  ASIGNADO: "Asignado",
-  'EN CAMINO': "En camino",
-  ENTREGADO: "Entregado",
-  PAGADO: "Pagado",
-  CANCELADO: "Cancelado",
-  'NO ENTREGADO': "No entregado",
-  RESERVADO: "Reservado",
-  PENDIENTE: "Pendiente",
-  EMPAQUETADO: "Empaquetado",
-  LISTO: "Listo"
+  CREADO: "CREADO",
+  RESERVADO: "RESERVADO",
+  PENDIENTE: "PENDIENTE",
+  EMPAQUETADO: "EMPAQUETADO",
+  LISTO: "LISTO",
+  ASIGNADO: "ASIGNADO",
+  ACEPTADO: "ACEPTADO",
+  'PENDIENTE REASIGNACION': "RECHAZADO",
+  DEVUELTO: "DEVUELTO",
+  'EN CAMINO': "EN CAMINO",
+  ENTREGADO: "ENTREGADO",
+  PAGADO: "PAGADO",
+  CANCELADO: "CANCELADO",
+  'NO ENTREGADO': "NO ENTREGADO",
 };
 
 export interface OrderItem {
@@ -35,25 +42,66 @@ export interface OrderItem {
   quantity: number;
   subtotal: number;
   description?: string;
+  stockAvailable?: number;
+}
+
+export interface Delivery {
+  id: string;
+  orderId: string;
+  courierId?: string;
+  courierName?: string;
+  status: string;
+  deliveryCode?: string;
+  attemptNumber?: number;
+  incidentReason?: string | null;
+  incidentNotes?: string | null;
+  evidenceUrl?: string;
+  failureReason?: string;
+  amountCollected?: number;
+  customerConfirmed?: boolean;
+  customerConfirmedAt?: Timestamp | null;
+  assignedAt?: Timestamp | null;
+  pickedUpAt?: Timestamp | null;
+  deliveredAt?: Timestamp | null;
+  inTransitAt?: Timestamp | null;
+  failedAt?: Timestamp | null;
+  reprogrammedAt?: Timestamp | null;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
 }
 
 export interface Order {
   id: string;
   secret?: string;
   buyerId: string;
+  buyerName?: string;
   sellerId?: string;
   status: OrderStatus;
   buyerReceptionConfirmed?: boolean;
   buyerReceptionConfirmedAt: Timestamp | null;
-  delivery: {
-    destination: string;
-  };
+  address: string;
+  deliveryStatus?: string | null;
+  delivery?: Delivery | null;
+  paymentId?: string | null;
+  paymentStatus?: string | null;
   total?: number;
   items: OrderItem[];
   createdAt: Timestamp;
+  updatedAt: Timestamp;
+  incidentReason?: string;
+  incidentNotes?: string;
 }
 
 export type ReturnStatus = 'pending_review' | 'approved' | 'rejected';
+
+export type ReturnReason = 'damaged' | 'wrong_product' | 'unwanted' | 'other';
+
+export const RETURN_REASON_LABELS: Record<ReturnReason, string> = {
+  damaged: 'Producto dañado',
+  wrong_product: 'Producto incorrecto',
+  unwanted: 'No deseado',
+  other: 'Otro',
+};
 
 export interface ReturnRequest {
   id?: string;

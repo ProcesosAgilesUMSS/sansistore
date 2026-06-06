@@ -7,7 +7,7 @@ import {
   getUserCartItems,
   removeCartItem,
 } from '../services/cartService';
-import type { CartItem } from '../types';
+import type { CartDisplayItem } from '../types';
 
 function RemoveItemModal({
   item,
@@ -15,7 +15,7 @@ function RemoveItemModal({
   onConfirm,
   onCancel,
 }: {
-  item: CartItem;
+  item: CartDisplayItem;
   isLoading: boolean;
   onConfirm: () => void;
   onCancel: () => void;
@@ -104,7 +104,7 @@ function RemoveItemModal({
   );
 }
 
-function AvailabilityPill({ item }: { item: CartItem }) {
+function AvailabilityPill({ item }: { item: CartDisplayItem }) {
   const available = item.isAvailable;
   return (
     <span
@@ -127,9 +127,9 @@ function CartItemCard({
   removing,
   onRemove,
 }: {
-  item: CartItem;
+  item: CartDisplayItem;
   removing: boolean;
-  onRemove: (item: CartItem) => void;
+  onRemove: (item: CartDisplayItem) => void;
 }) {
   return (
     <article className="rounded-xl border border-(--theme-border) bg-(--theme-card-bg) p-4 transition hover:border-(--theme-text)/20">
@@ -189,7 +189,7 @@ function CartItemCard({
   );
 }
 
-function CartSummary({ items }: { items: CartItem[] }) {
+function CartSummary({ items }: { items: CartDisplayItem[] }) {
   const subtotal = items.reduce((sum, item) => sum + item.subtotal, 0);
   const shipping = 0;
   const total = subtotal + shipping;
@@ -269,15 +269,15 @@ function EmptyCart() {
 export default function CartPage() {
   const [user, setUser] = useState<User | null>(null);
   const [authReady, setAuthReady] = useState(false);
-  const [items, setItems] = useState<CartItem[] | null>(null);
+  const [items, setItems] = useState<CartDisplayItem[]>([]);
   const [error, setError] = useState('');
   const [removingItemId, setRemovingItemId] = useState<string | null>(null);
-  const [itemToRemove, setItemToRemove] = useState<CartItem | null>(null);
+  const [itemToRemove, setItemToRemove] = useState<CartDisplayItem | null>(null);
 
   useEffect(() => {
     return onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      setItems(null);
+      setItems([]);
       setError('');
       setAuthReady(true);
     });
@@ -306,7 +306,7 @@ export default function CartPage() {
     [items],
   );
 
-  const handleRemoveItem = (item: CartItem) => {
+  const handleRemoveItem = (item: CartDisplayItem) => {
     if (!user || removingItemId) return;
     setItemToRemove(item);
   };
@@ -332,7 +332,7 @@ export default function CartPage() {
     }
   };
 
-  if (!authReady || (user && items === null && !error)) {
+  if (!authReady || (user && items.length === 0 && !error && !items)) {
     return <div id="cart-status">Cargando...</div>;
   }
 

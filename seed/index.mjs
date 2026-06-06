@@ -7,6 +7,7 @@ import { locationList } from './data/locations.mjs';
 import { orderList } from './data/orders.mjs';
 import { deliveryList } from './data/deliveries.mjs';
 import { run as seedCartItems } from './data/cart.mjs';
+import { inventoryMovements } from './data/inventoryMovements.mjs';
 
 process.env.FIRESTORE_EMULATOR_HOST =
   process.env.FIRESTORE_EMULATOR_HOST || '127.0.0.1:8080';
@@ -21,6 +22,12 @@ const auth = admin.auth();
 
 const TS = () => admin.firestore.FieldValue.serverTimestamp();
 
+const FAILED_RESTORE_ORDER_IDS = new Set([
+  '019e74a6-1001-7000-bbbb-000000000001_restore-chromium',
+  '019e74a6-1002-7000-bbbb-000000000002_restore-firefox',
+  '019e74a6-1003-7000-bbbb-000000000003_restore-webkit',
+]);
+
 const toTimestamp = (value, fallback = TS()) => {
   if (!value) return fallback;
   return admin.firestore.Timestamp.fromDate(new Date(value));
@@ -33,6 +40,35 @@ const setDoc = async (collection, id, data) => {
   await ref.set(data, { merge: true });
   return ref.id;
 };
+
+const clearCollection = async (collectionPath) => {
+  const snapshot = await db.collection(collectionPath).get();
+  if (snapshot.empty) return;
+
+  const batch = db.batch();
+  snapshot.docs.forEach((doc) => batch.delete(doc.ref));
+  await batch.commit();
+};
+
+const buildOrderItems = (order) =>
+  order.items.map((item, idx) => {
+    const unitPrice = item.product.hasOffer
+      ? item.product.offerPrice
+      : item.product.price;
+    const subtotal = unitPrice * item.quantity;
+    return {
+      itemId: `${order.id}-item-${idx + 1}`,
+      productId: item.product.slug,
+      productName: item.product.name,
+      imageUrl: item.product.imageUrl,
+      unitPrice,
+      quantity: item.quantity,
+      subtotal,
+    };
+  });
+
+const calculateOrderTotal = (order) =>
+  buildOrderItems(order).reduce((sum, item) => sum + item.subtotal, 0);
 
 async function seedAuthUsers() {
   for (const user of userList) {
@@ -99,6 +135,7 @@ async function seedFirestoreUsers() {
       email: user.email,
       displayName: user.displayName,
       photoURL: user.photoURL,
+      phoneNumber: user.phoneNumber ?? null,
       roles: user.roles,
       institutionalId: user.institutionalId,
       isActive: user.isActive,
@@ -193,21 +230,9 @@ async function seedLocations() {
 
 async function seedOrders() {
   for (const order of orderList) {
-    const items = order.items.map((item, idx) => {
-      const unitPrice = item.product.hasOffer
-        ? item.product.offerPrice
-        : item.product.price;
-      const subtotal = unitPrice * item.quantity;
-      return {
-        itemId: `${order.code}-item-${idx + 1}`,
-        productId: item.product.slug,
-        productName: item.product.name,
-        unitPrice,
-        quantity: item.quantity,
-        subtotal,
-      };
-    });
+    await clearCollection(`orders/${order.id}/orderItems`);
 
+    const items = buildOrderItems(order);
     const total = items.reduce((sum, item) => sum + item.subtotal, 0);
     const deliveryStatus = order.deliveryStatus;
 
@@ -218,7 +243,12 @@ async function seedOrders() {
       in_transit: 'PENDIENTE',
       delivered: 'COBRADO',
       pending_reassignment: 'PENDIENTE',
+      NOT_DELIVERED: 'PENDIENTE',
+      CANCELLED: 'CANCELADO',
     };
+
+    const isCancelled = order.status === 'CANCELADO';
+    const delivery = deliveryList.find((item) => item.orderCode === order.id);
 
     await setDoc('orders', order.id, {
       orderId: order.id,
@@ -227,23 +257,35 @@ async function seedOrders() {
       sellerId: order.seller?.uid || null,
       customerName: order.customerName,
       customerPhone: order.customerPhone,
-      address: order.address ?? null,
+      address: order.location?.label ?? null,
       status: order.status,
-      incidentReason: null,
+      incidentReason: order.incidentReason ?? null,
+      failedAt: order.failedAt ? toTimestamp(order.failedAt) : null,
+      stockRestored: false,
       total,
       locationId: order.location.id,
       paymentStatus: paymentStatusMap[deliveryStatus] || 'PENDIENTE',
       deliveryStatus,
-      deliveryId: null,
+      deliveryId: delivery?.code ?? null,
       paymentId: order.id,
       confirmedAt: toTimestamp(order.confirmedAt),
-      cancelledAt: null,
+      cancelledAt:
+        isCancelled && order.failedAt ? toTimestamp(order.failedAt) : null,
       createdAt: toTimestamp(order.createdAt),
       updatedAt: toTimestamp(order.updatedAt),
     });
 
     for (const item of items) {
       await setDoc(`orders/${order.id}/orderItems`, item.itemId, item);
+    }
+
+    if (FAILED_RESTORE_ORDER_IDS.has(order.id)) {
+      for (const item of items) {
+        await setDoc('inventory', item.productId, {
+          stockReserved: admin.firestore.FieldValue.increment(item.quantity),
+          updatedAt: TS(),
+        });
+      }
     }
 
     await setDoc('payments', order.id, {
@@ -264,17 +306,26 @@ async function seedOrders() {
 
 async function seedDeliveries() {
   for (const d of deliveryList) {
+    const legacyIndex = /^order-(\d+)$/.exec(d.orderCode)?.[1];
+    const order = legacyIndex
+      ? orderList[Number(legacyIndex) - 1]
+      : orderList.find((item) => item.id === d.orderCode);
+
     await setDoc('deliveries', d.code, {
       deliveryId: d.code,
-      orderId: d.orderCode,
+      orderId: order?.id || d.orderCode,
+      orderCode: d.orderCode,
       courierId: d.courier ? d.courier.uid : null,
       status: d.status,
       deliveryCode: d.code.replace('delivery-', 'DEL-2026-'),
       attemptNumber: d.attemptNumber,
-      incidentReason: null,
+      incidentReason: d.incidentReason ?? null,
+      incidentNotes: d.incidentNotes ?? null,
+      cancellationReason: d.cancellationReason ?? null,
+      cancellationNotes: d.cancellationNotes ?? null,
       evidenceUrl: null,
       failureReason: null,
-      amountCollected: d.amountCollected,
+      amountCollected: order ? calculateOrderTotal(order) : null,
       customerConfirmed: d.customerConfirmed,
       customerConfirmedAt: toTimestamp(d.customerConfirmedAt),
       assignedAt: toTimestamp(d.assignedAt),
@@ -282,12 +333,24 @@ async function seedDeliveries() {
       inTransitAt: toTimestamp(d.inTransitAt),
       deliveredAt: toTimestamp(d.deliveredAt),
       failedAt: toTimestamp(d.failedAt),
+      cancelledAt: toTimestamp(d.cancelledAt),
       reprogrammedAt: toTimestamp(d.reprogrammedAt),
       createdAt: toTimestamp(d.createdAt),
       updatedAt: toTimestamp(d.updatedAt),
     });
   }
   console.log('deliveries seeded');
+}
+
+// inventoryMovements.............
+async function seedMovements() {
+  for (const movement of inventoryMovements) {
+    await db.collection('inventoryMovements').add({
+      ...movement,
+      createdAt: toTimestamp(movement.createdAt)
+    });
+  }
+  console.log('inventory movements seeded');
 }
 
 async function main() {
@@ -300,6 +363,9 @@ async function main() {
     await seedLocations();
     await seedOrders();
     await seedDeliveries();
+    
+    await seedMovements();
+    
   } catch (err) {
     console.error('seed failed:', err);
     process.exit(1);

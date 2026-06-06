@@ -1,0 +1,25 @@
+# Dependencias y artefactos: se instalan/generan dentro de la imagen.
+node_modules
+dist
+.vercel
+.astro
+
+# Reportes y resultados de tests (se regeneran).
+playwright-report
+test-results
+junit-result
+
+# Logs y debug de Firebase.
+*-debug.log
+firebase-debug.log
+firestore-debug.log
+
+# Control de versiones y editores.
+.git
+.github
+.vscode
+
+# Entorno local.
+.env
+.env.*
+!.env.example

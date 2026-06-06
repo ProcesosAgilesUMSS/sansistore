@@ -13,6 +13,8 @@ import {onSchedule} from "firebase-functions/v2/scheduler";
 import {onDocumentUpdated} from "firebase-functions/v2/firestore";
 import {initializeApp} from "firebase-admin/app";
 import {getFirestore, FieldValue} from "firebase-admin/firestore";
+import {defineSecret} from "firebase-functions/params";
+import nodemailer from "nodemailer";
 
 // Inicializar Firebase Admin SDK
 // Esto da acceso a Firestore con permisos de administrador
@@ -21,9 +23,11 @@ initializeApp();
 
 const db = getFirestore();
 
+const gmailUser = defineSecret("GMAIL_USER");
+const gmailPass = defineSecret("GMAIL_PASS");
+
 /**
  * Convierte valores Timestamp/Date/string de Firestore a Date.
- *
  * @param {unknown} value Valor de fecha.
  * @return {Date|null} Fecha normalizada.
  */
@@ -35,10 +39,8 @@ function toDate(value) {
 }
 
 /**
- * Cancela pedidos vencidos de un snapshot y libera su stock reservado.
- *
- * @param {FirebaseFirestore.QueryDocumentSnapshot[]} orderDocs
- * Pedidos vencidos.
+ * Cancela pedidos vencidos y libera su stock reservado.
+ * @param {FirebaseFirestore.QueryDocumentSnapshot[]} orderDocs Pedidos.
  * @return {Promise<number>} Cantidad de pedidos cancelados.
  */
 async function cancelExpiredOrders(orderDocs) {
@@ -70,9 +72,7 @@ async function cancelExpiredOrders(orderDocs) {
     itemsSnap.docs.forEach((itemDoc) => {
       const {productId, quantity} = itemDoc.data();
       if (!productId || !quantity) return;
-
       const inventoryRef = db.collection("inventory").doc(productId);
-
       batch.update(inventoryRef, {
         stockReserved: FieldValue.increment(-quantity),
         stockAvailable: FieldValue.increment(quantity),
@@ -118,6 +118,7 @@ export const marcarTiempoReserva = onDocumentUpdated(
 // Se ejecuta automáticamente cada 5 minutos
 // Busca pedidos en estado RESERVADO que superaron el tiempo límite
 // y los cancela, liberando el stock correspondiente
+
 export const liberarReservas = onSchedule(
     {
       schedule: "every 5 minutes",
@@ -126,13 +127,12 @@ export const liberarReservas = onSchedule(
     },
     async () => {
       try {
-      // ── Paso 1: Leer el tiempo límite desde settings/config ──
         const settingsRef = db.collection("settings").doc("config");
         const settingsSnap = await settingsRef.get();
 
         const reservationTimeLimit = settingsSnap.exists ?
-        (settingsSnap.data().reservationTimeLimit ?? 30) :
-        30;
+          (settingsSnap.data().reservationTimeLimit ?? 30) :
+          30;
 
         const limitMs = reservationTimeLimit * 60 * 1000;
         const cutoffTime = new Date(Date.now() - limitMs);
@@ -177,5 +177,125 @@ export const liberarReservas = onSchedule(
         console.error("[liberarReservas] ❌ Error:", error);
         throw error;
       }
+    },
+);
+
+export const notificarStockDisponible = onDocumentUpdated(
+    {
+      document: "inventory/{productId}",
+      region: "southamerica-east1",
+      secrets: [gmailUser, gmailPass],
+    },
+    async (event) => {
+      const before = event.data.before.data();
+      const after = event.data.after.data();
+      const stockEfectivoAntes = Math.max(
+          0,
+          (before.stockAvailable ?? 0) - (before.stockReserved ?? 0),
+      );
+      const stockEfectivoDespues = Math.max(
+          0,
+          (after.stockAvailable ?? 0) - (after.stockReserved ?? 0),
+      );
+
+      if (stockEfectivoAntes > 0 || stockEfectivoDespues <= 0) {
+        return;
+      }
+
+      const productId = event.params.productId;
+      console.log(`[notificarStock] Stock disponible para: ${productId}`);
+
+      const subscribersSnap = await db
+          .collection("stockAlerts")
+          .doc(productId)
+          .collection("subscribers")
+          .get();
+
+      if (subscribersSnap.empty) {
+        console.log(`[notificarStock] Sin suscriptores para: ${productId}`);
+        return;
+      }
+
+      const productSnap = await db
+          .collection("products")
+          .doc(productId)
+          .get();
+
+      const productName = productSnap.exists ?
+        (productSnap.data().name ?? productId) :
+        productId;
+
+      const productSlug = productSnap.exists ?
+        (productSnap.data().slug ?? productId) :
+        productId;
+
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: gmailUser.value(),
+          pass: gmailPass.value(),
+        },
+      });
+
+      const userIds = subscribersSnap.docs.map((d) => d.data().userId);
+
+      const usersSnap = await Promise.all(
+          userIds.map((uid) => db.collection("users").doc(uid).get()),
+      );
+
+      const baseUrl = "https://sansistore-umss.vercel.app/productos";
+
+      const emailPromises = usersSnap
+          .filter((snap) => snap.exists && snap.data().email)
+          .map(async (snap) => {
+            const email = snap.data().email;
+            const displayName = snap.data().displayName ?? "Cliente";
+
+            await transporter.sendMail({
+              from: `"SansiStore" <${gmailUser.value()}>`,
+              to: email,
+              subject: `¡${productName} ya está disponible!`,
+              html: `
+                <div style="font-family:Arial,sans-serif;max-width:600px;">
+                  <h2 style="color:#22c55e;">
+                    ¡Buenas noticias, ${displayName}!
+                  </h2>
+                  <p>El producto que esperabas ya tiene stock:</p>
+                  <h3 style="color:#333;">${productName}</h3>
+                  <a
+                    href="${baseUrl}/${productSlug}"
+                    style="
+                      display:inline-block;
+                      background-color:#22c55e;
+                      color:white;
+                      padding:12px 24px;
+                      border-radius:24px;
+                      text-decoration:none;
+                      font-weight:bold;
+                      margin-top:16px;
+                    "
+                  >
+                    Ver producto
+                  </a>
+                  <p style="color:#888;font-size:12px;margin-top:24px;">
+                    Te suscribiste a alertas de stock en SansiStore.
+                  </p>
+                </div>
+              `,
+            });
+
+            console.log(`[notificarStock] Correo enviado a: ${email}`);
+          });
+
+      await Promise.all(emailPromises);
+
+      const batch = db.batch();
+      subscribersSnap.docs.forEach((d) => batch.delete(d.ref));
+      await batch.commit();
+
+      const count = subscribersSnap.size;
+      console.log(
+          `[notificarStock] ✅ ${count} suscriptores notificados.`,
+      );
     },
 );

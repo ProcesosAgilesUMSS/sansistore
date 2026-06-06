@@ -77,12 +77,10 @@ export const registerPurchase = async (data: PurchaseData): Promise<void> => {
   const movementRef = doc(collection(db, 'inventoryMovements'));
   batch.set(movementRef, {
     productId: data.productId,
+    operatorId: data.sellerId,
     type: 'INGRESO_COMPRA',
-    quantity: data.quantity,
     reason: `Compra registrada${data.supplier ? ` - Proveedor: ${data.supplier}` : ''}`,
-    sellerId: data.sellerId,
-    purchaseId: purchaseRef.id,
-    date: data.purchaseDate,
+    quantity: data.quantity,
     createdAt: serverTimestamp(),
   });
 

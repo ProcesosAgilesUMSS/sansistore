@@ -34,10 +34,10 @@ export default function OrderProductDetail({
             id="order-detail-title"
             className="text-[clamp(1.75rem,4vw,3rem)] font-black tracking-[-0.04em] leading-none text-text-light"
           >
-            {friendlyName.replace(/-/g, ' ')}
+            {friendlyName}
           </h3>
           <p className="text-sm text-text-light/80 mt-4">
-            Destino: {order.delivery.destination}
+            Destino: {order.address}
           </p>
           <div className="text-sm flex items-center gap-3 mt-3">
             <span className="text-text-light/60">Estado:</span>
@@ -48,8 +48,8 @@ export default function OrderProductDetail({
                   order.status === "RESERVADO" ? "bg-blue-500" :
                   order.status === "PENDIENTE" ? "bg-yellow-500" :
                   order.status === "EMPAQUETADO" ? "bg-purple-500" :
-                  order.status === "in_transit" ? "bg-blue-500" :
-                  order.status === "delivered" ? "bg-green-500" :
+                  order.status === "EN CAMINO" ? "bg-blue-500" :
+                  order.status === "ENTREGADO" ? "bg-green-500" :
                   "bg-current"
                 }`}
               />
@@ -127,7 +127,7 @@ export default function OrderProductDetail({
 
                 <div className="flex justify-between sm:block">
                   <span className="sm:hidden text-[11px] font-bold uppercase tracking-wider text-text-light/40">P. Unitario</span>
-                  <p className="text-sm text-text-light/80">Bs {item.price}</p>
+                  <p className="text-sm text-text-light/80">Bs {item.unitPrice}</p>
                 </div>
 
                 <div className="flex justify-between sm:block">

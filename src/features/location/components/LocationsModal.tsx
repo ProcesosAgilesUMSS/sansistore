@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X, Plus, MapPin, Loader2 } from 'lucide-react';
 import LocationCard from './LocationCard';
+import ErrorModal from './ErrorModal';
 import { useDeleteLocation } from '../hooks/useDeleteLocation';
 import { useSetDefaultLocation } from '../hooks/useSetDefaultLocation';
 import type { Location } from '../types';
@@ -29,7 +30,7 @@ export default function LocationsModal({
     const [selectedId, setSelectedId] = useState<string | null>(initialSelectedId ?? null);
 
     const { handleDelete } = useDeleteLocation();
-    const { handleSetDefault } = useSetDefaultLocation();
+    const { handleSetDefault, error: defaultError, clearError } = useSetDefaultLocation();
 
     const handleConfirm = () => {
         const selected = locations.find(l => l.id === selectedId);
@@ -117,6 +118,13 @@ export default function LocationsModal({
                     </button>
                 </div>
             </div>
+
+            <ErrorModal
+                isOpen={!!defaultError}
+                title="Error de Preferencia"
+                message={defaultError ?? ''}
+                onClose={clearError}
+            />
 
             <style dangerouslySetInnerHTML={{
                 __html: `

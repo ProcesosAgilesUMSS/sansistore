@@ -13,9 +13,19 @@ import {
   type Unsubscribe,
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
+import { getCurrentZone } from '../../location/utils/zoneLimits';
 import type { MessengerOrder, MessengerOrderItem } from '../types';
+import { getVisibleMessengerOrders } from '../utils/orderVisibility';
 
 type DeliveryStatus = MessengerOrder['deliveryStatus'];
+type OrderData = Record<string, unknown>;
+type PaymentData = Record<string, unknown>;
+
+type CustomerLocation = {
+  label: string | null;
+  lat: number | null;
+  lng: number | null;
+};
 
 const normalizeDeliveryStatus = (status: unknown): DeliveryStatus => {
   if (status === 'accepted' || status === 'ACCEPTED') return 'accepted';
@@ -72,6 +82,144 @@ const readOrderItems = async (
   });
 };
 
+const asString = (value: unknown): string | null =>
+  typeof value === 'string' && value.trim() ? value.trim() : null;
+
+const asNumber = (value: unknown): number | null =>
+  typeof value === 'number' && Number.isFinite(value) ? value : null;
+
+const toAmount = (...values: unknown[]) => {
+  for (const value of values) {
+    const amount =
+      typeof value === 'number' ? value : typeof value === 'string' ? Number(value) : null;
+
+    if (amount != null && Number.isFinite(amount)) return amount;
+  }
+
+  return 0;
+};
+
+const readBuyerName = async (buyerId: unknown): Promise<string | null> => {
+  const uid = asString(buyerId);
+  if (!uid) return null;
+
+  const userSnap = await getDoc(doc(db, 'users', uid));
+  if (!userSnap.exists()) return null;
+
+  const user = userSnap.data();
+  return asString(user.displayName) || asString(user.name) || asString(user.email);
+};
+
+const readCustomerLocation = async (
+  locationId: unknown
+): Promise<CustomerLocation> => {
+  const id = asString(locationId);
+  if (!id) return { label: null, lat: null, lng: null };
+
+  const locationSnap = await getDoc(doc(db, 'locations', id));
+  if (!locationSnap.exists()) return { label: null, lat: null, lng: null };
+
+  const location = locationSnap.data();
+  return {
+    label: asString(location.label),
+    lat: asNumber(location.lat),
+    lng: asNumber(location.lng),
+  };
+};
+
+const formatCourierZoneName = (zoneName: string | null): string | undefined => {
+  const name = asString(zoneName)?.replace(/^Zona\s+\d+\s*-\s*/i, '');
+  if (!name) return undefined;
+
+  return `${name.charAt(0).toUpperCase()}${name.slice(1)}`;
+};
+
+const readPayment = async (paymentId: string | null): Promise<PaymentData> => {
+  if (!paymentId) return {};
+
+  const paymentSnap = await getDoc(doc(db, 'payments', paymentId));
+  return paymentSnap.exists() ? paymentSnap.data() : {};
+};
+
+const isCollectedPaymentStatus = (status: string) => {
+  const normalized = status
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase();
+
+  return normalized === 'cobrado' || normalized === 'pagado' || normalized === 'paid';
+};
+
+const mapMessengerOrder = async (
+  deliveryId: string,
+  delivery: OrderData
+): Promise<MessengerOrder> => {
+  const orderId = String(delivery.orderId || '');
+  const orderSnap = orderId ? await getDoc(doc(db, 'orders', orderId)) : null;
+  const order = orderSnap?.exists() ? orderSnap.data() : {};
+  const paymentId = asString(order.paymentId) ?? (orderId || null);
+  const [items, buyerName, customerLocation, payment] = await Promise.all([
+    orderId ? readOrderItems(orderId) : [],
+    readBuyerName(order.buyerId),
+    readCustomerLocation(order.locationId),
+    readPayment(paymentId),
+  ]);
+  const paymentStatus = String(payment.status ?? order.paymentStatus ?? 'PENDIENTE');
+  const storedPaymentStatusLabel = String(
+    payment.statusLabel ?? order.paymentStatusLabel ?? ''
+  );
+  const paymentCollectedAt =
+    toDate(payment.collectedAt) ?? toDate(order.paymentCollectedAt);
+  const customerName =
+    asString(order.customerName) ||
+    'Cliente no registrado';
+  const address =
+    asString(order.address) ||
+    customerLocation.label ||
+    'Direccion no registrada';
+  const courierZoneName =
+    customerLocation.lat != null && customerLocation.lng != null
+      ? formatCourierZoneName(
+          getCurrentZone(customerLocation.lat, customerLocation.lng)
+        )
+      : undefined;
+
+  return {
+    id: orderId || deliveryId,
+    deliveryId,
+    paymentId,
+    customerName,
+    buyerName: asString(order.customerName) || buyerName || 'Comprador invitado',
+    secret: typeof order.secret === 'string' ? order.secret : undefined,
+    phone: String(order.customerPhone || order.phone || 'Sin telefono'),
+    address,
+    city: String(order.deliveryZone || 'Cochabamba'),
+    locationLabel: customerLocation.label ?? undefined,
+    deliveryLat: customerLocation.lat,
+    deliveryLng: customerLocation.lng,
+    reference:
+      asString(order.reference) ||
+      asString(order.locationLabel) ||
+      courierZoneName,
+    items,
+    cashToCollect: toAmount(delivery.amountCollected, payment.amount, order.total),
+    paymentMethod: 'cash_on_delivery' as const,
+    paymentStatus,
+    paymentStatusLabel: isCollectedPaymentStatus(paymentStatus)
+      ? 'Cobrado'
+      : storedPaymentStatusLabel || 'Pendiente de cobro',
+    paymentCollectedAt,
+    collectedBy:
+      asString(payment.collectedBy) ?? asString(order.collectedBy),
+    deliveryMethod: String(order.deliveryMethod || 'Delivery'),
+    deliveryStatus: normalizeDeliveryStatus(delivery.status),
+    assignedAt: toDate(delivery.assignedAt),
+    createdAt: toDate(delivery.createdAt) ?? toDate(order.createdAt),
+    updatedAt: toDate(delivery.updatedAt) ?? toDate(order.updatedAt),
+  };
+};
+
 export async function getMessengerOrders(
   courierId: string
 ): Promise<MessengerOrder[]> {
@@ -82,48 +230,12 @@ export async function getMessengerOrders(
   const deliveriesSnapshot = await getDocs(deliveriesQuery);
 
   const orders = await Promise.all(
-    deliveriesSnapshot.docs.map(async (deliveryDoc) => {
-      const delivery = deliveryDoc.data();
-      const orderId = String(delivery.orderId || '');
-      const orderSnap = orderId
-        ? await getDoc(doc(db, 'orders', orderId))
-        : null;
-      const order = orderSnap?.exists() ? orderSnap.data() : {};
-      const items = orderId ? await readOrderItems(orderId) : [];
-      const paymentStatus = String(order.paymentStatus || 'PENDIENTE');
-
-      return {
-        id: orderId || deliveryDoc.id,
-        deliveryId: deliveryDoc.id,
-        paymentId: typeof order.paymentId === 'string' ? order.paymentId : null,
-        orderCode: String(order.orderCode || order.code || orderId || ''),  
-        customerName: String(order.customerName || 'Cliente no registrado'),
-        buyerName: String(order.customerName || 'Comprador invitado'),       
-        phone: String(order.customerPhone || 'Sin telefono'),
-        address: String(order.address || 'Direccion no registrada'),
-        city: String(order.deliveryZone || 'Cochabamba'),
-        reference: String(order.reference || order.locationLabel || ''),
-        items,
-        cashToCollect: Number(delivery.amountCollected || order.total || 0),
-        paymentMethod: 'cash_on_delivery' as const,
-        paymentStatus,
-        paymentStatusLabel:
-          paymentStatus.toLowerCase() === 'cobrado' ||
-          paymentStatus.toLowerCase() === 'pagado'
-            ? 'Cobrado'
-            : 'Pendiente de cobro',
-        paymentCollectedAt: order.paymentCollectedAt?.toDate?.() ?? null,
-        collectedBy: typeof order.collectedBy === 'string' ? order.collectedBy : null,
-        deliveryMethod: String(order.deliveryMethod || 'Delivery'),         
-        deliveryStatus: normalizeDeliveryStatus(delivery.status),
-        assignedAt: toDate(delivery.assignedAt),
-        createdAt: toDate(delivery.createdAt) ?? toDate(order.createdAt),
-        updatedAt: toDate(delivery.updatedAt) ?? toDate(order.updatedAt),
-      };
-    })
+    deliveriesSnapshot.docs.map((deliveryDoc) =>
+      mapMessengerOrder(deliveryDoc.id, deliveryDoc.data())
+    )
   );
 
-  return orders.sort((a, b) => a.id.localeCompare(b.id));
+  return getVisibleMessengerOrders(orders);
 }
 
 export function subscribeToMessengerOrders(
@@ -141,55 +253,12 @@ export function subscribeToMessengerOrders(
     async (deliveriesSnapshot) => {
       try {
         const orders = await Promise.all(
-          deliveriesSnapshot.docs.map(async (deliveryDoc) => {
-            const delivery = deliveryDoc.data();
-            const orderId = String(delivery.orderId || '');
-            const orderSnap = orderId
-              ? await getDoc(doc(db, 'orders', orderId))
-              : null;
-            const order = orderSnap?.exists() ? orderSnap.data() : {};
-            const items = orderId ? await readOrderItems(orderId) : [];
-            const paymentStatus = String(order.paymentStatus || 'PENDIENTE');
-
-            return {
-              id: orderId || deliveryDoc.id,
-              deliveryId: deliveryDoc.id,
-              paymentId:
-                typeof order.paymentId === 'string' ? order.paymentId : null,
-              orderCode: String(order.orderCode || order.code || orderId || ''),
-              customerName: String(
-                order.customerName || 'Cliente no registrado'
-              ),
-              buyerName: String(order.customerName || 'Comprador invitado'),
-              phone: String(order.customerPhone || 'Sin telefono'),
-              address: String(order.address || 'Direccion no registrada'),
-              city: String(order.deliveryZone || 'Cochabamba'),
-              reference: String(order.reference || order.locationLabel || ''),
-              items,
-              cashToCollect: Number(delivery.amountCollected || order.total || 0),
-              paymentMethod: 'cash_on_delivery' as const,
-              paymentStatus,
-              paymentStatusLabel:
-                paymentStatus.toLowerCase() === 'cobrado' ||
-                paymentStatus.toLowerCase() === 'pagado'
-                  ? 'Cobrado'
-                  : 'Pendiente de cobro',
-              paymentCollectedAt:
-                order.paymentCollectedAt?.toDate?.() ?? null,
-              collectedBy:
-                typeof order.collectedBy === 'string'
-                  ? order.collectedBy
-                  : null,
-              deliveryMethod: String(order.deliveryMethod || 'Delivery'),
-              deliveryStatus: normalizeDeliveryStatus(delivery.status),
-              assignedAt: toDate(delivery.assignedAt),
-              createdAt: toDate(delivery.createdAt) ?? toDate(order.createdAt),
-              updatedAt: toDate(delivery.updatedAt) ?? toDate(order.updatedAt),
-            };
-          })
+          deliveriesSnapshot.docs.map((deliveryDoc) =>
+            mapMessengerOrder(deliveryDoc.id, deliveryDoc.data())
+          )
         );
 
-        onChange(orders.sort((a, b) => a.id.localeCompare(b.id)));
+        onChange(getVisibleMessengerOrders(orders));
       } catch (error) {
         onError?.(
           error instanceof Error
@@ -260,10 +329,13 @@ export async function registerMessengerCashPayment(
 ) {
   const orderRef = doc(db, 'orders', order.id);
   const deliveryRef = doc(db, 'deliveries', order.deliveryId);
+  const paymentId = order.paymentId || order.id;
+  const paymentRef = doc(db, 'payments', paymentId);
   const collectedAt = serverTimestamp();
   const batch = writeBatch(db);
 
   batch.update(orderRef, {
+    paymentId,
     status: 'ENTREGADO',
     deliveryStatus: 'DELIVERED',
     paymentStatus: 'COBRADO',
@@ -277,22 +349,29 @@ export async function registerMessengerCashPayment(
   batch.update(deliveryRef, {
     status: 'delivered',
     amountCollected: order.cashToCollect,
+    collectedBy: courierId,
+    paymentCollectedAt: collectedAt,
     customerConfirmed: true,
     customerConfirmedAt: collectedAt,
     deliveredAt: collectedAt,
     updatedAt: collectedAt,
   });
 
-  if (order.paymentId) {
-    batch.update(doc(db, 'payments', order.paymentId), {
+  batch.set(
+    paymentRef,
+    {
+      paymentId,
+      orderId: order.id,
       status: 'COBRADO',
       statusLabel: 'Cobrado',
+      method: order.paymentMethod,
       amount: order.cashToCollect,
       collectedAt,
       collectedBy: courierId,
       updatedAt: collectedAt,
-    });
-  }
+    },
+    { merge: true }
+  );
 
   await batch.commit();
 }
@@ -333,7 +412,6 @@ export async function markMessengerOrderAsNotDelivered({
 
   await setDoc(doc(db, 'undelivered_orders', order.id), {
     orderId: order.id,
-    orderCode: order.orderCode,
     deliveryId: order.deliveryId,
     buyerName: order.buyerName || order.customerName,
     deliveryZone: order.city,
@@ -408,7 +486,6 @@ export async function markMessengerOrderAsCancelledByNoPayment({
 
   batch.set(doc(db, 'cancelled_orders', order.id || order.deliveryId), {
     orderId: order.id,
-    orderCode: order.orderCode,
     deliveryId: order.deliveryId,
     buyerName: order.buyerName || order.customerName,
     deliveryZone: order.city,

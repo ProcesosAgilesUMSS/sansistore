@@ -39,10 +39,10 @@ export function AssignMessengerModal({
             <div>
               <h2
                 id="assign-messenger-title"
-                className="mt-2 text-2xl font-900 tracking-tight text-(--theme-text)"
+                className="mt-2 text-2xl font-bold tracking-tight text-(--theme-text)"
                 style={{ fontFamily: 'Outfit, sans-serif' }}
               >
-                #{order.orderId.slice(-10).toUpperCase()}
+                #{order.orderId}
               </h2>
               <p className="mt-1 text-sm text-(--theme-text) opacity-70">
                 Selecciona un mensajero y confirma la asignación.

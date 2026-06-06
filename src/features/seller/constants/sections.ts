@@ -1,14 +1,19 @@
 export const sections = [
   {
+    id: 'mis pedidos',
+    label: 'Mis pedidos',
+    route: '/seller/orders',
+  },
+  {
     id: 'creados',
     label: 'Pedidos Creados',
     route: '/seller/created-orders',
   },
-  {
-    id: 'empaqutados',
-    label: 'Pedidos Empaquetados',
-    route: '/seller/packaged-orders',
-  },
+//  {
+//    id: 'empaquetados',
+//    label: 'Pedidos Empaquetados',
+//    route: '/seller/packaged-orders',
+//  },
   {
     id: 'listos',
     label: 'Pedidos Listos',
@@ -20,6 +25,11 @@ export const sections = [
     route: '/seller/rejected-orders',
   },
   {
+    id: 'no-entregados',
+    label: 'Pedidos no entregados',
+    route: '/seller/undelivered-orders',
+  },
+  {
     id: 'compra',
     label: 'Registrar Compra',
     route: '/seller/purchase'
@@ -29,7 +39,7 @@ export const sections = [
   },
   {
     id: 'rendicion',
-    label: 'Rendicion del dia',
+    label: 'Pagos registrados',
     route: '/seller/daily-collections',
   },
   {
