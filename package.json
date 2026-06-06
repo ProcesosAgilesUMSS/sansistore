@@ -15,7 +15,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "emu": "firebase emulators:start --only firestore,auth,functions,pubsub",
-    "seed": "node ./seed/index.mjs"
+    "seed": "node --env-file .env ./seed/index.mjs"
   },
   "seeds": {
     "default": "seed"
