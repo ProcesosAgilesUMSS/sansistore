@@ -384,6 +384,31 @@ export async function createReturnRequest(requestData: Omit<ReturnRequest, 'id' 
   }
 }
 
+export function subscribeToMyOrders(
+  userId: string,
+  onUpdate: (orders: Order[]) => void,
+  onError?: (error: Error) => void
+): Unsubscribe {
+  const q = query(
+    collection(db, "orders"),
+    where("buyerId", "==", userId),
+    orderBy("createdAt", "desc")
+  );
+
+  return onSnapshot(q, async (querySnapshot) => {
+    try {
+      const orders = await processQuerySnapshot(querySnapshot);
+      onUpdate(orders);
+    } catch (error) {
+      onError?.(
+        error instanceof Error
+          ? error
+          : new Error("No se pudieron escuchar tus pedidos.")
+      );
+    }
+  }, onError);
+}
+
 export async function getMyReturns(userId: string): Promise<ReturnRequest[]> {
   const q = query(
     collection(db, "returns"),

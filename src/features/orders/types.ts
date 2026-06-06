@@ -94,6 +94,15 @@ export interface Order {
 
 export type ReturnStatus = 'pending_review' | 'approved' | 'rejected';
 
+export type ReturnReason = 'damaged' | 'wrong_product' | 'unwanted' | 'other';
+
+export const RETURN_REASON_LABELS: Record<ReturnReason, string> = {
+  damaged: 'Producto dañado',
+  wrong_product: 'Producto incorrecto',
+  unwanted: 'No deseado',
+  other: 'Otro',
+};
+
 export interface ReturnRequest {
   id?: string;
   orderId: string;
