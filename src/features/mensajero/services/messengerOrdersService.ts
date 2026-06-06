@@ -16,6 +16,11 @@ import { db } from '../../../lib/firebase';
 import { getCurrentZone } from '../../location/utils/zoneLimits';
 import type { MessengerOrder, MessengerOrderItem } from '../types';
 import { getVisibleMessengerOrders } from '../utils/orderVisibility';
+import {
+  assertCanTransitionDeliveryStatus,
+  getOrderDeliveryStatusForDeliveryStatus,
+  getOrderStatusForDeliveryStatus,
+} from '../utils/deliveryStatusFlow';
 
 type DeliveryStatus = MessengerOrder['deliveryStatus'];
 type OrderData = Record<string, unknown>;
@@ -42,16 +47,6 @@ const normalizeDeliveryStatus = (status: unknown): DeliveryStatus => {
   if (status === 'IN_TRANSIT') return 'in_transit';
   if (status === 'DELIVERED') return 'delivered';
   return 'assigned';
-};
-
-const normalizeOrderDeliveryStatus = (status: DeliveryStatus) => {
-  if (status === 'accepted') return 'ACCEPTED';
-  if (status === 'pending_reassignment') return 'PENDING_REASSIGNMENT';
-  if (status === 'in_transit') return 'IN_TRANSIT';
-  if (status === 'delivered') return 'DELIVERED';
-  if (status === 'not_delivered') return 'NOT_DELIVERED';
-  if (status === 'cancelled') return 'CANCELLED';
-  return 'ASSIGNED';
 };
 
 function toDate(value: unknown): Date | null {
@@ -273,29 +268,12 @@ export function subscribeToMessengerOrders(
   );
 }
 
-const getStatusForORder = (status: DeliveryStatus) => {
-  switch (status) {
-    case 'accepted':
-      return 'ACEPTADO';
-    case 'pending_reassignment':
-      return 'PENDIENTE REASIGNACION';
-    case 'in_transit':
-      return 'EN CAMINO';
-    case 'delivered':
-      return 'ENTREGADO';
-    case 'not_delivered':
-      return 'NO ENTREGADO';
-    case 'cancelled':
-      return 'CANCELADO';
-    default:
-      return 'ASIGNADO';
-  }
-};
-
 export async function setMessengerOrderStatus(
   order: MessengerOrder,
   status: DeliveryStatus
 ) {
+  assertCanTransitionDeliveryStatus(order.deliveryStatus, status);
+
   const deliveryRef = doc(db, 'deliveries', order.deliveryId);
   const dataToUpdate: Record<string, unknown> = {
     status,
@@ -316,8 +294,8 @@ export async function setMessengerOrderStatus(
 
   if (order.id) {
     await updateDoc(doc(db, 'orders', order.id), {
-      status: getStatusForORder(status),
-      deliveryStatus: normalizeOrderDeliveryStatus(status),
+      status: getOrderStatusForDeliveryStatus(status),
+      deliveryStatus: getOrderDeliveryStatusForDeliveryStatus(status),
       updatedAt: serverTimestamp(),
     });
   }
@@ -405,6 +383,7 @@ export async function markMessengerOrderAsNotDelivered({
 
   if (order.id) {
     await updateDoc(doc(db, 'orders', order.id), {
+      status: getOrderStatusForDeliveryStatus('not_delivered'),
       deliveryStatus: 'NOT_DELIVERED',
       updatedAt: serverTimestamp(),
     });
