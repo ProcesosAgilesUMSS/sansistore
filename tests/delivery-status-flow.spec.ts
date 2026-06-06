@@ -100,4 +100,29 @@ test.describe('delivery status flow', () => {
       assertCanTransitionDeliveryStatus('assigned', 'delivered')
     ).toThrow('Transicion de estado no permitida');
   });
+
+  test('covers principal and alternative courier status routes', () => {
+    const principalRoute: MessengerDeliveryStatus[] = [
+      'assigned',
+      'accepted',
+      'in_transit',
+      'delivered',
+    ];
+
+    for (let index = 0; index < principalRoute.length - 1; index += 1) {
+      expect(
+        canTransitionDeliveryStatus(
+          principalRoute[index],
+          principalRoute[index + 1]
+        )
+      ).toBe(true);
+    }
+
+    expect(canTransitionDeliveryStatus('assigned', 'pending_reassignment')).toBe(
+      true
+    );
+    expect(canTransitionDeliveryStatus('accepted', 'not_delivered')).toBe(true);
+    expect(canTransitionDeliveryStatus('in_transit', 'not_delivered')).toBe(true);
+    expect(canTransitionDeliveryStatus('in_transit', 'cancelled')).toBe(true);
+  });
 });
