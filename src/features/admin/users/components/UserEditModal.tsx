@@ -78,6 +78,11 @@ export default function UserEditModal({
       'ms.umss.edu',
       'umss.edu.bo',
       'umss.edu',
+      'est.umss.edu.bo',
+      'fcyt.umss.edu.bo',
+      'ms.umss.edu',
+      'dicyt.umss.edu.bo',
+      'posgrado.umss.edu.bo',
     ];
     const domain = email.trim().split('@')[1];
     if (!domain || !allowedDomains.includes(domain)) {

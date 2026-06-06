@@ -95,6 +95,11 @@ export default function RegisterUserModal({
       'ms.umss.edu',
       'umss.edu.bo',
       'umss.edu',
+      'est.umss.edu.bo',
+      'fcyt.umss.edu.bo',
+      'ms.umss.edu',
+      'dicyt.umss.edu.bo',
+      'posgrado.umss.edu.bo',
     ];
     if (!trimmedEmail) {
       newErrors.email = 'El correo electrónico es obligatorio.';
