@@ -59,6 +59,7 @@ const buildOrderItems = (order) =>
       itemId: `${order.id}-item-${idx + 1}`,
       productId: item.product.slug,
       productName: item.product.name,
+      imageUrl: item.product.imageUrl,
       unitPrice,
       quantity: item.quantity,
       subtotal,
@@ -267,7 +268,8 @@ async function seedOrders() {
       deliveryId: delivery?.code ?? null,
       paymentId: order.id,
       confirmedAt: toTimestamp(order.confirmedAt),
-      cancelledAt: isCancelled && order.failedAt ? toTimestamp(order.failedAt) : null,
+      cancelledAt:
+        isCancelled && order.failedAt ? toTimestamp(order.failedAt) : null,
       createdAt: toTimestamp(order.createdAt),
       updatedAt: toTimestamp(order.updatedAt),
     });
