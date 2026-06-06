@@ -125,4 +125,13 @@ test.describe('delivery status flow', () => {
     expect(canTransitionDeliveryStatus('in_transit', 'not_delivered')).toBe(true);
     expect(canTransitionDeliveryStatus('in_transit', 'cancelled')).toBe(true);
   });
+
+  test('keeps not delivered persistence mappings aligned with order status fields', () => {
+    expect(getOrderStatusForDeliveryStatus('not_delivered')).toBe(
+      'NO ENTREGADO'
+    );
+    expect(getOrderDeliveryStatusForDeliveryStatus('not_delivered')).toBe(
+      'NOT_DELIVERED'
+    );
+  });
 });
