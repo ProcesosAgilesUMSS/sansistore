@@ -28,8 +28,8 @@ export function CheckBox({ checked }: IconProps) {
 export function OpenFolderIcon() {
   return (
     <svg
-      width="18"
-      height="18"
+      width="16"
+      height="16"
       viewBox="0 0 12 10"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -49,8 +49,8 @@ export function ClosedFolderIcon() {
   return (
     <svg
       viewBox="0 0 12 10"
-      width="18"
-      height="18"
+      width="16"
+      height="16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >

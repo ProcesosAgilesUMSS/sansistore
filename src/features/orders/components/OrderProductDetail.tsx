@@ -37,7 +37,7 @@ export default function OrderProductDetail({
             {friendlyName}
           </h3>
           <p className="text-sm text-text-light/80 mt-4">
-            Destino: {order.delivery.destination}
+            Destino: {order.address}
           </p>
           <div className="text-sm flex items-center gap-3 mt-3">
             <span className="text-text-light/60">Estado:</span>

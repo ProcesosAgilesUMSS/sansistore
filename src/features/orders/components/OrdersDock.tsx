@@ -105,7 +105,7 @@ export default function OrdersDock() {
 
         {/* Otras Secciones Directas */}
         {sections.map((s) => {
-          if (['creados', 'compra', 'ofertas', 'mis pedidos'].includes(s.id)) return null;
+          if (['creados', 'compra', 'ofertas', 'mis pedidos', "empaquetados"].includes(s.id)) return null;
           return (
             <a key={s.id} href={s.route} className={`rounded px-3 py-1 ${isActive(s.route) ? "bg-white/15" : ""}`}>
               {s.label}
