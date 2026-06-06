@@ -465,14 +465,7 @@ function PendingOrderCard({
                                 <CheckCircle2 size={17} />
                                 Registrar pago
                             </button>
-                            <button
-                                className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-                                onClick={() => onCancelNoPayment(order)}
-                                type="button"
-                            >
-                                <DollarSign size={17} />
-                                Cancelar por falta de pago
-                            </button>
+
                             <button
                                 className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
                                 onClick={() => onNotDelivered(order)}
