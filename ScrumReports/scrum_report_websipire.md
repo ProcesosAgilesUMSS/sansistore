@@ -361,3 +361,9 @@ por las dudas que se tienen.
 * **Yesterday:** Terminé mis HUs asignadas y realicé una revisión general de las funcionalidades implementadas para verificar que todo estuviera funcionando correctamente.
 * **Today:** Apoyé en las corrección de bugs, además de realizar la revisión y validación de las funcionalidades desarrolladas.
 * **Blockers:** None
+
+* ## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Avance en el desarrollo de mis hus asignadas revisando que la neuva funcionalidad no rompa nada
+* **Today:** Realice la correccion de bugs sobre mi hu asignada
+* **Blockers:** None
