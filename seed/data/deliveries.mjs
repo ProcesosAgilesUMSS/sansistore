@@ -41,11 +41,11 @@ export const Deliveries = {
   DELIVERY_004: {
     code: 'delivery-004',
     orderCode: 'order-004',
-    courier: null,
+    courier: Users.LUIS, 
     status: 'created',
     attemptNumber: 1,
     customerConfirmed: false,
-    assignedAt: null,
+    assignedAt: '2026-04-24T10:45:00.000Z', 
     createdAt: '2026-04-24T10:45:00.000Z',
     updatedAt: '2026-04-24T10:45:00.000Z',
   },
