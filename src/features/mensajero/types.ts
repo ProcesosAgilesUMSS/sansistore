@@ -8,7 +8,7 @@ export interface CourierOrderItem {
 
 export interface CourierOrder {
   id: string;
-  orderCode: string;
+  displayId: string;
   buyerName: string;
   deliveryZone: string;
   productsTotal: number;
@@ -44,13 +44,16 @@ export interface MessengerOrderItem {
 export interface MessengerOrder {
   id: string;
   deliveryId: string;
+  secret?: string;
   paymentId: string | null;
-  orderCode: string;        
   customerName: string;
-  buyerName: string;        
+  buyerName: string;
   phone: string;
   address: string;
   city: string;
+  locationLabel?: string;
+  deliveryLat?: number | null;
+  deliveryLng?: number | null;
   reference?: string;
   items: MessengerOrderItem[];
   cashToCollect: number;
@@ -59,9 +62,60 @@ export interface MessengerOrder {
   paymentStatusLabel: string;
   paymentCollectedAt: Date | null;
   collectedBy: string | null;
-  deliveryMethod: string;   
-  deliveryStatus: 'assigned' | 'accepted' | 'in_transit' | 'delivered' | 'not_delivered' | 'pending_reassignment' | 'cancelled';
+  deliveryMethod: string;
+  deliveryStatus:
+    | 'assigned'
+    | 'accepted'
+    | 'in_transit'
+    | 'delivered'
+    | 'not_delivered'
+    | 'pending_reassignment'
+    | 'cancelled'
+    | 'reprogrammed';
   assignedAt: Date | null;
   createdAt: Date | null;
   updatedAt: Date | null;
+
+  reprogrammedAt: Date | null;
+  newDeliveryAt: Date | null;
+  reprogramReason: string | null;
+}
+export interface MessengerShiftOrderSnapshot {
+  id: string;
+  deliveryId: string;
+  customerName: string;
+  buyerName: string;
+  phone: string;
+  address: string;
+  city: string;
+  deliveryStatus: MessengerOrder['deliveryStatus'];
+  paymentStatus: string;
+  paymentStatusLabel: string;
+  cashToCollect: number;
+  paymentCollectedAt: Date | null;
+  assignedAt: Date | null;
+  updatedAt: Date | null;
+  items: MessengerOrderItem[];
+}
+
+export interface MessengerShiftSummary {
+  completedCount: number;
+  pendingCount: number;
+  notDeliveredCount: number;
+  cancelledCount: number;
+  totalCollected: number;
+}
+
+export interface MessengerShiftClosure {
+  id: string;
+  courierId: string;
+  dateKey: string;
+  status: 'closed';
+  startedAt: Date | null;
+  closedAt: Date | null;
+  createdAt: Date | null;
+  summary: MessengerShiftSummary;
+  completedOrders: MessengerShiftOrderSnapshot[];
+  pendingOrders: MessengerShiftOrderSnapshot[];
+  incidentOrders: MessengerShiftOrderSnapshot[];
 }

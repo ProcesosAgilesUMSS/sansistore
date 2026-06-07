@@ -1,6 +1,6 @@
 import { collection, deleteDoc, doc, getDoc, getDocs } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
-import type { CartInventory, CartItem, CartProduct } from '../types';
+import type { CartInventory, CartDisplayItem, CartProduct } from '../types';
 
 function toPositiveInteger(value: unknown) {
   const quantity = Number(value);
@@ -50,7 +50,7 @@ function getAvailabilityMessage({
   return '';
 }
 
-export async function getUserCartItems(userId: string): Promise<CartItem[]> {
+export async function getUserCartItems(userId: string): Promise<CartDisplayItem[]> {
   const cartCol = collection(db, 'users', userId, 'cartItems');
   const snap = await getDocs(cartCol);
 
@@ -74,7 +74,8 @@ export async function getUserCartItems(userId: string): Promise<CartItem[]> {
           ? (inventorySnap.data() as CartInventory)
           : null;
       const unitPrice = getProductPrice(product);
-      const stockAvailable = toPositiveStock(inventory?.stockAvailable);
+      const stockReserved = toPositiveStock(inventory?.stockReserved);
+      const stockAvailable = Math.max(0, toPositiveStock(inventory?.stockAvailable) - stockReserved);
       const availabilityMessage = getAvailabilityMessage({
         product,
         inventory,
@@ -92,6 +93,7 @@ export async function getUserCartItems(userId: string): Promise<CartItem[]> {
         quantity,
         unitPrice,
         stockAvailable,
+        stockReserved,
         isAvailable,
         availabilityMessage,
         subtotal: isAvailable ? Number((unitPrice * quantity).toFixed(2)) : 0,

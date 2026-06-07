@@ -4,6 +4,10 @@ let emulatorProcess = null;
 
 const FIRESTORE_TEST_HOST = '127.0.0.1:8180';
 const AUTH_TEST_HOST = '127.0.0.1:9199';
+const EMULATOR_STARTUP_TIMEOUT_MS = Number.parseInt(
+  process.env.PLAYWRIGHT_EMULATOR_STARTUP_TIMEOUT_MS ?? '240000',
+  10
+);
 
 process.env.FIRESTORE_EMULATOR_HOST = FIRESTORE_TEST_HOST;
 process.env.FIREBASE_AUTH_EMULATOR_HOST = AUTH_TEST_HOST;
@@ -25,6 +29,7 @@ function stopProcessesOnPorts(ports: number[]) {
           execSync(`taskkill /PID ${pid} /T /F`, { stdio: 'ignore' });
         }
       } catch {
+        // The port may not be in use; setup can continue.
       }
     }
     return;
@@ -36,6 +41,7 @@ function stopProcessesOnPorts(ports: number[]) {
         stdio: 'ignore',
       });
     } catch {
+      // The port may not be in use; setup can continue.
     }
   }
 }
@@ -43,11 +49,11 @@ function stopProcessesOnPorts(ports: number[]) {
 async function waitForEmulator(
   host: string,
   label: string,
-  maxAttempts = 60,
+  timeoutMs = EMULATOR_STARTUP_TIMEOUT_MS,
   delayMs = 500
 ) {
-  let attempts = 0;
-  while (attempts < maxAttempts) {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
     try {
       const response = await fetch(`http://${host}/`, {
         signal: AbortSignal.timeout(2000),
@@ -57,28 +63,32 @@ async function waitForEmulator(
         return true;
       }
     } catch {
+      // Retry until the emulator is ready or the timeout expires.
     }
-    attempts++;
     await new Promise((resolve) => setTimeout(resolve, delayMs));
   }
-  throw new Error(`${label} emulator did not start within timeout`);
+  throw new Error(
+    `${label} emulator did not start within ${timeoutMs}ms`
+  );
 }
 
 async function runSeed() {
   await new Promise<void>((resolve, reject) => {
-    const seedProcess = spawn(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['run', 'seed'], {
-      stdio: 'inherit',
-      detached: false,
-      shell: true,
-      env: {
-        ...process.env,
-        FIRESTORE_EMULATOR_HOST: FIRESTORE_TEST_HOST,
-        FIREBASE_AUTH_EMULATOR_HOST: AUTH_TEST_HOST,
-        PUBLIC_FIREBASE_PROJECT_ID:
-          process.env.PUBLIC_FIREBASE_PROJECT_ID || 'sansistore',
-      },
-    });
-
+    const seedProcess = spawn(
+      process.platform === 'win32' ? 'node.exe' : 'node',
+      ['./seed/index.mjs'],
+      {
+        stdio: 'inherit',
+        detached: false,
+        env: {
+          ...process.env,
+          FIRESTORE_EMULATOR_HOST: FIRESTORE_TEST_HOST,
+          FIREBASE_AUTH_EMULATOR_HOST: AUTH_TEST_HOST,
+          PUBLIC_FIREBASE_PROJECT_ID:
+            process.env.PUBLIC_FIREBASE_PROJECT_ID || 'sansistore',
+        },
+      }
+    );
 
     seedProcess.on('error', reject);
     seedProcess.on('exit', (code) => {
@@ -101,6 +111,9 @@ export default async function globalSetup() {
   console.log(
     'Starting Firestore and Auth emulators on ports 8180 and 9199...'
   );
+  console.log(
+    `Waiting up to ${EMULATOR_STARTUP_TIMEOUT_MS}ms for emulators to become ready...`
+  );
   emulatorProcess = spawn(
     process.platform === 'win32' ? 'npx.cmd' : 'npx',
     [
@@ -116,16 +129,9 @@ export default async function globalSetup() {
     {
       stdio: ['ignore', 'pipe', 'pipe'],
       detached: false,
-      shell: true,
     }
   );
 
-  if (emulatorProcess.stdout) {
-    emulatorProcess.stdout.on('data', (data) => {
-      const msg = data.toString().trim();
-      if (msg) console.log(`[Emulator] ${msg}`);
-    });
-  }
   if (emulatorProcess.stderr) {
     emulatorProcess.stderr.on('data', (data) => {
       const msg = data.toString().trim();

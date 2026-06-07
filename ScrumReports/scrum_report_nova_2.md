@@ -228,3 +228,119 @@
 * **Yesterday:**  Resolví algunos bugs qué tenía en el diseño de mi hu #147
 * **Today:** Finalice la revisión de los errores y con eso se concluye mi hu #147
 * **Blockers:** none.
+
+# 26/05/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+* **Yesterday:** empece a revisar la hus que nos falta por desarrollar
+* **Today:** coordine con mi equipo para escoger las hus que toca para este sprint y hablar de dudas sobre el proyecot
+* **Blockers:** Hay Hus que requieren una revision a profundidad
+
+## Dylan Coca Beltran
+- **Yesterday:** revise las historias de usuario y ver si se podian reformular, como (HU #150 y #159) que son demasiado ambiguas
+- **Today:** nos reunimos con mi equipo para discutir que historias de usuario podriamos hacer este sprint y revisar las hu
+- **Blockers:** las historias de usuario son bastante ambiguas
+
+## Fabricio Javier Córdova Caceres
+- **Yesterday:** revision grupal de las  historias de usuario y ver si se podian reformular, como HU #150 y #159 que no tienen mucho detalle y no se entiende la finalidad de cada una.
+- **Today:** Finalizamos con la decisión en grupo de las HU que se llevarán a cabo en este sprint y las preguntas que formularemos al ingeniero en clase
+- **Blockers:** las historias de usuario no están definidas
+
+## Camila Wara Fernandez Sandoval 
+- **Yesterday:** revise las historias de usuario del PB y ver cuales se pueden trabajar para este sprint, tambien realice el retrospective del sprint 
+- **Today:** nos reunimos con mi equipo para discutir que historias de usuario podriamos hacer este sprint 
+- **Blockers:** Hay algunas dudas con las historias de usuario
+
+## Jherlan Marcelo Calero Sardan
+- **Yesterday:** revise las HU que nos quedan para desarollar y proponer las de mayor prioridad.
+- **Today:** Participe de la reunion de equipo para discutir y definir las HUs para este sprint segun la importancia.
+- **Blockers:** Existe HUs confusas que no se logran entender su proposito.
+
+# 28/05/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+* **Yesterday:** nos sorteamos las hus para que se asigne en este 3er sprint
+* **Today:** empece a refinar mi hu que es la #163 y empezar a definir criterios de aceptación y luego realizar sus respectivos mock ups
+* **Blockers:** none.
+
+## Fabricio Javier Cordova Caceres 
+* **Yesterday:** nos sorteamos las hus para que se asigne en este 3er sprint
+* **Today:** empece a refinar mi hu que es la #164 y empezar a definir criterios de aceptación 
+* **Blockers:** none.
+
+## Camila Wara Fernandez Sandoval 
+* **Yesterday:** nos sorteamos las hus para que se asigno en este 3er sprint 
+* **Today:** Comencé revisando mi hu #160, definir los criterios de aceptación y luego realizar sus respectivos mock ups
+* **Blockers:** none.
+
+## Jherlan Marcelo Calero Sardan 
+* **Yesterday:** nos sorteamos las hus para que se asigne en este 3er sprint
+* **Today:** empece a hacer el mockup y los criterios de aceptacion de mi hu #159
+* **Blockers:** none.
+
+## Dylan Coca Beltran
+- **Yesterday:** comence con el frontend de mi hu 178 y ver que necesitaria para el backend
+- **Today:** avance en el frontend y comence a hacer el backend a la par
+- **Blockers:** no se tienen las credenciales del usuario admin
+
+# 02/06/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+* **Yesterday:** estaba haciendo mi mockup de mi hu #163
+* **Today:** empece a hacer el fronted de mi hu #163
+* **Blockers:** none.
+
+## Fabricio Cordova Caceres 
+* **Yesterday:** empezo el desarrollo del frontend UH #164
+* **Today:** terminando detalles del frontend de us#164
+* **Blockers:** none.
+
+## Jherlan Marcelo Calero Sardan
+* **Yesterday:** termine con la parte del fronted de mi HU #159
+* **Today:** empece a hacer el backend de mi HU #159
+* **Blockers:** none.
+
+## Camila Wara Fernandez Sandoval 
+* **Yesterday:**  Revise los requerimientos de mi hu #160 y empecé con el desarrollo del front 
+* **Today:** Refinando últimos detalles del front de mi hu #160
+* **Blockers:** none.
+
+## Dylan Coca Beltran
+- **Yesterday:** termine el frontend de mi hu y revise algunos bugs 
+- **Today:** realice avances en el backend de mi hu y vi detalles con la db
+- **Blockers:** none
+
+# 06/06/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+* **Yesterday:** estaba haciendo mi backend de mi hu #163
+* **Today:** empece a conectar el fronted con el backend de mi hu #163
+* **Blockers:** el el seed de orders habia una orden de cancelado sin fecha , la cual no se tomaba en reporte de cancelados.
+
+## Dylan Coca Beltran
+- **Yesterday:** corregi algunos bugs de mi hu #178, tambien implemente un listado de pedidos para seleccionar de forma sencilla
+- **Today:** termine el backend de mi hu 178, ademas de implementar otro endpoint para el listado de pedidos
+- **Blockers:** faltaban indexes en firebase pero ya se soluciono
+
+## Camila Wara Fernandez Sandoval 
+* **Yesterday:**  Continúe con el desarrollo del front de mi hu#160 y corregí algunos detalles del front 
+* **Today:** Comencé a desarrollar el back de mi hu #160 y conectarlo con el front para que haga las consultas 
+* **Blockers:** en las llamadas a los atributos en firebase.
+
+## Jherlan Marcelo Calero Sardan
+* **Yesterday:** Integre mis ultimos cambios de mi HU #159. 
+* **Today:** Revise si faltaba algunos detalles de mi HU #159 antes de la presentación. 
+* **Blockers:** none.
+
+## Fabricio Javier Cordova Caceres 
+- **Yesterday:** finalización del desarrollo de mi hu#164
+- **Today:** arreglo del bug reportado y implementación del seed del formulario de registro 
+- **Blockers:** none

@@ -88,16 +88,27 @@ export default function RegisterUserModal({
       newErrors.displayName = 'Error: El formato de nombre no permite espacios excesivos.';
     }
 
-    // 2. Email validation - only @est.umss.edu
+    // 2. Email validation - allow institutional UMSS domains
     const trimmedEmail = email.trim().toLowerCase();
+    const allowedDomains = [
+      'umss.edu',
+      'umss.edu.bo',
+      'est.umss.edu',
+      'est.umss.edu.bo',
+      'mi.umss.edu',
+      'ms.umss.edu',
+      'fcyt.umss.edu.bo',
+      'dicyt.umss.edu.bo',
+      'posgrado.umss.edu.bo',
+    ];
     if (!trimmedEmail) {
       newErrors.email = 'El correo electrónico es obligatorio.';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
       newErrors.email = 'Por favor, ingrese un formato de correo electrónico válido.';
     } else {
       const domain = trimmedEmail.split('@')[1];
-      if (domain !== 'est.umss.edu') {
-        newErrors.email = 'Por favor, ingrese un formato de correo electrónico válido.';
+      if (!allowedDomains.includes(domain)) {
+        newErrors.email = 'Solo se permiten cuentas institucionales UMSS.';
       }
     }
 
@@ -243,7 +254,7 @@ export default function RegisterUserModal({
             </label>
             <input
               type="email"
-              placeholder="usuario@est.umss.edu"
+              placeholder="usuario@umss.edu"
               value={email}
               disabled={isLoading}
               onChange={(e) => handleEmailChange(e.target.value)}
@@ -261,7 +272,7 @@ export default function RegisterUserModal({
               `}
             />
             <p className="mt-1 text-[11px] text-(--theme-text)/40">
-              Solo se permite el dominio @est.umss.edu
+              Dominios permitidos: @umss.edu, @umss.edu.bo, @est.umss.edu, @est.umss.edu.bo, @mi.umss.edu, @ms.umss.edu, @fcyt.umss.edu.bo, @dicyt.umss.edu.bo, @posgrado.umss.edu.bo
             </p>
             {errors.email && (
               <p className="mt-0.5 text-[11px] text-red-500">{errors.email}</p>

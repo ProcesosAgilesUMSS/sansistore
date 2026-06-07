@@ -1,18 +1,38 @@
 export const sections = [
   {
-    id: 'reservados',
-    label: 'Pedidos Reservados',
-    route: '/seller/reserved-orders',
-  },
-  {
-    id: 'entregados',
-    label: 'Pedidos Empaquetados',
+    id: 'mis pedidos',
+    label: 'Mis pedidos',
     route: '/seller/orders',
   },
   {
+    id: 'creados',
+    label: 'Pedidos Creados',
+    route: '/seller/created-orders',
+  },
+//  {
+//    id: 'empaquetados',
+//    label: 'Pedidos Empaquetados',
+//    route: '/seller/packaged-orders',
+//  },
+  {
+    id: 'listos',
+    label: 'Pedidos Listos',
+    'route': '/seller/ready-orders',
+  },
+  {
     id: 'asignar',
-    label: 'Asignar a Mensajero',
-    route: '/seller/assign',
+    label: 'Pedidos rechazados',
+    route: '/seller/rejected-orders',
+  },
+  {
+    id: 'incidencias',
+    label: 'Incidencias',
+    route: '/seller/incidents',
+  },
+  {
+    id: 'no-entregados',
+    label: 'Pedidos no entregados',
+    route: '/seller/undelivered-orders',
   },
   {
     id: 'compra',
@@ -20,11 +40,11 @@ export const sections = [
     route: '/seller/purchase'
   },
   {
-    id: 'ofertas', label: 'Gestionar Ofertas', route: '/seller/offers'
+    id: 'ofertas', label: 'Registrar Oferta', route: '/seller/offers'
   },
   {
     id: 'rendicion',
-    label: 'Rendicion del dia',
+    label: 'Pagos registrados',
     route: '/seller/daily-collections',
   },
   {
@@ -33,4 +53,3 @@ export const sections = [
     route: '/seller/order-history',
   },
 ];
-

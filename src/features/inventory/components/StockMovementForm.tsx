@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { collection, getDocs, writeBatch, doc, getDoc, serverTimestamp, increment } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';///
 import { db } from '../../../lib/firebase';
 import { PackageOpen, CheckCircle2, RefreshCw, AlertCircle } from 'lucide-react';
 
@@ -37,7 +38,7 @@ export const StockMovementForm: React.FC = () => {
     setErrorMessage('');
     setSuccessMessage('');
 
-    // Validación 1: Datos completos y motivo de 10 caracteres
+    // Validar datos completos y motivo de 10 caracteres
     if (!selectedProductId || quantity <= 0) return;
     if (reason.trim().length < 10) {
       setErrorMessage('El motivo debe tener al menos 10 caracteres.');
@@ -47,9 +48,17 @@ export const StockMovementForm: React.FC = () => {
     setIsSubmitting(true);
 
     try {
+      // OBTENER EL USUARIO AUTENTICADO
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+
+      if (!currentUser) {
+        throw new Error("No hay una sesión activa. Por favor, inicia sesión para realizar esta operación.");
+      }
+
       const inventoryRef = doc(db, 'inventory', selectedProductId);
       
-      // Validación 2: Evitar stock negativo si es SALIDA (Ajuste/Merma)
+      // Validación stock negativo si es SALIDA (Ajuste/Merma)
       if (movementType === 'SALIDA') {
         const invSnap = await getDoc(inventoryRef);
         const currentStock = invSnap.exists() ? (invSnap.data().stockTotal || 0) : 0;
@@ -72,14 +81,14 @@ export const StockMovementForm: React.FC = () => {
         enabled: true
       }, { merge: true });
 
-      // Registro en el historial
+      // Registro en el historial con el ID real del operador
       batch.set(movementRef, {
         productId: selectedProductId,
         type: movementType,
         quantity: quantity, 
-        operatorId: 'operador_sansi', // Esto debería venir de la sesión del usuario idealmente
-        reason: reason.trim(), // Enviamos el motivo obligatorio limpio de espacios
-        date: serverTimestamp()
+        operatorId: currentUser.uid,///////-----------------------
+        reason: reason.trim(),
+        createdAt: serverTimestamp()
       });
 
       await batch.commit();

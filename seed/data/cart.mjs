@@ -107,7 +107,6 @@ const cartItemsData = [
 export async function run({ db }) {
   const firestore = db;
 
-  console.log('Clearing existing cartItems subcollections for seeded users...');
   for (const user of Object.values(Users)) {
     const snap = await firestore
       .collection('users')
@@ -121,8 +120,6 @@ export async function run({ db }) {
       await batch.commit();
     }
   }
-
-  console.log(`Seeding cartItems for ${cartItemsData.length} users...`);
 
   for (const entry of cartItemsData) {
     for (const item of entry.items) {
@@ -143,10 +140,8 @@ export async function run({ db }) {
         .collection('cartItems')
         .doc(item.cartItemId)
         .set(payload);
-
-      console.log(`  ✓ users/${entry.user.uid}/cartItems/${item.cartItemId}`);
     }
   }
 
-  console.log('Cart items seeded successfully.');
+  console.log('Cart items seeded');
 }

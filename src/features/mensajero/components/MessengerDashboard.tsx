@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
+import PaymentSuccessModal from '../modals/PaymentSuccessModal';
 import {
     AlertTriangle,
     CheckCircle2,
@@ -15,27 +16,75 @@ import {
     XCircle,
 } from 'lucide-react';
 import { onAuthStateChanged } from 'firebase/auth';
-import { getSellerLocation } from '../../location/services/locationService';
+import { getSellerData } from '../../location/services/locationService';
 import { auth } from '../../../lib/firebase';
+import { parseOrderId } from '../../cart/services/orderService';
 import {
+    closeMessengerShift,
     markMessengerOrderAsCancelledByNoPayment,
     markMessengerOrderAsNotDelivered,
     registerMessengerCashPayment,
     setMessengerOrderStatus,
     subscribeToMessengerOrders,
+    subscribeToMessengerShiftClosures,
 } from '../services/messengerOrdersService';
-import type { MessengerOrder } from '../types';
+import type { MessengerOrder, MessengerShiftClosure } from '../types';
 import {
     sortAcceptedOrdersByAge,
     type AcceptedOrderSort,
 } from '../utils/acceptedOrderSorting';
+import { getDeliveryStatusLabel } from '../utils/deliveryStatusFlow';
+import {
+    getCollectedOrdersForDay,
+    getCollectedTotal,
+    getCollectedTotalForDay,
+    isMessengerOrderCollected,
+} from '../utils/collectionSummary';
+import { formatBolivianos } from '../utils/money';
 import UndeliveredModal from '../modals/UndeliveredModal';
+
 import CancelNoPaymentModal from '../modals/CancelNoPaymentModal';
 import './MessengerDashboard.css';
+import ConfirmPaymentModal from '../modals/Confirmpaymentmodal';
+import ConfirmAssignedOrderActionModal, {
+    type AssignedOrderAction,
+} from '../modals/ConfirmAssignedOrderActionModal';
 
 const DEV_COURIER_ID = 'user-nadia';
 
-const formatBolivianos = (amount: number) => `Bs ${amount}`;
+const formatDate = (date: Date | null | undefined) => {
+    if (!date) return 'Fecha no disponible';
+    return new Intl.DateTimeFormat('es-BO', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+    }).format(date);
+};
+const getLocalDateKey = (date = new Date()) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+};
+
+const formatDateKey = (dateKey: string) => {
+    const [year, month, day] = dateKey.split('-').map(Number);
+
+    if (!year || !month || !day) return dateKey;
+
+    return new Intl.DateTimeFormat('es-BO', {
+        dateStyle: 'medium',
+    }).format(new Date(year, month - 1, day));
+};
+
+const formatTimeOnly = (date: Date | null | undefined) => {
+    if (!date) return 'No registrado';
+
+    return new Intl.DateTimeFormat('es-BO', {
+        hour: '2-digit',
+        minute: '2-digit',
+    }).format(date);
+};
 
 const formatOrderAgeDate = (order: MessengerOrder) => {
     const date = order.assignedAt ?? order.createdAt ?? order.updatedAt;
@@ -48,37 +97,81 @@ const formatOrderAgeDate = (order: MessengerOrder) => {
     }).format(date);
 };
 
-const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']) => {
-    if (status === 'assigned') return 'Asignado';
-    if (status === 'accepted') return 'Aceptado';
-    if (status === 'pending_reassignment') return 'Pendiente de reasignacion';
-    if (status === 'in_transit') return 'En camino';
-    if (status === 'not_delivered') return 'No entregado';
-    if (status === 'cancelled') return 'Cancelado';
-    return 'Entregado';
+function CopyableOrderId({
+    order,
+    codeClassName,
+}: {
+    order: MessengerOrder;
+    codeClassName: string;
+}) {
+    const { uuid, friendlyName } = parseOrderId(order.id);
+    const copyOrderId = () => {
+        void navigator.clipboard?.writeText(order.id);
+    };
+
+    return (
+        <button
+            className="block text-left"
+            onClick={copyOrderId}
+            title="Copiar ID del pedido"
+            type="button"
+        >
+            <p className="font-mono text-[10px] font-bold opacity-40">{uuid}</p>
+            <h3 className={codeClassName}>{friendlyName}</h3>
+        </button>
+    );
+}
+
+const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']): string => {
+    return getDeliveryStatusLabel(status);
 };
+
+const getStatusUpdateMessage = (status: MessengerOrder['deliveryStatus']): string => {
+    if (status === 'accepted') return 'Pedido aceptado correctamente.';
+    if (status === 'in_transit') return 'Entrega iniciada correctamente.';
+    if (status === 'pending_reassignment') {
+        return 'Pedido rechazado y enviado a reasignacion.';
+    }
+    return `Estado actualizado a ${formatDeliveryStatus(status)}.`;
+};
+
+const buildBuyerMapUrl = (order: MessengerOrder) => {
+    const url = new URL('/mapa', window.location.origin);
+
+    if (order.deliveryLat != null && order.deliveryLng != null) {
+        url.searchParams.set('lat', String(order.deliveryLat));
+        url.searchParams.set('lng', String(order.deliveryLng));
+    }
+
+    url.searchParams.set('order', order.id);
+
+    return url.toString();
+};
+
+const storeBuyerMapOrder = (order: MessengerOrder) => {
+    localStorage.setItem(
+        'courier_panel_order',
+        JSON.stringify({
+            customerName: order.customerName,
+            phone: order.phone,
+            address: order.address,
+            reference: order.reference || order.locationLabel,
+            items: order.items.map((item) => ({
+                name: item.name,
+                quantity: item.quantity,
+            })),
+            cashToCollect: order.cashToCollect,
+        })
+    );
+};
+
+
+
+
+
 const openDeliveryMap = (order: MessengerOrder) => {
-  localStorage.setItem('courier_panel_order', JSON.stringify({
-    customerName: order.customerName,
-    phone: order.phone,
-    address: order.address,
-    reference: order.reference || order.locationLabel,
-    items: order.items.map((item) => ({ name: item.name, quantity: item.quantity })),
-    cashToCollect: order.cashToCollect,
-  }));
-
-  const lat = order.deliveryLat ?? order.lat ?? null;
-  const lng = order.deliveryLng ?? order.lng ?? null;
-  const url = new URL('/mapa', window.location.origin);
-
-  if (lat != null && lng != null) {
-    url.searchParams.set('lat', String(lat));
-    url.searchParams.set('lng', String(lng));
-  } else {
-    url.searchParams.set('location', order.address);
-  }
-
-  window.location.href = url.toString();
+    storeBuyerMapOrder(order);
+    window.location.href = buildBuyerMapUrl(order);
 };
 
 const canCancelByNoPayment = (order: MessengerOrder) => {
@@ -225,15 +318,44 @@ function PendingOrderCard({
     onReject: (orderId: string) => void;
 }) {
     const [sellerLocationUrl, setSellerLocationUrl] = useState<string | null>(null);
+    const customerLocationUrl = useMemo(() => {
+        return buildBuyerMapUrl(order);
+    }, [order]);
+
+    const [sellerData, setSellerData] = useState<Awaited<ReturnType<typeof getSellerData>> | null>(null);
+
     useEffect(() => {
-        getSellerLocation(order.id).then(setSellerLocationUrl);
+        getSellerData(order.id).then(setSellerData).catch(() => setSellerData(null));
     }, [order.id]);
+
+    const openSellerMap = () => {
+        if (!sellerData) return;
+
+        localStorage.setItem(
+            'courier_panel_seller',
+            JSON.stringify({
+                customerName: sellerData.sellerName ?? 'Vendedor',
+                phone: sellerData.sellerPhone ?? '',
+                address: sellerData.address,
+                reference: null,
+                items: [],
+                cashToCollect: 0,
+            })
+        );
+
+        const url = new URL('/mapa', window.location.origin);
+        url.searchParams.set('lat', String(sellerData.lat));
+        url.searchParams.set('lng', String(sellerData.lng));
+        url.searchParams.set('order', order.id);
+        url.searchParams.set('mode', 'seller');
+        window.location.href = url.toString();
+    };
     return (
         <article className="messenger-order-card rounded-[28px] border p-6 shadow-[0_14px_30px_rgba(38,33,22,0.10)]">
             <div className="messenger-order-grid grid gap-8">
                 <div>
                     <div className="mb-6 flex items-center gap-3">
-                        <h3 className="text-base font-black">#{order.id}</h3>
+                        <CopyableOrderId order={order} codeClassName="text-base font-black" />
                         <span className="messenger-status-badge rounded-full px-3 py-1 text-xs font-bold">
                             {formatDeliveryStatus(order.deliveryStatus)}
                         </span>
@@ -245,11 +367,11 @@ function PendingOrderCard({
                     <div className="messenger-copy space-y-4 text-sm">
                         {(order.deliveryStatus === 'accepted' ||
                             order.deliveryStatus === 'in_transit') && (
-                            <div>
-                                <p className="messenger-muted mb-1 text-xs">Asignado</p>
-                                <p className="font-bold">{formatOrderAgeDate(order)}</p>
-                            </div>
-                        )}
+                                <div>
+                                    <p className="messenger-muted mb-1 text-xs">Asignado</p>
+                                    <p className="font-bold">{formatOrderAgeDate(order)}</p>
+                                </div>
+                            )}
 
                         <div>
                             <p className="messenger-muted mb-1 text-xs">Cliente</p>
@@ -278,6 +400,27 @@ function PendingOrderCard({
                                 {order.reference}
                             </p>
                         )}
+                        {order.deliveryStatus === 'reprogrammed' && (
+                        <div className="messenger-reference border-l-4 px-4 py-4 text-sm font-semibold">
+                            <p className="messenger-muted mb-1 text-xs font-bold uppercase">
+                                Nueva fecha y hora de entrega
+                            </p>
+                            <p className="font-black text-primary">
+                                {formatDate(order.newDeliveryAt)}
+                            </p>
+
+                            <p className="messenger-muted mb-1 mt-3 text-xs font-bold uppercase">
+                                Motivo de reprogramacion
+                            </p>
+                            <p>
+                                {order.reprogramReason || 'Sin motivo registrado'}
+                            </p>
+
+                            <p className="messenger-muted mt-3 text-xs">
+                                Reprogramado el: {formatDate(order.reprogrammedAt)}
+                            </p>
+                        </div>
+                    )}
                     </div>
                 </div>
 
@@ -307,93 +450,99 @@ function PendingOrderCard({
                 </div>
             </div>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                    <a
+                        className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+                        href={customerLocationUrl}
+                        onClick={() => storeBuyerMapOrder(order)}
+                    >
+                        <Send size={17} />
+                        Abrir Maps
+                    </a>
+
+                    {order.deliveryStatus !== 'assigned' && (
+                        <button
+                            className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+                            onClick={() => onDetail(order)}
+                            type="button"
+                        >
+                            <Eye size={17} />
+                            Ver detalle
+                        </button>
+                    )}
+
+                    {order.deliveryStatus === 'assigned' && (
+                        <>
+                            <button
+                                className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
+                                onClick={() => onAccept(order.id)}
+                                type="button"
+                            >
+                                <CheckCircle2 size={17} />
+                                Aceptar pedido
+                            </button>
+                            <button
+                                className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+                                onClick={() => onReject(order.id)}
+                                type="button"
+                            >
+                                <XCircle size={17} />
+                                Rechazar
+                            </button>
+                        </>
+                    )}
+
+                    {order.deliveryStatus === 'accepted' && (
+                        <button
+                            className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 text-sm font-bold text-white shadow-lg transition hover:scale-[1.02] hover:bg-blue-700"
+                            onClick={() => onInTransit(order.id)}
+                            type="button"
+                        >
+                            <Truck size={17} />
+                            Iniciar entrega
+                        </button>
+                    )}
+
+                    {order.deliveryStatus === 'in_transit' && (
+                        <>
+                            <button
+                                className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
+                                onClick={() => onDelivered(order)}
+                                type="button"
+                            >
+                                <CheckCircle2 size={17} />
+                                Registrar pago
+                            </button>
+
+                            <button
+                                className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+                                onClick={() => onNotDelivered(order)}
+                                type="button"
+                            >
+                                <AlertTriangle size={17} />
+                                No entregado
+                            </button>
+                        </>
+                    )}
+                </div>
                 <button
                     className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-                    onClick={() => openDeliveryMap(order)}
+                    disabled={!sellerData}
+                    onClick={openSellerMap}
                     type="button"
                 >
                     <Send size={17} />
-                    Abrir en Maps
+                    Ubi. Vendedor
                 </button>
-
-                {order.deliveryStatus !== 'assigned' && (
-                    <button
-                        className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-                        onClick={() => onDetail(order)}
-                        type="button"
-                    >
-                        <Eye size={17} />
-                        Ver detalle
-                    </button>
-                )}
-
-                {order.deliveryStatus === 'assigned' && (
-                    <>
-                        <button
-                            className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
-                            onClick={() => onAccept(order.id)}
-                            type="button"
-                        >
-                            <CheckCircle2 size={17} />
-                            Aceptar pedido
-                        </button>
-                        <button
-                            className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-                            onClick={() => onReject(order.id)}
-                            type="button"
-                        >
-                            <XCircle size={17} />
-                            Rechazar
-                        </button>
-                    </>
-                )}
-
-                {order.deliveryStatus === 'accepted' && (
-                    <button
-                        className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 text-sm font-bold text-white shadow-lg transition hover:scale-[1.02] hover:bg-blue-700"
-                        onClick={() => onInTransit(order.id)}
-                        type="button"
-                    >
-                        <Truck size={17} />
-                        Iniciar entrega
-                    </button>
-                )}
-
-                {order.deliveryStatus === 'in_transit' && (
-                    <>
-                        <button
-                            className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
-                            onClick={() => onDelivered(order)}
-                            type="button"
-                        >
-                            <CheckCircle2 size={17} />
-                            Registrar pago
-                        </button>
-                        <button
-                            className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-                            onClick={() => onCancelNoPayment(order)}
-                            type="button"
-                        >
-                            <DollarSign size={17} />
-                            Cancelar por falta de pago
-                        </button>
-                        <button
-                            className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-                            onClick={() => onNotDelivered(order)}
-                            type="button"
-                        >
-                            <AlertTriangle size={17} />
-                            No entregado
-                        </button>
-                    </>
-                )}
             </div>
         </article>
     );
 }
 
+// MODIFICADO: Se agregó la fecha de entrega
 function DeliveredOrderRow({ order }: { order: MessengerOrder }) {
+    const deliveryDate = order.paymentCollectedAt || order.updatedAt || order.createdAt;
     return (
         <article className="messenger-delivered-row flex items-center justify-between gap-4 rounded-[26px] border p-6 shadow-[0_10px_24px_rgba(18,32,56,0.06)]">
             <div className="flex items-center gap-4">
@@ -401,8 +550,11 @@ function DeliveredOrderRow({ order }: { order: MessengerOrder }) {
                     <CheckCircle2 size={20} />
                 </span>
                 <div>
-                    <h3 className="font-black">#{order.id}</h3>
+                    <CopyableOrderId order={order} codeClassName="font-black" />
                     <p className="messenger-copy text-sm">{order.customerName}</p>
+                    <p className="messenger-muted mt-1 text-xs">
+                        Entregado: {formatDate(deliveryDate)}
+                    </p>
                 </div>
             </div>
             <div className="flex shrink-0 items-center gap-4">
@@ -465,7 +617,7 @@ function OrderDetailModal({
                     <div className="space-y-5">
                         <article className="rounded-[24px] border border-border-light bg-secondary-bg-light/40 p-5">
                             <div className="flex flex-wrap items-center gap-3">
-                                <h3 className="text-lg font-black">#{order.id}</h3>
+                                <CopyableOrderId order={order} codeClassName="text-lg font-black" />
                                 <span className="messenger-status-badge rounded-full px-3 py-1 text-xs font-bold">
                                     {formatDeliveryStatus(order.deliveryStatus)}
                                 </span>
@@ -478,6 +630,43 @@ function OrderDetailModal({
                             </p>
                             <p className="text-xl font-black">{order.customerName}</p>
                         </article>
+
+                        {order.deliveryStatus === 'reprogrammed' && (
+                            <article className="rounded-[24px] border border-primary/40 bg-secondary-bg-light/40 p-5">
+                                <h3 className="mb-4 text-lg font-black text-primary">
+                                    Informacion de reprogramacion
+                                </h3>
+
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                    <div>
+                                        <p className="messenger-muted text-xs font-bold uppercase">
+                                            Nueva fecha y hora
+                                        </p>
+                                        <p className="font-black">
+                                            {formatDate(order.newDeliveryAt)}
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <p className="messenger-muted text-xs font-bold uppercase">
+                                            Reprogramado el
+                                        </p>
+                                        <p className="font-black">
+                                            {formatDate(order.reprogrammedAt)}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="mt-4">
+                                    <p className="messenger-muted text-xs font-bold uppercase">
+                                        Motivo
+                                    </p>
+                                    <p className="font-semibold">
+                                        {order.reprogramReason || 'Sin motivo registrado'}
+                                    </p>
+                                </div>
+                            </article>
+                        )}
 
                         <article className="rounded-[24px] border border-border-light bg-secondary-bg-light/40 p-5">
                             <h3 className="mb-4 text-lg font-black">Productos</h3>
@@ -564,50 +753,50 @@ function OrderDetailModal({
                             </p>
                         </div>
 
-                       <div className="mt-6 flex flex-col gap-3">
-  {order.deliveryStatus === 'in_transit' && (
-    <button
-      className="messenger-deliver-button inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition active:scale-95"
-      onClick={() => {
-        onDelivered(order);
-        onClose();
-      }}
-      type="button"
-    >
-      <CheckCircle2 size={18} />
-      <span>Registrar pago</span>
-    </button>
-  )}
+                        <div className="mt-6 flex flex-col gap-3">
+                            {order.deliveryStatus === 'in_transit' && (
+                                <button
+                                    className="messenger-deliver-button inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition active:scale-95"
+                                    onClick={() => {
+                                        onDelivered(order);
+                                        onClose();
+                                    }}
+                                    type="button"
+                                >
+                                    <CheckCircle2 size={18} />
+                                    <span>Registrar pago</span>
+                                </button>
+                            )}
 
-  {canCancelByNoPayment(order) && (
-    <button
-      className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-red-500 bg-red-50 px-6 text-sm font-bold text-red-600 transition hover:bg-red-100 active:scale-95"
-      onClick={() => {
-        onClose();
-        onCancelNoPayment(order);
-      }}
-      type="button"
-    >
-      <DollarSign size={18} />
-      <span>Cancelar por falta de pago</span>
-    </button>
-  )}
+                            {canCancelByNoPayment(order) && (
+                                <button
+                                    className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-red-500 bg-red-50 px-6 text-sm font-bold text-red-600 transition hover:bg-red-100 active:scale-95"
+                                    onClick={() => {
+                                        onClose();
+                                        onCancelNoPayment(order);
+                                    }}
+                                    type="button"
+                                >
+                                    <DollarSign size={18} />
+                                    <span>Cancelar por falta de pago</span>
+                                </button>
+                            )}
 
-  {(order.deliveryStatus === 'accepted' ||
-    order.deliveryStatus === 'in_transit') && (
-    <button
-      className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-red-500 bg-red-50 px-6 text-sm font-bold text-red-600 transition hover:bg-red-100 active:scale-95"
-      onClick={() => {
-        onClose();
-        onNotDelivered(order);
-      }}
-      type="button"
-    >
-      <AlertTriangle size={18} />
-      <span>No entregado</span>
-    </button>
-  )}
-</div>
+                            {(order.deliveryStatus === 'accepted' ||
+                                order.deliveryStatus === 'in_transit') && (
+                                    <button
+                                        className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-red-500 bg-red-50 px-6 text-sm font-bold text-red-600 transition hover:bg-red-100 active:scale-95"
+                                        onClick={() => {
+                                            onClose();
+                                            onNotDelivered(order);
+                                        }}
+                                        type="button"
+                                    >
+                                        <AlertTriangle size={18} />
+                                        <span>No entregado</span>
+                                    </button>
+                                )}
+                        </div>
 
                     </aside>
                 </div>
@@ -616,9 +805,275 @@ function OrderDetailModal({
     );
 }
 
+function CloseShiftModal({
+    completedCount,
+    pendingCount,
+    notDeliveredCount,
+    cancelledCount,
+    totalCollected,
+    alreadyClosed,
+    isSaving,
+    onClose,
+    onConfirm,
+}: {
+    completedCount: number;
+    pendingCount: number;
+    notDeliveredCount: number;
+    cancelledCount: number;
+    totalCollected: number;
+    alreadyClosed: boolean;
+    isSaving: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+}) {
+    return (
+        <div
+            className="fixed inset-0 z-[999] flex items-center justify-center bg-black/65 p-4 backdrop-blur-sm"
+            onClick={(event) => {
+                if (event.target === event.currentTarget && !isSaving) onClose();
+            }}
+        >
+            <section className="w-full max-w-xl rounded-[28px] border border-border-light bg-card-bg-light p-6 text-text-light shadow-2xl">
+                <header className="flex items-start justify-between gap-4">
+                    <div>
+                        <span className="messenger-icon mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full">
+                            <CheckCircle2 size={28} />
+                        </span>
+                        <h2 className="text-2xl font-black tracking-[-0.04em]">
+                            ¿Cerrar jornada?
+                        </h2>
+                        <p className="messenger-copy mt-2 text-sm font-semibold">
+                            Se registrará el resumen de tus entregas realizadas durante la jornada actual.
+                        </p>
+                    </div>
+
+                    <button
+                        aria-label="Cerrar modal"
+                        className="flex h-10 w-10 items-center justify-center rounded-full border border-border-light bg-secondary-bg-light transition hover:text-primary"
+                        disabled={isSaving}
+                        onClick={onClose}
+                        type="button"
+                    >
+                        <X size={16} />
+                    </button>
+                </header>
+
+                <div className="mt-6 space-y-3 rounded-[22px] border border-border-light bg-secondary-bg-light/40 p-5 text-sm font-bold">
+                    <p className="flex justify-between gap-4">
+                        <span>Entregas completadas</span>
+                        <span>{completedCount}</span>
+                    </p>
+                    <p className="flex justify-between gap-4">
+                        <span>Pedidos pendientes</span>
+                        <span>{pendingCount}</span>
+                    </p>
+                    <p className="flex justify-between gap-4">
+                        <span>No entregados</span>
+                        <span>{notDeliveredCount}</span>
+                    </p>
+                    <p className="flex justify-between gap-4">
+                        <span>Cancelados</span>
+                        <span>{cancelledCount}</span>
+                    </p>
+                    <div className="border-t border-border-light pt-3">
+                        <p className="flex justify-between gap-4 text-primary">
+                            <span>Total cobrado</span>
+                            <span>{formatBolivianos(totalCollected)}</span>
+                        </p>
+                    </div>
+                </div>
+
+                {alreadyClosed && (
+                    <p className="mt-5 rounded-2xl border border-primary/30 bg-primary/10 p-4 text-sm font-bold text-primary">
+                        La jornada de hoy ya fue cerrada. Puedes revisar el reporte en el historial.
+                    </p>
+                )}
+
+                <footer className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                    <button
+                        className="messenger-map-button inline-flex h-12 items-center justify-center rounded-2xl border-2 px-6 text-sm font-bold transition"
+                        disabled={isSaving}
+                        onClick={onClose}
+                        type="button"
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                        className="messenger-deliver-button inline-flex h-12 items-center justify-center rounded-2xl px-6 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-60"
+                        disabled={isSaving || alreadyClosed}
+                        onClick={onConfirm}
+                        type="button"
+                    >
+                        {isSaving ? 'Cerrando jornada...' : 'Cerrar jornada'}
+                    </button>
+                </footer>
+            </section>
+        </div>
+    );
+}
+
+function ShiftReportDetailModal({
+    report,
+    onClose,
+}: {
+    report: MessengerShiftClosure;
+    onClose: () => void;
+}) {
+    const allOrders = [
+        ...report.completedOrders,
+        ...report.pendingOrders,
+        ...report.incidentOrders,
+    ];
+
+    return (
+        <div
+            className="fixed inset-0 z-[999] flex items-center justify-center bg-black/65 p-4 backdrop-blur-sm"
+            onClick={(event) => {
+                if (event.target === event.currentTarget) onClose();
+            }}
+        >
+            <section className="max-h-[92vh] w-full max-w-6xl overflow-y-auto rounded-[28px] border border-border-light bg-card-bg-light text-text-light shadow-2xl">
+                <header className="flex items-start justify-between gap-4 border-b border-border-light px-6 py-5">
+                    <div>
+                        <p className="text-sm font-bold uppercase tracking-[0.24em] text-primary">
+                            Reporte de jornada
+                        </p>
+                        <h2 className="mt-2 text-2xl font-black tracking-[-0.04em]">
+                            Detalle de jornada - {formatDateKey(report.dateKey)}
+                        </h2>
+                        <p className="messenger-copy mt-1 text-sm font-semibold">
+                            Inicio: {formatTimeOnly(report.startedAt)} · Cierre: {formatTimeOnly(report.closedAt)}
+                        </p>
+                    </div>
+
+                    <button
+                        aria-label="Cerrar detalle de jornada"
+                        className="flex h-10 w-10 items-center justify-center rounded-full border border-border-light bg-secondary-bg-light transition hover:text-primary"
+                        onClick={onClose}
+                        type="button"
+                    >
+                        <X size={16} />
+                    </button>
+                </header>
+
+                <div className="grid gap-5 p-6 lg:grid-cols-[280px_1fr]">
+                    <aside className="h-fit rounded-[24px] border border-border-light bg-secondary-bg-light/40 p-5">
+                        <h3 className="text-lg font-black">Resumen</h3>
+
+                        <div className="mt-5 space-y-3 text-sm font-bold">
+                            <p className="flex justify-between gap-3">
+                                <span>Completadas</span>
+                                <span>{report.summary.completedCount}</span>
+                            </p>
+                            <p className="flex justify-between gap-3">
+                                <span>Pendientes</span>
+                                <span>{report.summary.pendingCount}</span>
+                            </p>
+                            <p className="flex justify-between gap-3">
+                                <span>No entregadas</span>
+                                <span>{report.summary.notDeliveredCount}</span>
+                            </p>
+                            <p className="flex justify-between gap-3">
+                                <span>Canceladas</span>
+                                <span>{report.summary.cancelledCount}</span>
+                            </p>
+                            <div className="border-t border-border-light pt-3">
+                                <p className="flex justify-between gap-3 text-primary">
+                                    <span>Total cobrado</span>
+                                    <span>{formatBolivianos(report.summary.totalCollected)}</span>
+                                </p>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <div className="space-y-5">
+                        <h3 className="text-xl font-black">Pedidos registrados</h3>
+
+                        {allOrders.length > 0 ? (
+                            <div className="space-y-4">
+                                {allOrders.map((order) => (
+                                    <article
+                                        className="rounded-[24px] border border-border-light bg-secondary-bg-light/40 p-5"
+                                        key={`${report.id}-${order.deliveryId}`}
+                                    >
+                                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                            <div>
+                                                <p className="font-mono text-xs font-bold opacity-50">
+                                                    {order.id}
+                                                </p>
+                                                <h4 className="text-lg font-black">
+                                                    {order.customerName}
+                                                </h4>
+                                                <p className="messenger-copy text-sm">
+                                                    {order.address}
+                                                </p>
+                                            </div>
+
+                                            <div className="flex flex-wrap gap-2">
+                                                <span className="messenger-status-badge rounded-full px-3 py-1 text-xs font-bold">
+                                                    {formatDeliveryStatus(order.deliveryStatus)}
+                                                </span>
+                                                <span className="messenger-charge-badge rounded-full px-3 py-1 text-xs font-bold">
+                                                    {order.paymentStatusLabel.toUpperCase()}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-4 grid gap-4 md:grid-cols-[1fr_180px]">
+                                            <div>
+                                                <p className="messenger-muted mb-2 text-xs font-bold uppercase">
+                                                    Productos
+                                                </p>
+                                                {order.items.length > 0 ? (
+                                                    <div className="space-y-2">
+                                                        {order.items.map((item) => (
+                                                            <p
+                                                                className="messenger-copy flex items-center gap-2 text-sm"
+                                                                key={item.id}
+                                                            >
+                                                                <Package size={15} />
+                                                                <span>
+                                                                    {item.quantity}x {item.name} - {formatBolivianos(item.price)}
+                                                                </span>
+                                                            </p>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <p className="messenger-copy text-sm">
+                                                        Sin productos visibles.
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <div className="messenger-cash-box rounded-2xl border-2 p-4">
+                                                <p className="text-xs font-bold uppercase">
+                                                    Monto
+                                                </p>
+                                                <p className="mt-1 text-2xl font-black">
+                                                    {formatBolivianos(order.cashToCollect)}
+                                                </p>
+                                                <p className="messenger-copy mt-1 text-xs">
+                                                    Cobrado: {formatTimeOnly(order.paymentCollectedAt)}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </article>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="messenger-order-card rounded-[28px] border p-8 text-sm font-semibold">
+                                Esta jornada no tiene pedidos registrados.
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </section>
+        </div>
+    );
+}
 interface MessengerDashboardProps {
     embedded?: boolean;
-    clientSection?: 'assigned' | 'accepted' | 'delivered' | 'not_delivered';
+    clientSection?: 'assigned' | 'accepted' | 'reprogrammed' | 'delivered' | 'not_delivered';
 }
 
 export default function MessengerDashboard({
@@ -635,10 +1090,22 @@ export default function MessengerDashboard({
     const [cancelNoPaymentOrder, setCancelNoPaymentOrder] =
         useState<MessengerOrder | null>(null);
     const [savingCancelNoPayment, setSavingCancelNoPayment] = useState(false);
+    const [confirmPaymentOrder, setConfirmPaymentOrder] = useState<MessengerOrder | null>(null);
+    const [paymentSuccessOrder, setPaymentSuccessOrder] = useState<MessengerOrder | null>(null);
+    const [pendingAssignedAction, setPendingAssignedAction] = useState<{
+        order: MessengerOrder;
+        action: AssignedOrderAction;
+    } | null>(null);
+    const [savingAssignedAction, setSavingAssignedAction] = useState(false);
     const [currentCourierId, setCurrentCourierId] = useState<string | null>(null);
     const [newOrderCount, setNewOrderCount] = useState(0);
     const [acceptedSortOrder, setAcceptedSortOrder] =
-        useState<AcceptedOrderSort>('oldest-first');
+        useState<AcceptedOrderSort>('newest-first');
+    const [showCloseShiftModal, setShowCloseShiftModal] = useState(false);
+    const [savingShiftClose, setSavingShiftClose] = useState(false);
+    const [shiftReports, setShiftReports] = useState<MessengerShiftClosure[]>([]);
+    const [selectedShiftReport, setSelectedShiftReport] =
+    useState<MessengerShiftClosure | null>(null);
     const notifiedOrderIdsRef = useRef<Set<string>>(new Set());
     const isFirstLoadRef = useRef(true);
 
@@ -679,6 +1146,7 @@ export default function MessengerDashboard({
             );
         };
 
+
         const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
             const devCourierId =
                 import.meta.env.PUBLIC_APP_ENV !== 'production' ? DEV_COURIER_ID : null;
@@ -704,8 +1172,32 @@ export default function MessengerDashboard({
         };
     }, []);
 
+    useEffect(() => {
+        if (!currentCourierId) {
+            setShiftReports([]);
+            return;
+        }
+
+        const unsubscribeReports = subscribeToMessengerShiftClosures(
+            currentCourierId,
+            setShiftReports,
+            (error) => {
+                console.error(error);
+                setMessage('No se pudo cargar el historial de jornadas.');
+            }
+        );
+
+        return () => {
+            unsubscribeReports();
+        };
+    }, [currentCourierId]);
+
     const assignedOrders = useMemo(
-        () => orders.filter((order) => order.deliveryStatus === 'assigned'),
+        () =>
+            sortAcceptedOrdersByAge(
+                orders.filter((order) => order.deliveryStatus === 'assigned'),
+                'newest-first'
+            ),
         [orders]
     );
 
@@ -718,60 +1210,60 @@ export default function MessengerDashboard({
         [assignedOrders]
     );
 
-   useEffect(() => {
-    if (loading || clientSection !== 'assigned') return;
+    useEffect(() => {
+        if (loading || clientSection !== 'assigned') return;
 
-    const currentOrderIds = assignedOrderIdsKey
-        ? assignedOrderIdsKey.split('|')
-        : [];
+        const currentOrderIds = assignedOrderIdsKey
+            ? assignedOrderIdsKey.split('|')
+            : [];
 
-    // Primera carga: mostrar toast si hay pedidos, sin filtrar por sesión previa
-    if (isFirstLoadRef.current) {
-        isFirstLoadRef.current = false;
+        // Primera carga: mostrar toast si hay pedidos, sin filtrar por sesión previa
+        if (isFirstLoadRef.current) {
+            isFirstLoadRef.current = false;
 
-        if (currentOrderIds.length === 0) return;
+            if (currentOrderIds.length === 0) return;
 
-        // Marcar todos como notificados para futuras comparaciones
+            // Marcar todos como notificados para futuras comparaciones
+            const storageKey = 'sansistore:messenger:notified-order-ids';
+            const updatedIds = Array.from(new Set(currentOrderIds));
+            try {
+                sessionStorage.setItem(storageKey, JSON.stringify(updatedIds));
+            } catch { /* ignorar */ }
+            notifiedOrderIdsRef.current = new Set(updatedIds);
+
+            setNewOrderCount(currentOrderIds.length);
+            return;
+        }
+
+        // Cargas posteriores: solo nuevos pedidos que no se habían notificado
+        if (currentOrderIds.length === 0) {
+            setNewOrderCount(0);
+            return;
+        }
+
         const storageKey = 'sansistore:messenger:notified-order-ids';
-        const updatedIds = Array.from(new Set(currentOrderIds));
+        let storedIds: string[] = [];
+        try {
+            storedIds = JSON.parse(sessionStorage.getItem(storageKey) || '[]') as string[];
+        } catch {
+            storedIds = [];
+        }
+
+        const alreadyNotifiedIds = new Set([
+            ...storedIds,
+            ...Array.from(notifiedOrderIdsRef.current),
+        ]);
+
+        const newIds = currentOrderIds.filter((id) => !alreadyNotifiedIds.has(id));
+        if (newIds.length === 0) return;
+
+        const updatedIds = Array.from(new Set([...storedIds, ...currentOrderIds]));
         try {
             sessionStorage.setItem(storageKey, JSON.stringify(updatedIds));
         } catch { /* ignorar */ }
         notifiedOrderIdsRef.current = new Set(updatedIds);
-
-        setNewOrderCount(currentOrderIds.length);
-        return;
-    }
-
-    // Cargas posteriores: solo nuevos pedidos que no se habían notificado
-    if (currentOrderIds.length === 0) {
-        setNewOrderCount(0);
-        return;
-    }
-
-    const storageKey = 'sansistore:messenger:notified-order-ids';
-    let storedIds: string[] = [];
-    try {
-        storedIds = JSON.parse(sessionStorage.getItem(storageKey) || '[]') as string[];
-    } catch {
-        storedIds = [];
-    }
-
-    const alreadyNotifiedIds = new Set([
-        ...storedIds,
-        ...Array.from(notifiedOrderIdsRef.current),
-    ]);
-
-    const newIds = currentOrderIds.filter((id) => !alreadyNotifiedIds.has(id));
-    if (newIds.length === 0) return;
-
-    const updatedIds = Array.from(new Set([...storedIds, ...currentOrderIds]));
-    try {
-        sessionStorage.setItem(storageKey, JSON.stringify(updatedIds));
-    } catch { /* ignorar */ }
-    notifiedOrderIdsRef.current = new Set(updatedIds);
-    setNewOrderCount(newIds.length);
-}, [assignedOrderIdsKey, clientSection, loading]);
+        setNewOrderCount(newIds.length);
+    }, [assignedOrderIdsKey, clientSection, loading]);
 
     const acceptedOrders = useMemo(
         () =>
@@ -786,12 +1278,90 @@ export default function MessengerDashboard({
         () => sortAcceptedOrdersByAge(acceptedOrders, acceptedSortOrder),
         [acceptedOrders, acceptedSortOrder]
     );
+
+    // ✅ MODIFICADO: Se agregó ordenamiento por fecha descendente
     const deliveredOrders = useMemo(
-        () => orders.filter((order) => order.deliveryStatus === 'delivered'),
+        () => orders
+            .filter(isMessengerOrderCollected)
+            .sort((a, b) => {
+                const dateA = a.paymentCollectedAt;
+                const dateB = b.paymentCollectedAt;
+                if (!dateA || !dateB) return 0;
+                return dateB.getTime() - dateA.getTime();
+            }),
         [orders]
     );
-    const notDeliveredOrders = useMemo(
+    const todayCollectedOrders = useMemo(
+        () => getCollectedOrdersForDay(orders),
+        [orders]
+    );
+    const todayCollectedTotal = useMemo(
+        () => getCollectedTotalForDay(orders),
+        [orders]
+    );
+    const collectedTotal = useMemo(() => getCollectedTotal(orders), [orders]);
+    const todayDateKey = useMemo(() => getLocalDateKey(new Date()), []);
+
+    const todayShiftReport = useMemo(
+        () => shiftReports.find((report) => report.dateKey === todayDateKey) ?? null,
+        [shiftReports, todayDateKey]
+    );
+
+    const currentShiftPendingOrders = useMemo(
+        () =>
+            orders.filter(
+                (order) =>
+                    order.deliveryStatus === 'assigned' ||
+                    order.deliveryStatus === 'accepted' ||
+                    order.deliveryStatus === 'in_transit'
+            ),
+        [orders]
+    );
+
+    const currentShiftNotDeliveredOrders = useMemo(
         () => orders.filter((order) => order.deliveryStatus === 'not_delivered'),
+        [orders]
+    );
+
+    const currentShiftCancelledOrders = useMemo(
+        () => orders.filter((order) => order.deliveryStatus === 'cancelled'),
+        [orders]
+    );
+
+    const currentShiftActivityCount =
+        todayCollectedOrders.length +
+        currentShiftPendingOrders.length +
+        currentShiftNotDeliveredOrders.length +
+        currentShiftCancelledOrders.length;
+
+    const notDeliveredOrders = useMemo(
+        () =>
+            sortAcceptedOrdersByAge(
+                orders.filter((order) => order.deliveryStatus === 'not_delivered'),
+                'newest-first'
+            ),
+        [orders]
+    );
+
+    const reprogrammedOrders = useMemo(
+        () =>
+            orders
+                .filter((order) => order.deliveryStatus === 'reprogrammed')
+                .sort((a, b) => {
+                    const dateA =
+                        a.newDeliveryAt?.getTime() ??
+                        a.updatedAt?.getTime() ??
+                        a.createdAt?.getTime() ??
+                        0;
+
+                    const dateB =
+                        b.newDeliveryAt?.getTime() ??
+                        b.updatedAt?.getTime() ??
+                        b.createdAt?.getTime() ??
+                        0;
+
+                    return dateA - dateB;
+                }),
         [orders]
     );
 
@@ -815,7 +1385,7 @@ export default function MessengerDashboard({
 
         try {
             await setMessengerOrderStatus(targetOrder, status);
-            setMessage('Estado actualizado correctamente.');
+            setMessage(getStatusUpdateMessage(status));
         } catch (error) {
             console.error(error);
             setMessage('No se pudo actualizar el estado en Firestore.');
@@ -827,22 +1397,23 @@ export default function MessengerDashboard({
         }
     };
 
-    const markAsDelivered = async (order: MessengerOrder) => {
+    const markAsDelivered = (order: MessengerOrder) => {
+        setConfirmPaymentOrder(order);
+    };
+
+    const confirmPayment = async (order: MessengerOrder, secret: string) => {
         if (!currentCourierId) {
-            setMessage('No se pudo identificar al mensajero para registrar el pago.');
-            return;
+            throw new Error('No se pudo identificar al mensajero.');
         }
 
         if (order.paymentStatusLabel === 'Cobrado') {
-            setMessage('Este pedido ya tiene el pago registrado.');
-            return;
+            throw new Error('Este pedido ya tiene el pago registrado.');
         }
 
-        const confirmed = window.confirm(
-            `Confirmar pago en efectivo de ${formatBolivianos(order.cashToCollect)} del pedido ${order.orderCode}.`
-        );
-
-        if (!confirmed) return;
+        // Validar secret contra order.secret (campo del tipo Order)
+        if (secret !== order.secret) {
+            throw new Error('Código incorrecto.');
+        }
 
         const previousOrder = order;
         setOrders((currentOrders) =>
@@ -862,20 +1433,35 @@ export default function MessengerDashboard({
 
         try {
             await registerMessengerCashPayment(order, currentCourierId);
-            setMessage('Pago en efectivo registrado y venta cerrada correctamente.');
+
+            setConfirmPaymentOrder(null);
+
+            setPaymentSuccessOrder(order);
+
         } catch (error) {
             console.error(error);
-            setMessage('No se pudo registrar el pago en efectivo.');
             setOrders((currentOrders) =>
                 currentOrders.map((currentOrder) =>
                     currentOrder.id === previousOrder.id ? previousOrder : currentOrder
                 )
             );
+            throw error; // el modal captura y muestra el error
         }
     };
 
+
+    const openAssignedActionConfirmation = (
+        orderId: string,
+        action: AssignedOrderAction
+    ) => {
+        const order = orders.find((currentOrder) => currentOrder.id === orderId);
+        if (!order || order.deliveryStatus !== 'assigned') return;
+
+        setPendingAssignedAction({ order, action });
+    };
+
     const acceptOrder = (orderId: string) => {
-        void updateOrderStatus(orderId, 'accepted');
+        openAssignedActionConfirmation(orderId, 'accept');
     };
 
     const markAsInTransit = (orderId: string) => {
@@ -883,7 +1469,23 @@ export default function MessengerDashboard({
     };
 
     const rejectOrder = (orderId: string) => {
-        void updateOrderStatus(orderId, 'pending_reassignment');
+        openAssignedActionConfirmation(orderId, 'reject');
+    };
+
+    const confirmAssignedOrderAction = async () => {
+        if (!pendingAssignedAction || savingAssignedAction) return;
+
+        const { order, action } = pendingAssignedAction;
+        const nextStatus =
+            action === 'accept' ? 'accepted' : 'pending_reassignment';
+
+        setSavingAssignedAction(true);
+        try {
+            await updateOrderStatus(order.id, nextStatus);
+            setPendingAssignedAction(null);
+        } finally {
+            setSavingAssignedAction(false);
+        }
     };
 
     const registerUndeliveredOrder = async (reason: string, notes: string) => {
@@ -968,29 +1570,71 @@ export default function MessengerDashboard({
             setSavingCancelNoPayment(false);
         }
     };
+        
+    const confirmCloseShift = async () => {
+        if (!currentCourierId) {
+            setMessage('No se pudo identificar al mensajero para cerrar la jornada.');
+            return;
+        }
+
+        if (todayShiftReport) {
+            setMessage('La jornada de hoy ya fue cerrada.');
+            setShowCloseShiftModal(false);
+            setSelectedShiftReport(todayShiftReport);
+            return;
+        }
+
+        setSavingShiftClose(true);
+
+        try {
+            const report = await closeMessengerShift({
+                courierId: currentCourierId,
+                orders,
+            });
+
+            setShowCloseShiftModal(false);
+            setSelectedShiftReport(report);
+            setMessage('Jornada cerrada correctamente. El reporte ya está disponible en el historial.');
+        } catch (error) {
+            console.error(error);
+            setMessage(
+                error instanceof Error
+                    ? error.message
+                    : 'No se pudo cerrar la jornada.'
+            );
+        } finally {
+            setSavingShiftClose(false);
+        }
+    };
 
     const activeOrders =
         clientSection === 'assigned'
             ? assignedOrders
             : clientSection === 'not_delivered'
                 ? notDeliveredOrders
-                : sortedAcceptedOrders;
+                : clientSection === 'reprogrammed'
+                    ? reprogrammedOrders
+                    : sortedAcceptedOrders;
     const activeTitle =
         clientSection === 'assigned'
             ? 'Gestión Entregas'
             : clientSection === 'accepted'
                 ? 'Pedidos aceptados'
-                : clientSection === 'not_delivered'
-                    ? 'No entregados'
-                    : 'Entregados';
+                : clientSection === 'reprogrammed'
+                    ? 'Pedidos reprogramados'
+                    : clientSection === 'not_delivered'
+                        ? 'No entregados'
+                        : 'Entregados';
     const activeDescription =
         clientSection === 'assigned'
             ? 'Acepta o rechaza los pedidos asignados antes de iniciar la entrega.'
             : clientSection === 'accepted'
                 ? 'Organiza tus entregas, revisa direcciones y cambia el estado de cada pedido.'
-                : clientSection === 'not_delivered'
-                    ? 'Revisa los pedidos con incidente registrado durante la jornada.'
-                    : 'Revisa las entregas completadas y el monto cobrado durante la jornada.';
+                : clientSection === 'reprogrammed'
+                    ? 'Revisa los pedidos que tienen una nueva fecha u hora de entrega.'
+                    : clientSection === 'not_delivered'
+                        ? 'Revisa los pedidos con incidente registrado durante la jornada.'
+                        : 'Revisa las entregas completadas y el monto cobrado durante la jornada.';
 
     return (
         <main
@@ -1056,7 +1700,10 @@ export default function MessengerDashboard({
                             <SummaryCard
                                 icon={<Clock3 size={20} />}
                                 label={
-                                    clientSection === 'assigned' ? 'Asignados' : 'Pendientes'
+                                    clientSection === 'assigned' ? 'Asignados' 
+                                    : clientSection === 'reprogrammed' ? 'Reprogramados'
+                                    : clientSection === 'not_delivered' ? 'No entregados'
+                                    : 'Pendientes'
                                 }
                                 value={activeOrders.length}
                             />
@@ -1078,9 +1725,11 @@ export default function MessengerDashboard({
                                 <h2 className="text-2xl font-black tracking-[-0.04em]">
                                     {clientSection === 'assigned'
                                         ? 'Pedidos asignados'
-                                        : clientSection === 'not_delivered'
-                                            ? 'Pedidos no entregados'
-                                            : 'Pedidos pendientes'}
+                                        : clientSection === 'reprogrammed'
+                                            ? 'Pedidos reprogramados'
+                                            : clientSection === 'not_delivered'
+                                                ? 'Pedidos no entregados'
+                                                : 'Pedidos pendientes'}
                                 </h2>
 
                                 {clientSection === 'accepted' && activeOrders.length > 0 && (
@@ -1096,10 +1745,10 @@ export default function MessengerDashboard({
                                             className="rounded-2xl border-2 border-border-light bg-card-bg-light px-4 py-3 text-sm font-bold text-text-light outline-none transition focus:border-primary"
                                         >
                                             <option value="oldest-first">
-                                                Mas antiguos primero
+                                                Más antiguos primero
                                             </option>
                                             <option value="newest-first">
-                                                Mas recientes primero
+                                                Más recientes primero
                                             </option>
                                         </select>
                                     </label>
@@ -1110,7 +1759,7 @@ export default function MessengerDashboard({
                                 {activeOrders.length > 0 ? (
                                     activeOrders.map((order) => (
                                         <PendingOrderCard
-                                            key={order.id}
+                                            key={`${clientSection}-${order.deliveryId || order.id}`}
                                             order={order}
                                             onAccept={acceptOrder}
                                             onCancelNoPayment={setCancelNoPaymentOrder}
@@ -1125,9 +1774,11 @@ export default function MessengerDashboard({
                                     <div className="messenger-order-card rounded-[28px] border p-8 text-sm font-semibold">
                                         {clientSection === 'assigned'
                                             ? 'No hay pedidos asignados.'
-                                            : clientSection === 'not_delivered'
-                                                ? 'No hay pedidos no entregados.'
-                                                : 'No hay pedidos pendientes.'}
+                                            : clientSection === 'reprogrammed'
+                                                ? 'No hay pedidos reprogramados.'
+                                                : clientSection === 'not_delivered'
+                                                    ? 'No hay pedidos no entregados.'
+                                                    : 'No hay pedidos pendientes.'}
                                     </div>
                                 )}
                             </div>
@@ -1138,20 +1789,131 @@ export default function MessengerDashboard({
                         <section className="messenger-summary-grid grid gap-5">
                             <SummaryCard
                                 icon={<CheckCircle2 size={20} />}
-                                label="Cantidad completados"
-                                value={deliveredOrders.length}
+                                label="Cobrados en la jornada"
+                                value={todayCollectedOrders.length}
+                            />
+                            <SummaryCard
+                                icon={<CheckCircle2 size={20} />}
+                                label="Cobrado en la jornada"
+                                value={formatBolivianos(todayCollectedTotal)}
                             />
                             <SummaryCard
                                 featured
                                 icon={<DollarSign size={20} />}
                                 label="Total cobrado"
-                                value={formatBolivianos(
-                                    deliveredOrders.reduce(
-                                        (total, order) => total + order.cashToCollect,
-                                        0
-                                    )
-                                )}
+                                value={formatBolivianos(collectedTotal)}
                             />
+
+                        </section>
+
+                        <section className="mt-8 rounded-[28px] border border-border-light bg-card-bg-light p-6 shadow-[0_14px_30px_rgba(38,33,22,0.08)]">
+                            <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                                <div>
+                                    <p className="text-sm font-bold uppercase tracking-[0.22em] text-primary">
+                                        Cierre de jornada
+                                    </p>
+                                    <h2 className="mt-2 text-2xl font-black tracking-[-0.04em]">
+                                        Registrar cierre del día
+                                    </h2>
+                                    <p className="messenger-copy mt-2 max-w-2xl text-sm font-semibold">
+                                        Guarda un reporte con tus entregas completadas, pendientes, no entregadas, canceladas y el total cobrado.
+                                    </p>
+
+                                    {todayShiftReport && (
+                                        <p className="mt-4 rounded-2xl border border-primary/30 bg-primary/10 p-4 text-sm font-bold text-primary">
+                                            La jornada de hoy ya fue cerrada a las {formatTimeOnly(todayShiftReport.closedAt)}.
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div className="flex flex-col gap-3 sm:flex-row">
+                                    {todayShiftReport && (
+                                        <button
+                                            className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+                                            onClick={() => setSelectedShiftReport(todayShiftReport)}
+                                            type="button"
+                                        >
+                                            <Eye size={17} />
+                                            Ver reporte de hoy
+                                        </button>
+                                    )}
+
+                                    <button
+                                        className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-60"
+                                        disabled={savingShiftClose || currentShiftActivityCount === 0 || Boolean(todayShiftReport)}
+                                        onClick={() => setShowCloseShiftModal(true)}
+                                        type="button"
+                                    >
+                                        <CheckCircle2 size={17} />
+                                        Cerrar jornada
+                                    </button>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section className="mt-8">
+                            <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <h2 className="text-2xl font-black tracking-[-0.04em]">
+                                        Historial de jornadas
+                                    </h2>
+                                    <p className="messenger-copy mt-1 text-sm font-semibold">
+                                        Consulta los reportes generados al cerrar cada jornada.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                {shiftReports.length > 0 ? (
+                                    shiftReports.map((report) => (
+                                        <article
+                                            className="messenger-delivered-row flex flex-col gap-4 rounded-[26px] border p-6 shadow-[0_10px_24px_rgba(18,32,56,0.06)] lg:flex-row lg:items-center lg:justify-between"
+                                            key={report.id}
+                                        >
+                                            <div>
+                                                <p className="text-lg font-black">
+                                                    Jornada - {formatDateKey(report.dateKey)}
+                                                </p>
+                                                <p className="messenger-copy mt-1 text-sm font-semibold">
+                                                    Inicio: {formatTimeOnly(report.startedAt)} · Cierre: {formatTimeOnly(report.closedAt)}
+                                                </p>
+                                            </div>
+
+                                            <div className="grid gap-3 text-sm font-bold sm:grid-cols-4 lg:min-w-[520px]">
+                                                <p>
+                                                    <span className="messenger-muted block text-xs">Completadas</span>
+                                                    {report.summary.completedCount}
+                                                </p>
+                                                <p>
+                                                    <span className="messenger-muted block text-xs">Pendientes</span>
+                                                    {report.summary.pendingCount}
+                                                </p>
+                                                <p>
+                                                    <span className="messenger-muted block text-xs">Incidentes</span>
+                                                    {report.summary.notDeliveredCount + report.summary.cancelledCount}
+                                                </p>
+                                                <p>
+                                                    <span className="messenger-muted block text-xs">Cobrado</span>
+                                                    {formatBolivianos(report.summary.totalCollected)}
+                                                </p>
+                                            </div>
+
+                                            <button
+                                                className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+                                                onClick={() => setSelectedShiftReport(report)}
+                                                type="button"
+                                            >
+                                                <Eye size={17} />
+                                                Ver detalle
+                                            </button>
+                                        </article>
+                                    ))
+                                ) : (
+                                    <div className="messenger-order-card rounded-[28px] border p-8 text-sm font-semibold">
+                                        Aún no hay jornadas cerradas.
+                                    </div>
+                                )}
+                            </div>
                         </section>
 
                         <section className="mt-11">
@@ -1166,7 +1928,7 @@ export default function MessengerDashboard({
                                     ))
                                 ) : (
                                     <div className="messenger-order-card rounded-[28px] border p-8 text-sm font-semibold">
-                                        No hay entregas completadas hoy.
+                                        No hay entregas completadas.
                                     </div>
                                 )}
                             </div>
@@ -1199,6 +1961,47 @@ export default function MessengerDashboard({
                     order={cancelNoPaymentOrder}
                     onClose={() => setCancelNoPaymentOrder(null)}
                     onConfirm={registerCancelNoPayment}
+                />
+            )}
+            {pendingAssignedAction && (
+                <ConfirmAssignedOrderActionModal
+                    action={pendingAssignedAction.action}
+                    isSaving={savingAssignedAction}
+                    order={pendingAssignedAction.order}
+                    onClose={() => setPendingAssignedAction(null)}
+                    onConfirm={confirmAssignedOrderAction}
+                />
+            )}
+            {confirmPaymentOrder && (
+                <ConfirmPaymentModal
+                    order={confirmPaymentOrder}
+                    onClose={() => setConfirmPaymentOrder(null)}
+                    onConfirm={confirmPayment}
+                />
+            )}
+            {paymentSuccessOrder && (
+                <PaymentSuccessModal
+                    onClose={() => setPaymentSuccessOrder(null)}
+                />
+            )}
+            {showCloseShiftModal && (
+                <CloseShiftModal
+                    alreadyClosed={Boolean(todayShiftReport)}
+                    cancelledCount={currentShiftCancelledOrders.length}
+                    completedCount={todayCollectedOrders.length}
+                    isSaving={savingShiftClose}
+                    notDeliveredCount={currentShiftNotDeliveredOrders.length}
+                    onClose={() => setShowCloseShiftModal(false)}
+                    onConfirm={confirmCloseShift}
+                    pendingCount={currentShiftPendingOrders.length}
+                    totalCollected={todayCollectedTotal}
+                />
+            )}
+
+            {selectedShiftReport && (
+                <ShiftReportDetailModal
+                    report={selectedShiftReport}
+                    onClose={() => setSelectedShiftReport(null)}
                 />
             )}
         </main>

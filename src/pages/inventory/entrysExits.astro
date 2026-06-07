@@ -1,0 +1,20 @@
+---
+import InventoryLayout from '../../layouts/InventoryLayout.astro';
+import { StockMovementForm } from '../../features/inventory/components/StockMovementForm.tsx';
+import { MovementHistory } from '../../features/inventory/components/MovementHistory.tsx';
+---
+
+<InventoryLayout title="Sansistore | Movimientos">
+
+    <div class="mb-4">
+      <h2 class="font-['Outfit'] font-black text-2xl tracking-tight text-(--theme-text)">
+      Control de <span class="text-primary">Inventario</span>
+      </h2>
+      <p class="text-xs opacity-60 text-(--theme-text)">Usa esto solo para abastecimiento de proveedores o ajustes de mermas.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-1 gap-8 items-stretch">
+      <StockMovementForm client:load />
+    </div>
+  </section>
+</InventoryLayout>

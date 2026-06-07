@@ -1,0 +1,8 @@
+---
+import UndeliveredOrdersPanel from "@features/seller/components/UndeliveredOrdersPanel";
+import SellerLayout from "@/layouts/SellerLayout.astro";
+---
+
+<SellerLayout title="Pedidos no entregados">
+  <UndeliveredOrdersPanel client:load embedded />
+</SellerLayout>

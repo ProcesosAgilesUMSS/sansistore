@@ -1,119 +1,46 @@
-import type { Order } from "../types";
-import LoadingMessage from "./LoadingMessage";
-import GridSpinner from "./GridSpinner";
-import { reserveOrder } from "../services/ordersService";
-import { useState } from "react";
-import { BookMarkedIcon, Check, Package, Search } from "lucide-react";
+import type { Order } from "@features/orders/types";
+import { formatCurrency } from "../utils/currency";
+import OrderStatusBadge from "./OrderStatusBadge";
 
-interface CreatedOrderItemProps {
+interface Props {
   order: Order;
-  onOrderReserved: () => void;
+  index: number;
+  selectOrder: () => void
 }
 
-export default function CreatedOrderItem({ order, onOrderReserved }: CreatedOrderItemProps) {
-  const [isReserving, setIsReserving] = useState(false);
-
-  const isCreated = order.status.toUpperCase() === 'CREADO';
-  const isReserved = order.status.toUpperCase() === 'RESERVADO';
-  const isPending = order.status.toUpperCase() === 'PENDIENTE';
-  const isPackaged = order.status.toUpperCase() === 'EMPAQUETADO';
-
-  const handleReserve = async () => {
-    if (!isCreated || isReserving) return;
-
-    setIsReserving(true);
-    try {
-      await reserveOrder(order.id);
-      // No reseteamos isReserving aquí.
-      // Esperamos a que el cambio de status en las props (vía Firebase)
-      // desmonte este componente gracias al cambio de 'key' en la lista.
-    } catch (error) {
-      console.error("Error confirming order:", error);
-      alert("Error al confirmar el pedido. Por favor intenta de nuevo.");
-      setIsReserving(false);
-    }
-  };
-
-  const renderStatusDisplay = () => {
-    if (isReserving) {
-      return (
-        <div className="flex items-center gap-2 text-black ml-2">
-          <GridSpinner size={5} />
-          <LoadingMessage text="Reservando" />
-        </div>
-      );
-    }
-
-    if (isReserved || isPending || isPackaged) {
-      return (
-        <div className="flex w-full items-center gap-6 ml-2">
-          <div className="flex gap-2 items-center">
-            <Check size={15} color="green" />
-            <span>Reservado</span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {isPending ? (
-              <>
-                <GridSpinner size={4.5} />
-                <LoadingMessage text="Buscando productos" />
-              </>
-            ) : (
-              (isPackaged) && (
-                <div className="flex gap-2 w-[16ch]">
-                  <Search size={18} color="blue" />
-                  <span className="">Productos listos</span>
-                </div>
-              )
-            )}
-          </div>
-
-          {isPackaged && (
-            <div className="col-start-8  flex gap-2">
-              <Package size={18} color="#C28B25" />
-              <span>Empaquetado</span>
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    return (
-      <>
-        {isCreated && (
-          <button
-            className="flex border gap-2 ml-2 px-2 py-0.5 rounded border-black/45 cursor-pointer"
-            onClick={handleReserve}
-            disabled={isReserving}
-          >
-            <BookMarkedIcon size={18} />
-            {isReserving ? "Reservando..." : "Reservar"}
-          </button>
-        )}
-      </>
-    );
-  };
-
+export default function CreatedOrderItem({ order, index, selectOrder }: Props) {
   return (
-    <li className="grid grid-cols-subgrid col-span-full border-b items-center py-[10px] min-[760px]:py-0">
-      <div className="col-span-full min-[760px]:col-start-1 min-[760px]:col-end-3 text-sm flex items-center gap-[8px] text-xs">
-        <div className="size-1.5 bg-[#1e1e1e]" />
-        {order.id}
-      </div>
-      <div className="col-start-1 col-end-9 min-[760px]:col-start-3 min-[760px]:col-end-8 text-[calc(.78125vw+14.5px)] truncate
-      min-[960px]:col-end-13">
-        {order.delivery.destination}
+    <li
+      onClick={selectOrder}
+      className="grid grid-cols-subgrid col-span-full border-b border-dotted border-(--theme-border) py-3 hover:bg-(--theme-secondary-bg) cursor-pointer transition-colors items-center"
+    >
+      {/* Order ID */}
+      <div className="col-span-full min-[570px]:col-start-1 min-[570px]:col-end-4 min-[775px]:col-end-3 flex items-center gap-x-2 text-sm font-mono">
+        <div className="size-1.5 bg-(--theme-text) opacity-70 shrink-0" />
+        ORD-{(index + 1).toString().padStart(3, '0')}
       </div>
 
-      <div className="min-[960px]:col-start-13 min-[960px]:col-end-23 min-[760px]:col-start-8 min-[760px]:col-end-16 text-sm flex
-      items-center col-span-full">
-        {renderStatusDisplay()}
+      {/* Destination */}
+      <div className="col-span-full min-[570px]:col-start-4 min-[570px]:col-end-16 min-[775px]:col-start-3 min-[775px]:col-end-12 min-[775px]:ml-4 min-[850px]:ml-0 text-sm uppercase truncate leading-[120%]">
+        {order.address}
+      </div>
+
+      {/* Status */}
+      <div className="col-span-full min-[570px]:col-start-16 min-[570px]:col-end-19 min-[775px]:col-start-13 min-[775px]:col-end-16 min-[850px]:col-start-12 min-[850px]:col-end-14 flex items-center gap-x-2 w-fit">
+        <OrderStatusBadge status={order.status} />
+      </div>
+
+      {/* Total */}
+      <div className="hidden min-[775px]:flex min-[775px]:col-start-17 min-[775px]:col-end-19 min-[850px]:col-start-15 min-[850px]:col-end-17 items-center min-[850px]:ml-4 tabular-nums">
+        {formatCurrency(order.total)}
+      </div>
+
+      {/* [VER] */}
+      <div className="hidden min-[850px]:flex col-start-18 items-center justify-end">
+        <button className="rounded-full border border-(--theme-border) px-3 py-1 text-[10px] uppercase font-600 text-(--theme-text) opacity-70 hover:opacity-100 transition-colors">
+          Ver
+        </button>
       </div>
     </li>
   );
 }
-
-
-//         className="col-start-7 col-end-9 min-[760px]:col-start-14 min-[760px]:col-end-17 cursor-pointer text-sm
-//   min-[960px]:col-start-20 min-[960px]:col-end-23 border text-center w-fit px-2 border-black/33 rounded disabled:opacity-50
-//   disabled:cursor-not-allowed"

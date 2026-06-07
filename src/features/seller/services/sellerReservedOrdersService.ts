@@ -13,6 +13,9 @@ import {
 } from 'firebase/firestore';
 import type { Order, OrderDoc, OrderItem, OrderItemDoc } from '../types';
 
+// ── HU #160: Monitoreo de actividad de vendedores ──
+import { registrarActividadVendedor } from '../../admin/monitoring/services/sellerActivityService';
+
 function toDate(value: unknown): Date | null {
   if (!value) return null;
   if (typeof (value as { toDate?: unknown }).toDate === 'function') {
@@ -203,7 +206,30 @@ export async function reserveConfirmedOrder(
     tx.update(orderRef, {
       status: 'RESERVADO',
       sellerId,
+      reservedAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
   });
+
+
+   // ── HU #160: Registrar actividad del vendedor ──
+  // Se ejecuta DESPUÉS de la transacción exitosa.
+  // Si falla el log, no afecta la operación principal.
+  const sellerSnap = await getDoc(doc(db, 'users', sellerId));
+  const sellerData = sellerSnap.exists() ? sellerSnap.data() : {};
+ 
+  registrarActividadVendedor({
+    sellerId,
+    sellerName: sellerData.displayName ?? 'Vendedor',
+    sellerEmail: sellerData.email ?? '',
+    actionType: 'RESERVAR',
+    orderId,
+    previousStatus: 'CREADO',
+    newStatus: 'RESERVADO',
+  }).catch((err) => {
+    // El log es secundario — si falla, no interrumpe el flujo del vendedor
+    console.error('No se pudo registrar la actividad del vendedor:', err);
+  });
+
 }
+

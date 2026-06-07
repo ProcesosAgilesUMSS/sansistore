@@ -1,0 +1,8 @@
+---
+import SellerLayout from '@/layouts/SellerLayout.astro';
+import CreatedOrdersList from '@features/orders/components/CreatedOrdersList';
+---
+
+<SellerLayout title="Pedidos reservados">
+  <CreatedOrdersList client:load />
+</SellerLayout>

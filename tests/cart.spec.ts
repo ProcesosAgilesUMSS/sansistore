@@ -289,7 +289,13 @@ test.describe('Cart - Carrito', () => {
     await loginWithEmail(page, 'juan.paredes@est.umss.edu');
 
     await page.goto('/carrito');
-    await expect(page.locator('a[href="/productos/leche-pil-natural-900-ml"]').filter({ hasText: 'Leche PIL Natural 900 ml' }).first()).toBeVisible();
+    await expectFilledCartPage(page);
+    await expect(
+      page
+        .locator('a[href="/productos/leche-pil-natural-900-ml"]')
+        .filter({ hasText: 'Leche PIL Natural 900 ml' })
+        .last()
+    ).toBeVisible({ timeout: 15_000 });
 
     await page.goto('/logout');
 

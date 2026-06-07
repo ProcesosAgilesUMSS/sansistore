@@ -323,3 +323,128 @@ También realice pruebas funcionales en entorno local sobre el flujo completo de
 - **Yesterday:** Refinación de HU #80
 - **Today:** Finalizar HU #80, hacer integración
 - **Blockers:** none
+
+# 26/05/ 2026
+## Daily Reports - Team 6 SoftwareOne
+
+
+### Llanos Vega Juan Carlos
+
+
+- **Yesterday:** Realice la demo del Sprint 2.
+- **Today:** Participar en la retrospectiva del sprint y en la sesión de planning para definir las tareas del Sprint 3.
+- **Blockers:** Ninguno.
+
+
+### Rodriguez Torrico Arnold Guery
+
+
+- **Yesterday:** Apoyo en la ejecución de la demo del Sprint 2 y resolución de dudas técnicas durante la presentación.
+- **Today:** Participación activa en la retrospectiva del sprint y estimación de User Stories (US) para el planning del Sprint 3.
+- **Blockers:** Ninguno.
+
+
+### Pereira Fiorilo Oliver Do Santos
+- **Yesterday:** Realice la corrección de un bug en la lista de productos de compras al listar estaba desactualizado según a los nuevos cambios en la base de datos US Fix #396
+- **Today:** Realizaremos la retrospectiva del sprint y también el planning del sprint 3 escogiendo y puntuando las US
+- **Blockers:** Ninguno.
+
+
+### Paqui Rojas Aaron David
+
+
+- **Yesterday:** Consolidación del entorno de pruebas y despliegue para la correcta ejecución de la demo del Sprint 2.
+- **Today:** Análisis de métricas en la retrospectiva y selección de tareas durante el planning del Sprint 3.
+- **Blockers:** Ninguno.
+
+
+### Gutiérrez Fuentes Alexander Raul
+
+
+- **Yesterday:** Diseño de listas de vendedor (órdenes creadas, mis reservas, órdenes enviadas)
+- **Today:** Rediseño de más detalles de una orden creada, rediseño de más detalles de una orden reservada, rediseño de más detalles de una orden de órdenes [enviadas, en camino].
+- **Blockers:** NONE
+
+
+# 28/05/ 2026
+## Daily Reports - Team 6 SoftwareOne
+
+
+### Llanos Vega Juan Carlos
+
+
+- **Yesterday:** Desarrollo de las Historias de Usuario HU-082, HU-083, HU-084, HU-085 y la HU-407 de los requerimientos asignados del Product Backlog para el Sprint 3 referente al área de las Ventas Online y presencial
+- **Today:** Actualización de mi área local con el proyecto principal main, y creación de la rama del grupo feature/VentasOnline-Presencial_Team06 para desarrollar los requerimientos.
+- **Blockers:** Ninguno
+
+
+### Rodriguez Torrico Arnold Guery
+
+
+- **Yesterday:** Participación en la sesión de Planning y refinamiento de Historias de Usuario (US), definiendo descripciones y estableciendo los criterios de aceptación.
+- **Today:** Revisión de las tareas (tasks) generadas y preparación del entorno para iniciar el desarrollo de las US asignadas.
+- **Blockers:** Ninguno
+
+
+### Pereira Fiorilo Oliver Do Santos
+- **Yesterday:** Análisis y diagnóstico del bug al registrar una compra en /seller/purchase, el cual creaba el documento inventoryMovements con un esquema incorrecto en Firestore.
+- **Today:** Trabajando en el fix para asegurar que inventoryMovements respete el formato definido en el README, garantizando específicamente que el movementId se asigne directamente al doc.id y no se cree como un campo interno.
+- **Blockers:** Ninguno.
+
+
+### Paqui Rojas Aaron David
+
+
+- **Yesterday:** Sprint Planning y refinamiento conjunto de las US, apoyando en la validación de los criterios de aceptación y la asignación final de las responsabilidades.
+- **Today:** Sincronización de repositorios e inicio del desarrollo de las tareas asignadas durante la sesión de refinamiento.
+- **Blockers:** Ninguno.
+
+
+### Gutiérrez Fuentes Alexander Raul
+
+
+- **Yesterday:** Apoyo en el Sprint Planning y refinamiento activo de Historias de Usuario, enfocándose en el desglose detallado de tareas (tasks).
+- **Today:** Organización y asignación de tareas del Sprint para el equipo, junto con la revisión técnica para comenzar el desarrollo.
+- **Blockers:** NONE
+
+
+# 02/06/ 2026
+## Daily Reports - Team 6 SoftwareOne
+
+
+### Llanos Vega Juan Carlos
+
+
+- **Yesterday:** Revisión de los bug presentados en los requerimientos reportados como pendientes para la continuación del desarrollo del proyecto.
+- **Today:** Actualización de los cambios al local desde la rama principal, resolución del issue #426 y realizamos code review grupal.
+- **Blockers:** Ninguno
+
+
+### Rodriguez Torrico Arnold Guery
+
+
+- **Yesterday:** Revisión de la arquitectura y del flujo necesario para implementar el requerimiento asignado.
+- **Today:** Trabajo y resolución del issue #81. Realizamos code review grupal.
+- **Blockers:** Ninguno.
+
+
+### Pereira Fiorilo Oliver Do Santos
+- **Yesterday:** Validación de algunos detalles pendientes en mi módulo y pruebas generales.
+- **Today:** Participación activa y realizamos code review grupal.
+- **Blockers:** Ninguno.
+
+
+### Paqui Rojas Aaron David
+
+
+- **Yesterday:** Análisis técnico y configuración del entorno local para abordar el ticket #84.
+- **Today:** Trabajo y resolución del issue #84. Realizamos code review grupal.
+- **Blockers:** Ninguno.
+
+
+### Gutiérrez Fuentes Alexander Raul
+
+
+- **Yesterday:** Diagnóstico y rastreo de varios bugs visuales que fueron reportados en la plataforma.
+- **Today:** Trabajo y resolución de los issues #425, #407 y #82. Realizamos code review grupal.
+- **Blockers:** NONE

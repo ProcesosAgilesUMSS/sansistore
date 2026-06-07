@@ -3,6 +3,7 @@ import { STATUS_LABELS } from "../types";
 import type { Order } from "../types";
 import GridSpinner from "./GridSpinner";
 import LoadingMessage from "./LoadingMessage";
+import { parseOrderId } from "../../cart/services/orderService";
 
 interface OrderProductDetailProps {
   order: Order;
@@ -18,6 +19,7 @@ export default function OrderProductDetail({
   isReserving,
 }: OrderProductDetailProps) {
   const hasItems = order.items.length > 0;
+  const { uuid, friendlyName } = parseOrderId(order.id);
 
   return (
     <section aria-labelledby="order-detail-title">
@@ -27,14 +29,15 @@ export default function OrderProductDetail({
             <span className="text-primary">/</span>
             Detalle del pedido
           </p>
+          <p className="text-xs font-mono text-text-light/40 mb-1">{uuid}</p>
           <h3
             id="order-detail-title"
             className="text-[clamp(1.75rem,4vw,3rem)] font-black tracking-[-0.04em] leading-none text-text-light"
           >
-            {order.id}
+            {friendlyName}
           </h3>
           <p className="text-sm text-text-light/80 mt-4">
-            Destino: {order.delivery.destination}
+            Destino: {order.address}
           </p>
           <div className="text-sm flex items-center gap-3 mt-3">
             <span className="text-text-light/60">Estado:</span>
@@ -45,8 +48,8 @@ export default function OrderProductDetail({
                   order.status === "RESERVADO" ? "bg-blue-500" :
                   order.status === "PENDIENTE" ? "bg-yellow-500" :
                   order.status === "EMPAQUETADO" ? "bg-purple-500" :
-                  order.status === "in_transit" ? "bg-blue-500" :
-                  order.status === "delivered" ? "bg-green-500" :
+                  order.status === "EN CAMINO" ? "bg-blue-500" :
+                  order.status === "ENTREGADO" ? "bg-green-500" :
                   "bg-current"
                 }`}
               />
@@ -124,7 +127,7 @@ export default function OrderProductDetail({
 
                 <div className="flex justify-between sm:block">
                   <span className="sm:hidden text-[11px] font-bold uppercase tracking-wider text-text-light/40">P. Unitario</span>
-                  <p className="text-sm text-text-light/80">Bs {item.price}</p>
+                  <p className="text-sm text-text-light/80">Bs {item.unitPrice}</p>
                 </div>
 
                 <div className="flex justify-between sm:block">

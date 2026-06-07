@@ -2,8 +2,8 @@
 import Layout from './Layout.astro';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { SideBarSeller } from '../features/seller/components/SideBarSeller';
 import RouteGuard from '../components/RouteGuard';
+import OrdersDock from '../features/orders/components/OrdersDock';
 
 interface Props {
   title?: string;
@@ -13,20 +13,13 @@ const { title = 'Sansistore | Vendedor' } = Astro.props;
 ---
 
 <Layout title={title}>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <Navbar client:load />
+  <OrdersDock client:load transition:persist />
   <RouteGuard client:load allowedRoles={['vendedor']} roleName="Vendedor">
-    <main class="bg-(--theme-bg) pt-16 md:pt-20">
-      <div class="w-full px-2 pb-10 sm:px-3 md:px-4 lg:px-0">
-        <div
-          class="grid gap-4 lg:grid-cols-[300px_minmax(0,1fr)] lg:items-start"
-        >
-          <div class="lg:sticky lg:top-10 lg:self-start lg:pl-0 xl:pl-2">
-            <SideBarSeller client:load />
-          </div>
-          <slot />
-        </div>
-      </div>
+    <main class="bg-(--theme-bg) pt-16 md:pt-20 font-['Inter',sans-serif] flex-1 flex flex-col w-full">
+      <slot />
     </main>
   </RouteGuard>
-  <Footer client:load />
+  <Footer client:load className="pb-36 lg:pb-24" />
 </Layout>

@@ -113,6 +113,7 @@ classDiagram
     +string uid
     +string email
     +string displayName
+    +string phoneNumber
     +array roles
     +string institutionalId
     +boolean isActive
@@ -185,8 +186,12 @@ classDiagram
 
   class orders {
     +string orderId
+    +string secret
     +string buyerId
     +string sellerId
+    +string customerName
+    +string customerPhone
+    +string address
     +string status
     +string incidentReason
     +number total
@@ -233,6 +238,8 @@ classDiagram
     +timestamp reprogrammedAt
     +timestamp createdAt
     +timestamp updatedAt
+    +string reprogramReason  
+    +timestamp newDeliveryAt
   }
 
   class payments {
@@ -295,6 +302,28 @@ classDiagram
     +timestamp createdAt
   }
 
+  class accessLogs {
+    +string logId
+    +string uid
+    +string displayName
+    +string email
+    +array roles
+    +string action
+    +string status
+    +timestamp timestamp
+  }
+
+  class sellerActivityLogs {
+    +string sellerId
+    +string sellerName
+    +string sellerEmail
+    +string actionType
+    +string orderId
+    +string previousStatus
+    +string newStatus
+    +timestamp timestamp
+  }
+
   users "1" --> "0..*" locations : owns
   users "1" --> "0..*" orders : places
   users "1" --> "0..*" reviews : writes
@@ -313,6 +342,9 @@ classDiagram
   users "1" --> "1" settings : configures
   users "1" --> "0..*" notifications : receives
   orders "1" --> "0..*" notifications : triggers
+  users "1" --> "0..*" accessLogs : generates
+  users "1" --> "0..*" sellerActivityLogs : generates
+  orders "1" --> "0..*" sellerActivityLogs : referenced in
 ```
 
 ## Branching and releases

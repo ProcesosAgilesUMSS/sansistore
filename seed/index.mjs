@@ -7,19 +7,54 @@ import { locationList } from './data/locations.mjs';
 import { orderList } from './data/orders.mjs';
 import { deliveryList } from './data/deliveries.mjs';
 import { run as seedCartItems } from './data/cart.mjs';
+import { inventoryMovements } from './data/inventoryMovements.mjs';
+import { activityLogList } from './data/activityLogs.mjs';
+import { readFileSync, existsSync } from 'node:fs';
 
-process.env.FIRESTORE_EMULATOR_HOST =
-  process.env.FIRESTORE_EMULATOR_HOST || '127.0.0.1:8080';
-process.env.FIREBASE_AUTH_EMULATOR_HOST =
-  process.env.FIREBASE_AUTH_EMULATOR_HOST || '127.0.0.1:9099';
+const envPath = new URL('../.env', import.meta.url);
+if (existsSync(envPath)) {
+  for (const line of readFileSync(envPath, 'utf-8').split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eq = trimmed.indexOf('=');
+    if (eq === -1) continue;
+    const key = trimmed.slice(0, eq).trim();
+    const val = trimmed.slice(eq + 1).trim().replace(/^['"]|['"]$/g, '');
+    if (!process.env[key]) process.env[key] = val;
+  }
+}
 
-admin.initializeApp({
-  projectId: process.env.PUBLIC_FIREBASE_PROJECT_ID || 'sansistore',
-});
+const isProduction = process.argv.includes('--production');
+
+if (isProduction) {
+  if (!process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+    console.error("Missing FIREBASE_SERVICE_ACCOUNT_KEY in .env");
+    process.exit(1);
+  }
+  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+} else {
+  process.env.FIRESTORE_EMULATOR_HOST =
+    process.env.FIRESTORE_EMULATOR_HOST || '127.0.0.1:8080';
+  process.env.FIREBASE_AUTH_EMULATOR_HOST =
+    process.env.FIREBASE_AUTH_EMULATOR_HOST || '127.0.0.1:9099';
+  admin.initializeApp({
+    projectId: process.env.PUBLIC_FIREBASE_PROJECT_ID || 'sansistore',
+  });
+}
+
 const db = admin.firestore();
 const auth = admin.auth();
 
 const TS = () => admin.firestore.FieldValue.serverTimestamp();
+
+const FAILED_RESTORE_ORDER_IDS = new Set([
+  '019e74a6-1001-7000-bbbb-000000000001_restore-chromium',
+  '019e74a6-1002-7000-bbbb-000000000002_restore-firefox',
+  '019e74a6-1003-7000-bbbb-000000000003_restore-webkit',
+]);
 
 const toTimestamp = (value, fallback = TS()) => {
   if (!value) return fallback;
@@ -31,12 +66,70 @@ const setDoc = async (collection, id, data) => {
     ? db.collection(collection).doc(id)
     : db.collection(collection).doc();
   await ref.set(data, { merge: true });
-  console.log(`  ✓ ${collection}/${ref.id}`);
   return ref.id;
 };
 
+const clearCollection = async (collectionPath) => {
+  const snapshot = await db.collection(collectionPath).get();
+  if (snapshot.empty) return;
+
+  if (isProduction) {
+    const ref = db.collection(collectionPath);
+    await db.recursiveDelete(ref);
+  } else {
+    const batch = db.batch();
+    snapshot.docs.forEach((doc) => batch.delete(doc.ref));
+    await batch.commit();
+  }
+};
+
+const buildOrderItems = (order) =>
+  order.items.map((item, idx) => {
+    const unitPrice = item.product.hasOffer
+      ? item.product.offerPrice
+      : item.product.price;
+    const subtotal = unitPrice * item.quantity;
+    return {
+      itemId: `${order.id}-item-${idx + 1}`,
+      productId: item.product.slug,
+      productName: item.product.name,
+      imageUrl: item.product.imageUrl,
+      unitPrice,
+      quantity: item.quantity,
+      subtotal,
+    };
+  });
+
+const calculateOrderTotal = (order) =>
+  buildOrderItems(order).reduce((sum, item) => sum + item.subtotal, 0);
+
+async function deleteAllAuthUsers() {
+  let totalDeleted = 0;
+  let pageToken;
+
+  try {
+    do {
+      const result = await auth.listUsers(1000, pageToken);
+      const usersToDelete = result.users.map((userRecord) => userRecord.uid);
+
+      if (usersToDelete.length > 0) {
+        await auth.deleteUsers(usersToDelete);
+        totalDeleted += usersToDelete.length;
+      }
+
+      pageToken = result.pageToken;
+    } while (pageToken);
+
+    if (totalDeleted > 0) {
+      console.log(`  ✓ Deleted ${totalDeleted} auth users.`);
+    }
+  } catch (error) {
+    console.error('Error deleting auth users:', error);
+  }
+}
+
 async function seedAuthUsers() {
-  console.log('\n Seeding Auth users...');
+  console.log(isProduction ? '  Seeding auth users...' : '');
   for (const user of userList) {
     try {
       const existing = await auth.getUser(user.uid);
@@ -47,7 +140,6 @@ async function seedAuthUsers() {
       if (user.authType === 'google' && !hasGoogle) {
         await auth.deleteUser(user.uid);
       } else {
-        console.log(`  ✓ Auth: ${user.email} (exists)`);
         continue;
       }
     } catch {
@@ -87,22 +179,22 @@ async function seedAuthUsers() {
             password: '12345678',
           });
         }
-        console.log(`  ✓ Auth: ${user.email} (${user.authType})`);
       } catch (err) {
         console.log(`  ⚠ Auth: ${user.email} - ${err.message}`);
       }
     }
   }
+  if (!isProduction) console.log('auth seeded');
 }
 
 async function seedFirestoreUsers() {
-  console.log('\n Seeding Firestore users...');
   for (const user of userList) {
     await setDoc('users', user.uid, {
       uid: user.uid,
       email: user.email,
       displayName: user.displayName,
       photoURL: user.photoURL,
+      phoneNumber: user.phoneNumber ?? null,
       roles: user.roles,
       institutionalId: user.institutionalId,
       isActive: user.isActive,
@@ -111,10 +203,10 @@ async function seedFirestoreUsers() {
       updatedAt: TS(),
     });
   }
+  console.log('users seeded');
 }
 
 async function seedCategories() {
-  console.log('\n Seeding categories...');
   for (const cat of categoryList) {
     await setDoc('categories', cat.id, {
       categoryId: cat.id,
@@ -124,10 +216,10 @@ async function seedCategories() {
       createdAt: TS(),
     });
   }
+  console.log('categories seeded');
 }
 
 async function seedProducts() {
-  console.log('\n Seeding products, inventory & reviews...');
   for (const p of productList) {
     const productId = await setDoc('products', p.slug, {
       productId: p.slug,
@@ -175,10 +267,10 @@ async function seedProducts() {
       });
     }
   }
+  console.log('products seeded');
 }
 
 async function seedLocations() {
-  console.log('\n Seeding locations...');
   for (const loc of locationList) {
     await setDoc('locations', loc.id, {
       locationId: loc.id,
@@ -192,26 +284,14 @@ async function seedLocations() {
       updatedAt: TS(),
     });
   }
+  console.log('locations seeded');
 }
 
 async function seedOrders() {
-  console.log('\n Seeding orders & orderItems...');
   for (const order of orderList) {
-    const items = order.items.map((item, idx) => {
-      const unitPrice = item.product.hasOffer
-        ? item.product.offerPrice
-        : item.product.price;
-      const subtotal = unitPrice * item.quantity;
-      return {
-        itemId: `${order.code}-item-${idx + 1}`,
-        productId: item.product.slug,
-        productName: item.product.name,
-        unitPrice,
-        quantity: item.quantity,
-        subtotal,
-      };
-    });
+    await clearCollection(`orders/${order.id}/orderItems`);
 
+    const items = buildOrderItems(order);
     const total = items.reduce((sum, item) => sum + item.subtotal, 0);
     const deliveryStatus = order.deliveryStatus;
 
@@ -222,39 +302,54 @@ async function seedOrders() {
       in_transit: 'PENDIENTE',
       delivered: 'COBRADO',
       pending_reassignment: 'PENDIENTE',
+      NOT_DELIVERED: 'PENDIENTE',
+      CANCELLED: 'CANCELADO',
     };
 
-    const deliveryCode = order.code.replace('order', 'delivery');
-    const paymentCode = order.code.replace('order', 'payment');
+    const isCancelled = order.status === 'CANCELADO';
+    const delivery = deliveryList.find((item) => item.orderCode === order.id);
 
-    await setDoc('orders', order.code, {
-      orderId: order.code,
+    await setDoc('orders', order.id, {
+      orderId: order.id,
+      secret: order.secret,
       buyerId: order.buyer.uid,
-      sellerId: order.seller.uid,
+      sellerId: order.seller?.uid || null,
       customerName: order.customerName,
       customerPhone: order.customerPhone,
-      address: order.address ?? null,
+      address: order.location?.label ?? null,
       status: order.status,
-      incidentReason: null,
+      incidentReason: order.incidentReason ?? null,
+      failedAt: order.failedAt ? toTimestamp(order.failedAt) : null,
+      stockRestored: false,
       total,
       locationId: order.location.id,
       paymentStatus: paymentStatusMap[deliveryStatus] || 'PENDIENTE',
       deliveryStatus,
-      deliveryId: deliveryStatus !== 'created' ? deliveryCode : null,
-      paymentId: paymentCode,
+      deliveryId: delivery?.code ?? null,
+      paymentId: order.id,
       confirmedAt: toTimestamp(order.confirmedAt),
-      cancelledAt: null,
+      cancelledAt:
+        isCancelled && order.failedAt ? toTimestamp(order.failedAt) : null,
       createdAt: toTimestamp(order.createdAt),
       updatedAt: toTimestamp(order.updatedAt),
     });
 
     for (const item of items) {
-      await setDoc(`orders/${order.code}/orderItems`, item.itemId, item);
+      await setDoc(`orders/${order.id}/orderItems`, item.itemId, item);
     }
 
-    await setDoc('payments', paymentCode, {
-      paymentId: paymentCode,
-      orderId: order.code,
+    if (FAILED_RESTORE_ORDER_IDS.has(order.id)) {
+      for (const item of items) {
+        await setDoc('inventory', item.productId, {
+          stockReserved: admin.firestore.FieldValue.increment(item.quantity),
+          updatedAt: TS(),
+        });
+      }
+    }
+
+    await setDoc('payments', order.id, {
+      paymentId: order.id,
+      orderId: order.id,
       amount: total,
       method: 'cash_on_delivery',
       status: paymentStatusMap[deliveryStatus] || 'PENDIENTE',
@@ -265,22 +360,31 @@ async function seedOrders() {
       updatedAt: toTimestamp(order.updatedAt),
     });
   }
+  console.log('orders seeded');
 }
 
 async function seedDeliveries() {
-  console.log('\n Seeding deliveries...');
   for (const d of deliveryList) {
+    const legacyIndex = /^order-(\d+)$/.exec(d.orderCode)?.[1];
+    const order = legacyIndex
+      ? orderList[Number(legacyIndex) - 1]
+      : orderList.find((item) => item.id === d.orderCode);
+
     await setDoc('deliveries', d.code, {
       deliveryId: d.code,
-      orderId: d.orderCode,
+      orderId: order?.id || d.orderCode,
+      orderCode: d.orderCode,
       courierId: d.courier ? d.courier.uid : null,
       status: d.status,
       deliveryCode: d.code.replace('delivery-', 'DEL-2026-'),
       attemptNumber: d.attemptNumber,
-      incidentReason: null,
+      incidentReason: d.incidentReason ?? null,
+      incidentNotes: d.incidentNotes ?? null,
+      cancellationReason: d.cancellationReason ?? null,
+      cancellationNotes: d.cancellationNotes ?? null,
       evidenceUrl: null,
       failureReason: null,
-      amountCollected: d.amountCollected,
+      amountCollected: order ? calculateOrderTotal(order) : null,
       customerConfirmed: d.customerConfirmed,
       customerConfirmedAt: toTimestamp(d.customerConfirmedAt),
       assignedAt: toTimestamp(d.assignedAt),
@@ -288,15 +392,55 @@ async function seedDeliveries() {
       inTransitAt: toTimestamp(d.inTransitAt),
       deliveredAt: toTimestamp(d.deliveredAt),
       failedAt: toTimestamp(d.failedAt),
-      reprogrammedAt: toTimestamp(d.reprogrammedAt),
+      cancelledAt: toTimestamp(d.cancelledAt),
+      reprogrammedAt: toTimestamp(d.reprogrammedAt, null),
+      newDeliveryAt: toTimestamp(d.newDeliveryAt, null),
+      reprogramReason: d.reprogramReason ?? null,
       createdAt: toTimestamp(d.createdAt),
       updatedAt: toTimestamp(d.updatedAt),
     });
   }
+  console.log('deliveries seeded');
+}
+
+async function seedMovements() {
+  for (const movement of inventoryMovements) {
+    await db.collection('inventoryMovements').add({
+      ...movement,
+      createdAt: toTimestamp(movement.createdAt),
+    });
+  }
+  console.log('inventory movements seeded');
+}
+
+async function seedActivityLogs() {
+  for (const log of activityLogList) {
+    await db.collection('sellerActivityLogs').add({
+      ...log,
+      timestamp: toTimestamp(log.timestamp),
+    });
+  }
+  console.log('activity logs seeded');
+}
+
+async function clearAllData() {
+  console.log('\n Clearing existing data...');
+
+  console.log('  Deleting auth users...');
+  await deleteAllAuthUsers();
+
+  const collections = await db.listCollections();
+  for (const col of collections) {
+    console.log(`  Clearing ${col.id}...`);
+    await db.recursiveDelete(col);
+  }
 }
 
 async function main() {
-  console.log(' Starting seed...\n');
+  if (isProduction) {
+    console.log(' Starting production seed...\n');
+    await clearAllData();
+  }
 
   await seedAuthUsers();
   await seedFirestoreUsers();
@@ -306,12 +450,15 @@ async function main() {
   await seedLocations();
   await seedOrders();
   await seedDeliveries();
+  await seedMovements();
+  await seedActivityLogs();
 
-  console.log('\n Seed complete!\n');
-  process.exit(0);
+  if (isProduction) {
+    console.log('\n Production seed complete!\n');
+  }
 }
 
 main().catch((err) => {
-  console.error(' Seed failed:', err);
+  console.error('seed failed:', err);
   process.exit(1);
 });

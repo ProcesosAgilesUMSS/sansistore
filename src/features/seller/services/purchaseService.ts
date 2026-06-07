@@ -7,7 +7,6 @@ import {
   serverTimestamp,
   query,
   where,
-  orderBy,
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 
@@ -30,12 +29,11 @@ export const getSellerProducts = async (sellerId: string): Promise<ProductForPur
   try {
     const q = query(
       collection(db, 'products'),
-      where('active', '==', true),
-      orderBy('name', 'asc'),
+      where('active', '==', true)
     );
     const snap = await getDocs(q);
 
-    return snap.docs
+    const products = snap.docs
       .filter((d) => {
         const data = d.data();
         return !data.sellerId || data.sellerId === sellerId;
@@ -45,7 +43,11 @@ export const getSellerProducts = async (sellerId: string): Promise<ProductForPur
         name: d.data().name as string,
         price: d.data().price as number,
       }));
-  } catch {
+      
+    // Sort in memory to avoid needing a composite index
+    return products.sort((a, b) => a.name.localeCompare(b.name, 'es'));
+  } catch (error) {
+    console.error('Error fetching seller products:', error);
     return [];
   }
 };
@@ -75,12 +77,10 @@ export const registerPurchase = async (data: PurchaseData): Promise<void> => {
   const movementRef = doc(collection(db, 'inventoryMovements'));
   batch.set(movementRef, {
     productId: data.productId,
+    operatorId: data.sellerId,
     type: 'INGRESO_COMPRA',
-    quantity: data.quantity,
     reason: `Compra registrada${data.supplier ? ` - Proveedor: ${data.supplier}` : ''}`,
-    sellerId: data.sellerId,
-    purchaseId: purchaseRef.id,
-    date: data.purchaseDate,
+    quantity: data.quantity,
     createdAt: serverTimestamp(),
   });
 

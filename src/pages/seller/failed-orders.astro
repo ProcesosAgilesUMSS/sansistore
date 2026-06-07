@@ -1,0 +1,8 @@
+---
+import SellerLayout from '../../layouts/SellerLayout.astro';
+import FailedOrdersPanel from '../../features/seller/components/FailedOrdersPanel';
+---
+
+<SellerLayout title="Pedidos fallidos">
+  <FailedOrdersPanel client:load embedded />
+</SellerLayout>

@@ -13,14 +13,16 @@ export default function LoadingMessage({ text }: { text: string }) {
   useEffect(() => {
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % titles.length);
-    }, 600);
+    }, 400);
 
     return () => clearInterval(timer);
   }, []);
 
+  const length = text.length;
+
   return (
-    <div className="tracking-tighter w-[20ch]">
-      <div className="flex gap-2">
+    <div className={`tracking-tight w-[${length}ch]`}>
+      <div className="flex gap-1 text-xs">
         {text}
         <div>
           {titles[index]}
