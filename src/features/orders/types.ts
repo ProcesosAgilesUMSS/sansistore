@@ -14,7 +14,8 @@ export type OrderStatus =
   'LISTO' |
   'ACEPTADO' |
   'PENDIENTE REASIGNACION' |
-  'DEVUELTO';
+  'DEVUELTO' |
+  'COMPLETADO';
 
 
 export const STATUS_LABELS: Record<OrderStatus, string> = {
@@ -32,6 +33,7 @@ export const STATUS_LABELS: Record<OrderStatus, string> = {
   PAGADO: "PAGADO",
   CANCELADO: "CANCELADO",
   'NO ENTREGADO': "NO ENTREGADO",
+  COMPLETADO: "COMPLETADO",
 };
 
 export interface OrderItem {
@@ -43,6 +45,7 @@ export interface OrderItem {
   subtotal: number;
   description?: string;
   stockAvailable?: number;
+  imageUrl?: string;
 }
 
 export interface Delivery {
@@ -103,13 +106,21 @@ export const RETURN_REASON_LABELS: Record<ReturnReason, string> = {
   other: 'Otro',
 };
 
+export interface ReturnItem {
+  productId: string;
+  productName: string;
+  quantity: number;
+}
+
 export interface ReturnRequest {
   id?: string;
   orderId: string;
   buyerId: string;
-  productId: string;
-  productName: string;
+  productId?: string;
+  productName?: string;
+  items?: ReturnItem[];
   reason: string;
+  description?: string;
   status: ReturnStatus;
   createdAt: Timestamp;
 }
