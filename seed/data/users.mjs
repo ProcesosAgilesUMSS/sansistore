@@ -57,7 +57,6 @@ export const Users = {
     authType: 'google',
     roles: ['vendedor'],
     institutionalId: 'ADM-2022-010',
-    phoneNumber: '+591 67415299',
     isActive: true,
   },
   LUIS: {
@@ -94,7 +93,6 @@ export const Users = {
     authType: 'email',
     roles: ['operador_inv'],
     institutionalId: 'OPR-2021-003',
-    phoneNumber: '+591 67415288',
     isActive: true,
   },
   ADMIN: {
