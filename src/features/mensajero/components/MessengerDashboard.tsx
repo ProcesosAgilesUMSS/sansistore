@@ -20,13 +20,15 @@ import { getSellerData } from '../../location/services/locationService';
 import { auth } from '../../../lib/firebase';
 import { parseOrderId } from '../../cart/services/orderService';
 import {
+    closeMessengerShift,
     markMessengerOrderAsCancelledByNoPayment,
     markMessengerOrderAsNotDelivered,
     registerMessengerCashPayment,
     setMessengerOrderStatus,
     subscribeToMessengerOrders,
+    subscribeToMessengerShiftClosures,
 } from '../services/messengerOrdersService';
-import type { MessengerOrder } from '../types';
+import type { MessengerOrder, MessengerShiftClosure } from '../types';
 import {
     sortAcceptedOrdersByAge,
     type AcceptedOrderSort,
@@ -52,6 +54,32 @@ const formatDate = (date: Date | null | undefined) => {
     return new Intl.DateTimeFormat('es-BO', {
         dateStyle: 'medium',
         timeStyle: 'short',
+    }).format(date);
+};
+const getLocalDateKey = (date = new Date()) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+};
+
+const formatDateKey = (dateKey: string) => {
+    const [year, month, day] = dateKey.split('-').map(Number);
+
+    if (!year || !month || !day) return dateKey;
+
+    return new Intl.DateTimeFormat('es-BO', {
+        dateStyle: 'medium',
+    }).format(new Date(year, month - 1, day));
+};
+
+const formatTimeOnly = (date: Date | null | undefined) => {
+    if (!date) return 'No registrado';
+
+    return new Intl.DateTimeFormat('es-BO', {
+        hour: '2-digit',
+        minute: '2-digit',
     }).format(date);
 };
 
@@ -719,6 +747,272 @@ function OrderDetailModal({
     );
 }
 
+function CloseShiftModal({
+    completedCount,
+    pendingCount,
+    notDeliveredCount,
+    cancelledCount,
+    totalCollected,
+    alreadyClosed,
+    isSaving,
+    onClose,
+    onConfirm,
+}: {
+    completedCount: number;
+    pendingCount: number;
+    notDeliveredCount: number;
+    cancelledCount: number;
+    totalCollected: number;
+    alreadyClosed: boolean;
+    isSaving: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+}) {
+    return (
+        <div
+            className="fixed inset-0 z-[999] flex items-center justify-center bg-black/65 p-4 backdrop-blur-sm"
+            onClick={(event) => {
+                if (event.target === event.currentTarget && !isSaving) onClose();
+            }}
+        >
+            <section className="w-full max-w-xl rounded-[28px] border border-border-light bg-card-bg-light p-6 text-text-light shadow-2xl">
+                <header className="flex items-start justify-between gap-4">
+                    <div>
+                        <span className="messenger-icon mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full">
+                            <CheckCircle2 size={28} />
+                        </span>
+                        <h2 className="text-2xl font-black tracking-[-0.04em]">
+                            ¿Cerrar jornada?
+                        </h2>
+                        <p className="messenger-copy mt-2 text-sm font-semibold">
+                            Se registrará el resumen de tus entregas realizadas durante la jornada actual.
+                        </p>
+                    </div>
+
+                    <button
+                        aria-label="Cerrar modal"
+                        className="flex h-10 w-10 items-center justify-center rounded-full border border-border-light bg-secondary-bg-light transition hover:text-primary"
+                        disabled={isSaving}
+                        onClick={onClose}
+                        type="button"
+                    >
+                        <X size={16} />
+                    </button>
+                </header>
+
+                <div className="mt-6 space-y-3 rounded-[22px] border border-border-light bg-secondary-bg-light/40 p-5 text-sm font-bold">
+                    <p className="flex justify-between gap-4">
+                        <span>Entregas completadas</span>
+                        <span>{completedCount}</span>
+                    </p>
+                    <p className="flex justify-between gap-4">
+                        <span>Pedidos pendientes</span>
+                        <span>{pendingCount}</span>
+                    </p>
+                    <p className="flex justify-between gap-4">
+                        <span>No entregados</span>
+                        <span>{notDeliveredCount}</span>
+                    </p>
+                    <p className="flex justify-between gap-4">
+                        <span>Cancelados</span>
+                        <span>{cancelledCount}</span>
+                    </p>
+                    <div className="border-t border-border-light pt-3">
+                        <p className="flex justify-between gap-4 text-primary">
+                            <span>Total cobrado</span>
+                            <span>{formatBolivianos(totalCollected)}</span>
+                        </p>
+                    </div>
+                </div>
+
+                {alreadyClosed && (
+                    <p className="mt-5 rounded-2xl border border-primary/30 bg-primary/10 p-4 text-sm font-bold text-primary">
+                        La jornada de hoy ya fue cerrada. Puedes revisar el reporte en el historial.
+                    </p>
+                )}
+
+                <footer className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                    <button
+                        className="messenger-map-button inline-flex h-12 items-center justify-center rounded-2xl border-2 px-6 text-sm font-bold transition"
+                        disabled={isSaving}
+                        onClick={onClose}
+                        type="button"
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                        className="messenger-deliver-button inline-flex h-12 items-center justify-center rounded-2xl px-6 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-60"
+                        disabled={isSaving || alreadyClosed}
+                        onClick={onConfirm}
+                        type="button"
+                    >
+                        {isSaving ? 'Cerrando jornada...' : 'Cerrar jornada'}
+                    </button>
+                </footer>
+            </section>
+        </div>
+    );
+}
+
+function ShiftReportDetailModal({
+    report,
+    onClose,
+}: {
+    report: MessengerShiftClosure;
+    onClose: () => void;
+}) {
+    const allOrders = [
+        ...report.completedOrders,
+        ...report.pendingOrders,
+        ...report.incidentOrders,
+    ];
+
+    return (
+        <div
+            className="fixed inset-0 z-[999] flex items-center justify-center bg-black/65 p-4 backdrop-blur-sm"
+            onClick={(event) => {
+                if (event.target === event.currentTarget) onClose();
+            }}
+        >
+            <section className="max-h-[92vh] w-full max-w-6xl overflow-y-auto rounded-[28px] border border-border-light bg-card-bg-light text-text-light shadow-2xl">
+                <header className="flex items-start justify-between gap-4 border-b border-border-light px-6 py-5">
+                    <div>
+                        <p className="text-sm font-bold uppercase tracking-[0.24em] text-primary">
+                            Reporte de jornada
+                        </p>
+                        <h2 className="mt-2 text-2xl font-black tracking-[-0.04em]">
+                            Detalle de jornada - {formatDateKey(report.dateKey)}
+                        </h2>
+                        <p className="messenger-copy mt-1 text-sm font-semibold">
+                            Inicio: {formatTimeOnly(report.startedAt)} · Cierre: {formatTimeOnly(report.closedAt)}
+                        </p>
+                    </div>
+
+                    <button
+                        aria-label="Cerrar detalle de jornada"
+                        className="flex h-10 w-10 items-center justify-center rounded-full border border-border-light bg-secondary-bg-light transition hover:text-primary"
+                        onClick={onClose}
+                        type="button"
+                    >
+                        <X size={16} />
+                    </button>
+                </header>
+
+                <div className="grid gap-5 p-6 lg:grid-cols-[280px_1fr]">
+                    <aside className="h-fit rounded-[24px] border border-border-light bg-secondary-bg-light/40 p-5">
+                        <h3 className="text-lg font-black">Resumen</h3>
+
+                        <div className="mt-5 space-y-3 text-sm font-bold">
+                            <p className="flex justify-between gap-3">
+                                <span>Completadas</span>
+                                <span>{report.summary.completedCount}</span>
+                            </p>
+                            <p className="flex justify-between gap-3">
+                                <span>Pendientes</span>
+                                <span>{report.summary.pendingCount}</span>
+                            </p>
+                            <p className="flex justify-between gap-3">
+                                <span>No entregadas</span>
+                                <span>{report.summary.notDeliveredCount}</span>
+                            </p>
+                            <p className="flex justify-between gap-3">
+                                <span>Canceladas</span>
+                                <span>{report.summary.cancelledCount}</span>
+                            </p>
+                            <div className="border-t border-border-light pt-3">
+                                <p className="flex justify-between gap-3 text-primary">
+                                    <span>Total cobrado</span>
+                                    <span>{formatBolivianos(report.summary.totalCollected)}</span>
+                                </p>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <div className="space-y-5">
+                        <h3 className="text-xl font-black">Pedidos registrados</h3>
+
+                        {allOrders.length > 0 ? (
+                            <div className="space-y-4">
+                                {allOrders.map((order) => (
+                                    <article
+                                        className="rounded-[24px] border border-border-light bg-secondary-bg-light/40 p-5"
+                                        key={`${report.id}-${order.deliveryId}`}
+                                    >
+                                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                            <div>
+                                                <p className="font-mono text-xs font-bold opacity-50">
+                                                    {order.id}
+                                                </p>
+                                                <h4 className="text-lg font-black">
+                                                    {order.customerName}
+                                                </h4>
+                                                <p className="messenger-copy text-sm">
+                                                    {order.address}
+                                                </p>
+                                            </div>
+
+                                            <div className="flex flex-wrap gap-2">
+                                                <span className="messenger-status-badge rounded-full px-3 py-1 text-xs font-bold">
+                                                    {formatDeliveryStatus(order.deliveryStatus)}
+                                                </span>
+                                                <span className="messenger-charge-badge rounded-full px-3 py-1 text-xs font-bold">
+                                                    {order.paymentStatusLabel.toUpperCase()}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-4 grid gap-4 md:grid-cols-[1fr_180px]">
+                                            <div>
+                                                <p className="messenger-muted mb-2 text-xs font-bold uppercase">
+                                                    Productos
+                                                </p>
+                                                {order.items.length > 0 ? (
+                                                    <div className="space-y-2">
+                                                        {order.items.map((item) => (
+                                                            <p
+                                                                className="messenger-copy flex items-center gap-2 text-sm"
+                                                                key={item.id}
+                                                            >
+                                                                <Package size={15} />
+                                                                <span>
+                                                                    {item.quantity}x {item.name} - {formatBolivianos(item.price)}
+                                                                </span>
+                                                            </p>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <p className="messenger-copy text-sm">
+                                                        Sin productos visibles.
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <div className="messenger-cash-box rounded-2xl border-2 p-4">
+                                                <p className="text-xs font-bold uppercase">
+                                                    Monto
+                                                </p>
+                                                <p className="mt-1 text-2xl font-black">
+                                                    {formatBolivianos(order.cashToCollect)}
+                                                </p>
+                                                <p className="messenger-copy mt-1 text-xs">
+                                                    Cobrado: {formatTimeOnly(order.paymentCollectedAt)}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </article>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="messenger-order-card rounded-[28px] border p-8 text-sm font-semibold">
+                                Esta jornada no tiene pedidos registrados.
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </section>
+        </div>
+    );
+}
 interface MessengerDashboardProps {
     embedded?: boolean;
     clientSection?: 'assigned' | 'accepted' | 'delivered' | 'not_delivered';
@@ -744,6 +1038,11 @@ export default function MessengerDashboard({
     const [newOrderCount, setNewOrderCount] = useState(0);
     const [acceptedSortOrder, setAcceptedSortOrder] =
         useState<AcceptedOrderSort>('newest-first');
+    const [showCloseShiftModal, setShowCloseShiftModal] = useState(false);
+    const [savingShiftClose, setSavingShiftClose] = useState(false);
+    const [shiftReports, setShiftReports] = useState<MessengerShiftClosure[]>([]);
+    const [selectedShiftReport, setSelectedShiftReport] =
+    useState<MessengerShiftClosure | null>(null);
     const notifiedOrderIdsRef = useRef<Set<string>>(new Set());
     const isFirstLoadRef = useRef(true);
 
@@ -809,6 +1108,26 @@ export default function MessengerDashboard({
             unsubscribeAuth();
         };
     }, []);
+
+    useEffect(() => {
+        if (!currentCourierId) {
+            setShiftReports([]);
+            return;
+        }
+
+        const unsubscribeReports = subscribeToMessengerShiftClosures(
+            currentCourierId,
+            setShiftReports,
+            (error) => {
+                console.error(error);
+                setMessage('No se pudo cargar el historial de jornadas.');
+            }
+        );
+
+        return () => {
+            unsubscribeReports();
+        };
+    }, [currentCourierId]);
 
     const assignedOrders = useMemo(
         () =>
@@ -918,6 +1237,39 @@ export default function MessengerDashboard({
         [orders]
     );
     const collectedTotal = useMemo(() => getCollectedTotal(orders), [orders]);
+    const todayDateKey = useMemo(() => getLocalDateKey(new Date()), []);
+
+    const todayShiftReport = useMemo(
+        () => shiftReports.find((report) => report.dateKey === todayDateKey) ?? null,
+        [shiftReports, todayDateKey]
+    );
+
+    const currentShiftPendingOrders = useMemo(
+        () =>
+            orders.filter(
+                (order) =>
+                    order.deliveryStatus === 'assigned' ||
+                    order.deliveryStatus === 'accepted' ||
+                    order.deliveryStatus === 'in_transit'
+            ),
+        [orders]
+    );
+
+    const currentShiftNotDeliveredOrders = useMemo(
+        () => orders.filter((order) => order.deliveryStatus === 'not_delivered'),
+        [orders]
+    );
+
+    const currentShiftCancelledOrders = useMemo(
+        () => orders.filter((order) => order.deliveryStatus === 'cancelled'),
+        [orders]
+    );
+
+    const currentShiftActivityCount =
+        todayCollectedOrders.length +
+        currentShiftPendingOrders.length +
+        currentShiftNotDeliveredOrders.length +
+        currentShiftCancelledOrders.length;
 
     const notDeliveredOrders = useMemo(
         () =>
@@ -1107,6 +1459,42 @@ export default function MessengerDashboard({
             setSavingCancelNoPayment(false);
         }
     };
+        
+    const confirmCloseShift = async () => {
+        if (!currentCourierId) {
+            setMessage('No se pudo identificar al mensajero para cerrar la jornada.');
+            return;
+        }
+
+        if (todayShiftReport) {
+            setMessage('La jornada de hoy ya fue cerrada.');
+            setShowCloseShiftModal(false);
+            setSelectedShiftReport(todayShiftReport);
+            return;
+        }
+
+        setSavingShiftClose(true);
+
+        try {
+            const report = await closeMessengerShift({
+                courierId: currentCourierId,
+                orders,
+            });
+
+            setShowCloseShiftModal(false);
+            setSelectedShiftReport(report);
+            setMessage('Jornada cerrada correctamente. El reporte ya está disponible en el historial.');
+        } catch (error) {
+            console.error(error);
+            setMessage(
+                error instanceof Error
+                    ? error.message
+                    : 'No se pudo cerrar la jornada.'
+            );
+        } finally {
+            setSavingShiftClose(false);
+        }
+    };
 
     const activeOrders =
         clientSection === 'assigned'
@@ -1294,6 +1682,116 @@ export default function MessengerDashboard({
 
                         </section>
 
+                        <section className="mt-8 rounded-[28px] border border-border-light bg-card-bg-light p-6 shadow-[0_14px_30px_rgba(38,33,22,0.08)]">
+                            <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                                <div>
+                                    <p className="text-sm font-bold uppercase tracking-[0.22em] text-primary">
+                                        Cierre de jornada
+                                    </p>
+                                    <h2 className="mt-2 text-2xl font-black tracking-[-0.04em]">
+                                        Registrar cierre del día
+                                    </h2>
+                                    <p className="messenger-copy mt-2 max-w-2xl text-sm font-semibold">
+                                        Guarda un reporte con tus entregas completadas, pendientes, no entregadas, canceladas y el total cobrado.
+                                    </p>
+
+                                    {todayShiftReport && (
+                                        <p className="mt-4 rounded-2xl border border-primary/30 bg-primary/10 p-4 text-sm font-bold text-primary">
+                                            La jornada de hoy ya fue cerrada a las {formatTimeOnly(todayShiftReport.closedAt)}.
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div className="flex flex-col gap-3 sm:flex-row">
+                                    {todayShiftReport && (
+                                        <button
+                                            className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+                                            onClick={() => setSelectedShiftReport(todayShiftReport)}
+                                            type="button"
+                                        >
+                                            <Eye size={17} />
+                                            Ver reporte de hoy
+                                        </button>
+                                    )}
+
+                                    <button
+                                        className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-60"
+                                        disabled={savingShiftClose || currentShiftActivityCount === 0 || Boolean(todayShiftReport)}
+                                        onClick={() => setShowCloseShiftModal(true)}
+                                        type="button"
+                                    >
+                                        <CheckCircle2 size={17} />
+                                        Cerrar jornada
+                                    </button>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section className="mt-8">
+                            <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <h2 className="text-2xl font-black tracking-[-0.04em]">
+                                        Historial de jornadas
+                                    </h2>
+                                    <p className="messenger-copy mt-1 text-sm font-semibold">
+                                        Consulta los reportes generados al cerrar cada jornada.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                {shiftReports.length > 0 ? (
+                                    shiftReports.map((report) => (
+                                        <article
+                                            className="messenger-delivered-row flex flex-col gap-4 rounded-[26px] border p-6 shadow-[0_10px_24px_rgba(18,32,56,0.06)] lg:flex-row lg:items-center lg:justify-between"
+                                            key={report.id}
+                                        >
+                                            <div>
+                                                <p className="text-lg font-black">
+                                                    Jornada - {formatDateKey(report.dateKey)}
+                                                </p>
+                                                <p className="messenger-copy mt-1 text-sm font-semibold">
+                                                    Inicio: {formatTimeOnly(report.startedAt)} · Cierre: {formatTimeOnly(report.closedAt)}
+                                                </p>
+                                            </div>
+
+                                            <div className="grid gap-3 text-sm font-bold sm:grid-cols-4 lg:min-w-[520px]">
+                                                <p>
+                                                    <span className="messenger-muted block text-xs">Completadas</span>
+                                                    {report.summary.completedCount}
+                                                </p>
+                                                <p>
+                                                    <span className="messenger-muted block text-xs">Pendientes</span>
+                                                    {report.summary.pendingCount}
+                                                </p>
+                                                <p>
+                                                    <span className="messenger-muted block text-xs">Incidentes</span>
+                                                    {report.summary.notDeliveredCount + report.summary.cancelledCount}
+                                                </p>
+                                                <p>
+                                                    <span className="messenger-muted block text-xs">Cobrado</span>
+                                                    {formatBolivianos(report.summary.totalCollected)}
+                                                </p>
+                                            </div>
+
+                                            <button
+                                                className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+                                                onClick={() => setSelectedShiftReport(report)}
+                                                type="button"
+                                            >
+                                                <Eye size={17} />
+                                                Ver detalle
+                                            </button>
+                                        </article>
+                                    ))
+                                ) : (
+                                    <div className="messenger-order-card rounded-[28px] border p-8 text-sm font-semibold">
+                                        Aún no hay jornadas cerradas.
+                                    </div>
+                                )}
+                            </div>
+                        </section>
+
                         <section className="mt-11">
                             <h2 className="mb-6 text-2xl font-black tracking-[-0.04em]">
                                 Historial
@@ -1351,6 +1849,26 @@ export default function MessengerDashboard({
             {paymentSuccessOrder && (
                 <PaymentSuccessModal
                     onClose={() => setPaymentSuccessOrder(null)}
+                />
+            )}
+            {showCloseShiftModal && (
+                <CloseShiftModal
+                    alreadyClosed={Boolean(todayShiftReport)}
+                    cancelledCount={currentShiftCancelledOrders.length}
+                    completedCount={todayCollectedOrders.length}
+                    isSaving={savingShiftClose}
+                    notDeliveredCount={currentShiftNotDeliveredOrders.length}
+                    onClose={() => setShowCloseShiftModal(false)}
+                    onConfirm={confirmCloseShift}
+                    pendingCount={currentShiftPendingOrders.length}
+                    totalCollected={todayCollectedTotal}
+                />
+            )}
+
+            {selectedShiftReport && (
+                <ShiftReportDetailModal
+                    report={selectedShiftReport}
+                    onClose={() => setSelectedShiftReport(null)}
                 />
             )}
         </main>
