@@ -220,7 +220,7 @@ const mapMessengerOrder = async (
     assignedAt: toDate(delivery.assignedAt),
     createdAt: toDate(delivery.createdAt) ?? toDate(order.createdAt),
     updatedAt: toDate(delivery.updatedAt) ?? toDate(order.updatedAt),
-    reprogrammedAt: toDate(delivery.reprogrammedAt) ?? toDate(order.reprogrammedAt),
+    reprogrammedAt: toDate(delivery.reprogrammedAt),
     newDeliveryAt: toDate(delivery.newDeliveryAt) ?? toDate(order.newDeliveryAt),
     reprogramReason:
       asString(delivery.reprogramReason) ||
