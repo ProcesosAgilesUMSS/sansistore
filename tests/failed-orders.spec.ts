@@ -5,21 +5,18 @@ const FIRESTORE_DOCUMENTS_URL =
 
 const restoreOrderByProject: Record<
   string,
-  { customer: string; orderId: string; productId: string }
+  { customer: string; productId: string }
 > = {
   chromium: {
     customer: 'Restore Chromium',
-    orderId: '019e74a6-1001-7000-bbbb-000000000001_restore-chromium',
     productId: 'galletas-agua-victoria-120-gr',
   },
   firefox: {
     customer: 'Restore Firefox',
-    orderId: '019e74a6-1002-7000-bbbb-000000000002_restore-firefox',
     productId: 'arroz-grano-de-oro-caisy-1-kg',
   },
   webkit: {
     customer: 'Restore Webkit',
-    orderId: '019e74a6-1003-7000-bbbb-000000000003_restore-webkit',
     productId: 'aceite-fino-vegetal-900-ml',
   },
 };
@@ -34,6 +31,48 @@ async function readFirestoreDocument(documentPath: string) {
   const response = await fetch(`${FIRESTORE_DOCUMENTS_URL}/${documentPath}`);
   expect(response.ok).toBeTruthy();
   return response.json();
+}
+
+async function findFirestoreOrderIdByCustomer(customerName: string) {
+  const response = await fetch(`${FIRESTORE_DOCUMENTS_URL}:runQuery`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      structuredQuery: {
+        from: [{ collectionId: 'orders' }],
+        where: {
+          fieldFilter: {
+            field: { fieldPath: 'customerName' },
+            op: 'EQUAL',
+            value: { stringValue: customerName },
+          },
+        },
+        limit: 1,
+      },
+    }),
+  });
+
+  expect(response.ok).toBeTruthy();
+
+  const results = (await response.json()) as Array<{
+    document?: { name?: string };
+  }>;
+  const documentName = results.find((entry) => entry.document?.name)?.document?.name;
+
+  if (!documentName) {
+    throw new Error(`No se encontro pedido para ${customerName}.`);
+  }
+
+  const segments = documentName.split('/');
+  const orderId = segments[segments.length - 1];
+
+  if (!orderId) {
+    throw new Error(`No se pudo resolver el ID del pedido para ${customerName}.`);
+  }
+
+  return orderId;
 }
 
 /**
@@ -176,6 +215,7 @@ test.describe('Pedidos con fallos', () => {
     const reservedBefore = readNumberField(inventoryBefore.fields.stockReserved);
     const availableBefore = readNumberField(inventoryBefore.fields.stockAvailable);
     const totalBefore = readNumberField(inventoryBefore.fields.stockTotal);
+    const restoredOrderId = await findFirestoreOrderIdByCustomer(restoreOrder.customer);
 
     const card = page
       .locator('button')
@@ -197,7 +237,7 @@ test.describe('Pedidos con fallos', () => {
 
     await expect
       .poll(async () => {
-        const orderDoc = await readFirestoreDocument(`orders/${restoreOrder.orderId}`);
+        const orderDoc = await readFirestoreDocument(`orders/${restoredOrderId}`);
         return orderDoc.fields.stockRestored?.booleanValue === true;
       })
       .toBe(true);

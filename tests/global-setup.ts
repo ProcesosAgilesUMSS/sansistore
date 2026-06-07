@@ -114,23 +114,30 @@ export default async function globalSetup() {
   console.log(
     `Waiting up to ${EMULATOR_STARTUP_TIMEOUT_MS}ms for emulators to become ready...`
   );
-  emulatorProcess = spawn(
-    process.platform === 'win32' ? 'npx.cmd' : 'npx',
-    [
-      'firebase-tools',
-      'emulators:start',
-      '--only',
-      'firestore,auth',
-      '--project',
-      'sansistore',
-      '--config',
-      'firebase.testing.json',
-    ],
-    {
-      stdio: ['ignore', 'pipe', 'pipe'],
-      detached: false,
-    }
-  );
+  const emulatorCommand = process.platform === 'win32' ? 'cmd.exe' : 'npx';
+  const emulatorArgs =
+    process.platform === 'win32'
+      ? [
+          '/d',
+          '/s',
+          '/c',
+          'npx firebase-tools emulators:start --only firestore,auth --project sansistore --config firebase.testing.json',
+        ]
+      : [
+          'firebase-tools',
+          'emulators:start',
+          '--only',
+          'firestore,auth',
+          '--project',
+          'sansistore',
+          '--config',
+          'firebase.testing.json',
+        ];
+
+  emulatorProcess = spawn(emulatorCommand, emulatorArgs, {
+    stdio: ['ignore', 'pipe', 'pipe'],
+    detached: false,
+  });
 
   if (emulatorProcess.stderr) {
     emulatorProcess.stderr.on('data', (data) => {

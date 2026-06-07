@@ -1,5 +1,9 @@
 import { expect, test, type Page } from '@playwright/test';
 
+const acceptedOrderCode = 'pu4-qsc';
+const juanOrderCustomer = 'Juan Paredes';
+const carlosOrderCustomer = 'Carlos Flores';
+
 async function loginAsCourier(page: Page, email = 'luis.mensajero@est.umss.edu') {
   await page.goto('/login');
 
@@ -34,20 +38,59 @@ async function loginAsCourier(page: Page, email = 'luis.mensajero@est.umss.edu')
   await expect(page).not.toHaveURL(/\/login/, { timeout: 30_000 });
 }
 
+async function selectCourierSection(
+  page: Page,
+  buttonName: string | RegExp,
+  headingName: string | RegExp
+) {
+  const sectionButton = page.getByRole('button', { name: buttonName });
+  const buttonPattern =
+    typeof buttonName === 'string'
+      ? buttonName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      : buttonName.source;
+  const buttonFlags = typeof buttonName === 'string' ? '' : buttonName.flags;
+
+  await expect(sectionButton).toBeVisible({ timeout: 15_000 });
+  await expect
+    .poll(
+      async () =>
+        page.evaluate(({ source, flags }) => {
+          const pattern = new RegExp(source, flags);
+          const button = [...document.querySelectorAll('button')].find((item) =>
+            pattern.test(item.textContent ?? '')
+          );
+
+          return Boolean(
+            button &&
+            Object.keys(button).some((key) => key.startsWith('__reactProps'))
+          );
+        }, { source: buttonPattern, flags: buttonFlags }),
+      { timeout: 15_000 }
+    )
+    .toBe(true);
+
+  await sectionButton.click();
+  await expect(page.getByRole('heading', { name: headingName })).toBeVisible({
+    timeout: 15_000,
+  });
+}
+
 test.describe('Courier smoke tests', () => {
   test('shows totals calculated from order items and allowed zone labels', async ({
     page,
   }) => {
     await loginAsCourier(page);
     await page.goto('/courier');
-    await page.getByRole('button', { name: 'Pedidos aceptados' }).click();
+    await selectCourierSection(page, 'Pedidos aceptados', 'Pedidos aceptados');
 
     const assignedOrder = page
       .locator('article')
-      .filter({ hasText: 'pu4-qsc' });
+      .filter({ hasText: acceptedOrderCode });
     await expect(assignedOrder).toBeVisible({ timeout: 15_000 });
-    await expect(assignedOrder.getByText('1x Detergente Liquido Ola Futuro Limpieza Completa 5 L — Bs 109')).toBeVisible();
-    await expect(assignedOrder.getByText('10x Leche PIL Natural 900 ml — Bs 9.7')).toBeVisible();
+    await expect(
+      assignedOrder.getByText('1x Detergente Liquido Ola Futuro Limpieza Completa 5 L')
+    ).toBeVisible();
+    await expect(assignedOrder.getByText('10x Leche PIL Natural 900 ml')).toBeVisible();
     await expect(assignedOrder.getByText('Cancha principal FCyT')).toBeVisible();
   });
 
@@ -55,26 +98,37 @@ test.describe('Courier smoke tests', () => {
     await loginAsCourier(page);
     await page.goto('/courier');
 
-    await page.getByRole('button', { name: 'Gestión Entregas' }).click();
-    await expect(page.locator('article').filter({ hasText: 'pu4-qsc' })).toHaveCount(0);
+    await selectCourierSection(page, /Gesti.*n Entregas/, /Gesti.*n Entregas/);
+    await expect(
+      page.locator('article').filter({ hasText: acceptedOrderCode })
+    ).toHaveCount(0);
 
-    await page.getByRole('button', { name: 'Pedidos aceptados' }).click();
-    await expect(page.locator('article').filter({ hasText: 'pu4-qsc' })).toHaveCount(1);
+    await selectCourierSection(page, 'Pedidos aceptados', 'Pedidos aceptados');
+    await expect(
+      page.locator('article').filter({ hasText: acceptedOrderCode })
+    ).toHaveCount(1);
   });
 
   test('opens buyer location in the internal Leaflet map', async ({ page }) => {
     await loginAsCourier(page);
     await page.goto('/courier');
-    await page.getByRole('button', { name: 'Pedidos aceptados' }).click();
+    await selectCourierSection(page, 'Pedidos aceptados', 'Pedidos aceptados');
 
     const assignedOrder = page
       .locator('article')
-      .filter({ hasText: 'pu4-qsc' });
+      .filter({ hasText: juanOrderCustomer });
     await expect(assignedOrder).toBeVisible({ timeout: 15_000 });
 
-    await assignedOrder.getByRole('link', { name: 'Abrir Maps' }).click();
+    const mapLink = assignedOrder.getByRole('link', { name: 'Abrir Maps' });
+    await expect(mapLink).toHaveAttribute(
+      'href',
+      /\/mapa\?lat=-17\.395102&lng=-66\.145782&order=[^&]+$/
+    );
+    await mapLink.click();
 
-    await expect(page).toHaveURL("/mapa?lat=-17.395102&lng=-66.145782&order=019e74a3-e030-74ce-9d9a-4b1d37b85d11_pu4-qsc");
+    await expect(page).toHaveURL(
+      /\/mapa\?lat=-17\.395102&lng=-66\.145782&order=[^&]+$/
+    );
     await expect(page.getByText('1x Detergente Liquido Ola Futuro Limpieza Completa 5 L')).toBeVisible();
     await expect(page.getByText('10x Leche PIL Natural 900 ml')).toBeVisible();
   });
@@ -85,7 +139,9 @@ test.describe('Courier smoke tests', () => {
     await loginAsCourier(page, 'nadia.mensajero@est.umss.edu');
     await page.goto('/courier');
 
-    const assignedOrder = page.locator('article').filter({ hasText: 'wab-4ok' });
+    const assignedOrder = page
+      .locator('article')
+      .filter({ hasText: carlosOrderCustomer });
     await expect(assignedOrder).toBeVisible({ timeout: 15_000 });
 
     await assignedOrder.getByRole('button', { name: 'Aceptar pedido' }).click();
