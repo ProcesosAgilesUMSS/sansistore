@@ -15,6 +15,12 @@ import {
 import { db } from '../../../lib/firebase';
 import { getCurrentZone } from '../../location/utils/zoneLimits';
 import type { MessengerOrder, MessengerOrderItem } from '../types';
+import { getVisibleMessengerOrders } from '../utils/orderVisibility';
+import {
+  assertCanTransitionDeliveryStatus,
+  getOrderDeliveryStatusForDeliveryStatus,
+  getOrderStatusForDeliveryStatus,
+} from '../utils/deliveryStatusFlow';
 
 type DeliveryStatus = MessengerOrder['deliveryStatus'];
 type OrderData = Record<string, unknown>;
@@ -243,7 +249,7 @@ export async function getMessengerOrders(
     )
   );
 
-  return orders.sort((a, b) => a.id.localeCompare(b.id));
+  return getVisibleMessengerOrders(orders);
 }
 
 export function subscribeToMessengerOrders(
@@ -266,7 +272,7 @@ export function subscribeToMessengerOrders(
           )
         );
 
-        onChange(orders.sort((a, b) => a.id.localeCompare(b.id)));
+        onChange(getVisibleMessengerOrders(orders));
       } catch (error) {
         onError?.(
           error instanceof Error
@@ -306,6 +312,8 @@ export async function setMessengerOrderStatus(
   order: MessengerOrder,
   status: DeliveryStatus
 ) {
+  assertCanTransitionDeliveryStatus(order.deliveryStatus, status);
+
   const deliveryRef = doc(db, 'deliveries', order.deliveryId);
   const dataToUpdate: Record<string, unknown> = {
     status,
@@ -326,8 +334,8 @@ export async function setMessengerOrderStatus(
 
   if (order.id) {
     await updateDoc(doc(db, 'orders', order.id), {
-      status: getStatusForORder(status),
-      deliveryStatus: normalizeOrderDeliveryStatus(status),
+      status: getOrderStatusForDeliveryStatus(status),
+      deliveryStatus: getOrderDeliveryStatusForDeliveryStatus(status),
       updatedAt: serverTimestamp(),
     });
   }
@@ -415,6 +423,7 @@ export async function markMessengerOrderAsNotDelivered({
 
   if (order.id) {
     await updateDoc(doc(db, 'orders', order.id), {
+      status: getOrderStatusForDeliveryStatus('not_delivered'),
       deliveryStatus: 'NOT_DELIVERED',
       updatedAt: serverTimestamp(),
     });

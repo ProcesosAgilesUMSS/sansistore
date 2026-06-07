@@ -89,11 +89,11 @@ export default function OrderDetailView({ orderId }: { orderId: string | undefin
       <div className="col-start-1 col-end-4 max-[760px]:col-end-3 truncate text-sm text-text-light/50 leading-[120%]">Creación: </div>
       <div className="col-start-4 col-end-13 max-[760px]:col-start-3 max-[760px]:col-end-7 leading-[120%]">{date}</div>
       <div className="col-start-1 col-end-4 max-[760px]:col-end-3 truncate text-sm text-text-light/50 leading-[120%]">Ubicación: </div>
-      <div className={`col-start-4 col-end-13 max-[760px]:col-start-3 max-[760px]:col-end-8 leading-[120%] truncate ${order.status === "CANCELADO" ? "" : "mb-4"}`}>{order.delivery.destination}</div>
+      <div className={`col-start-4 col-end-13 max-[760px]:col-start-3 max-[760px]:col-end-8 leading-[120%] truncate ${order.status === "CANCELADO" ? "" : "mb-4"}`}>{order.address}</div>
       {order.status === "CANCELADO" &&
         <>
           <div className="col-start-1 col-end-4 max-[760px]:col-end-3 truncate text-sm text-text-light/50 leading-[120%]">Motivo:</div>
-          <div className="col-start-4 col-end-13 max-[760px]:col-start-3 max-[760px]:col-end-7 leading-[120%] mb-4 ">{order.incidentReason}</div>
+          <div className="col-start-4 col-end-13 max-[760px]:col-start-3 max-[760px]:col-end-7 leading-[120%] mb-4 ">{order.incidentNotes || order.incidentReason}</div>
         </>
       }
 

@@ -1,5 +1,5 @@
 import { db } from "../../../lib/firebase";
-import { addDoc, collection, query, where, deleteDoc, doc, onSnapshot, writeBatch, getDocs } from "firebase/firestore";
+import { addDoc, collection, query, where, deleteDoc, doc, onSnapshot, writeBatch, getDocs, getDoc } from "firebase/firestore";
 import type { Location } from "../types";
 import { updateDoc } from "firebase/firestore";
 
@@ -58,7 +58,7 @@ export async function updateLocation(
     const locationRef = doc(db, "locations", locationId);
     await updateDoc(locationRef, {
         ...data,
-        updatedAt: new Date().toISOString(), 
+        updatedAt: new Date().toISOString(),
     });
 }
 
@@ -74,26 +74,55 @@ export async function hasActiveOrders(locationId: string): Promise<boolean> {
     return !snapshot.empty;
 }
 
-export async function getSellerLocation(orderId: string): Promise<string | null> {
+
+export async function getSellerData(orderId: string) {
+    if (!orderId) {
+        throw new Error('orderId es requerido para obtener datos del vendedor');
+    }
+
     const ordersQuery = query(
         collection(db, 'orders'),
         where('orderId', '==', orderId)
     );
     const orderSnapshot = await getDocs(ordersQuery);
 
-    if (orderSnapshot.empty) return null;
+    if (orderSnapshot.empty) {
+        throw new Error(`No se encontró la orden con ID: ${orderId}`);
+    }
 
     const sellerId = orderSnapshot.docs[0].data().sellerId as string;
 
+    if (!sellerId) {
+        throw new Error(`La orden ${orderId} no tiene un sellerId válido`);
+    }
+
+    const sellerQuery = doc(db, 'users', sellerId);
+    const sellerSnapshot = await getDoc(sellerQuery);
+
+    if (!sellerSnapshot.exists()) {
+        throw new Error(`No se encontró el vendedor con ID: ${sellerId}`);
+    }
+
     const locationQuery = query(
         collection(db, 'locations'),
-        where('userId', '==', sellerId),
-        where('isDefault', '==', true)
+        where('userId', '==', sellerId)
     );
     const locationSnapshot = await getDocs(locationQuery);
 
-    if (locationSnapshot.empty) return null;
+    if (locationSnapshot.empty) {
+        throw new Error(`No se encontró ubicación para el vendedor: ${sellerId}`);
+    }
 
-    const { lat, lng } = locationSnapshot.docs[0].data();
-    return `https://www.google.com/maps?q=${lat},${lng}`;
+    const locations = locationSnapshot.docs.map(doc => doc.data());
+    const selectedLocation = locations.find(loc => loc.isDefault === true) || locations[0];
+
+    const userData = sellerSnapshot.data();
+
+    return {
+        sellerName: userData?.displayName,
+        sellerPhone: userData?.phoneNumber,
+        address: selectedLocation.label,
+        lat: selectedLocation.lat,
+        lng: selectedLocation.lng
+    };
 }

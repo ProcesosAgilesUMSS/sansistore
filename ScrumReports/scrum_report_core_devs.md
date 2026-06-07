@@ -178,7 +178,7 @@
   ## Soliz Moya Alejandra
   - **Yesterday:**    Mejorar las US definidas
   - **Today:**        Colaborar en el diseño para visualizacion del stock
-  - **Blockers:**     ninguno
+  - **Blockers:**     Ninguno.
 
  
 
@@ -205,9 +205,9 @@
   - **Blockers:**     
 
   ## Soliz Moya Alejandra
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Revisé las historias de usuario seleccionadas para el Sprint 3.
+  - **Today:**        Analizar los requerimientos y criterios de aceptación de la US #51 (Historial de movimientos).
+  - **Blockers:**     Ninguno.
 
 
 
@@ -235,9 +235,9 @@
   - **Blockers:**     
 
   ## Soliz Moya Alejandra
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Revisé los requerimientos de la US #51 y la información que deberá mostrarse.
+  - **Today:**        Colaborar en la definición de la visualización del historial de movimientos.
+  - **Blockers:**     Ninguno.
 
 
 
@@ -265,9 +265,9 @@
   - **Blockers:**     
 
   ## Soliz Moya Alejandra
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Colaboré en la revisión de la visualización propuesta para el historial de movimientos.
+  - **Today:**        Revisar posibles mejoras de interfaz y usabilidad en las vistas de inventario.
+  - **Blockers:**     Ninguno.
 
 
 
@@ -295,6 +295,6 @@
   - **Blockers:**     
 
   ## Soliz Moya Alejandra
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Revisé la presentación de información en las vistas del módulo de inventarios.
+  - **Today:**        Analizar los problemas de legibilidad reportados en los bugs #451 y #453.
+  - **Blockers:**     Ninguno.

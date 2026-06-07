@@ -315,3 +315,32 @@
 - **Yesterday:** termine el frontend de mi hu y revise algunos bugs 
 - **Today:** realice avances en el backend de mi hu y vi detalles con la db
 - **Blockers:** none
+
+# 06/06/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+* **Yesterday:** estaba haciendo mi backend de mi hu #163
+* **Today:** empece a conectar el fronted con el backend de mi hu #163
+* **Blockers:** el el seed de orders habia una orden de cancelado sin fecha , la cual no se tomaba en reporte de cancelados.
+
+## Dylan Coca Beltran
+- **Yesterday:** corregi algunos bugs de mi hu #178, tambien implemente un listado de pedidos para seleccionar de forma sencilla
+- **Today:** termine el backend de mi hu 178, ademas de implementar otro endpoint para el listado de pedidos
+- **Blockers:** faltaban indexes en firebase pero ya se soluciono
+
+## Camila Wara Fernandez Sandoval 
+* **Yesterday:**  Continúe con el desarrollo del front de mi hu#160 y corregí algunos detalles del front 
+* **Today:** Comencé a desarrollar el back de mi hu #160 y conectarlo con el front para que haga las consultas 
+* **Blockers:** en las llamadas a los atributos en firebase.
+
+## Jherlan Marcelo Calero Sardan
+* **Yesterday:** Integre mis ultimos cambios de mi HU #159. 
+* **Today:** Revise si faltaba algunos detalles de mi HU #159 antes de la presentación. 
+* **Blockers:** none.
+
+## Fabricio Javier Cordova Caceres 
+- **Yesterday:** finalización del desarrollo de mi hu#164
+- **Today:** arreglo del bug reportado y implementación del seed del formulario de registro 
+- **Blockers:** none

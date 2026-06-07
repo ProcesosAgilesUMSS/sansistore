@@ -4,10 +4,15 @@ import { adminAuth, adminDb } from '../../lib/firebase-admin';
 
 const ALLOWED_ROLES = ['admin', 'vendedor', 'mensajero', 'operador_inv', 'comprador'] as const;
 const ALLOWED_INSTITUTIONAL_DOMAINS = [
-  'est.umss.edu',
-  'ms.umss.edu',
-  'umss.edu.bo',
   'umss.edu',
+  'umss.edu.bo',
+  'est.umss.edu',
+  'est.umss.edu.bo',
+  'mi.umss.edu',
+  'ms.umss.edu',
+  'fcyt.umss.edu.bo',
+  'dicyt.umss.edu.bo',
+  'posgrado.umss.edu.bo',
 ] as const;
 type AllowedRole = (typeof ALLOWED_ROLES)[number];
 type AllowedInstitutionalDomain = (typeof ALLOWED_INSTITUTIONAL_DOMAINS)[number];
@@ -132,7 +137,7 @@ function validateCreateUserPayload(payload: CreateUserRequest) {
   if (!isAllowedInstitutionalEmail(email)) {
     return {
       error:
-        'Solo se permiten dominios institucionales: @est.umss.edu, @ms.umss.edu, @umss.edu.bo, @umss.edu',
+        'Solo se permiten dominios institucionales UMSS.',
     };
   }
   if (!phoneNumber) return { error: 'El telefono es obligatorio.' };
@@ -167,7 +172,7 @@ function validateUpdateUserPayload(payload: UpdateUserRequest) {
   if (email && !isAllowedInstitutionalEmail(email)) {
     return {
       error:
-        'Solo se permiten dominios institucionales: @est.umss.edu, @ms.umss.edu, @umss.edu.bo, @umss.edu',
+        'Solo se permiten dominios institucionales UMSS.',
     };
   }
 

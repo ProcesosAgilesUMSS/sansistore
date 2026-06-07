@@ -1,133 +1,166 @@
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import type { Order, OrderStatus } from "@features/orders/types";
 import { STATUS_LABELS } from "@features/orders/types";
-import { subscribeToSellerOrders } from "@features/orders/services/ordersService";
-import { auth } from "@/lib/firebase";
-import SellerOrderItem from "@features/orders/components/SellerOrderItem";
-import OrderGridSection from "@features/orders/components/OrderGridSection";
-import { Package, X, ChevronDown, Check } from "lucide-react";
-import { OpenFolderIcon } from "@features/orders/components/Icons";
+import { subscribeToSellerOrders } from "../services/ordersService";
+import { useAuthUser } from "../../../hooks/useAuthUser";
+import SellerOrderItem from "./SellerOrderItem";
+import OrderModal from "./OrderModal";
+import { ClosedFolderIcon, OpenFolderIcon } from "./Icons";
+import { X } from "lucide-react";
+import OrderStatusBadge from "./OrderStatusBadge";
+import Toast from "@features/admin/users/components/Toast";
+import { SectionHeader } from "../../seller/components/SectionHeader";
 
 export default function Orders() {
+  const { user } = useAuthUser();
   const [orders, setOrders] = useState<Order[]>([]);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [showFilters, setShowFilters] = useState<boolean>(false);
   const [selectedStatuses, setSelectedStatuses] = useState<OrderStatus[]>([]);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const filterRef = useRef<HTMLDivElement>(null);
 
-  const filteredOrders = useMemo(() => {
-    if (selectedStatuses.length === 0) return orders;
-    return orders.filter(order => selectedStatuses.includes(order.status));
-  }, [orders, selectedStatuses]);
+  const showNotification = (type: "success" | "error", message: string) => {
+    const allowedMessages = ["Pedido marcado como listo.", "Pago validado correctamente."];
+    if (type === "success" && !allowedMessages.includes(message)) return;
+    setToast({ message, type });
+  };
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
-        setIsFilterOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [filterRef]);
+    if (!user) return;
 
-  function toggleStatus(status: OrderStatus) {
-    setSelectedStatuses(prev =>
-      prev.includes(status)
-        ? prev.filter(s => s !== status)
-        : [...prev, status]
-    );
-  }
-
-  useEffect(() => {
-    let unsubscribeOrders: (() => void) | null = null;
-    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
-      if (unsubscribeOrders) {
-        unsubscribeOrders();
-        unsubscribeOrders = null;
-      }
-      if (!user) {
-        setLoading(false);
-        setOrders([]);
-        return;
-      }
-
-      unsubscribeOrders = subscribeToSellerOrders(user.uid, (data) => {
-        setOrders(data);
-        setLoading(false);
-      });
+    const unsubscribe = subscribeToSellerOrders(user.uid, (newOrders) => {
+      setOrders(newOrders);
+      setLoading(false);
     });
-    return () => {
-      if (unsubscribeOrders) {
-        unsubscribeOrders();
+
+    return () => unsubscribe();
+  }, [user]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
+        setShowFilters(false);
       }
-      unsubscribeAuth();
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
-  return (
-    <OrderGridSection
-      title="Mis Ordenes"
-      loading={loading}
-      loadingMessage="Receiving your orders"
-      ariaLabelledby="orders-seller-title"
-      headerContent={
-        <div className="col-span-full min-[960px]:col-start-3 min-[960px]:col-end-23 grid grid-cols-subgrid tracking-tight gap-y-8">
-          <div className="flex items-center gap-x-3 min-[960px]:col-start-1 min-[960px]:col-end-5 col-start-1 col-end-3 w-[15ch]">
-            <Package strokeWidth={1.5} size={20} />
-            <div>{filteredOrders.length} ordenes</div>
-          </div>
+  const filteredOrders = useMemo(() => {
+    if (selectedStatuses.length === 0) return orders;
+    return orders.filter((order) => selectedStatuses.includes(order.status));
+  }, [orders, selectedStatuses]);
 
-          <div ref={filterRef} className="col-start-3 col-end-6  min-[760px]:col-start-4  min-[760px]:col-end-7   min-[960px]:col-start-5 min-[960px]:col-end-8 relative flex items-center gap-x-3 cursor-pointer" onClick={() => setIsFilterOpen(!isFilterOpen)}>
-            <OpenFolderIcon />
-            Estados
-            <ChevronDown size={16} />
-            {isFilterOpen && (
-              <div className="p-2 absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded shadow-lg z-10 w-50 text-sm">
-                {Object.entries(STATUS_LABELS)
-                  .filter(([status]) => status !== 'CREADO')
-                  .map(([status, label]) => (
+  const toggleStatus = (status: OrderStatus) => {
+    setSelectedStatuses((prev) =>
+      prev.includes(status)
+        ? prev.filter((s) => s !== status)
+        : [...prev, status]
+    );
+  };
+
+  if (loading) return null;
+
+  return (
+    <>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+      {selectedOrder ? (
+        <OrderModal
+          order={selectedOrder}
+          closeModal={() => setSelectedOrder(null)}
+          onNotification={showNotification}
+        />
+      ) : null}
+      <div className="px-4 pb-10 md:px-8 xl:px-10">
+        <section className="rounded-3xl border border-(--theme-border) bg-(--theme-card-bg) p-5 shadow-sm">
+          <SectionHeader title="Mis pedidos" count={filteredOrders.length} />
+          
+          <div className="relative mb-8 w-full border-b border-dotted border-(--theme-border) pb-4">
+            <div ref={filterRef} className="w-fit">
+              <div className="flex items-center gap-x-2 text-sm font-medium w-fit cursor-pointer text-(--theme-text) opacity-80 hover:opacity-100 transition-opacity" onClick={() => setShowFilters(!showFilters)}>
+                {showFilters ? <ClosedFolderIcon /> : <OpenFolderIcon />}
+                Filtrar por estado
+              </div>
+
+              {selectedStatuses.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3 text-xs w-full items-center">
+                  {selectedStatuses.map(status => (
                     <div
                       key={status}
-                      className=" hover:bg-gray-100 flex items-center justify-between cursor-pointer uppercase"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleStatus(status as OrderStatus);
-                      }}
+                      className="flex items-center gap-x-2 bg-(--theme-secondary-bg) border border-(--theme-border) hover:brightness-95 cursor-pointer px-2.5 py-1 rounded-full text-(--theme-text)"
+                      onClick={() => toggleStatus(status)}
                     >
-                      <div className="flex items-center gap-x-2">
-                        <Package size={14} />
-                        {label}
-                      </div>
-                      {selectedStatuses.includes(status as OrderStatus) && <Check size={14} />}
+                      <X size={13} />
+                      <span>{STATUS_LABELS[status]}</span>
                     </div>
                   ))}
-              </div>
-            )}
+                </div>
+              )}
+
+              {showFilters && (
+                <div className="bg-(--theme-card-bg) border border-(--theme-border) shadow-xl rounded-xl p-2 absolute z-10 w-[18ch] top-full mt-2">
+                  {(Object.entries(STATUS_LABELS) as [OrderStatus, string][])
+                    .filter(([status]) => status !== 'CREADO')
+                    .map(([status]) => (
+                      <div
+                        onClick={() => toggleStatus(status)}
+                        className={`flex text-xs gap-x-2 cursor-pointer p-1.5 rounded-lg transition-colors hover:bg-(--theme-secondary-bg) ${selectedStatuses.includes(status as OrderStatus) ? 'bg-(--theme-secondary-bg)' : ''}`}
+                      >
+                        <OrderStatusBadge status={status} />
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
           </div>
 
-          {selectedStatuses.length > 0 && (
-            <div className="col-span-full flex flex-wrap gap-x-8">
-              {selectedStatuses.map(status => (
-                <div
-                  key={status}
-                  className="flex items-center gap-1 cursor-pointer text-black/70 uppercase text-sm"
-                  onClick={() => toggleStatus(status)}
-                >
-                  <X size={14} color="black" />
-                  {STATUS_LABELS[status].toUpperCase()}
-                </div>
-              ))}
+        <ul className="grid grid-cols-18 mx-auto w-full">
+          <li className="hidden min-[765px]:grid grid-cols-subgrid col-span-full uppercase border-b border-dotted border-(--theme-border) pb-3 mb-1 text-[10px] tracking-widest font-normal opacity-50">
+            <div className="flex gap-x-2">
+              <span>/</span>
+              Orden
             </div>
-          )}
-        </div>
-      }
-    >
-      {filteredOrders.map((order) => (
-        <SellerOrderItem
-          key={order.id + order.status}
-          order={order}
-        />
-      ))}
-    </OrderGridSection >
+            <div className="flex gap-x-2 min-[765px]:col-start-3 min-[765px]:col-end-7">
+              <span>/</span>
+              Destino
+            </div>
+            <div className="flex gap-x-2 min-[765px]:col-start-11 min-[765px]:col-end-13  min-[765px]:ml-2 min-[965px]:col-start-9 min-[965px]:col-end-13 min-[960px]:ml-10">
+              <span>/</span>
+              Estado
+            </div>
+
+            <div className="ml-4 hidden gap-x-2 min-[965px]:flex min-[965px]:col-start-13 min-[965px]:col-end-16">
+              <span>/</span>
+              Actualizado
+            </div>
+
+            <div className="flex gap-x-2 min-[765px]:col-start-16 min-[765px]:col-end-19">
+              <span>/</span>
+              Asignado a
+            </div>
+          </li>
+
+          {filteredOrders.map((order, index) => (
+            <SellerOrderItem
+              key={order.id}
+              order={order}
+              index={index}
+              selectOrder={() => setSelectedOrder(order)}
+            />
+          ))}
+        </ul>
+        </section>
+      </div>
+    </>
   );
 }

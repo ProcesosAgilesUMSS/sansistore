@@ -15,6 +15,7 @@ import {
   ChevronRight,
   ArrowLeft,
   ClipboardList,
+  Activity,
 } from 'lucide-react';
 import UserManagement from '../users/components/UserManagement.tsx';
 import CategoryList from '../categories/components/CategoryList.tsx';
@@ -31,6 +32,8 @@ import AccessLogPanel from '../audit/components/AccessLogPanel.tsx';
 import CancelledOrdersReport from '../reports/components/CancelledOrdersReport.tsx';
 // ── HU #178: Historial de pedido ──
 import OrderHistory from '../pedidos/components/OrderHistory.tsx';
+// ── HU #160: Monitoreo de actividad de vendedores ──
+import SellerActivityPanel from '../monitoring/components/SellerActivityPanel.tsx';
 
 type Section =
   | 'dashboard'
@@ -45,6 +48,7 @@ type Section =
   | 'reportes'       // ── HU #161 ──
   | 'reportes-cancelados'   // ── HU #163 ──
   | 'bitacora'       
+  | 'monitoreo'      // ── HU #160 ──
   | null;
 
 interface NavItem {
@@ -108,6 +112,12 @@ export default function AdminLayout() {
           icon: <Settings size={15} />,
           section: 'bitacora',
         },
+        {
+          // ── HU #160: Monitoreo de vendedores ──
+          label: 'Monitoreo',
+          icon: <Activity size={15} />,
+          section: 'monitoreo',
+        },
       ],
     },
     {
@@ -141,6 +151,7 @@ export default function AdminLayout() {
     reportes: { title: 'Reportes de ventas', subtitle: 'Genera reportes de ventas por rango de fechas' },
     bitacora: { title: 'Bitácora', subtitle: 'Registra actividad de inicio y cierre de sesión' },
     'reportes-cancelados': {title: 'Pedidos cancelados', subtitle: 'Reporte de órdenes canceladas por período'},
+    monitoreo:              { title: 'Monitoreo de vendedores', subtitle: 'Bitácora de actividad y cambios de estado en pedidos' },
   };
 
   const currentPage = pageTitles[activeSection ?? 'dashboard'];
@@ -488,6 +499,8 @@ export default function AdminLayout() {
           {/*Reportes de ventas*/}
           {activeSection === 'reportes' && <SalesReport />}
           {activeSection === 'bitacora' && <AccessLogPanel />}
+          {/* ── HU #160 ── */}
+          {activeSection === 'monitoreo' && <SellerActivityPanel />}
           
           {/* Reportes de pedidos cancelados — HU #163 */}
           {activeSection === 'reportes-cancelados' && <CancelledOrdersReport />}
