@@ -16,23 +16,23 @@ interface ConfirmAssignedOrderActionModalProps {
 const actionConfig = {
   accept: {
     title: 'Aceptar pedido asignado',
-    description: 'Confirma que tomaras este pedido para continuar con la entrega.',
-    buttonLabel: 'Confirmar aceptacion',
+    description: 'Confirma que tomarás este pedido para continuar con la entrega.',
+    buttonLabel: 'Confirmar',
     Icon: CheckCircle2,
     iconClassName: 'bg-primary/15 text-primary',
     buttonClassName: 'bg-primary text-black hover:opacity-90',
     warning:
-      'El pedido pasara a Pedidos aceptados y quedara bajo tu responsabilidad.',
+      'El pedido pasará a Pedidos aceptados y quedará bajo tu responsabilidad.',
   },
   reject: {
     title: 'Rechazar pedido asignado',
-    description: 'Confirma que no podras atender este pedido asignado.',
-    buttonLabel: 'Confirmar rechazo',
+    description: 'Confirma que no podrás atender este pedido asignado.',
+    buttonLabel: 'Confirmar',
     Icon: XCircle,
     iconClassName: 'bg-red-500/10 text-red-600',
     buttonClassName: 'bg-red-600 text-white hover:bg-red-700',
     warning:
-      'El pedido quedara pendiente de reasignacion para que el vendedor seleccione otro mensajero.',
+      'El pedido quedará pendiente de reasignación para que el vendedor seleccione otro mensajero.',
   },
 } satisfies Record<
   AssignedOrderAction,
