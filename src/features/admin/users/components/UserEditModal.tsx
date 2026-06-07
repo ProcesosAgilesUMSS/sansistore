@@ -74,13 +74,13 @@ export default function UserEditModal({
       return;
     }
     const allowedDomains = [
-      'est.umss.edu',
-      'ms.umss.edu',
-      'umss.edu.bo',
       'umss.edu',
+      'umss.edu.bo',
+      'est.umss.edu',
       'est.umss.edu.bo',
-      'fcyt.umss.edu.bo',
+      'mi.umss.edu',
       'ms.umss.edu',
+      'fcyt.umss.edu.bo',
       'dicyt.umss.edu.bo',
       'posgrado.umss.edu.bo',
     ];
