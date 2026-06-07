@@ -218,7 +218,7 @@ export const Orders = {
     id: '019e74a4-9326-77be-9a46-23d11413d3f3_waq-cbs',
     secret: '8073',
     buyer: Users.JUAN,
-    seller: User.PEDRO,
+    seller: Users.PEDRO,
     location: Locations.LOC_JUAN,
     status: 'CREADO',
     deliveryStatus: null,
