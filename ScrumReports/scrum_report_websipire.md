@@ -356,6 +356,7 @@ por las dudas que se tienen.
 * **Yesterday:** Terminar mis Hus desigandas y revisar los avances de los otros grupo para ver como esta yendo el flujo.
 * **Today:** Ordene la tabla de github, asigne size y prioridad, tambien andaba revisando un poco los avances de los integrantes de mi grupo y realice una tarea que es de localizar bien el boton de "Cancelar pedido"
 * **Blockers:** None.
+
 ## Maria Victoria Grageda Vallejos
 
 * **Yesterday:** Terminé mis HUs asignadas y realicé una revisión general de las funcionalidades implementadas para verificar que todo estuviera funcionando correctamente.
@@ -372,4 +373,10 @@ por las dudas que se tienen.
 
 * **Yesterday:** Avance en el desarrollo de mis hus asignadas revisando que la nueva funcionalidad no rompa nada.
 * **Today:** Realice la correccion de bugs sobre mi hu asignada.
+* **Blockers:** None
+
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Trabaje en mis HU asignadas y mi issue asignado
+* **Today:** Realizar mi bug asignado
 * **Blockers:** None
