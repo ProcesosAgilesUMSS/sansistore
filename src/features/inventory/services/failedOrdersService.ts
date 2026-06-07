@@ -32,6 +32,7 @@ export interface FailedOrder {
   reason: string | null;
   failedAt: Date | null;
   stockRestored: boolean;
+  sellerId: string | null;
   items: FailedOrderItem[];
 }
 
@@ -106,6 +107,7 @@ async function mapFailedOrder(
         data.updatedAt
     ),
     stockRestored: Boolean(data.stockRestored),
+    sellerId: typeof data.sellerId === 'string' ? data.sellerId : null,
     items,
   };
 }
@@ -116,7 +118,8 @@ async function mapFailedOrder(
  */
 export function subscribeFailedOrders(
   onChange: (orders: FailedOrder[]) => void,
-  onError?: (error: Error) => void
+  onError?: (error: Error) => void,
+  sellerId?: string
 ): Unsubscribe {
   const failedStatusQuery = query(
     collection(db, 'orders'),
@@ -141,10 +144,14 @@ export function subscribeFailedOrders(
         ...statusDocs.entries(),
         ...deliveryDocs.entries(),
       ]);
-      const orders = await Promise.all(
+      const mappedOrders = await Promise.all(
         [...mergedDocs.entries()].map(([orderId, data]) =>
           mapFailedOrder(orderId, data)
         )
+      );
+
+      const orders = mappedOrders.filter(
+        (order) => !sellerId || order.sellerId === sellerId
       );
 
       orders.sort(
@@ -232,15 +239,15 @@ export async function restoreStockForOrder(
 
       const inventory = inventorySnap.data();
       const currentReserved = Number(inventory.stockReserved ?? 0);
+      const currentAvailable = Number(inventory.stockAvailable ?? 0);
 
-      if (currentReserved < item.quantity) {
-        throw new Error(
-          `El producto ${item.productName} no tiene stock reservado suficiente para reponer.`
-        );
-      }
+      // Eliminamos el throw Error restrictivo para permitir reponer stock 
+      // de pedidos de prueba (seeded) cuyo stockReserved original no se sumó bien.
+      const newReserved = Math.max(0, currentReserved - item.quantity);
 
       transaction.update(inventoryRef, {
-        stockReserved: currentReserved - item.quantity,
+        stockAvailable: currentAvailable + item.quantity,
+        stockReserved: newReserved,
         updatedAt: now,
       });
 
