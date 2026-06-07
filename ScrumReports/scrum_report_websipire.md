@@ -364,12 +364,12 @@ por las dudas que se tienen.
 
 ## Juan Daniel Vasquez Casana
 
-* **Yesterday:** TTerminé mis HUs asignadas y realicé una revisión general de las funcionalidades implementadas para verificar su correcto funcionamiento.
+* **Yesterday:** Terminé mis HUs asignadas y realicé una revisión general de las funcionalidades implementadas para verificar su correcto funcionamiento.
 * **Today:** Realizaré la revisión y validación de las funcionalidades desarrolladas, verificando que los flujos implementados operen correctamente y cumplan con los requerimientos definidos.
 * **Blockers:** None
 
-* ## Maria Victoria Grageda Vallejos
+* ## Alejandro Torrico Quispe
 
-* **Yesterday:** Avance en el desarrollo de mis hus asignadas revisando que la neuva funcionalidad no rompa nada
-* **Today:** Realice la correccion de bugs sobre mi hu asignada
+* **Yesterday:** Avance en el desarrollo de mis hus asignadas revisando que la nueva funcionalidad no rompa nada.
+* **Today:** Realice la correccion de bugs sobre mi hu asignada.
 * **Blockers:** None
