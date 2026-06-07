@@ -41,8 +41,13 @@ export function OrderDetailsModal({ order, onClose }: Props) {
 			role="dialog"
 			aria-modal="true"
 			aria-labelledby="order-details-title"
+			tabIndex={-1}
+			ref={(el) => el?.focus()}
 			onClick={(event) => {
 				if (event.target === event.currentTarget) onClose();
+			}}
+			onKeyDown={(event) => {
+				if (event.key === "Escape") onClose();
 			}}
 		>
 			<section className="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-[28px] border border-(--theme-border) bg-(--theme-card-bg) shadow-2xl">

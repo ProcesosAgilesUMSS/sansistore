@@ -35,9 +35,16 @@ function DecisionModal({
 			role="dialog"
 			aria-modal="true"
 			aria-labelledby="undelivered-order-decision-title"
+			tabIndex={-1}
+			ref={(el) => el?.focus()}
+			onKeyDown={(e) => {
+				if (e.key === "Escape") onClose();
+			}}
 		>
-			<div
-				className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
+			<button
+				type="button"
+				aria-label="Cerrar"
+				className="absolute inset-0 cursor-default bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
 				onClick={onClose}
 			/>
 
