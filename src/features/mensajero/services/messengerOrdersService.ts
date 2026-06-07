@@ -14,8 +14,9 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { getCurrentZone } from '../../location/utils/zoneLimits';
-import type { MessengerOrder, MessengerOrderItem } from '../types';
+import type { MessengerOrder, MessengerOrderItem, MessengerShiftClosure, MessengerShiftOrderSnapshot,} from '../types';
 import { getVisibleMessengerOrders } from '../utils/orderVisibility';
+import { isMessengerOrderCollected, isSameLocalDay, } from '../utils/collectionSummary';
 import {
   assertCanTransitionDeliveryStatus,
   getOrderDeliveryStatusForDeliveryStatus,
@@ -522,4 +523,240 @@ export async function markMessengerOrderAsCancelledByNoPayment({
   });
 
   await batch.commit();
+}
+const SHIFT_CLOSURES_COLLECTION = 'messenger_shift_closures';
+
+const getLocalDateKey = (date = new Date()) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
+
+const getOrderActivityDate = (order: MessengerOrder) =>
+  order.paymentCollectedAt ?? order.updatedAt ?? order.assignedAt ?? order.createdAt;
+
+const isPendingForShift = (order: MessengerOrder) =>
+  order.deliveryStatus === 'assigned' ||
+  order.deliveryStatus === 'accepted' ||
+  order.deliveryStatus === 'in_transit';
+
+const buildShiftOrderSnapshot = (
+  order: MessengerOrder
+): MessengerShiftOrderSnapshot => ({
+  id: order.id,
+  deliveryId: order.deliveryId,
+  customerName: order.customerName,
+  buyerName: order.buyerName,
+  phone: order.phone,
+  address: order.address,
+  city: order.city,
+  deliveryStatus: order.deliveryStatus,
+  paymentStatus: order.paymentStatus,
+  paymentStatusLabel: order.paymentStatusLabel,
+  cashToCollect: order.cashToCollect,
+  paymentCollectedAt: order.paymentCollectedAt,
+  assignedAt: order.assignedAt,
+  updatedAt: order.updatedAt,
+  items: order.items,
+});
+
+const buildShiftReportFromOrders = ({
+  courierId,
+  orders,
+  date = new Date(),
+}: {
+  courierId: string;
+  orders: MessengerOrder[];
+  date?: Date;
+}) => {
+  const dateKey = getLocalDateKey(date);
+
+  const completedOrders = orders.filter(
+    (order) =>
+      isMessengerOrderCollected(order) &&
+      order.paymentCollectedAt != null &&
+      isSameLocalDay(order.paymentCollectedAt, date)
+  );
+
+  const pendingOrders = orders.filter(isPendingForShift);
+
+    const notDeliveredOrders = orders.filter(
+    (order) => order.deliveryStatus === 'not_delivered'
+  );
+
+  const cancelledOrders = orders.filter(
+    (order) => order.deliveryStatus === 'cancelled'
+  );
+
+  const incidentOrders = [...notDeliveredOrders, ...cancelledOrders];
+
+  const relatedDates = [
+    ...completedOrders,
+    ...pendingOrders,
+    ...incidentOrders,
+  ]
+    .map(getOrderActivityDate)
+    .filter((value): value is Date => value != null)
+    .sort((a, b) => a.getTime() - b.getTime());
+
+  const startedAt = relatedDates[0] ?? null;
+  const totalCollected = completedOrders.reduce(
+    (total, order) => total + order.cashToCollect,
+    0
+  );
+
+  return {
+    courierId,
+    dateKey,
+    status: 'closed' as const,
+    startedAt,
+    summary: {
+      completedCount: completedOrders.length,
+      pendingCount: pendingOrders.length,
+      notDeliveredCount: notDeliveredOrders.length,
+      cancelledCount: cancelledOrders.length,
+      totalCollected,
+    },
+    completedOrders: completedOrders.map(buildShiftOrderSnapshot),
+    pendingOrders: pendingOrders.map(buildShiftOrderSnapshot),
+    incidentOrders: incidentOrders.map(buildShiftOrderSnapshot),
+  };
+};
+
+const mapShiftOrderSnapshot = (
+  value: unknown
+): MessengerShiftOrderSnapshot => {
+  const data = (value ?? {}) as Record<string, unknown>;
+
+  const items = Array.isArray(data.items)
+    ? data.items.map((item) => {
+        const itemData = (item ?? {}) as Record<string, unknown>;
+
+        return {
+          id: String(itemData.id ?? ''),
+          name: String(itemData.name ?? 'Producto sin nombre'),
+          quantity: Number(itemData.quantity ?? 0),
+          price: Number(itemData.price ?? 0),
+        };
+      })
+    : [];
+
+  return {
+    id: String(data.id ?? ''),
+    deliveryId: String(data.deliveryId ?? ''),
+    customerName: String(data.customerName ?? 'Cliente no registrado'),
+    buyerName: String(data.buyerName ?? 'Comprador invitado'),
+    phone: String(data.phone ?? 'Sin telefono'),
+    address: String(data.address ?? 'Direccion no registrada'),
+    city: String(data.city ?? 'Cochabamba'),
+    deliveryStatus: normalizeDeliveryStatus(data.deliveryStatus),
+    paymentStatus: String(data.paymentStatus ?? 'PENDIENTE'),
+    paymentStatusLabel: String(data.paymentStatusLabel ?? 'Pendiente de cobro'),
+    cashToCollect: toAmount(data.cashToCollect),
+    paymentCollectedAt: toDate(data.paymentCollectedAt),
+    assignedAt: toDate(data.assignedAt),
+    updatedAt: toDate(data.updatedAt),
+    items,
+  };
+};
+
+const mapShiftClosure = (
+  reportId: string,
+  data: Record<string, unknown>
+): MessengerShiftClosure => {
+  const summary = (data.summary ?? {}) as Record<string, unknown>;
+
+  return {
+    id: reportId,
+    courierId: String(data.courierId ?? ''),
+    dateKey: String(data.dateKey ?? ''),
+    status: 'closed',
+    startedAt: toDate(data.startedAt),
+    closedAt: toDate(data.closedAt),
+    createdAt: toDate(data.createdAt),
+    summary: {
+      completedCount: Number(summary.completedCount ?? 0),
+      pendingCount: Number(summary.pendingCount ?? 0),
+      notDeliveredCount: Number(summary.notDeliveredCount ?? 0),
+      cancelledCount: Number(summary.cancelledCount ?? 0),
+      totalCollected: toAmount(summary.totalCollected),
+    },
+    completedOrders: Array.isArray(data.completedOrders)
+      ? data.completedOrders.map(mapShiftOrderSnapshot)
+      : [],
+    pendingOrders: Array.isArray(data.pendingOrders)
+      ? data.pendingOrders.map(mapShiftOrderSnapshot)
+      : [],
+    incidentOrders: Array.isArray(data.incidentOrders)
+      ? data.incidentOrders.map(mapShiftOrderSnapshot)
+      : [],
+  };
+};
+
+export async function closeMessengerShift({
+  courierId,
+  orders,
+}: {
+  courierId: string;
+  orders: MessengerOrder[];
+}): Promise<MessengerShiftClosure> {
+  const now = new Date();
+  const reportData = buildShiftReportFromOrders({
+    courierId,
+    orders,
+    date: now,
+  });
+
+  const reportId = `${courierId}_${reportData.dateKey}`;
+  const reportRef = doc(db, SHIFT_CLOSURES_COLLECTION, reportId);
+  const existingReport = await getDoc(reportRef);
+
+  if (existingReport.exists()) {
+    throw new Error('La jornada de hoy ya fue cerrada.');
+  }
+
+  await setDoc(reportRef, {
+    ...reportData,
+    closedAt: serverTimestamp(),
+    createdAt: serverTimestamp(),
+  });
+
+  return {
+    id: reportId,
+    ...reportData,
+    closedAt: now,
+    createdAt: now,
+  };
+}
+
+export function subscribeToMessengerShiftClosures(
+  courierId: string,
+  onChange: (reports: MessengerShiftClosure[]) => void,
+  onError?: (error: Error) => void
+): Unsubscribe {
+  const reportsQuery = query(
+    collection(db, SHIFT_CLOSURES_COLLECTION),
+    where('courierId', '==', courierId)
+  );
+
+  return onSnapshot(
+    reportsQuery,
+    (snapshot) => {
+      const reports = snapshot.docs
+        .map((reportDoc) => mapShiftClosure(reportDoc.id, reportDoc.data()))
+        .sort((a, b) => {
+          const dateA = a.closedAt ?? a.createdAt ?? new Date(0);
+          const dateB = b.closedAt ?? b.createdAt ?? new Date(0);
+
+          return dateB.getTime() - dateA.getTime();
+        });
+
+      onChange(reports);
+    },
+    (error) => {
+      onError?.(error);
+    }
+  );
 }
