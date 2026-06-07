@@ -68,3 +68,42 @@ export interface MessengerOrder {
   createdAt: Date | null;
   updatedAt: Date | null;
 }
+export interface MessengerShiftOrderSnapshot {
+  id: string;
+  deliveryId: string;
+  customerName: string;
+  buyerName: string;
+  phone: string;
+  address: string;
+  city: string;
+  deliveryStatus: MessengerOrder['deliveryStatus'];
+  paymentStatus: string;
+  paymentStatusLabel: string;
+  cashToCollect: number;
+  paymentCollectedAt: Date | null;
+  assignedAt: Date | null;
+  updatedAt: Date | null;
+  items: MessengerOrderItem[];
+}
+
+export interface MessengerShiftSummary {
+  completedCount: number;
+  pendingCount: number;
+  notDeliveredCount: number;
+  cancelledCount: number;
+  totalCollected: number;
+}
+
+export interface MessengerShiftClosure {
+  id: string;
+  courierId: string;
+  dateKey: string;
+  status: 'closed';
+  startedAt: Date | null;
+  closedAt: Date | null;
+  createdAt: Date | null;
+  summary: MessengerShiftSummary;
+  completedOrders: MessengerShiftOrderSnapshot[];
+  pendingOrders: MessengerShiftOrderSnapshot[];
+  incidentOrders: MessengerShiftOrderSnapshot[];
+}
