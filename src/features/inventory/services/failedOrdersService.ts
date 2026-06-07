@@ -246,7 +246,6 @@ export async function restoreStockForOrder(
       const newReserved = Math.max(0, currentReserved - item.quantity);
 
       transaction.update(inventoryRef, {
-        stockAvailable: currentAvailable + item.quantity,
         stockReserved: newReserved,
         updatedAt: now,
       });
