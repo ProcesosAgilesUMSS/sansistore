@@ -85,7 +85,7 @@ test.describe('Courier smoke tests', () => {
     await loginAsCourier(page, 'nadia.mensajero@est.umss.edu');
     await page.goto('/courier');
 
-    const assignedOrder = page.locator('article').filter({ hasText: 'waq-cbs' });
+    const assignedOrder = page.locator('article').filter({ hasText: 'wab-4ok' });
     await expect(assignedOrder).toBeVisible({ timeout: 15_000 });
 
     await assignedOrder.getByRole('button', { name: 'Aceptar pedido' }).click();
