@@ -374,13 +374,7 @@ por las dudas que se tienen.
 * **Yesterday:** Avance en el desarrollo de mis hus asignadas revisando que la nueva funcionalidad no rompa nada.
 * **Today:** Realice la correccion de bugs sobre mi hu asignada.
 * **Blockers:** None
-
-## Jose Brandon Pinedo Gonzales
-
-* **Yesterday:** Trabaje en mis HU asignadas y mi issue asignado
-* **Today:** Realizar mi bug asignado
-* **Blockers:** None
-  
+    
 ## Jose Brandon Pinedo Gonzales
 
 * **Yesterday:** Completé el desarrollo de las historias de usuario asignadas y revisé las observaciones realizadas sobre la HU-125.
