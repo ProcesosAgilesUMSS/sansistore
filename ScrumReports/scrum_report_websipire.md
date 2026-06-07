@@ -348,3 +348,35 @@ por las dudas que se tienen.
 * **Yesterday:** Avancé con la implementación de la HU asignada, desarrollando las funcionalidades principales y verificando su integración con los componentes relacionados.
 * **Today:** Continuaré realizando ajustes en la implementación, ejecutando pruebas y validando que la funcionalidad cumpla con los criterios de aceptación establecidos.
 * **Blockers:** none
+
+# Daily Reports - Team 3 Webspire 04/06/26
+
+## Dayana Saleth Ortuño Guzman
+
+* **Yesterday:** Terminar mis Hus desigandas y revisar los avances de los otros grupo para ver como esta yendo el flujo.
+* **Today:** Ordene la tabla de github, asigne size y prioridad, tambien andaba revisando un poco los avances de los integrantes de mi grupo y realice una tarea que es de localizar bien el boton de "Cancelar pedido"
+* **Blockers:** None.
+
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Terminé mis HUs asignadas y realicé una revisión general de las funcionalidades implementadas para verificar que todo estuviera funcionando correctamente.
+* **Today:** Apoyé en las corrección de bugs, además de realizar la revisión y validación de las funcionalidades desarrolladas.
+* **Blockers:** None
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Terminé mis HUs asignadas y realicé una revisión general de las funcionalidades implementadas para verificar su correcto funcionamiento.
+* **Today:** Realizaré la revisión y validación de las funcionalidades desarrolladas, verificando que los flujos implementados operen correctamente y cumplan con los requerimientos definidos.
+* **Blockers:** None
+
+* ## Alejandro Torrico Quispe
+
+* **Yesterday:** Avance en el desarrollo de mis hus asignadas revisando que la nueva funcionalidad no rompa nada.
+* **Today:** Realice la correccion de bugs sobre mi hu asignada.
+* **Blockers:** None
+    
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Completé el desarrollo de las historias de usuario asignadas y revisé las observaciones realizadas sobre la HU-125.
+* **Today:** Realicé pruebas funcionales del flujo de la HU-125 para validar las observaciones recibidas, verificando el comportamiento de la funcionalidad e identificando algunos ajustes pendientes para asegurar el cumplimiento de los requerimientos.
+* **Blockers:** None.

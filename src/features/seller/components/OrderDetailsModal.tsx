@@ -81,6 +81,15 @@ export function OrderDetailsModal({ order, onClose }: Props) {
                   <DetailRow label="Ubicación" value={order.locationLabel ?? 'No registrada'} />
                   <DetailRow label="Tipo" value={order.locationType ?? 'No registrado'} />
                 </div>
+
+                {order.incidentReason && (
+                  <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                    <p className="text-[11px] font-800 uppercase tracking-[0.22em] opacity-70">
+                      Motivo registrado
+                    </p>
+                    <p className="mt-1 font-700">{order.incidentReason}</p>
+                  </div>
+                )}
               </article>
 
               <article className="p-5">

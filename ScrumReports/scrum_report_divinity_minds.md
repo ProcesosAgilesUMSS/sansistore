@@ -363,3 +363,35 @@
 - **Yesterday:** Revisé el flujo de ver/editar perfil. Reporté el bug #469 (la vista `/me` existe pero no hay ningún botón que lleve a ella estando logueado) y reabrí el bug #441 (el arreglo del menú móvil se perdió en un merge del PR #468, la falla volvió a reproducir). También definí las HUs #24, #27 y #17 que estaban con la plantilla vacía, agregándoles criterios de aceptación.
 - **Today:** Verifiqué las HUs en Done y dejé observaciones; la HU #20 (ver ubicación) cumple lo funcional pero su restricción de "solo pedidos asignados" está solo en la UI, parte de la deuda de reglas de Firestore abiertas.
 - **Blockers:** n/a.
+
+# 06/04/2026
+
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Coordiné de manera presencial con el equipo de Flow la unificación del perfil `/me` y registré en el backlog la US contenedora (#490) con sus 5 sub-tasks (#491-#495) para el Sprint 4.
+- **Today:** Analicé y deprecé las issues redundantes del backlog (#23, #26 y #190) marcándolas con la etiqueta `duplicate` y editando sus títulos en GitHub.
+- **Blockers:** n/a.
+
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Revise pull request nuevos y reporte bugs de los mismos.
+- **Today:** Revisar si ya se completaron correctamente los bugs reportados previamente.
+- **Blockers:** n/a.
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:**  Ejecuté pruebas de regresión en los roles de operador y mensajero para validar su funcionalidad y flujos de trabajo
+- **Today:** Continuaré con las pruebas en otros roles del sistema para verificar su correcta integración con operador y mensajero.
+- **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Corregí bugs relacionados con la etiqueta de "Agotado", ajustando el cálculo de stock para reflejar correctamente la disponibilidad de los productos.
+- **Today:** Solucioné problemas de responsividad en las secciones de "Mis pedidos", mejorando la experiencia de usuario en distintos dispositivos. Además, corregí un bug en la funcionalidad de notificaciones al usuario, ajustando el cálculo de stock para que los avisos se envíen correctamente cuando un producto vuelve a estar disponible.
+- **Blockers:** Ninguno.
+
+## Velasquez Vela Marcos
+
+- **Yesterday:**
+- **Today:**
+- **Blockers:**

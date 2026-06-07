@@ -40,6 +40,7 @@ test.describe('Courier smoke tests', () => {
   }) => {
     await loginAsCourier(page);
     await page.goto('/courier');
+    await page.getByRole('button', { name: 'Pedidos aceptados' }).click();
 
     const assignedOrder = page
       .locator('article')
@@ -50,9 +51,21 @@ test.describe('Courier smoke tests', () => {
     await expect(assignedOrder.getByText('Cancha principal FCyT')).toBeVisible();
   });
 
+  test('shows each courier order in only one active section', async ({ page }) => {
+    await loginAsCourier(page);
+    await page.goto('/courier');
+
+    await page.getByRole('button', { name: 'Gestión Entregas' }).click();
+    await expect(page.locator('article').filter({ hasText: 'pu4-qsc' })).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'Pedidos aceptados' }).click();
+    await expect(page.locator('article').filter({ hasText: 'pu4-qsc' })).toHaveCount(1);
+  });
+
   test('opens buyer location in the internal Leaflet map', async ({ page }) => {
     await loginAsCourier(page);
     await page.goto('/courier');
+    await page.getByRole('button', { name: 'Pedidos aceptados' }).click();
 
     const assignedOrder = page
       .locator('article')

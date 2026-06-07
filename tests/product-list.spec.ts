@@ -24,7 +24,7 @@ test.describe('Avaiable product list', () => {
     await expectProductsPageVisible(page);
     await expect(
       page.getByRole('textbox', { name: '¿Qué estás buscando hoy?' })
-    ).toBeEnabled({ timeout: 15_000 });
+    ).not.toHaveAttribute('disabled', { timeout: 15_000 });
   }
 
   test('load products page', async ({ page }) => {

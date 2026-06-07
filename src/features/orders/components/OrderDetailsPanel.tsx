@@ -291,7 +291,7 @@ export default function OrderDetailsPanel({
               <MapPin className="text-primary mt-0.5 shrink-0" size={18} />
               <div className="min-w-0">
                 <h4 className="text-sm font-bold mb-1">Ubicación de entrega</h4>
-                <p className="text-sm opacity-80 break-words">{order.delivery.destination}</p>
+                <p className="text-sm opacity-80 break-words">{order.address}</p>
               </div>
             </div>
             {order.secret && (
@@ -303,6 +303,19 @@ export default function OrderDetailsPanel({
                   <h4 className="text-sm font-bold mb-1">Código de confirmación</h4>
                   <p className="text-xl font-mono font-black tracking-widest text-primary">
                     {order.secret}
+                  </p>
+                </div>
+              </div>
+            )}
+            {order.status === 'CANCELADO' && (order.incidentNotes || order.incidentReason) && (
+              <div className="flex items-start gap-3 pt-4 border-t border-(--theme-border)">
+                <div className="flex items-center justify-center w-6 h-6 mt-0.5 shrink-0 rounded-full bg-red-500/10 text-red-500 font-bold text-xs">
+                  <AlertCircle size={14} />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold mb-1 text-red-500">Motivo de cancelación</h4>
+                  <p className="text-sm opacity-80 break-words">
+                    {order.incidentNotes || order.incidentReason}
                   </p>
                 </div>
               </div>
