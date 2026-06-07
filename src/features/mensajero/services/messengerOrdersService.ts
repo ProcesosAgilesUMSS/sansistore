@@ -34,12 +34,8 @@ const normalizeDeliveryStatus = (status: unknown): DeliveryStatus => {
   if (status === 'not_delivered' || status === 'NOT_DELIVERED') {
     return 'not_delivered';
   }
-  if (
-    status === 'reprogrammed' ||
-    status === 'REPROGRAMMED' ||
-    status === 'REPROGRAMADO'
-  ) {
-    return 'reprogrammed';
+  if (status === 'reprogrammed') {
+  return 'reprogrammed';
   }
   if (status === 'cancelled' || status === 'CANCELLED' || status === 'CANCELADO') {
     return 'cancelled';
