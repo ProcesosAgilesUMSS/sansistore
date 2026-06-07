@@ -380,3 +380,9 @@ por las dudas que se tienen.
 * **Yesterday:** Trabaje en mis HU asignadas y mi issue asignado
 * **Today:** Realizar mi bug asignado
 * **Blockers:** None
+  
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Completé el desarrollo de las historias de usuario asignadas y revisé las observaciones realizadas sobre la HU-125.
+* **Today:** Realicé pruebas funcionales del flujo de la HU-125 para validar las observaciones recibidas, verificando el comportamiento de la funcionalidad e identificando algunos ajustes pendientes para asegurar el cumplimiento de los requerimientos.
+* **Blockers:** None.
