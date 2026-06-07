@@ -91,17 +91,17 @@ function CopyableOrderId({
     );
 }
 
-const getOrderDisplayId = (order: MessengerOrder) => parseOrderId(order.id).friendlyName;
+const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']): string => {
+    return getDeliveryStatusLabel(status);
+};
 
-const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']) => {
-    if (status === 'assigned') return 'Asignado';
-    if (status === 'accepted') return 'Aceptado';
-    if (status === 'pending_reassignment') return 'Pendiente de reasignacion';
-    if (status === 'in_transit') return 'En camino';
-    if (status === 'not_delivered') return 'No entregado';
-    if (status === 'cancelled') return 'Cancelado';
-    if (status === 'reprogrammed') return 'Reprogramado';
-    return 'Entregado';
+const getStatusUpdateMessage = (status: MessengerOrder['deliveryStatus']): string => {
+    if (status === 'accepted') return 'Pedido aceptado correctamente.';
+    if (status === 'in_transit') return 'Entrega iniciada correctamente.';
+    if (status === 'pending_reassignment') {
+        return 'Pedido rechazado y enviado a reasignacion.';
+    }
+    return `Estado actualizado a ${formatDeliveryStatus(status)}.`;
 };
 
 const buildBuyerMapUrl = (order: MessengerOrder) => {

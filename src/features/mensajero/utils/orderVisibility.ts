@@ -8,6 +8,7 @@ const statusPriority: Record<MessengerOrder['deliveryStatus'], number> = {
   pending_reassignment: 4,
   cancelled: 4,
   delivered: 5,
+  reprogrammed: 1,
 };
 
 const getOrderActivityTime = (order: MessengerOrder) =>
