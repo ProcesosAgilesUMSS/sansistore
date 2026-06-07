@@ -224,11 +224,7 @@ const mapMessengerOrder = async (
     newDeliveryAt: toDate(delivery.newDeliveryAt) ?? toDate(order.newDeliveryAt),
     reprogramReason:
       asString(delivery.reprogramReason) ||
-      asString(delivery.reprogrammingReason) ||
-      asString(delivery.rescheduleReason) ||
-      asString(order.reprogramReason) ||
-      asString(order.reprogrammingReason) ||
-      asString(order.rescheduleReason),
+      asString(order.reprogramReason) 
   };
 };
 
