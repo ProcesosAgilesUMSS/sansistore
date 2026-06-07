@@ -362,6 +362,12 @@ por las dudas que se tienen.
 * **Today:** Apoyé en las corrección de bugs, además de realizar la revisión y validación de las funcionalidades desarrolladas.
 * **Blockers:** None
 
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** TTerminé mis HUs asignadas y realicé una revisión general de las funcionalidades implementadas para verificar su correcto funcionamiento.
+* **Today:** Realizaré la revisión y validación de las funcionalidades desarrolladas, verificando que los flujos implementados operen correctamente y cumplan con los requerimientos definidos.
+* **Blockers:** None
+
 * ## Maria Victoria Grageda Vallejos
 
 * **Yesterday:** Avance en el desarrollo de mis hus asignadas revisando que la neuva funcionalidad no rompa nada
