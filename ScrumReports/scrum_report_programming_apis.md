@@ -273,6 +273,10 @@
 - **Today:** Continuaré corrigiendo detalles de integración del mapa y validando que la funcionalidad funcione correctamente dentro del flujo del mensajero.
 - **Blockers:** Dudas puntuales sobre ajustes de Leaflet y manejo de coordenadas.
 
+*** 
+
+# Sprint 3
+
 ## 26-05-2026
 
 ### José Daniel Virreira Rufino
@@ -364,7 +368,36 @@
 - **Today:** Terminar la Hu de este sprint 
 - **Blockers:** None
 
-## Adrian Said Andrade Medina
+### Adrian Said Andrade Medina
 - **Yesterday:** Trabaje en el bug de asignado
 - **Today:** Iniciar la HU correspondiente a este sprint.
 - **Blockers:** None
+
+## 04-06-2026
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Trabajé en los bugs asignados a mi persona encontrado por diferentes compañeros del equipo completo.
+- **Today:** Validaré que todas las funcionalidades (bugs e historias de usuario) trabajen correctamente para la presentación demo.
+- **None:** Los bugs corregidos necesitan validación extra para asegurarse de que todo funcione como debería.
+
+### Efrain Peralta Felipe
+- **Yesterday:** En la reunión se quedo de acuerdo que mi hu es un duplicado.
+- **Today:** Hice revisión del bug de asignar mensajero.
+- **None:** None.
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday (04/06):** La HU que me asignaron ("Administrador, solo pedidos listos a delivery") resultó ser duplicada. Se reportó al ingeniero y se acordó descartarla del sprint por no aportar valor, ya que el vendedor ya tiene esa funcionalidad. Se realizó el análisis completo y la comunicación correspondiente.
+- **Today (05/06):** Cierre del sprint, preparación de documentación final y estar atento a la retrospectiva.
+- **Blockers:** None.
+
+### Adrian
+
+- **Yesterday:** Estuve trabajando en la hu asignada
+- **Today:** Termine de corregir un bug que salia.
+- **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+
+- **Yesterday:** Trabaje en mis HU asignadas y mi issue asignado
+- **Today:** Preveo terminar mi HU y bug asignado
+- **Blockers:** None.

@@ -9,6 +9,30 @@ const ACTIONS = {
   ENTREGADO: { label: "Validar pago", color: "bg-[#16A34A]", handler: paidOrder, successMsg: "Pago validado correctamente." },
 } as const;
 
+const PAYMENT_VALIDATED_STATUSES = new Set(["pagado", "paid", "validado", "verified"]);
+
+function normalizeStatus(value: unknown): string {
+  return String(value ?? "").trim().toLowerCase();
+}
+
+function isPaymentValidated(order: Order): boolean {
+  return (
+    normalizeStatus(order.status) === "pagado" ||
+    PAYMENT_VALIDATED_STATUSES.has(normalizeStatus(order.paymentStatus))
+  );
+}
+
+function canValidatePayment(order: Order): boolean {
+  const orderStatus = normalizeStatus(order.status);
+  const deliveryStatus = normalizeStatus(order.deliveryStatus);
+  const isDeliveredOrCompleted =
+    orderStatus === "entregado" ||
+    orderStatus === "completado" ||
+    deliveryStatus === "delivered";
+
+  return isDeliveredOrCompleted && !isPaymentValidated(order);
+}
+
 export default function OrderActions({
   order,
   onSuccess,
@@ -38,10 +62,13 @@ export default function OrderActions({
   };
 
   if (order.status === "RESERVADO") {
-    return <CancelOrderSection order={order} onSuccess={onSuccess} onNotification={onNotification} />;
+    return <CancelOrderSection order={order} onSuccess={onSuccess} />;
   }
 
-  const config = ACTIONS[order.status as keyof typeof ACTIONS];
+  const showPaymentValidation = canValidatePayment(order);
+  const config = showPaymentValidation
+    ? ACTIONS.ENTREGADO
+    : ACTIONS[order.status as keyof typeof ACTIONS];
   if (!config) return null;
 
   return (
@@ -49,7 +76,7 @@ export default function OrderActions({
       <button
         className={`text-white rounded tracking-tight px-4 py-1.5 ${config.color} leading-[100%] cursor-pointer disabled:opacity-50`}
         onClick={() => {
-          if (order.status === "ENTREGADO") {
+          if (showPaymentValidation) {
             setShowPaymentConfirm(true);
           } else {
             handleAction(() => config.handler(order.id), config.successMsg);
@@ -98,11 +125,9 @@ export default function OrderActions({
 function CancelOrderSection({
   order,
   onSuccess,
-  onNotification
 }: {
   order: Order;
   onSuccess?: () => void;
-  onNotification?: (type: "success" | "error", message: string) => void;
 }) {
   const [showCancelForm, setShowCancelForm] = useState(false);
   const [incidentNotes, setIncidentNotes] = useState("");
