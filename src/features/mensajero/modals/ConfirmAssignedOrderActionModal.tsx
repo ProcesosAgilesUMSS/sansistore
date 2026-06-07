@@ -58,6 +58,7 @@ export default function ConfirmAssignedOrderActionModal({
 }: ConfirmAssignedOrderActionModalProps) {
   const config = actionConfig[action];
   const { friendlyName } = parseOrderId(order.id);
+  const displayId = order.displayId ?? friendlyName;
   const Icon = config.Icon;
 
   const confirmAction = async () => {
@@ -112,7 +113,7 @@ export default function ConfirmAssignedOrderActionModal({
           <div className="grid gap-3 rounded-2xl border border-border-light bg-secondary-bg-light/60 p-4 sm:grid-cols-2">
             <div>
               <p className="text-xs font-bold uppercase opacity-50">Pedido</p>
-              <p className="mt-1 text-sm font-bold">{friendlyName}</p>
+              <p className="mt-1 text-sm font-bold">{displayId}</p>
             </div>
 
             <div>

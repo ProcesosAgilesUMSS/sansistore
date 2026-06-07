@@ -144,6 +144,11 @@ const formatCourierZoneName = (zoneName: string | null): string | undefined => {
   return `${name.charAt(0).toUpperCase()}${name.slice(1)}`;
 };
 
+const readOrderDisplayId = (orderId: string): string | undefined => {
+  const [, friendlyName] = orderId.split('_');
+  return asString(friendlyName) ?? asString(orderId);
+};
+
 const readPayment = async (paymentId: string | null): Promise<PaymentData> => {
   if (!paymentId) return {};
 
@@ -197,6 +202,7 @@ const mapMessengerOrder = async (
 
   return {
     id: orderId || deliveryId,
+    displayId: readOrderDisplayId(orderId || deliveryId),
     deliveryId,
     paymentId,
     customerName,
@@ -251,6 +257,14 @@ export async function getMessengerOrders(
   );
 
   return getVisibleMessengerOrders(orders);
+}
+
+export async function getMessengerOrderById(
+  courierId: string,
+  orderId: string
+): Promise<MessengerOrder | null> {
+  const orders = await getMessengerOrders(courierId);
+  return orders.find((order) => order.id === orderId) ?? null;
 }
 
 export function subscribeToMessengerOrders(

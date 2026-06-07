@@ -52,6 +52,13 @@ import ConfirmAssignedOrderActionModal, {
 
 const DEV_COURIER_ID = 'user-nadia';
 
+const buildDeliveryOrderDetailUrl = (orderId: string) =>
+    `/delivery/order/${encodeURIComponent(orderId)}`;
+
+const navigateToDeliveryOrderDetail = (orderId: string) => {
+    window.location.href = buildDeliveryOrderDetailUrl(orderId);
+};
+
 const formatDate = (date: Date | null | undefined) => {
     if (!date) return 'Fecha no disponible';
     return new Intl.DateTimeFormat('es-BO', {
@@ -105,6 +112,8 @@ function CopyableOrderId({
     codeClassName: string;
 }) {
     const { uuid, friendlyName } = parseOrderId(order.id);
+    const displayId = order.displayId ?? friendlyName;
+    const showTechnicalId = !order.displayId;
     const copyOrderId = () => {
         void navigator.clipboard?.writeText(order.id);
     };
@@ -116,8 +125,10 @@ function CopyableOrderId({
             title="Copiar ID del pedido"
             type="button"
         >
-            <p className="font-mono text-[10px] font-bold opacity-40">{uuid}</p>
-            <h3 className={codeClassName}>{friendlyName}</h3>
+            {showTechnicalId && (
+                <p className="font-mono text-[10px] font-bold opacity-40">{uuid}</p>
+            )}
+            <h3 className={codeClassName}>{displayId}</h3>
         </button>
     );
 }
@@ -461,16 +472,17 @@ function PendingOrderCard({
                         Abrir Maps
                     </a>
 
-                    {order.deliveryStatus !== 'assigned' && (
-                        <button
-                            className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-                            onClick={() => onDetail(order)}
-                            type="button"
-                        >
-                            <Eye size={17} />
-                            Ver detalle
-                        </button>
-                    )}
+                    <a
+                        className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+                        href={buildDeliveryOrderDetailUrl(order.id)}
+                        onClick={(event) => {
+                            event.preventDefault();
+                            onDetail(order);
+                        }}
+                    >
+                        <Eye size={17} />
+                        Ver detalle
+                    </a>
 
                     {order.deliveryStatus === 'assigned' && (
                         <>
@@ -1367,7 +1379,8 @@ export default function MessengerDashboard({
 
     const updateOrderStatus = async (
         orderId: string,
-        status: MessengerOrder['deliveryStatus']
+        status: MessengerOrder['deliveryStatus'],
+        options: { redirectToDetail?: boolean } = {}
     ) => {
         const targetOrder = orders.find((order) => order.id === orderId);
         if (!targetOrder) return;
@@ -1386,6 +1399,9 @@ export default function MessengerDashboard({
         try {
             await setMessengerOrderStatus(targetOrder, status);
             setMessage(getStatusUpdateMessage(status));
+            if (options.redirectToDetail) {
+                navigateToDeliveryOrderDetail(orderId);
+            }
         } catch (error) {
             console.error(error);
             setMessage('No se pudo actualizar el estado en Firestore.');
@@ -1465,7 +1481,7 @@ export default function MessengerDashboard({
     };
 
     const markAsInTransit = (orderId: string) => {
-        void updateOrderStatus(orderId, 'in_transit');
+        void updateOrderStatus(orderId, 'in_transit', { redirectToDetail: true });
     };
 
     const rejectOrder = (orderId: string) => {
@@ -1481,7 +1497,7 @@ export default function MessengerDashboard({
 
         setSavingAssignedAction(true);
         try {
-            await updateOrderStatus(order.id, nextStatus);
+            await updateOrderStatus(order.id, nextStatus, { redirectToDetail: true });
             setPendingAssignedAction(null);
         } finally {
             setSavingAssignedAction(false);
@@ -1516,6 +1532,7 @@ export default function MessengerDashboard({
             });
             setMessage('Problema registrado y pedido marcado como no entregado.');
             setUndeliveredOrder(null);
+            navigateToDeliveryOrderDetail(targetOrder.id);
         } catch (error) {
             console.error(error);
             setMessage('No se pudo registrar el incidente en Firestore.');
@@ -1557,6 +1574,7 @@ export default function MessengerDashboard({
 
             setMessage('Pedido cancelado por falta de pago.');
             setCancelNoPaymentOrder(null);
+            navigateToDeliveryOrderDetail(targetOrder.id);
         } catch (error) {
             console.error(error);
             setMessage('No se pudo cancelar el pedido por falta de pago.');
@@ -1764,7 +1782,9 @@ export default function MessengerDashboard({
                                             onAccept={acceptOrder}
                                             onCancelNoPayment={setCancelNoPaymentOrder}
                                             onDelivered={markAsDelivered}
-                                            onDetail={setDetailOrder}
+                                            onDetail={(order) =>
+                                                navigateToDeliveryOrderDetail(order.id)
+                                            }
                                             onInTransit={markAsInTransit}
                                             onNotDelivered={setUndeliveredOrder}
                                             onReject={rejectOrder}
