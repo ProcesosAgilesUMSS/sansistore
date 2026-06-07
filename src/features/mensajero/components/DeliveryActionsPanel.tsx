@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import MessengerDashboard from './MessengerDashboard';
 
-type DeliverySection = 'assigned' | 'accepted' | 'delivered' | 'not_delivered';
+type DeliverySection = 'assigned' | 'accepted' | 'reprogrammed' | 'delivered' | 'not_delivered';
 
 const sections: Array<{ id: DeliverySection; label: string }> = [
   { id: 'assigned', label: 'Gestión Entregas' },
   { id: 'accepted', label: 'Pedidos aceptados' },
+  { id: 'reprogrammed', label: 'Reprogramados' },
   { id: 'not_delivered', label: 'No entregados' },
   { id: 'delivered', label: 'Entregados ' },
 ];

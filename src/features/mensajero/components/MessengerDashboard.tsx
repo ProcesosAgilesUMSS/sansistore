@@ -91,20 +91,17 @@ function CopyableOrderId({
     );
 }
 
-const getOrderDisplayId = (order: MessengerOrder) => parseOrderId(order.id).friendlyName;
-
-const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']) => {
+const formatDeliveryStatus = (status: MessengerOrder['deliveryStatus']): string => {
     return getDeliveryStatusLabel(status);
 };
 
-const getStatusUpdateMessage = (status: MessengerOrder['deliveryStatus']) => {
+const getStatusUpdateMessage = (status: MessengerOrder['deliveryStatus']): string => {
     if (status === 'accepted') return 'Pedido aceptado correctamente.';
     if (status === 'in_transit') return 'Entrega iniciada correctamente.';
     if (status === 'pending_reassignment') {
         return 'Pedido rechazado y enviado a reasignacion.';
     }
-
-    return `Estado actualizado a ${getDeliveryStatusLabel(status)}.`;
+    return `Estado actualizado a ${formatDeliveryStatus(status)}.`;
 };
 
 const buildBuyerMapUrl = (order: MessengerOrder) => {
@@ -372,6 +369,27 @@ function PendingOrderCard({
                                 {order.reference}
                             </p>
                         )}
+                        {order.deliveryStatus === 'reprogrammed' && (
+                        <div className="messenger-reference border-l-4 px-4 py-4 text-sm font-semibold">
+                            <p className="messenger-muted mb-1 text-xs font-bold uppercase">
+                                Nueva fecha y hora de entrega
+                            </p>
+                            <p className="font-black text-primary">
+                                {formatDate(order.newDeliveryAt)}
+                            </p>
+
+                            <p className="messenger-muted mb-1 mt-3 text-xs font-bold uppercase">
+                                Motivo de reprogramacion
+                            </p>
+                            <p>
+                                {order.reprogramReason || 'Sin motivo registrado'}
+                            </p>
+
+                            <p className="messenger-muted mt-3 text-xs">
+                                Reprogramado el: {formatDate(order.reprogrammedAt)}
+                            </p>
+                        </div>
+                    )}
                     </div>
                 </div>
 
@@ -582,6 +600,43 @@ function OrderDetailModal({
                             <p className="text-xl font-black">{order.customerName}</p>
                         </article>
 
+                        {order.deliveryStatus === 'reprogrammed' && (
+                            <article className="rounded-[24px] border border-primary/40 bg-secondary-bg-light/40 p-5">
+                                <h3 className="mb-4 text-lg font-black text-primary">
+                                    Informacion de reprogramacion
+                                </h3>
+
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                    <div>
+                                        <p className="messenger-muted text-xs font-bold uppercase">
+                                            Nueva fecha y hora
+                                        </p>
+                                        <p className="font-black">
+                                            {formatDate(order.newDeliveryAt)}
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <p className="messenger-muted text-xs font-bold uppercase">
+                                            Reprogramado el
+                                        </p>
+                                        <p className="font-black">
+                                            {formatDate(order.reprogrammedAt)}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="mt-4">
+                                    <p className="messenger-muted text-xs font-bold uppercase">
+                                        Motivo
+                                    </p>
+                                    <p className="font-semibold">
+                                        {order.reprogramReason || 'Sin motivo registrado'}
+                                    </p>
+                                </div>
+                            </article>
+                        )}
+
                         <article className="rounded-[24px] border border-border-light bg-secondary-bg-light/40 p-5">
                             <h3 className="mb-4 text-lg font-black">Productos</h3>
                             {order.items.length > 0 ? (
@@ -721,7 +776,7 @@ function OrderDetailModal({
 
 interface MessengerDashboardProps {
     embedded?: boolean;
-    clientSection?: 'assigned' | 'accepted' | 'delivered' | 'not_delivered';
+    clientSection?: 'assigned' | 'accepted' | 'reprogrammed' | 'delivered' | 'not_delivered';
 }
 
 export default function MessengerDashboard({
@@ -928,6 +983,28 @@ export default function MessengerDashboard({
         [orders]
     );
 
+    const reprogrammedOrders = useMemo(
+        () =>
+            orders
+                .filter((order) => order.deliveryStatus === 'reprogrammed')
+                .sort((a, b) => {
+                    const dateA =
+                        a.newDeliveryAt?.getTime() ??
+                        a.updatedAt?.getTime() ??
+                        a.createdAt?.getTime() ??
+                        0;
+
+                    const dateB =
+                        b.newDeliveryAt?.getTime() ??
+                        b.updatedAt?.getTime() ??
+                        b.createdAt?.getTime() ??
+                        0;
+
+                    return dateA - dateB;
+                }),
+        [orders]
+    );
+
     const updateOrderStatus = async (
         orderId: string,
         status: MessengerOrder['deliveryStatus']
@@ -1113,23 +1190,29 @@ export default function MessengerDashboard({
             ? assignedOrders
             : clientSection === 'not_delivered'
                 ? notDeliveredOrders
-                : sortedAcceptedOrders;
+                : clientSection === 'reprogrammed'
+                    ? reprogrammedOrders
+                    : sortedAcceptedOrders;
     const activeTitle =
         clientSection === 'assigned'
             ? 'Gestión Entregas'
             : clientSection === 'accepted'
                 ? 'Pedidos aceptados'
-                : clientSection === 'not_delivered'
-                    ? 'No entregados'
-                    : 'Entregados';
+                : clientSection === 'reprogrammed'
+                    ? 'Pedidos reprogramados'
+                    : clientSection === 'not_delivered'
+                        ? 'No entregados'
+                        : 'Entregados';
     const activeDescription =
         clientSection === 'assigned'
             ? 'Acepta o rechaza los pedidos asignados antes de iniciar la entrega.'
             : clientSection === 'accepted'
                 ? 'Organiza tus entregas, revisa direcciones y cambia el estado de cada pedido.'
-                : clientSection === 'not_delivered'
-                    ? 'Revisa los pedidos con incidente registrado durante la jornada.'
-                    : 'Revisa las entregas completadas y el monto cobrado durante la jornada.';
+                : clientSection === 'reprogrammed'
+                    ? 'Revisa los pedidos que tienen una nueva fecha u hora de entrega.'
+                    : clientSection === 'not_delivered'
+                        ? 'Revisa los pedidos con incidente registrado durante la jornada.'
+                        : 'Revisa las entregas completadas y el monto cobrado durante la jornada.';
 
     return (
         <main
@@ -1195,7 +1278,10 @@ export default function MessengerDashboard({
                             <SummaryCard
                                 icon={<Clock3 size={20} />}
                                 label={
-                                    clientSection === 'assigned' ? 'Asignados' : 'Pendientes'
+                                    clientSection === 'assigned' ? 'Asignados' 
+                                    : clientSection === 'reprogrammed' ? 'Reprogramados'
+                                    : clientSection === 'not_delivered' ? 'No entregados'
+                                    : 'Pendientes'
                                 }
                                 value={activeOrders.length}
                             />
@@ -1217,9 +1303,11 @@ export default function MessengerDashboard({
                                 <h2 className="text-2xl font-black tracking-[-0.04em]">
                                     {clientSection === 'assigned'
                                         ? 'Pedidos asignados'
-                                        : clientSection === 'not_delivered'
-                                            ? 'Pedidos no entregados'
-                                            : 'Pedidos pendientes'}
+                                        : clientSection === 'reprogrammed'
+                                            ? 'Pedidos reprogramados'
+                                            : clientSection === 'not_delivered'
+                                                ? 'Pedidos no entregados'
+                                                : 'Pedidos pendientes'}
                                 </h2>
 
                                 {clientSection === 'accepted' && activeOrders.length > 0 && (
@@ -1249,7 +1337,7 @@ export default function MessengerDashboard({
                                 {activeOrders.length > 0 ? (
                                     activeOrders.map((order) => (
                                         <PendingOrderCard
-                                            key={order.id}
+                                            key={`${clientSection}-${order.deliveryId || order.id}`}
                                             order={order}
                                             onAccept={acceptOrder}
                                             onCancelNoPayment={setCancelNoPaymentOrder}
@@ -1264,9 +1352,11 @@ export default function MessengerDashboard({
                                     <div className="messenger-order-card rounded-[28px] border p-8 text-sm font-semibold">
                                         {clientSection === 'assigned'
                                             ? 'No hay pedidos asignados.'
-                                            : clientSection === 'not_delivered'
-                                                ? 'No hay pedidos no entregados.'
-                                                : 'No hay pedidos pendientes.'}
+                                            : clientSection === 'reprogrammed'
+                                                ? 'No hay pedidos reprogramados.'
+                                                : clientSection === 'not_delivered'
+                                                    ? 'No hay pedidos no entregados.'
+                                                    : 'No hay pedidos pendientes.'}
                                     </div>
                                 )}
                             </div>

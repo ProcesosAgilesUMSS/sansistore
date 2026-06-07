@@ -238,6 +238,8 @@ classDiagram
     +timestamp reprogrammedAt
     +timestamp createdAt
     +timestamp updatedAt
+    +string reprogramReason  
+    +timestamp newDeliveryAt
   }
 
   class payments {

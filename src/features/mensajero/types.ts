@@ -44,10 +44,10 @@ export interface MessengerOrderItem {
 export interface MessengerOrder {
   id: string;
   deliveryId: string;
-  secret?: string;  
+  secret?: string;
   paymentId: string | null;
   customerName: string;
-  buyerName: string;        
+  buyerName: string;
   phone: string;
   address: string;
   city: string;
@@ -62,9 +62,21 @@ export interface MessengerOrder {
   paymentStatusLabel: string;
   paymentCollectedAt: Date | null;
   collectedBy: string | null;
-  deliveryMethod: string;   
-  deliveryStatus: 'assigned' | 'accepted' | 'in_transit' | 'delivered' | 'not_delivered' | 'pending_reassignment' | 'cancelled';
+  deliveryMethod: string;
+  deliveryStatus:
+    | 'assigned'
+    | 'accepted'
+    | 'in_transit'
+    | 'delivered'
+    | 'not_delivered'
+    | 'pending_reassignment'
+    | 'cancelled'
+    | 'reprogrammed';
   assignedAt: Date | null;
   createdAt: Date | null;
   updatedAt: Date | null;
+
+  reprogrammedAt: Date | null;
+  newDeliveryAt: Date | null;
+  reprogramReason: string | null;
 }

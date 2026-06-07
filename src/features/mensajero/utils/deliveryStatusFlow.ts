@@ -10,6 +10,7 @@ export const messengerDeliveryStatuses = [
   'not_delivered',
   'pending_reassignment',
   'cancelled',
+  'reprogrammed',
 ] as const satisfies MessengerDeliveryStatus[];
 
 const deliveryStatusLabels: Record<MessengerDeliveryStatus, string> = {
@@ -20,6 +21,7 @@ const deliveryStatusLabels: Record<MessengerDeliveryStatus, string> = {
   not_delivered: 'No entregado',
   pending_reassignment: 'Pendiente de reasignacion',
   cancelled: 'Cancelado',
+  reprogrammed: 'Reprogramado',
 };
 
 const orderStatusByDeliveryStatus: Record<MessengerDeliveryStatus, string> = {
@@ -30,6 +32,7 @@ const orderStatusByDeliveryStatus: Record<MessengerDeliveryStatus, string> = {
   not_delivered: 'NO ENTREGADO',
   pending_reassignment: 'PENDIENTE REASIGNACION',
   cancelled: 'CANCELADO',
+  reprogrammed: 'REPROGRAMADO',
 };
 
 const orderDeliveryStatusByDeliveryStatus: Record<MessengerDeliveryStatus, string> = {
@@ -40,6 +43,7 @@ const orderDeliveryStatusByDeliveryStatus: Record<MessengerDeliveryStatus, strin
   not_delivered: 'NOT_DELIVERED',
   pending_reassignment: 'PENDING_REASSIGNMENT',
   cancelled: 'CANCELLED',
+  reprogrammed: 'REPROGRAMMED',
 };
 
 const allowedTransitions: Record<MessengerDeliveryStatus, MessengerDeliveryStatus[]> = {
@@ -50,6 +54,7 @@ const allowedTransitions: Record<MessengerDeliveryStatus, MessengerDeliveryStatu
   not_delivered: [],
   pending_reassignment: [],
   cancelled: [],
+  reprogrammed: ['assigned'],
 };
 
 export function getDeliveryStatusLabel(status: MessengerDeliveryStatus) {

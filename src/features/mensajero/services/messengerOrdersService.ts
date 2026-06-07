@@ -40,6 +40,9 @@ const normalizeDeliveryStatus = (status: unknown): DeliveryStatus => {
   if (status === 'not_delivered' || status === 'NOT_DELIVERED') {
     return 'not_delivered';
   }
+  if (status === 'reprogrammed') {
+  return 'reprogrammed';
+  }
   if (status === 'cancelled' || status === 'CANCELLED' || status === 'CANCELADO') {
     return 'cancelled';
   }
@@ -47,6 +50,17 @@ const normalizeDeliveryStatus = (status: unknown): DeliveryStatus => {
   if (status === 'IN_TRANSIT') return 'in_transit';
   if (status === 'DELIVERED') return 'delivered';
   return 'assigned';
+};
+
+const normalizeOrderDeliveryStatus = (status: DeliveryStatus) => {
+  if (status === 'accepted') return 'ACCEPTED';
+  if (status === 'pending_reassignment') return 'PENDING_REASSIGNMENT';
+  if (status === 'in_transit') return 'IN_TRANSIT';
+  if (status === 'delivered') return 'DELIVERED';
+  if (status === 'not_delivered') return 'NOT_DELIVERED';
+  if (status === 'cancelled') return 'CANCELLED';
+  if (status === 'reprogrammed') return 'REPROGRAMMED';
+  return 'ASSIGNED';
 };
 
 function toDate(value: unknown): Date | null {
@@ -212,6 +226,11 @@ const mapMessengerOrder = async (
     assignedAt: toDate(delivery.assignedAt),
     createdAt: toDate(delivery.createdAt) ?? toDate(order.createdAt),
     updatedAt: toDate(delivery.updatedAt) ?? toDate(order.updatedAt),
+    reprogrammedAt: toDate(delivery.reprogrammedAt),
+    newDeliveryAt: toDate(delivery.newDeliveryAt) ?? toDate(order.newDeliveryAt),
+    reprogramReason:
+      asString(delivery.reprogramReason) ||
+      asString(order.reprogramReason) 
   };
 };
 
@@ -267,6 +286,27 @@ export function subscribeToMessengerOrders(
     }
   );
 }
+
+const getStatusForORder = (status: DeliveryStatus) => {
+  switch (status) {
+    case 'accepted':
+      return 'ACEPTADO';
+    case 'pending_reassignment':
+      return 'PENDIENTE REASIGNACION';
+    case 'in_transit':
+      return 'EN CAMINO';
+    case 'delivered':
+      return 'ENTREGADO';
+    case 'not_delivered':
+      return 'NO ENTREGADO';
+    case 'cancelled':
+      return 'CANCELADO';
+    case 'reprogrammed':
+      return 'REPROGRAMADO';
+    default:
+      return 'ASIGNADO';
+  }
+};
 
 export async function setMessengerOrderStatus(
   order: MessengerOrder,
