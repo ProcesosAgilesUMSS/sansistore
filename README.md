@@ -238,6 +238,8 @@ classDiagram
     +timestamp reprogrammedAt
     +timestamp createdAt
     +timestamp updatedAt
+    +string reprogramReason  
+    +timestamp newDeliveryAt
   }
 
   class payments {
@@ -311,6 +313,17 @@ classDiagram
     +timestamp timestamp
   }
 
+  class sellerActivityLogs {
+    +string sellerId
+    +string sellerName
+    +string sellerEmail
+    +string actionType
+    +string orderId
+    +string previousStatus
+    +string newStatus
+    +timestamp timestamp
+  }
+
   users "1" --> "0..*" locations : owns
   users "1" --> "0..*" orders : places
   users "1" --> "0..*" reviews : writes
@@ -330,6 +343,8 @@ classDiagram
   users "1" --> "0..*" notifications : receives
   orders "1" --> "0..*" notifications : triggers
   users "1" --> "0..*" accessLogs : generates
+  users "1" --> "0..*" sellerActivityLogs : generates
+  orders "1" --> "0..*" sellerActivityLogs : referenced in
 ```
 
 ## Branching and releases

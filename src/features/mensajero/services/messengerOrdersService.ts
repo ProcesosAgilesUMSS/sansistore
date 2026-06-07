@@ -16,6 +16,11 @@ import { db } from '../../../lib/firebase';
 import { getCurrentZone } from '../../location/utils/zoneLimits';
 import type { MessengerOrder, MessengerOrderItem } from '../types';
 import { getVisibleMessengerOrders } from '../utils/orderVisibility';
+import {
+  assertCanTransitionDeliveryStatus,
+  getOrderDeliveryStatusForDeliveryStatus,
+  getOrderStatusForDeliveryStatus,
+} from '../utils/deliveryStatusFlow';
 
 type DeliveryStatus = MessengerOrder['deliveryStatus'];
 type OrderData = Record<string, unknown>;
@@ -35,6 +40,9 @@ const normalizeDeliveryStatus = (status: unknown): DeliveryStatus => {
   if (status === 'not_delivered' || status === 'NOT_DELIVERED') {
     return 'not_delivered';
   }
+  if (status === 'reprogrammed') {
+  return 'reprogrammed';
+  }
   if (status === 'cancelled' || status === 'CANCELLED' || status === 'CANCELADO') {
     return 'cancelled';
   }
@@ -51,6 +59,7 @@ const normalizeOrderDeliveryStatus = (status: DeliveryStatus) => {
   if (status === 'delivered') return 'DELIVERED';
   if (status === 'not_delivered') return 'NOT_DELIVERED';
   if (status === 'cancelled') return 'CANCELLED';
+  if (status === 'reprogrammed') return 'REPROGRAMMED';
   return 'ASSIGNED';
 };
 
@@ -217,6 +226,11 @@ const mapMessengerOrder = async (
     assignedAt: toDate(delivery.assignedAt),
     createdAt: toDate(delivery.createdAt) ?? toDate(order.createdAt),
     updatedAt: toDate(delivery.updatedAt) ?? toDate(order.updatedAt),
+    reprogrammedAt: toDate(delivery.reprogrammedAt),
+    newDeliveryAt: toDate(delivery.newDeliveryAt) ?? toDate(order.newDeliveryAt),
+    reprogramReason:
+      asString(delivery.reprogramReason) ||
+      asString(order.reprogramReason) 
   };
 };
 
@@ -287,6 +301,8 @@ const getStatusForORder = (status: DeliveryStatus) => {
       return 'NO ENTREGADO';
     case 'cancelled':
       return 'CANCELADO';
+    case 'reprogrammed':
+      return 'REPROGRAMADO';
     default:
       return 'ASIGNADO';
   }
@@ -296,6 +312,8 @@ export async function setMessengerOrderStatus(
   order: MessengerOrder,
   status: DeliveryStatus
 ) {
+  assertCanTransitionDeliveryStatus(order.deliveryStatus, status);
+
   const deliveryRef = doc(db, 'deliveries', order.deliveryId);
   const dataToUpdate: Record<string, unknown> = {
     status,
@@ -316,8 +334,8 @@ export async function setMessengerOrderStatus(
 
   if (order.id) {
     await updateDoc(doc(db, 'orders', order.id), {
-      status: getStatusForORder(status),
-      deliveryStatus: normalizeOrderDeliveryStatus(status),
+      status: getOrderStatusForDeliveryStatus(status),
+      deliveryStatus: getOrderDeliveryStatusForDeliveryStatus(status),
       updatedAt: serverTimestamp(),
     });
   }
@@ -405,6 +423,7 @@ export async function markMessengerOrderAsNotDelivered({
 
   if (order.id) {
     await updateDoc(doc(db, 'orders', order.id), {
+      status: getOrderStatusForDeliveryStatus('not_delivered'),
       deliveryStatus: 'NOT_DELIVERED',
       updatedAt: serverTimestamp(),
     });

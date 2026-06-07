@@ -1,8 +1,6 @@
-// AccessLogPanel.tsx — HU #159: Bitácora de accesos al sistema
 // Área 7: Administración & Analítica — Nova 2.0
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-// useRef solo se usa para hasFetched
 import { getAccessLogs } from '../services/accessLogService';
 import type { AccessLog, AccessLogFilter } from '../types';
 
@@ -18,7 +16,6 @@ const formatDateTime = (date: Date): string =>
     second: '2-digit',
   });
 
-// Badge de rol con color
 const RoleBadge = ({ role }: { role: string }) => {
   const styles: Record<string, string> = {
     vendedor: 'bg-blue-500/10 text-blue-600',
@@ -34,7 +31,6 @@ const RoleBadge = ({ role }: { role: string }) => {
   );
 };
 
-// Badge de acción LOGIN/LOGOUT
 const ActionBadge = ({ action }: { action: string }) => (
   <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full ${
     action === 'LOGIN'
@@ -45,7 +41,6 @@ const ActionBadge = ({ action }: { action: string }) => (
   </span>
 );
 
-// Badge de estado ACTIVO/CERRADO
 const StatusBadge = ({ status }: { status: string }) => (
   <span className={`inline-flex items-center gap-1 text-[9px] font-semibold px-2 py-0.5 rounded-full ${
     status === 'ACTIVO'
@@ -61,8 +56,8 @@ export default function AccessLogPanel() {
   const [logs, setLogs] = useState<AccessLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showActiveSessions, setShowActiveSessions] = useState(false);
 
-  // Filtros
   const today = new Date();
   const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
   const toInputDate = (d: Date) => d.toISOString().split('T')[0];
@@ -74,7 +69,6 @@ export default function AccessLogPanel() {
 
   const hasFetched = useRef(false);
 
-  // ── Cargar bitácora ─────────────────────────────────────────
   const fetchLogs = useCallback(async (filter?: AccessLogFilter) => {
     setLoading(true);
     setError('');
@@ -95,11 +89,12 @@ export default function AccessLogPanel() {
     void fetchLogs();
   }, []);
 
+  const parseLocalDate = (dateStr: string) => {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  };
+
   const handleFilter = () => {
-    const parseLocalDate = (dateStr: string) => {
-      const [year, month, day] = dateStr.split('-').map(Number);
-      return new Date(year, month - 1, day);
-    };
     void fetchLogs({
       startDate: startDate ? parseLocalDate(startDate) : undefined,
       endDate: endDate ? parseLocalDate(endDate) : undefined,
@@ -108,11 +103,17 @@ export default function AccessLogPanel() {
     });
   };
 
-  // Calcular estadísticas rápidas
+  const handleRefresh = () => {
+    void fetchLogs({
+      startDate: startDate ? parseLocalDate(startDate) : undefined,
+      endDate: endDate ? parseLocalDate(endDate) : undefined,
+      role: roleFilter,
+      action: actionFilter,
+    });
+  };
 
-  // Sesiones activas: toma el último registro de cada usuario
-  // y verifica si su estado es ACTIVO
-  const activeUsers = (() => {
+  // Sesiones activas: último registro por usuario con status ACTIVO
+  const activeUsersList = (() => {
     const lastByUser = new Map<string, AccessLog>();
     logs.forEach((l) => {
       const existing = lastByUser.get(l.uid);
@@ -120,8 +121,9 @@ export default function AccessLogPanel() {
         lastByUser.set(l.uid, l);
       }
     });
-    return [...lastByUser.values()].filter((l) => l.status === 'ACTIVO').length;
+    return [...lastByUser.values()].filter((l) => l.status === 'ACTIVO');
   })();
+  const activeUsers = activeUsersList.length;
 
   const todayLogins = logs.filter((l) => {
     const logDate = new Date(l.timestamp);
@@ -131,16 +133,11 @@ export default function AccessLogPanel() {
     );
   }).length;
 
-  // Usuarios únicos por rol (no cuenta múltiples registros del mismo usuario)
   const vendedores = new Set(
-    logs
-      .filter((l) => l.roles.includes('vendedor'))
-      .map((l) => l.uid)
+    logs.filter((l) => l.roles.includes('vendedor')).map((l) => l.uid)
   ).size;
   const operadores = new Set(
-    logs
-      .filter((l) => l.roles.includes('operador_inv'))
-      .map((l) => l.uid)
+    logs.filter((l) => l.roles.includes('operador_inv')).map((l) => l.uid)
   ).size;
 
   return (
@@ -159,10 +156,56 @@ export default function AccessLogPanel() {
       {/* KPIs rápidos */}
       {!loading && logs.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-          <div className="bg-[var(--theme-secondary-bg)] rounded-xl px-4 py-3">
-            <p className="text-[22px] font-semibold text-[#88B04B] leading-none">{activeUsers}</p>
-            <p className="text-[9px] text-[var(--theme-text)]/40 mt-1.5 uppercase tracking-wide">Sesiones activas</p>
+
+          {/* KPI Sesiones activas — clickeable */}
+          <div className="relative">
+            <button
+              onClick={() => setShowActiveSessions((v) => !v)}
+              className="w-full text-left bg-[var(--theme-secondary-bg)] rounded-xl px-4 py-3 hover:bg-[var(--theme-border)] transition-colors"
+            >
+              <p className="text-[22px] font-semibold text-[#88B04B] leading-none">{activeUsers}</p>
+              <p className="text-[9px] text-[var(--theme-text)]/40 mt-1.5 uppercase tracking-wide flex items-center gap-1">
+                Sesiones activas
+                <span className="text-[#88B04B]">{showActiveSessions ? '▲' : '▼'}</span>
+              </p>
+            </button>
+
+            {/* Dropdown con usuarios activos */}
+            {showActiveSessions && (
+              <div className="absolute top-full left-0 mt-1 w-72 bg-[var(--theme-card-bg)] border border-[var(--theme-border)] rounded-xl shadow-lg z-20 overflow-hidden">
+                <div className="px-3 py-2 border-b border-[var(--theme-border)]">
+                  <p className="text-[10px] font-semibold text-[var(--theme-text)]/50 uppercase tracking-wide">
+                    Usuarios con sesión activa
+                  </p>
+                </div>
+                {activeUsersList.length === 0 ? (
+                  <p className="text-[12px] text-[var(--theme-text)]/40 px-3 py-3">
+                    No hay sesiones activas.
+                  </p>
+                ) : (
+                  <div className="max-h-60 overflow-y-auto">
+                    {activeUsersList.map((u) => (
+                      <div key={u.uid} className="px-3 py-2.5 border-b border-[var(--theme-border)]/50 last:border-0">
+                        <p className="text-[12px] font-semibold text-[var(--theme-text)] truncate">{u.displayName}</p>
+                        <p className="text-[10px] text-[var(--theme-text)]/40 truncate">{u.email}</p>
+                        <div className="flex items-center gap-1.5 mt-1">
+                          {u.roles.map((r) => (
+                            <span key={r} className="text-[9px] bg-[var(--theme-secondary-bg)] text-[var(--theme-text)]/60 px-1.5 py-0.5 rounded-full">
+                              {r}
+                            </span>
+                          ))}
+                          <span className="ml-auto text-[9px] text-[var(--theme-text)]/40">
+                            {u.timestamp.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
+
           <div className="bg-[var(--theme-secondary-bg)] rounded-xl px-4 py-3">
             <p className="text-[22px] font-semibold text-[var(--theme-text)] leading-none">{todayLogins}</p>
             <p className="text-[9px] text-[var(--theme-text)]/40 mt-1.5 uppercase tracking-wide">Logins hoy</p>
@@ -238,12 +281,7 @@ export default function AccessLogPanel() {
             {loading ? 'Cargando...' : 'Filtrar'}
           </button>
           <button
-            onClick={() => void fetchLogs({
-              startDate: startDate ? (() => { const [y,m,d] = startDate.split('-').map(Number); return new Date(y,m-1,d); })() : undefined,
-              endDate: endDate ? (() => { const [y,m,d] = endDate.split('-').map(Number); return new Date(y,m-1,d); })() : undefined,
-              role: roleFilter,
-              action: actionFilter,
-            })}
+            onClick={handleRefresh}
             disabled={loading}
             title="Actualizar registros"
             className="border border-[var(--theme-border)] text-[var(--theme-text)]/60 text-[13px] font-semibold px-3 py-2 rounded-full hover:border-[#88B04B] hover:text-[#88B04B] transition-colors disabled:opacity-60"
