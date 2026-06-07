@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-async function loginAsCourier(page: Page) {
+async function loginAsCourier(page: Page, email = 'luis.mensajero@est.umss.edu') {
   await page.goto('/login');
 
   const loginButton = page
@@ -27,7 +27,7 @@ async function loginAsCourier(page: Page) {
     )
     .toBe(true);
 
-  await page.locator('#email').fill('luis.mensajero@est.umss.edu');
+  await page.locator('#email').fill(email);
   await page.locator('#password').fill('12345678');
   await loginButton.click({ noWaitAfter: true });
 
@@ -77,5 +77,27 @@ test.describe('Courier smoke tests', () => {
     await expect(page).toHaveURL("/mapa?lat=-17.395102&lng=-66.145782&order=019e74a3-e030-74ce-9d9a-4b1d37b85d11_pu4-qsc");
     await expect(page.getByText('1x Detergente Liquido Ola Futuro Limpieza Completa 5 L')).toBeVisible();
     await expect(page.getByText('10x Leche PIL Natural 900 ml')).toBeVisible();
+  });
+
+  test('requires confirmation before accepting an assigned order', async ({
+    page,
+  }) => {
+    await loginAsCourier(page, 'nadia.mensajero@est.umss.edu');
+    await page.goto('/courier');
+
+    const assignedOrder = page.locator('article').filter({ hasText: 'wab-4ok' });
+    await expect(assignedOrder).toBeVisible({ timeout: 15_000 });
+
+    await assignedOrder.getByRole('button', { name: 'Aceptar pedido' }).click();
+
+    const confirmationDialog = page.getByRole('dialog', {
+      name: 'Aceptar pedido asignado',
+    });
+    await expect(confirmationDialog).toBeVisible();
+    await expect(assignedOrder).toBeVisible();
+
+    await confirmationDialog.getByRole('button', { name: 'Cancelar' }).click();
+    await expect(confirmationDialog).toBeHidden();
+    await expect(assignedOrder).toBeVisible();
   });
 });

@@ -46,6 +46,9 @@ import UndeliveredModal from '../modals/UndeliveredModal';
 import CancelNoPaymentModal from '../modals/CancelNoPaymentModal';
 import './MessengerDashboard.css';
 import ConfirmPaymentModal from '../modals/Confirmpaymentmodal';
+import ConfirmAssignedOrderActionModal, {
+    type AssignedOrderAction,
+} from '../modals/ConfirmAssignedOrderActionModal';
 
 const DEV_COURIER_ID = 'user-nadia';
 
@@ -1089,6 +1092,11 @@ export default function MessengerDashboard({
     const [savingCancelNoPayment, setSavingCancelNoPayment] = useState(false);
     const [confirmPaymentOrder, setConfirmPaymentOrder] = useState<MessengerOrder | null>(null);
     const [paymentSuccessOrder, setPaymentSuccessOrder] = useState<MessengerOrder | null>(null);
+    const [pendingAssignedAction, setPendingAssignedAction] = useState<{
+        order: MessengerOrder;
+        action: AssignedOrderAction;
+    } | null>(null);
+    const [savingAssignedAction, setSavingAssignedAction] = useState(false);
     const [currentCourierId, setCurrentCourierId] = useState<string | null>(null);
     const [newOrderCount, setNewOrderCount] = useState(0);
     const [acceptedSortOrder, setAcceptedSortOrder] =
@@ -1442,8 +1450,18 @@ export default function MessengerDashboard({
     };
 
 
+    const openAssignedActionConfirmation = (
+        orderId: string,
+        action: AssignedOrderAction
+    ) => {
+        const order = orders.find((currentOrder) => currentOrder.id === orderId);
+        if (!order || order.deliveryStatus !== 'assigned') return;
+
+        setPendingAssignedAction({ order, action });
+    };
+
     const acceptOrder = (orderId: string) => {
-        void updateOrderStatus(orderId, 'accepted');
+        openAssignedActionConfirmation(orderId, 'accept');
     };
 
     const markAsInTransit = (orderId: string) => {
@@ -1451,7 +1469,23 @@ export default function MessengerDashboard({
     };
 
     const rejectOrder = (orderId: string) => {
-        void updateOrderStatus(orderId, 'pending_reassignment');
+        openAssignedActionConfirmation(orderId, 'reject');
+    };
+
+    const confirmAssignedOrderAction = async () => {
+        if (!pendingAssignedAction || savingAssignedAction) return;
+
+        const { order, action } = pendingAssignedAction;
+        const nextStatus =
+            action === 'accept' ? 'accepted' : 'pending_reassignment';
+
+        setSavingAssignedAction(true);
+        try {
+            await updateOrderStatus(order.id, nextStatus);
+            setPendingAssignedAction(null);
+        } finally {
+            setSavingAssignedAction(false);
+        }
     };
 
     const registerUndeliveredOrder = async (reason: string, notes: string) => {
@@ -1927,6 +1961,15 @@ export default function MessengerDashboard({
                     order={cancelNoPaymentOrder}
                     onClose={() => setCancelNoPaymentOrder(null)}
                     onConfirm={registerCancelNoPayment}
+                />
+            )}
+            {pendingAssignedAction && (
+                <ConfirmAssignedOrderActionModal
+                    action={pendingAssignedAction.action}
+                    isSaving={savingAssignedAction}
+                    order={pendingAssignedAction.order}
+                    onClose={() => setPendingAssignedAction(null)}
+                    onConfirm={confirmAssignedOrderAction}
                 />
             )}
             {confirmPaymentOrder && (
