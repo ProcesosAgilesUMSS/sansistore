@@ -1,4 +1,5 @@
-import { doc, runTransaction, serverTimestamp, type Firestore } from "firebase/firestore";
+import { doc, getDoc, runTransaction, serverTimestamp, type Firestore } from "firebase/firestore";
+import { registrarActividadVendedor } from '../../admin/monitoring/services/sellerActivityService';
 
 export const markOrderReady = async (db: Firestore, orderId: string, sellerId: string): Promise<void> => {
   const orderRef = doc(db, 'orders', orderId);
@@ -24,4 +25,18 @@ export const markOrderReady = async (db: Firestore, orderId: string, sellerId: s
       updatedAt: serverTimestamp(),
     });
   });
+
+  // ── HU #160: Registrar actividad del vendedor ──
+  const sellerSnap = await getDoc(doc(db, 'users', sellerId));
+  const sellerData = sellerSnap.exists() ? sellerSnap.data() : {};
+ 
+  registrarActividadVendedor({
+    sellerId,
+    sellerName: sellerData.displayName ?? 'Vendedor',
+    sellerEmail: sellerData.email ?? '',
+    actionType: 'MARCAR_LISTO',
+    orderId,
+    previousStatus: 'EMPAQUETADO',
+    newStatus: 'LISTO',
+  }).catch((err) => console.error('No se pudo registrar la actividad del vendedor:', err));
 }
