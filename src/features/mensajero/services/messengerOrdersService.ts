@@ -144,6 +144,13 @@ const formatCourierZoneName = (zoneName: string | null): string | undefined => {
   return `${name.charAt(0).toUpperCase()}${name.slice(1)}`;
 };
 
+const formatOrderDisplayId = (value: unknown): string | undefined => {
+  const code = asString(value);
+  if (!code) return undefined;
+
+  return code.startsWith('#') ? code : `#${code}`;
+};
+
 const readPayment = async (paymentId: string | null): Promise<PaymentData> => {
   if (!paymentId) return {};
 
@@ -197,6 +204,7 @@ const mapMessengerOrder = async (
 
   return {
     id: orderId || deliveryId,
+    displayId: formatOrderDisplayId(delivery.orderCode),
     deliveryId,
     paymentId,
     customerName,

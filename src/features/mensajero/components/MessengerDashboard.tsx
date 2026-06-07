@@ -112,6 +112,8 @@ function CopyableOrderId({
     codeClassName: string;
 }) {
     const { uuid, friendlyName } = parseOrderId(order.id);
+    const displayId = order.displayId ?? friendlyName;
+    const showTechnicalId = !order.displayId;
     const copyOrderId = () => {
         void navigator.clipboard?.writeText(order.id);
     };
@@ -123,8 +125,10 @@ function CopyableOrderId({
             title="Copiar ID del pedido"
             type="button"
         >
-            <p className="font-mono text-[10px] font-bold opacity-40">{uuid}</p>
-            <h3 className={codeClassName}>{friendlyName}</h3>
+            {showTechnicalId && (
+                <p className="font-mono text-[10px] font-bold opacity-40">{uuid}</p>
+            )}
+            <h3 className={codeClassName}>{displayId}</h3>
         </button>
     );
 }

@@ -100,6 +100,8 @@ const canCancelByNoPayment = (order: MessengerOrder) => {
 
 function CopyableOrderId({ order }: { order: MessengerOrder }) {
   const { uuid, friendlyName } = parseOrderId(order.id);
+  const displayId = order.displayId ?? friendlyName;
+  const showTechnicalId = !order.displayId;
 
   return (
     <button
@@ -108,8 +110,10 @@ function CopyableOrderId({ order }: { order: MessengerOrder }) {
       title="Copiar ID del pedido"
       type="button"
     >
-      <p className="font-mono text-[10px] font-bold opacity-40">{uuid}</p>
-      <h1 className="text-3xl font-black tracking-normal">{friendlyName}</h1>
+      {showTechnicalId && (
+        <p className="font-mono text-[10px] font-bold opacity-40">{uuid}</p>
+      )}
+      <h1 className="text-3xl font-black tracking-normal">{displayId}</h1>
     </button>
   );
 }
