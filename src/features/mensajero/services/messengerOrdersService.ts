@@ -253,6 +253,14 @@ export async function getMessengerOrders(
   return getVisibleMessengerOrders(orders);
 }
 
+export async function getMessengerOrderById(
+  courierId: string,
+  orderId: string
+): Promise<MessengerOrder | null> {
+  const orders = await getMessengerOrders(courierId);
+  return orders.find((order) => order.id === orderId) ?? null;
+}
+
 export function subscribeToMessengerOrders(
   courierId: string,
   onChange: (orders: MessengerOrder[]) => void,

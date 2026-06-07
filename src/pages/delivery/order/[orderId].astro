@@ -1,0 +1,17 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Navbar from '../../../components/Navbar';
+import RouteGuard from '../../../components/RouteGuard';
+import DeliveryOrderDetailPage from '../../../features/mensajero/components/DeliveryOrderDetailPage';
+
+const { orderId } = Astro.params;
+---
+
+<Layout title="Detalle de entrega | SansiStore">
+  <Navbar client:load />
+  <main class="min-h-screen bg-bg-light pt-14 text-text-light">
+    <RouteGuard client:load allowedRoles={['mensajero']} roleName="Mensajero">
+      <DeliveryOrderDetailPage client:load orderId={orderId ?? ''} />
+    </RouteGuard>
+  </main>
+</Layout>
