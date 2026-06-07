@@ -91,10 +91,15 @@ export default function RegisterUserModal({
     // 2. Email validation - allow institutional UMSS domains
     const trimmedEmail = email.trim().toLowerCase();
     const allowedDomains = [
-      'est.umss.edu',
-      'ms.umss.edu',
-      'umss.edu.bo',
       'umss.edu',
+      'umss.edu.bo',
+      'est.umss.edu',
+      'est.umss.edu.bo',
+      'mi.umss.edu',
+      'ms.umss.edu',
+      'fcyt.umss.edu.bo',
+      'dicyt.umss.edu.bo',
+      'posgrado.umss.edu.bo',
     ];
     if (!trimmedEmail) {
       newErrors.email = 'El correo electrónico es obligatorio.';
@@ -267,7 +272,7 @@ export default function RegisterUserModal({
               `}
             />
             <p className="mt-1 text-[11px] text-(--theme-text)/40">
-              Solo se permiten dominios institucionales: @est.umss.edu, @ms.umss.edu, @umss.edu.bo, @umss.edu
+              Dominios permitidos: @umss.edu, @umss.edu.bo, @est.umss.edu, @est.umss.edu.bo, @mi.umss.edu, @ms.umss.edu, @fcyt.umss.edu.bo, @dicyt.umss.edu.bo, @posgrado.umss.edu.bo
             </p>
             {errors.email && (
               <p className="mt-0.5 text-[11px] text-red-500">{errors.email}</p>

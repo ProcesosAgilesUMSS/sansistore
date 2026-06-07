@@ -18,7 +18,30 @@ import {
 import { db, auth } from "@/lib/firebase";
 import type { Order, OrderItem, ReturnRequest, Delivery } from "@features/orders/types";
 
+// ── HU #160: Monitoreo de actividad de vendedores ──
+import { registrarActividadVendedor } from '../../admin/monitoring/services/sellerActivityService';
+
 // --- Seller Actions ---
+const SELLER_VALIDATED_PAYMENT_STATUSES = new Set(["pagado", "paid", "validado", "verified"]);
+
+function normalizeStatus(value: unknown): string {
+  return String(value ?? "").trim().toLowerCase();
+}
+
+function isSellerPaymentValidated(value: unknown): boolean {
+  return SELLER_VALIDATED_PAYMENT_STATUSES.has(normalizeStatus(value));
+}
+
+function isDeliveredOrCompletedOrder(data: DocumentData): boolean {
+  const status = normalizeStatus(data.status);
+  const deliveryStatus = normalizeStatus(data.deliveryStatus);
+
+  return (
+    status === "entregado" ||
+    status === "completado" ||
+    deliveryStatus === "delivered"
+  );
+}
 
 export async function paidOrder(orderId: string): Promise<void> {
   const user = auth.currentUser;
@@ -32,15 +55,60 @@ export async function paidOrder(orderId: string): Promise<void> {
   }));
 
   await runTransaction(db, async (transaction) => {
-    // 1. Gather all reads
+    const orderSnap = await transaction.get(orderRef);
+    if (!orderSnap.exists()) {
+      throw new Error("El pedido no existe.");
+    }
+
+    const orderData = orderSnap.data();
+    if (!isDeliveredOrCompletedOrder(orderData)) {
+      throw new Error("Solo se puede validar el pago de pedidos entregados.");
+    }
+
+    if (
+      normalizeStatus(orderData.status) === "pagado" ||
+      isSellerPaymentValidated(orderData.paymentStatus)
+    ) {
+      throw new Error("El pago de este pedido ya fue validado.");
+    }
+
+    const paymentId =
+      typeof orderData.paymentId === "string" && orderData.paymentId.trim()
+        ? orderData.paymentId
+        : orderId;
+    const paymentRef = doc(db, "payments", paymentId);
+    const paymentSnap = await transaction.get(paymentRef);
+    const paymentData = paymentSnap.exists() ? paymentSnap.data() : null;
+
+    if (isSellerPaymentValidated(paymentData?.status)) {
+      throw new Error("El pago de este pedido ya fue validado.");
+    }
+
     const invRefs = items.map(item => doc(db, "inventory", item.productId));
     const invSnaps = await Promise.all(invRefs.map(ref => transaction.get(ref)));
 
-    // 2. Perform all writes
+    const verifiedAt = serverTimestamp();
+
     transaction.update(orderRef, {
       status: "PAGADO",
+      paymentId,
+      paymentStatus: "PAGADO",
+      paymentStatusLabel: "Pagado",
+      paymentVerifiedAt: verifiedAt,
+      paymentVerifiedBy: user.uid,
       updatedAt: serverTimestamp(),
     });
+    transaction.set(paymentRef, {
+      paymentId,
+      orderId,
+      amount: orderData.total ?? paymentData?.amount ?? null,
+      method: paymentData?.method ?? orderData.paymentMethod ?? "cash_on_delivery",
+      status: "PAGADO",
+      statusLabel: "Pagado",
+      verifiedBy: user.uid,
+      verifiedAt,
+      updatedAt: verifiedAt,
+    }, { merge: true });
 
     invSnaps.forEach((invSnap, index) => {
       if (!invSnap.exists()) {
@@ -59,6 +127,19 @@ export async function paidOrder(orderId: string): Promise<void> {
       });
     });
   });
+
+  // ── HU #160: Registrar actividad del vendedor ──
+  const sellerSnap = await getDoc(doc(db, 'users', user.uid));
+  const sellerData = sellerSnap.exists() ? sellerSnap.data() : {};
+  registrarActividadVendedor({
+    sellerId: user.uid,
+    sellerName: sellerData.displayName ?? 'Vendedor',
+    sellerEmail: sellerData.email ?? '',
+    actionType: 'MARCAR_PAGADA',
+    orderId,
+    previousStatus: 'ENTREGADO',
+    newStatus: 'PAGADO',
+  }).catch((err) => console.error('❌ ERROR al registrar actividad:', err));
 }
 
 export async function returnOrder(orderId: string): Promise<void> {
@@ -111,17 +192,49 @@ export async function reserveOrder(orderId: string): Promise<void> {
       });
     });
   });
+
+  // ── HU #160: Registrar actividad del vendedor ──
+  const sellerSnap = await getDoc(doc(db, 'users', user.uid));
+  const sellerData = sellerSnap.exists() ? sellerSnap.data() : {};
+  registrarActividadVendedor({
+    sellerId: user.uid,
+    sellerName: sellerData.displayName ?? 'Vendedor',
+    sellerEmail: sellerData.email ?? '',
+    actionType: 'RESERVAR',
+    orderId,
+    previousStatus: 'CREADO',
+    newStatus: 'RESERVADO',
+  }).catch((err) => console.error('No se pudo registrar la actividad:', err));
 }
 
 export async function readyOrder(orderId: string): Promise<void> {
+  //camila-160
+  const user = auth.currentUser;
   const orderRef = doc(db, "orders", orderId);
   await updateDoc(orderRef, {
     status: "LISTO",
     updatedAt: serverTimestamp(),
   });
+
+  // ── HU #160: Registrar actividad del vendedor ──
+  if (user) {
+    const sellerSnap = await getDoc(doc(db, 'users', user.uid));
+    const sellerData = sellerSnap.exists() ? sellerSnap.data() : {};
+    registrarActividadVendedor({
+      sellerId: user.uid,
+      sellerName: sellerData.displayName ?? 'Vendedor',
+      sellerEmail: sellerData.email ?? '',
+      actionType: 'MARCAR_LISTO',
+      orderId,
+      previousStatus: 'EMPAQUETADO',
+      newStatus: 'LISTO',
+    }).catch((err) => console.error('No se pudo registrar actividad:', err));
+  }
 }
 
+
 export async function cancelOrder(orderId: string, incidentReason: string, incidentNotes?: string): Promise<void> {
+  const user = auth.currentUser;
   const orderRef = doc(db, "orders", orderId);
   const itemsSnapshot = await getDocs(collection(orderRef, "orderItems"));
   const items = itemsSnapshot.docs.map(doc => ({
@@ -160,6 +273,21 @@ export async function cancelOrder(orderId: string, incidentReason: string, incid
       });
     });
   });
+
+  // ── HU #160: Registrar actividad del vendedor ──
+  if (user) {
+    const sellerSnap = await getDoc(doc(db, 'users', user.uid));
+    const sellerData = sellerSnap.exists() ? sellerSnap.data() : {};
+    registrarActividadVendedor({
+      sellerId: user.uid,
+      sellerName: sellerData.displayName ?? 'Vendedor',
+      sellerEmail: sellerData.email ?? '',
+      actionType: 'CANCELAR',
+      orderId,
+      previousStatus: 'RESERVADO',
+      newStatus: 'CANCELADO',
+    }).catch((err) => console.error('No se pudo registrar la actividad:', err));
+  }
 }
 
 // --- Real-time Subscriptions ---
