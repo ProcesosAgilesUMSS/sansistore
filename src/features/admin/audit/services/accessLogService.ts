@@ -1,9 +1,8 @@
-// accessLogService.ts — HU #159: Registro de accesos al sistema
-// Área 7: Administración & Analítica — Nova 2.0
-//
-// Este service escribe y lee la colección accessLogs en Firestore.
-// Sigue el mismo patrón que categoryService.ts y salesService.ts
 
+//Área 7: Administración & Analítica — Nova 2.0
+//
+//Este service escribe y lee la colección accessLogs en Firestore.
+//Sigue el mismo patrón que categoryService.ts y salesService.ts
 import {
   collection,
   addDoc,
@@ -49,21 +48,14 @@ export const getAccessLogs = async (
   // Construir la query base sin orderBy para evitar requerir índices compuestos
   let q = query(collection(db, COLLECTION));
 
-  // Aplicar filtro de fechas si se proporcionó
+  // Solo aplicar filtro de fecha inicio en Firestore.
+  // (dos where sobre el mismo campo requiere índice compuesto en producción)
   if (filter?.startDate) {
     const start = new Date(filter.startDate);
     start.setHours(0, 0, 0, 0);
     const startTimestamp = Timestamp.fromDate(start);
     q = query(q, where('timestamp', '>=', startTimestamp));
   }
-  if (filter?.endDate) {
-    const endOfDay = new Date(filter.endDate);
-    endOfDay.setHours(23, 59, 59, 999);
-    q = query(q, where('timestamp', '<=', Timestamp.fromDate(endOfDay)));
-  }
-
-  // Aplicar filtro de acción (LOGIN/LOGOUT) en memoria
-  // para evitar requerir índices compuestos en Firestore
 
   const snapshot = await getDocs(q);
 
@@ -84,8 +76,15 @@ export const getAccessLogs = async (
   // Ordenar en memoria por timestamp descendente (más recientes primero)
   logs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 
-  // Filtrar acción en memoria
+  // Filtrar fecha fin en memoria para evitar índice compuesto en Firestore
   let filtered = logs;
+  if (filter?.endDate) {
+    const endOfDay = new Date(filter.endDate);
+    endOfDay.setHours(23, 59, 59, 999);
+    filtered = filtered.filter((log) => log.timestamp <= endOfDay);
+  }
+
+  // Filtrar acción en memoria
   if (filter?.action && filter.action !== 'ALL') {
     filtered = filtered.filter((log) => log.action === filter.action);
   }
