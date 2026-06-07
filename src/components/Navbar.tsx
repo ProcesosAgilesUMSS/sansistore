@@ -182,6 +182,24 @@ export default function Navbar() {
   const showAdminFeatures = user && roles.length > 0 && roles.some(r => ['admin'].includes(r));
   const showMisPedidos = user && roles.length > 0 && roles.some(r => ['comprador', 'admin'].includes(r));
 
+  type NavItem = {
+    label: string;
+    href: string;
+    reqComprador?: boolean;
+    reqVendedor?: boolean;
+    reqVendedorOrOperador?: boolean;
+    reqMensajero?: boolean;
+    reqAdmin?: boolean;
+  };
+
+  const navItems: NavItem[] = [
+    { label: 'Productos', href: '/productos', reqComprador: true },
+    { label: 'Ordenes', href: '/seller/created-orders', reqVendedor: true },
+    { label: 'Inventario', href: '/inventory', reqVendedorOrOperador: true },
+    { label: 'Entregas', href: '/courier', reqMensajero: true },
+    { label: 'Admin', href: '/admin', reqAdmin: true },
+  ];
+
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-bg-light/85 border-b border-border-light font-sans">
@@ -197,17 +215,11 @@ export default function Navbar() {
 
             {/* LINKS */}
             <div className="hidden md:flex items-center gap-8">
-              {[
-                { label: 'Productos', href: '/productos', reqComprador: true },
-                { label: 'Ordenes', href: '/seller/created-orders', reqVendedor: true },
-                { label: 'Inventario', href: '/inventory', reqOperadorInv: true },
-                { label: 'Entregas', href: '/courier', reqMensajero: true },
-                { label: 'Admin', href: '/admin', reqAdmin: true },
-              ]
+              {navItems
                 .filter(item => {
                   if (item.reqComprador && !showCompradorFeatures) return false;
                   if (item.reqVendedor && !showVendedorFeatures) return false;
-                  if (item.reqOperadorInv && !showOperadorInvFeatures) return false;
+                  if (item.reqVendedorOrOperador && !(showVendedorFeatures || showOperadorInvFeatures)) return false;
                   if (item.reqMensajero && !showMensajeroFeatures) return false;
                   if (item.reqAdmin && !showAdminFeatures) return false;
                   return true;
@@ -384,17 +396,11 @@ export default function Navbar() {
           {/* MOBILE MENU */}
           {menuOpen && (
             <div className="md:hidden py-3 flex flex-col gap-3 border-t border-border-light">
-              {[
-                { label: 'Productos', href: '/productos', reqComprador: true },
-                { label: 'Ordenes', href: '/seller/created-orders', reqVendedor: true },
-                { label: 'Inventario', href: '/inventory', reqOperadorInv: true },
-                { label: 'Entregas', href: '/courier', reqMensajero: true },
-                { label: 'Admin', href: '/admin', reqAdmin: true },
-              ]
+              {navItems
                 .filter(item => {
                   if (item.reqComprador && !showCompradorFeatures) return false;
                   if (item.reqVendedor && !showVendedorFeatures) return false;
-                  if (item.reqOperadorInv && !showOperadorInvFeatures) return false;
+                  if (item.reqVendedorOrOperador && !(showVendedorFeatures || showOperadorInvFeatures)) return false;
                   if (item.reqMensajero && !showMensajeroFeatures) return false;
                   if (item.reqAdmin && !showAdminFeatures) return false;
                   return true;
