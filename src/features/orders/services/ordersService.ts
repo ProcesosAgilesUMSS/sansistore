@@ -123,42 +123,13 @@ export async function readyOrder(orderId: string): Promise<void> {
 
 export async function cancelOrder(orderId: string, incidentReason: string, incidentNotes?: string): Promise<void> {
   const orderRef = doc(db, "orders", orderId);
-  const itemsSnapshot = await getDocs(collection(orderRef, "orderItems"));
-  const items = itemsSnapshot.docs.map(doc => ({
-    itemId: doc.id,
-    ...(doc.data() as Omit<OrderItem, "itemId">)
-  }));
 
-  await runTransaction(db, async (transaction) => {
-    // 1. Gather all reads
-    const invRefs = items.map(item => doc(db, "inventory", item.productId));
-    const invSnaps = await Promise.all(invRefs.map(ref => transaction.get(ref)));
-
-    // 2. Perform all writes
-    transaction.update(orderRef, {
-      status: "CANCELADO",
-      incidentReason,
-      incidentNotes: incidentNotes || null,
-      updatedAt: serverTimestamp(),
-      cancelledAt: serverTimestamp(),
-    });
-
-    invSnaps.forEach((invSnap, index) => {
-      if (!invSnap.exists()) {
-        throw new Error(`Inventario no encontrado para el producto: ${items[index].productId}`);
-      }
-
-      const invData = invSnap.data();
-      const currentAvailable = invData.stockAvailable || 0;
-      const currentReserved = invData.stockReserved || 0;
-      const qty = items[index].quantity || 0;
-
-      transaction.update(invRefs[index], {
-        stockAvailable: currentAvailable + qty,
-        stockReserved: Math.max(0, currentReserved - qty),
-        updatedAt: serverTimestamp(),
-      });
-    });
+  await updateDoc(orderRef, {
+    status: "CANCELADO",
+    incidentReason,
+    incidentNotes: incidentNotes || null,
+    updatedAt: serverTimestamp(),
+    cancelledAt: serverTimestamp(),
   });
 }
 
