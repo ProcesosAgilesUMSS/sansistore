@@ -1,19 +1,16 @@
+// AccessLogPanel.tsx — HU #159: Bitácora de accesos al sistema
 // Área 7: Administración & Analítica — Nova 2.0
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getAccessLogs } from '../services/accessLogService';
 import type { AccessLog, AccessLogFilter } from '../types';
 
-// ── Helpers ──────────────────────────────────────────────────────
+const PAGE_SIZE = 20;
 
 const formatDateTime = (date: Date): string =>
   date.toLocaleString('es-BO', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
   });
 
 const RoleBadge = ({ role }: { role: string }) => {
@@ -33,9 +30,7 @@ const RoleBadge = ({ role }: { role: string }) => {
 
 const ActionBadge = ({ action }: { action: string }) => (
   <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full ${
-    action === 'LOGIN'
-      ? 'bg-[rgba(136,176,75,0.15)] text-[#5E7E2F]'
-      : 'bg-red-500/10 text-red-500'
+    action === 'LOGIN' ? 'bg-[rgba(136,176,75,0.15)] text-[#5E7E2F]' : 'bg-red-500/10 text-red-500'
   }`}>
     {action}
   </span>
@@ -43,9 +38,7 @@ const ActionBadge = ({ action }: { action: string }) => (
 
 const StatusBadge = ({ status }: { status: string }) => (
   <span className={`inline-flex items-center gap-1 text-[9px] font-semibold px-2 py-0.5 rounded-full ${
-    status === 'ACTIVO'
-      ? 'bg-[rgba(136,176,75,0.15)] text-[#5E7E2F]'
-      : 'bg-gray-100 text-gray-500'
+    status === 'ACTIVO' ? 'bg-[rgba(136,176,75,0.15)] text-[#5E7E2F]' : 'bg-gray-100 text-gray-500'
   }`}>
     <span className={`w-1.5 h-1.5 rounded-full ${status === 'ACTIVO' ? 'bg-[#88B04B]' : 'bg-gray-400'}`} />
     {status}
@@ -57,6 +50,7 @@ export default function AccessLogPanel() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showActiveSessions, setShowActiveSessions] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const today = new Date();
   const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -72,6 +66,7 @@ export default function AccessLogPanel() {
   const fetchLogs = useCallback(async (filter?: AccessLogFilter) => {
     setLoading(true);
     setError('');
+    setCurrentPage(1); // reset a página 1 en cada búsqueda
     try {
       const data = await getAccessLogs(filter);
       setLogs(data);
@@ -112,14 +107,12 @@ export default function AccessLogPanel() {
     });
   };
 
-  // Sesiones activas: último registro por usuario con status ACTIVO
+  // KPIs — calculados sobre TODOS los logs filtrados
   const activeUsersList = (() => {
     const lastByUser = new Map<string, AccessLog>();
     logs.forEach((l) => {
       const existing = lastByUser.get(l.uid);
-      if (!existing || l.timestamp > existing.timestamp) {
-        lastByUser.set(l.uid, l);
-      }
+      if (!existing || l.timestamp > existing.timestamp) lastByUser.set(l.uid, l);
     });
     return [...lastByUser.values()].filter((l) => l.status === 'ACTIVO');
   })();
@@ -127,37 +120,32 @@ export default function AccessLogPanel() {
 
   const todayLogins = logs.filter((l) => {
     const logDate = new Date(l.timestamp);
-    return (
-      l.action === 'LOGIN' &&
-      logDate.toDateString() === new Date().toDateString()
-    );
+    return l.action === 'LOGIN' && logDate.toDateString() === new Date().toDateString();
   }).length;
 
-  const vendedores = new Set(
-    logs.filter((l) => l.roles.includes('vendedor')).map((l) => l.uid)
-  ).size;
-  const operadores = new Set(
-    logs.filter((l) => l.roles.includes('operador_inv')).map((l) => l.uid)
-  ).size;
+  const vendedores = new Set(logs.filter((l) => l.roles.includes('vendedor')).map((l) => l.uid)).size;
+  const operadores = new Set(logs.filter((l) => l.roles.includes('operador_inv')).map((l) => l.uid)).size;
+
+  // Paginación
+  const totalPages = Math.ceil(logs.length / PAGE_SIZE);
+  const paginatedLogs = logs.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   return (
     <div className="max-w-5xl">
 
       {/* Título */}
       <div className="mb-6">
-        <h2 className="text-[15px] font-semibold text-[var(--theme-text)]">
-          Bitácora de accesos
-        </h2>
+        <h2 className="text-[15px] font-semibold text-[var(--theme-text)]">Bitácora de accesos</h2>
         <p className="text-[11px] text-[var(--theme-text)]/50 mt-0.5">
           Registro de entradas y salidas al sistema — colección accessLogs
         </p>
       </div>
 
-      {/* KPIs rápidos */}
+      {/* KPIs */}
       {!loading && logs.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
 
-          {/* KPI Sesiones activas — clickeable */}
+          {/* Sesiones activas — clickeable */}
           <div className="relative">
             <button
               onClick={() => setShowActiveSessions((v) => !v)}
@@ -169,19 +157,13 @@ export default function AccessLogPanel() {
                 <span className="text-[#88B04B]">{showActiveSessions ? '▲' : '▼'}</span>
               </p>
             </button>
-
-            {/* Dropdown con usuarios activos */}
             {showActiveSessions && (
               <div className="absolute top-full left-0 mt-1 w-72 bg-[var(--theme-card-bg)] border border-[var(--theme-border)] rounded-xl shadow-lg z-20 overflow-hidden">
                 <div className="px-3 py-2 border-b border-[var(--theme-border)]">
-                  <p className="text-[10px] font-semibold text-[var(--theme-text)]/50 uppercase tracking-wide">
-                    Usuarios con sesión activa
-                  </p>
+                  <p className="text-[10px] font-semibold text-[var(--theme-text)]/50 uppercase tracking-wide">Usuarios con sesión activa</p>
                 </div>
                 {activeUsersList.length === 0 ? (
-                  <p className="text-[12px] text-[var(--theme-text)]/40 px-3 py-3">
-                    No hay sesiones activas.
-                  </p>
+                  <p className="text-[12px] text-[var(--theme-text)]/40 px-3 py-3">No hay sesiones activas.</p>
                 ) : (
                   <div className="max-h-60 overflow-y-auto">
                     {activeUsersList.map((u) => (
@@ -190,9 +172,7 @@ export default function AccessLogPanel() {
                         <p className="text-[10px] text-[var(--theme-text)]/40 truncate">{u.email}</p>
                         <div className="flex items-center gap-1.5 mt-1">
                           {u.roles.map((r) => (
-                            <span key={r} className="text-[9px] bg-[var(--theme-secondary-bg)] text-[var(--theme-text)]/60 px-1.5 py-0.5 rounded-full">
-                              {r}
-                            </span>
+                            <span key={r} className="text-[9px] bg-[var(--theme-secondary-bg)] text-[var(--theme-text)]/60 px-1.5 py-0.5 rounded-full">{r}</span>
                           ))}
                           <span className="ml-auto text-[9px] text-[var(--theme-text)]/40">
                             {u.timestamp.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' })}
@@ -225,33 +205,21 @@ export default function AccessLogPanel() {
       <p className="text-[10px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-widest mb-3 pb-2 border-b border-[var(--theme-border)]">
         Filtros
       </p>
-
       <div className="flex flex-wrap gap-3 mb-5">
         <div>
           <label className="block text-[10px] font-semibold text-[var(--theme-text)]/50 uppercase tracking-wide mb-1.5">Fecha inicio</label>
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="bg-[var(--theme-secondary-bg)] border border-[var(--theme-border)] rounded-lg px-3 py-2 text-[13px] text-[var(--theme-text)] outline-none focus:border-[#88B04B]"
-          />
+          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)}
+            className="bg-[var(--theme-secondary-bg)] border border-[var(--theme-border)] rounded-lg px-3 py-2 text-[13px] text-[var(--theme-text)] outline-none focus:border-[#88B04B]" />
         </div>
         <div>
           <label className="block text-[10px] font-semibold text-[var(--theme-text)]/50 uppercase tracking-wide mb-1.5">Fecha fin</label>
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="bg-[var(--theme-secondary-bg)] border border-[var(--theme-border)] rounded-lg px-3 py-2 text-[13px] text-[var(--theme-text)] outline-none focus:border-[#88B04B]"
-          />
+          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)}
+            className="bg-[var(--theme-secondary-bg)] border border-[var(--theme-border)] rounded-lg px-3 py-2 text-[13px] text-[var(--theme-text)] outline-none focus:border-[#88B04B]" />
         </div>
         <div>
           <label className="block text-[10px] font-semibold text-[var(--theme-text)]/50 uppercase tracking-wide mb-1.5">Rol</label>
-          <select
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            className="bg-[var(--theme-secondary-bg)] border border-[var(--theme-border)] rounded-lg px-3 py-2 text-[13px] text-[var(--theme-text)] outline-none focus:border-[#88B04B]"
-          >
+          <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)}
+            className="bg-[var(--theme-secondary-bg)] border border-[var(--theme-border)] rounded-lg px-3 py-2 text-[13px] text-[var(--theme-text)] outline-none focus:border-[#88B04B]">
             <option value="todos">Todos los roles</option>
             <option value="vendedor">Vendedor ⭐</option>
             <option value="operador_inv">Operador ⭐</option>
@@ -262,30 +230,20 @@ export default function AccessLogPanel() {
         </div>
         <div>
           <label className="block text-[10px] font-semibold text-[var(--theme-text)]/50 uppercase tracking-wide mb-1.5">Acción</label>
-          <select
-            value={actionFilter}
-            onChange={(e) => setActionFilter(e.target.value as 'ALL' | 'LOGIN' | 'LOGOUT')}
-            className="bg-[var(--theme-secondary-bg)] border border-[var(--theme-border)] rounded-lg px-3 py-2 text-[13px] text-[var(--theme-text)] outline-none focus:border-[#88B04B]"
-          >
+          <select value={actionFilter} onChange={(e) => setActionFilter(e.target.value as 'ALL' | 'LOGIN' | 'LOGOUT')}
+            className="bg-[var(--theme-secondary-bg)] border border-[var(--theme-border)] rounded-lg px-3 py-2 text-[13px] text-[var(--theme-text)] outline-none focus:border-[#88B04B]">
             <option value="ALL">Todas las acciones</option>
             <option value="LOGIN">Solo LOGIN</option>
             <option value="LOGOUT">Solo LOGOUT</option>
           </select>
         </div>
         <div className="flex items-end gap-2">
-          <button
-            onClick={handleFilter}
-            disabled={loading}
-            className="bg-[#88B04B] text-white text-[13px] font-semibold px-5 py-2 rounded-full hover:bg-[#5E7E2F] transition-colors disabled:opacity-60"
-          >
+          <button onClick={handleFilter} disabled={loading}
+            className="bg-[#88B04B] text-white text-[13px] font-semibold px-5 py-2 rounded-full hover:bg-[#5E7E2F] transition-colors disabled:opacity-60">
             {loading ? 'Cargando...' : 'Filtrar'}
           </button>
-          <button
-            onClick={handleRefresh}
-            disabled={loading}
-            title="Actualizar registros"
-            className="border border-[var(--theme-border)] text-[var(--theme-text)]/60 text-[13px] font-semibold px-3 py-2 rounded-full hover:border-[#88B04B] hover:text-[#88B04B] transition-colors disabled:opacity-60"
-          >
+          <button onClick={handleRefresh} disabled={loading} title="Actualizar registros"
+            className="border border-[var(--theme-border)] text-[var(--theme-text)]/60 text-[13px] font-semibold px-3 py-2 rounded-full hover:border-[#88B04B] hover:text-[#88B04B] transition-colors disabled:opacity-60">
             ↻
           </button>
         </div>
@@ -308,12 +266,14 @@ export default function AccessLogPanel() {
         </div>
       )}
 
-      {/* Tabla de bitácora */}
+      {/* Tabla */}
       {!loading && (
         <>
-          <p className="text-[10px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-widest mb-3 pb-2 border-b border-[var(--theme-border)]">
-            Registros ({logs.length})
-          </p>
+          <div className="flex items-center justify-between mb-3 pb-2 border-b border-[var(--theme-border)]">
+            <p className="text-[10px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-widest">
+              Registros ({logs.length}) — Página {currentPage} de {totalPages || 1}
+            </p>
+          </div>
 
           {logs.length === 0 ? (
             <div className="text-center py-12 border border-dashed border-[var(--theme-border)] rounded-xl">
@@ -322,48 +282,100 @@ export default function AccessLogPanel() {
               </p>
             </div>
           ) : (
-            <div className="border border-[var(--theme-border)] rounded-xl overflow-hidden">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-[var(--theme-secondary-bg)]">
-                    <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">Usuario</th>
-                    <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">Rol</th>
-                    <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">Acción</th>
-                    <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">Fecha y hora</th>
-                    <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">Estado sesión</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {logs.map((log, i) => (
-                    <tr
-                      key={log.logId}
-                      className={i % 2 === 0 ? 'bg-[var(--theme-card-bg)]' : 'bg-[var(--theme-secondary-bg)]/50'}
-                    >
-                      <td className="px-4 py-2.5">
-                        <div className="text-[12px] font-medium text-[var(--theme-text)]">{log.displayName}</div>
-                        <div className="text-[10px] text-[var(--theme-text)]/40">{log.email}</div>
-                      </td>
-                      <td className="px-4 py-2.5">
-                        <div className="flex flex-wrap gap-1">
-                          {log.roles.map((role) => (
-                            <RoleBadge key={role} role={role} />
-                          ))}
-                        </div>
-                      </td>
-                      <td className="px-4 py-2.5">
-                        <ActionBadge action={log.action} />
-                      </td>
-                      <td className="px-4 py-2.5 text-[11px] text-[var(--theme-text)]/70">
-                        {formatDateTime(log.timestamp)}
-                      </td>
-                      <td className="px-4 py-2.5">
-                        <StatusBadge status={log.status} />
-                      </td>
+            <>
+              <div className="border border-[var(--theme-border)] rounded-xl overflow-hidden mb-4">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-[var(--theme-secondary-bg)]">
+                      <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">Usuario</th>
+                      <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">Rol</th>
+                      <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">Acción</th>
+                      <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">Fecha y hora</th>
+                      <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">Estado sesión</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {paginatedLogs.map((log, i) => (
+                      <tr key={log.logId} className={i % 2 === 0 ? 'bg-[var(--theme-card-bg)]' : 'bg-[var(--theme-secondary-bg)]/50'}>
+                        <td className="px-4 py-2.5">
+                          <div className="text-[12px] font-medium text-[var(--theme-text)]">{log.displayName}</div>
+                          <div className="text-[10px] text-[var(--theme-text)]/40">{log.email}</div>
+                        </td>
+                        <td className="px-4 py-2.5">
+                          <div className="flex flex-wrap gap-1">
+                            {log.roles.map((role) => <RoleBadge key={role} role={role} />)}
+                          </div>
+                        </td>
+                        <td className="px-4 py-2.5"><ActionBadge action={log.action} /></td>
+                        <td className="px-4 py-2.5 text-[11px] text-[var(--theme-text)]/70">{formatDateTime(log.timestamp)}</td>
+                        <td className="px-4 py-2.5"><StatusBadge status={log.status} /></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Controles de paginación */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2">
+                  <button
+                    onClick={() => setCurrentPage(1)}
+                    disabled={currentPage === 1}
+                    className="text-[11px] font-semibold px-3 py-1.5 rounded-lg border border-[var(--theme-border)] text-[var(--theme-text)]/50 hover:border-[#88B04B] hover:text-[#88B04B] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  >
+                    «
+                  </button>
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="text-[11px] font-semibold px-3 py-1.5 rounded-lg border border-[var(--theme-border)] text-[var(--theme-text)]/50 hover:border-[#88B04B] hover:text-[#88B04B] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  >
+                    ‹ Anterior
+                  </button>
+
+                  {/* Números de página */}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
+                    .reduce<(number | string)[]>((acc, p, idx, arr) => {
+                      if (idx > 0 && (p as number) - (arr[idx - 1] as number) > 1) acc.push('...');
+                      acc.push(p);
+                      return acc;
+                    }, [])
+                    .map((p, idx) =>
+                      typeof p === 'string' ? (
+                        <span key={`ellipsis-${idx}`} className="text-[11px] text-[var(--theme-text)]/30 px-1">…</span>
+                      ) : (
+                        <button
+                          key={p}
+                          onClick={() => setCurrentPage(p)}
+                          className={`text-[11px] font-semibold w-8 h-8 rounded-lg border transition-colors ${
+                            currentPage === p
+                              ? 'bg-[#88B04B] border-[#88B04B] text-white'
+                              : 'border-[var(--theme-border)] text-[var(--theme-text)]/50 hover:border-[#88B04B] hover:text-[#88B04B]'
+                          }`}
+                        >
+                          {p}
+                        </button>
+                      )
+                    )}
+
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="text-[11px] font-semibold px-3 py-1.5 rounded-lg border border-[var(--theme-border)] text-[var(--theme-text)]/50 hover:border-[#88B04B] hover:text-[#88B04B] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Siguiente ›
+                  </button>
+                  <button
+                    onClick={() => setCurrentPage(totalPages)}
+                    disabled={currentPage === totalPages}
+                    className="text-[11px] font-semibold px-3 py-1.5 rounded-lg border border-[var(--theme-border)] text-[var(--theme-text)]/50 hover:border-[#88B04B] hover:text-[#88B04B] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  >
+                    »
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </>
       )}
