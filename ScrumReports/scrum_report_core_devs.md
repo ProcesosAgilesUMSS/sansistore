@@ -195,9 +195,9 @@
   - **Blockers:**   
 
   ## Rios Quiruchi Edney Jhojan
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Colaboré en la planificación de las historias de usuario para el Sprint 3.
+  - **Today:**        Revisar los requerimientos de la US #72 (Solicitud de productos al inventario) y analizar su integración con el flujo actual.
+  - **Blockers:**     ninguno.
 
   ## Sejas Arze Eddy
   - **Yesterday:**    
@@ -225,9 +225,9 @@
   - **Blockers:**   
 
   ## Rios Quiruchi Edney Jhojan
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Analicé el flujo de solicitud de productos entre ventas e inventario.
+  - **Today:**        Ayudar con el dise;o de la US 72
+  - **Blockers:**     Dudas sobre el flujo actual
 
   ## Sejas Arze Eddy
   - **Yesterday:**    
@@ -255,9 +255,9 @@
   - **Blockers:**   
 
   ## Rios Quiruchi Edney Jhojan
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Ayudar en la implementacion de la US 72
+  - **Today:**        revisar la US 68 sobre correcciones de inventario
+  - **Blockers:**     ninguno.
 
   ## Sejas Arze Eddy
   - **Yesterday:**    
@@ -285,9 +285,9 @@
   - **Blockers:**   
 
   ## Rios Quiruchi Edney Jhojan
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Ayudar en la logica para correcciones de inventario y validacion de movimientos
+  - **Today:**        mejoras en el dise;o
+  - **Blockers:**     ninguno.
 
   ## Sejas Arze Eddy
   - **Yesterday:**    
