@@ -43,6 +43,7 @@ export interface MessengerOrderItem {
 
 export interface MessengerOrder {
   id: string;
+  displayId?: string;
   deliveryId: string;
   secret?: string;
   paymentId: string | null;

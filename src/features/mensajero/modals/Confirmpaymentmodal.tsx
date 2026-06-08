@@ -19,6 +19,7 @@ export default function ConfirmPaymentModal({
     const [saving, setSaving] = useState(false);
 
     const [error, setError] = useState('');
+    const orderDisplayId = order.displayId ?? parseOrderId(order.id).friendlyName;
 
 const canSubmit = secret.trim().length > 0 && !saving;
 
@@ -73,9 +74,9 @@ const canSubmit = secret.trim().length > 0 && !saving;
                         <div className="flex justify-between items-center">
                             <span className="messenger-muted text-xs font-bold uppercase">
                                 Orden
-                            </span>
+                                </span>
                                 <span className="text-sm font-black">
-                                    {parseOrderId(order.id).friendlyName}
+                                    {orderDisplayId}
                                 </span>
                         </div>
                         <div className="flex justify-between items-center">
