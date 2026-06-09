@@ -380,3 +380,15 @@ por las dudas que se tienen.
 * **Yesterday:** Completé el desarrollo de las historias de usuario asignadas y revisé las observaciones realizadas sobre la HU-125.
 * **Today:** Realicé pruebas funcionales del flujo de la HU-125 para validar las observaciones recibidas, verificando el comportamiento de la funcionalidad e identificando algunos ajustes pendientes para asegurar el cumplimiento de los requerimientos.
 * **Blockers:** None.
+
+# Daily Reports - Team 3 Webspire 09/06/26
+
+## Dayana Saleth Ortuño Guzman
+
+## Dayana Saleth Ortuño Guzmán
+
+* **Yesterday:** Estuve presente en la demo realizada el día de ayer.
+
+* **Today:** Coordinar la planificación de las historias de usuario pendientes, analizando su ubicación dentro del flujo de la aplicación para garantizar una mejor experiencia para el usuario.
+
+* **Blockers:** None.
