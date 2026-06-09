@@ -413,3 +413,9 @@
 - **Yesterday:** Participé en la demo, presentación y finalización de todo el Sprint 3
 - **Today:** Trabajaré en el sprint retrospective, en el sprint planning para esta cuarta iteración y empezaré con la implementación de las siguientes historias de usuario.
 - **Blockers:** Encontrar posibles dependencias para este sprint sobre nuestras historias de usuario.
+
+### Efrain Peralta Felipe
+
+- **Yesterday:** Encontre una hus posiblemente duplicada en las hus que nos faltan.
+- **Today:** Trabajare en la hu del sprint 4.
+- **Blockers:** None
