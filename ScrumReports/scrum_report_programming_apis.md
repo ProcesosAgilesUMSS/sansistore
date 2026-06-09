@@ -401,3 +401,15 @@
 - **Yesterday:** Trabaje en mis HU asignadas y mi issue asignado
 - **Today:** Preveo terminar mi HU y bug asignado
 - **Blockers:** None.
+
+***
+
+# Sprint 4
+
+## 09-06-2026
+
+### José Daniel Virreira Rufino
+
+- **Yesterday:** Participé en la demo, presentación y finalización de todo el Sprint 3
+- **Today:** Trabajaré en el sprint retrospective, en el sprint planning para esta cuarta iteración y empezaré con la implementación de las siguientes historias de usuario.
+- **Blockers:** Encontrar posibles dependencias para este sprint sobre nuestras historias de usuario.
