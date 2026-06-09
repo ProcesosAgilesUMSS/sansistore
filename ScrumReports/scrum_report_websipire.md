@@ -391,3 +391,24 @@ por las dudas que se tienen.
 * **Today:** Coordinar la planificación de las historias de usuario pendientes, analizando su ubicación dentro del flujo de la aplicación para garantizar una mejor experiencia para el usuario.
 
 * **Blockers:** None.
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Realicé la demo de las funcionalidades desarrolladas por mi grupo, presentando los avances alcanzados durante el sprint y participando en la revisión general del sistema.
+* **Today:** Coordinar la planificación de las historias de usuario pendientes, analizando su ubicación dentro del flujo de la aplicación para garantizar una mejor experiencia para el usuario.
+* **Blockers:** None.
+* 
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Estuve presente en la demo realizada el día de ayer, participando en la revisión de los avances y funcionalidades desarrolladas por el equipo.
+* **Today:** Revisar las historias de usuario pendientes y apoyar en su planificación, considerando su impacto dentro de la experiencia de usuario y el flujo de la aplicación.
+* **Blockers:** None.
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Estuve presente en la demo realizada el día de ayer, observando el funcionamiento de las funcionalidades implementadas y los avances del equipo.
+* **Today:** Colaborar en la organización de las historias de usuario pendientes y analizar los ajustes necesarios para mantener la coherencia dentro del flujo de la aplicación.
+* **Blockers:** None.
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Estuve presente en la demo realizada el día de ayer, revisando junto al equipo los avances alcanzados durante el sprint.
+* **Today:** Apoyar en la planificación de las historias de usuario pendientes, revisando posibles dependencias y su integración dentro del flujo de la aplicación.
+* **Blockers:** None.
