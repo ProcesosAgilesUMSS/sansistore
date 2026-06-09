@@ -383,7 +383,6 @@ por las dudas que se tienen.
 
 # Daily Reports - Team 3 Webspire 09/06/26
 
-## Dayana Saleth Ortuño Guzman
 
 ## Dayana Saleth Ortuño Guzmán
 
