@@ -190,9 +190,9 @@
   - **Blockers:**     Se tardó mucho en preguntar y entender el flujo de estados para #73
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
-  - **Blockers:**   
+  - **Yesterday:**  Revisé las historias de usuario
+  - **Today:** Apoyar en el análisis de requerimientos.
+  - **Blockers:** Ninguno.
 
   ## Rios Quiruchi Edney Jhojan
   - **Yesterday:**    Colaboré en la planificación de las historias de usuario para el Sprint 3.
@@ -220,9 +220,9 @@
   - **Blockers:**     Modificaciones de ultimo momento, en el flujo con el inventario
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
-  - **Blockers:**   
+  - **Yesterday:**  Participé en la planificación del Sprint 
+  - **Today:**   Revisar historias de usuario asignadas.   
+  - **Blockers:**   Cambios de último momento.
 
   ## Rios Quiruchi Edney Jhojan
   - **Yesterday:**    Analicé el flujo de solicitud de productos entre ventas e inventario.
@@ -250,9 +250,9 @@
   - **Blockers:**     Se reportaron cambios de ultimo momento, se tardó mas de lo debido.
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
-  - **Blockers:**   
+  - **Yesterday:**  Colaboré en la organización de tareas del sprint.
+  - **Today:**   Revisar mejoras de interfaz.    
+  - **Blockers:** ninguno   
 
   ## Rios Quiruchi Edney Jhojan
   - **Yesterday:**    Ayudar en la implementacion de la US 72
@@ -280,9 +280,9 @@
   - **Blockers:**     Se tardó mas de lo debido, todavia no se definió el flujo de pedidos cancelados o devueltos.
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
-  - **Blockers:**   
+  - **Yesterday:**  Colaboré en la revisión de la visualización
+  - **Today:**   corregir bugs   
+  - **Blockers:**    todavia no se definió el flujo
 
   ## Rios Quiruchi Edney Jhojan
   - **Yesterday:**    Ayudar en la logica para correcciones de inventario y validacion de movimientos
