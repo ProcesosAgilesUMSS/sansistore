@@ -419,3 +419,8 @@
 - **Yesterday:** Encontre una hus posiblemente duplicada en las hus que nos faltan.
 - **Today:** Trabajare en la hu del sprint 4.
 - **Blockers:** None
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday:** Cierre del Sprint 3, verificación de que todos los PRs estén mergeados en `main` y preparación para la retrospectiva.
+- **Today:** Participar en el sprint retrospective y en el sprint planning para esta cuarta iteración.
+- **Blockers:** None.
