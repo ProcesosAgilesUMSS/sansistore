@@ -152,7 +152,8 @@ export const OrderDispatch: React.FC = () => {
       order.items.forEach((item) => {
         const productRef = doc(db, 'inventory', item.productId);
         batch.update(productRef, {
-          stockTotal: increment(item.quantity)
+          stockTotal: increment(item.quantity),
+          stockAvailable: increment(item.quantity)
         });
 
         const movementRef = doc(collection(db, 'inventoryMovements'));
