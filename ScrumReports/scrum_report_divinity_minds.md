@@ -395,3 +395,11 @@
 - **Yesterday:** Revisé las HUs de dmind del Sprint 3 (reseña de delivery, identificar pedidos con fallos, categorías inactivas) contrastando código contra criterios de aceptación; confirmé que cumplen, incluida la reposición de stock atómica que evita duplicados.
 - **Today:** Revisé las HUs de mis compañeros validando que cumplieran sus criterios y las moví a "Aceptado por el PO". Además corrí las pruebas Playwright de las HUs en Docker (pedidos fallidos, flujo de delivery y reseñas) y dejé observaciones de readiness para el review.
 - **Blockers:** n/a.
+
+# 09/04/2026
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:**  Validé y reporté los bugs encontrados, actualizando sus estados de "Ready for QA" a "Done", y revisé los flujos completos que deberian pasar para asegurar el comportamiento correcto del sistema
+- **Today:** Me enfocaré en revisar las HUs del siguiente sprint para analizar los nuevos requerimientos.
+- **Blockers:** n/a.
