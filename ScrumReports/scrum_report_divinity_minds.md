@@ -400,8 +400,8 @@
 
 ## Castro Tejada Steven Lisandro
 
-- **Yesterday:** En base a la reunión grupal, aporté con parte de las ideas para el Sprint Retrospective, registrando en tarjetas dentro del tablero del equipo en Trello (aspectos positivos, puntos de mejora, felicitaciones y acuerdos a seguir).
-- **Today:** Revisar y consolidar las tarjetas del retrospective junto al equipo para dejar acuerdos claros y accionables.
+- **Yesterday:** Revisó historias de usuario pendientes y ayudó a ordenar los puntos principales para llevarlos al tablero de Trello de la Sprint Retrospective.
+- **Today:** Participar en la retrospectiva y proponer acciones concretas para mejorar la coordinación del equipo.
 - **Blockers:** n/a.
 
 ## Gutierrez Hinojosa Jhon Deymar
