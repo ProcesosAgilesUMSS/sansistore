@@ -395,3 +395,35 @@
 - **Yesterday:** Revisé las HUs de dmind del Sprint 3 (reseña de delivery, identificar pedidos con fallos, categorías inactivas) contrastando código contra criterios de aceptación; confirmé que cumplen, incluida la reposición de stock atómica que evita duplicados.
 - **Today:** Revisé las HUs de mis compañeros validando que cumplieran sus criterios y las moví a "Aceptado por el PO". Además corrí las pruebas Playwright de las HUs en Docker (pedidos fallidos, flujo de delivery y reseñas) y dejé observaciones de readiness para el review.
 - **Blockers:** n/a.
+
+# 06/09/2026
+
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** En base a la reunión grupal, aporté con parte de las ideas para el Sprint Retrospective, registrando en tarjetas dentro del tablero del equipo en Trello (aspectos positivos, puntos de mejora, felicitaciones y acuerdos a seguir).
+- **Today:** Revisar y consolidar las tarjetas del retrospective junto al equipo para dejar acuerdos claros y accionables.
+- **Blockers:** n/a.
+
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Configuraciones del github workflow para validacion de codigo limpio con biome.
+- **Today:** Corregir secciones de codigo con buenas practicas.
+- **Blockers:** n/a.
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:**  Validé y reporté los bugs encontrados, actualizando sus estados de "Ready for QA" a "Done", y revisé los flujos completos que deberian pasar para asegurar el comportamiento correcto del sistema
+- **Today:** Me enfocaré en revisar las HUs del siguiente sprint para analizar los nuevos requerimientos.
+- **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Revisó historias de usuario y creó el tablero de Trello usado por el equipo para registrar ideas, acuerdos y puntos de mejora de la Sprint Retrospective.
+- **Today:** Facilitar el uso del tablero durante la retrospectiva y dejar organizados los acuerdos finales.
+- **Blockers:** n/a.
+
+## Velasquez Vela Marcos
+
+- **Yesterday:** Preparó el reporte del equipo, creó la rama de trabajo y ordenó algunas HUs para que quedaran más claras dentro del sprint.
+- **Today:** Participar en la retrospectiva y registrar los compromisos que salgan para darles seguimiento.
+- **Blockers:** n/a.
