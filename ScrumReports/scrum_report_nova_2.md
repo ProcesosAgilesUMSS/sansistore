@@ -344,3 +344,32 @@
 - **Yesterday:** finalización del desarrollo de mi hu#164
 - **Today:** arreglo del bug reportado y implementación del seed del formulario de registro 
 - **Blockers:** none
+
+# 09/06/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+* **Yesterday:** estaba coordinando con mi equipo para el ultimo sprint
+* **Today:** empezamos a coordinar con mi grupo para la realizacion del scrum retrospective
+* **Blockers:** none.
+
+## Fabricio Javier Cordova Caceres 
+* **Yesterday:** estaba coordinando con mi equipo la planificación de la próximo sprint 
+* **Today:** empezamos a coordinar con mi equipo para la realizacion del scrum retrospective
+* **Blockers:** none.
+
+## Dylan Coca Beltran
+- **Yesterday:** revise algunos bugs de las hu pasadas y trate de solucionarlos
+- **Today:** solucione algunos bugs y coordine con mi equipo que hu podriamos hacer este sprint
+- **Blockers:** none
+
+## Jherlan Marcelo Calero Sardan
+* **Yesterday:**  Estaba coordinando con el grupo la planificación del siguiente sprint. 
+* **Today:** hice algunos cambios en mi HU #159. 
+* **Blockers:* none.
+
+## Camila Wara Fernandez Sandoval 
+* **Yesterday:**  Participe en las reuniones con mi grupo para la planificación del siguiente sprint
+* **Today:** coordine con mi grupo para realizar el scrum restrospective
+* **Blockers:** none.
