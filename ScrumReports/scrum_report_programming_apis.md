@@ -424,3 +424,8 @@
 - **Yesterday:** Cierre del Sprint 3, verificación de que todos los PRs estén mergeados en `main` y preparación para la retrospectiva.
 - **Today:** Participar en el sprint retrospective y en el sprint planning para esta cuarta iteración.
 - **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+- **Yesterday:** Verifique las funcionalidades añadidas por nuestro team para el sprint 3
+- **Today:** Realizar el trello para el sprint retrospective
+- **Blockers:** None.
