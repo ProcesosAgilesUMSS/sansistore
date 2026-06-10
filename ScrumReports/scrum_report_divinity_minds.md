@@ -398,6 +398,12 @@
 
 # 09/04/2026
 
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** En base a la reunión grupal, aporté con parte de las ideas para el Sprint Retrospective, registrando en tarjetas dentro del tablero del equipo en Trello (aspectos positivos, puntos de mejora, felicitaciones y acuerdos a seguir).
+- **Today:** Revisar y consolidar las tarjetas del retrospective junto al equipo para dejar acuerdos claros y accionables.
+- **Blockers:** n/a.
+
 ## Merudia Calderon Dayeza
 
 - **Yesterday:**  Validé y reporté los bugs encontrados, actualizando sus estados de "Ready for QA" a "Done", y revisé los flujos completos que deberian pasar para asegurar el comportamiento correcto del sistema
