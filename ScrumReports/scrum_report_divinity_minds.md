@@ -396,7 +396,7 @@
 - **Today:** Revisé las HUs de mis compañeros validando que cumplieran sus criterios y las moví a "Aceptado por el PO". Además corrí las pruebas Playwright de las HUs en Docker (pedidos fallidos, flujo de delivery y reseñas) y dejé observaciones de readiness para el review.
 - **Blockers:** n/a.
 
-# 09/04/2026
+# 06/09/2026
 
 ## Castro Tejada Steven Lisandro
 
@@ -404,18 +404,16 @@
 - **Today:** Revisar y consolidar las tarjetas del retrospective junto al equipo para dejar acuerdos claros y accionables.
 - **Blockers:** n/a.
 
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Configuraciones del github workflow para validacion de codigo limpio con biome.
+- **Today:** Corregir secciones de codigo con buenas practicas.
+- **Blockers:** n/a.
+
 ## Merudia Calderon Dayeza
 
 - **Yesterday:**  Validé y reporté los bugs encontrados, actualizando sus estados de "Ready for QA" a "Done", y revisé los flujos completos que deberian pasar para asegurar el comportamiento correcto del sistema
 - **Today:** Me enfocaré en revisar las HUs del siguiente sprint para analizar los nuevos requerimientos.
-- **Blockers:** n/a.
-
-# 06/09/2026
-
-## Castro Tejada Steven Lisandro
-
-- **Yesterday:** Revisó historias de usuario pendientes y ayudó a ordenar los puntos principales para llevarlos al tablero de Trello de la Sprint Retrospective.
-- **Today:** Participar en la retrospectiva y proponer acciones concretas para mejorar la coordinación del equipo.
 - **Blockers:** n/a.
 
 ## Merino Vidal Mateo Alejandro
