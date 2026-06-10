@@ -403,3 +403,23 @@
 - **Yesterday:**  Validé y reporté los bugs encontrados, actualizando sus estados de "Ready for QA" a "Done", y revisé los flujos completos que deberian pasar para asegurar el comportamiento correcto del sistema
 - **Today:** Me enfocaré en revisar las HUs del siguiente sprint para analizar los nuevos requerimientos.
 - **Blockers:** n/a.
+
+# 06/09/2026
+
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Revisó historias de usuario pendientes y ayudó a ordenar los puntos principales para llevarlos al tablero de Trello de la Sprint Retrospective.
+- **Today:** Participar en la retrospectiva y proponer acciones concretas para mejorar la coordinación del equipo.
+- **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Revisó historias de usuario y creó el tablero de Trello usado por el equipo para registrar ideas, acuerdos y puntos de mejora de la Sprint Retrospective.
+- **Today:** Facilitar el uso del tablero durante la retrospectiva y dejar organizados los acuerdos finales.
+- **Blockers:** n/a.
+
+## Velasquez Vela Marcos
+
+- **Yesterday:** Preparó el reporte del equipo, creó la rama de trabajo y ordenó algunas HUs para que quedaran más claras dentro del sprint.
+- **Today:** Participar en la retrospectiva y registrar los compromisos que salgan para darles seguimiento.
+- **Blockers:** n/a.
