@@ -436,3 +436,8 @@
 - **Yesterday:** Cierre del Sprint 3 y preparación para el Sprint 4.
 - **Today:** Inicio del desarrollo de las historias de usuario asignadas para el Sprint 4.
 - **Blockers:** None.
+
+### Efrain Peralta Felipe
+- **Yesterday:** Preparación del sprint 4.
+- **Today:** Comenzar con el desarrollo de la hu del sprint 4.
+- **Blockers:** None.
