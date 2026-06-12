@@ -3,19 +3,8 @@ import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { adminAuth, adminDb } from '../../lib/firebase-admin';
 
 const ALLOWED_ROLES = ['admin', 'vendedor', 'mensajero', 'operador_inv', 'comprador'] as const;
-const ALLOWED_INSTITUTIONAL_DOMAINS = [
-  'umss.edu',
-  'umss.edu.bo',
-  'est.umss.edu',
-  'est.umss.edu.bo',
-  'mi.umss.edu',
-  'ms.umss.edu',
-  'fcyt.umss.edu.bo',
-  'dicyt.umss.edu.bo',
-  'posgrado.umss.edu.bo',
-] as const;
+
 type AllowedRole = (typeof ALLOWED_ROLES)[number];
-type AllowedInstitutionalDomain = (typeof ALLOWED_INSTITUTIONAL_DOMAINS)[number];
 const devAdminBypassEnabled =
   import.meta.env.ENABLE_DEV_ADMIN_BYPASS === 'true' &&
   import.meta.env.PUBLIC_APP_ENV !== 'production';
@@ -112,7 +101,7 @@ function getEmailDomain(email: string) {
 
 function isAllowedInstitutionalEmail(email: string) {
   const domain = getEmailDomain(email);
-  return ALLOWED_INSTITUTIONAL_DOMAINS.includes(domain as AllowedInstitutionalDomain);
+  return /(?:^|\.)umss\.edu(?:\.|$)/.test(domain);
 }
 
 function isValidPhoneNumber(phoneNumber: string) {
