@@ -73,19 +73,9 @@ export default function UserEditModal({
       setError("Ingrese un correo electrónico válido.");
       return;
     }
-    const allowedDomains = [
-      'umss.edu',
-      'umss.edu.bo',
-      'est.umss.edu',
-      'est.umss.edu.bo',
-      'mi.umss.edu',
-      'ms.umss.edu',
-      'fcyt.umss.edu.bo',
-      'dicyt.umss.edu.bo',
-      'posgrado.umss.edu.bo',
-    ];
     const domain = email.trim().split('@')[1];
-    if (!domain || !allowedDomains.includes(domain)) {
+    const validUmssDomain = /(?:^|\.)umss\.edu(?:\.|$)/.test(domain ?? '');
+    if (!domain || !validUmssDomain) {
       setError("Solo se permiten cuentas institucionales UMSS.");
       return;
     }
