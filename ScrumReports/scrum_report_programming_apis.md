@@ -429,3 +429,10 @@
 - **Yesterday:** Verifique las funcionalidades añadidas por nuestro team para el sprint 3
 - **Today:** Realizar el trello para el sprint retrospective
 - **Blockers:** None.
+
+## 11-06-2026
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday:** Cierre del Sprint 3 y preparación para el Sprint 4.
+- **Today:** Inicio del desarrollo de las historias de usuario asignadas para el Sprint 4.
+- **Blockers:** None.
