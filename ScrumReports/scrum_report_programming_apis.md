@@ -441,3 +441,8 @@
 - **Yesterday:** Preparación del sprint 4.
 - **Today:** Comenzar con el desarrollo de la hu del sprint 4.
 - **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+- **Yesterday:** Empece la preparacion de las HU para el sprint 4.
+- **Today:** Comenzare con el desarrollo de HU para el sprint 4 y correccion de bugs
+- **Blockers:** None.
