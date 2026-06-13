@@ -446,3 +446,8 @@
 - **Yesterday:** Empece la preparacion de las HU para el sprint 4.
 - **Today:** Comenzare con el desarrollo de HU para el sprint 4 y correccion de bugs
 - **Blockers:** None.
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Documenté las historias de usuario para este sprint 4
+- **Today:** Refinaremos el sprint planning para poder empezar a desarrollar el sprint 4
+- **Blockers:** Las funcionalidades que estaban en el git son deprecadas, duplicadas, o en estado "not to release", por lo tanto, tuvimos que planear nuevas HU's en base a indicaciones del ingeniero.
