@@ -18,7 +18,7 @@ const pathname = Astro.url.pathname;
 
     <div class="h-14 shrink-0"></div>
 
-    <RouteGuard client:load allowedRoles={['operador_inv']} roleName="Inventario">
+    <RouteGuard client:load allowedRoles={['operador_inv', 'vendedor']} roleName="Inventario o Vendedor">
       <div class="flex flex-1 min-h-0">
         <SideBarInventory client:load pathname={pathname} />
 
