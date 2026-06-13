@@ -57,7 +57,7 @@ test.describe('Product Detail Page', () => {
 
     await expect(page.getByText(/Bs\s21\.50/)).toBeVisible();
     await expect(
-      page.getByText('Producto agotado', { exact: true }).or(page.getByText('No disponible', { exact: true }))
+      page.getByText('Producto agotado', { exact: true }).first().or(page.getByText('No disponible', { exact: true }).first())
     ).toBeVisible({ timeout: 15000 });
   });
 
