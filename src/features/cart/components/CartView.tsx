@@ -6,6 +6,7 @@ import {
   ChevronRight,
   Loader2,
   ShoppingBag,
+  Trash2,
 } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
 import { CartItemRow } from './CartItemRow';
@@ -15,6 +16,7 @@ import { LocationSelectorModal } from './LocationSelectorModal';
 import { PaymentConfirmModal } from './PaymentConfirmModal';
 import { OrderSuccessModal } from './OrderSuccessModal';
 import { RemoveItemModal } from './RemoveItemModal';
+import { ClearCartModal } from './ClearCartModal';
 import type { CartItemWithProduct } from '../types';
 import { useCartContext, CartProvider } from './CartContext';
 import { db } from '../../../lib/firebase';
@@ -29,6 +31,7 @@ function CartViewInner() {
     updateQuantity,
     setQuantity,
     removeItem,
+    clearCart,
     items,
   } = useCartContext();
   const { user, authReady } = useAuthUser();
@@ -42,6 +45,7 @@ function CartViewInner() {
     null
   );
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showClearCartModal, setShowClearCartModal] = useState(false);
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [showPaymentConfirmModal, setShowPaymentConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -309,9 +313,19 @@ function CartViewInner() {
 
       <div className="grid gap-4 md:gap-6 md:grid-cols-3 md:items-start">
         <section className="min-w-0 rounded-xl border border-border-light bg-card-bg-light p-3 sm:p-4 md:col-span-2">
-          <h2 className="mb-2 text-base sm:text-lg font-semibold">
-            Productos ({enriched.length})
-          </h2>
+          <div className="mb-4 flex items-center justify-between border-b border-border-light pb-2">
+            <h2 className="text-base sm:text-lg font-semibold">
+              Productos ({enriched.length})
+            </h2>
+            <button
+              type="button"
+              onClick={() => setShowClearCartModal(true)}
+              className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+            >
+              <Trash2 size={14} />
+              Vaciar carrito
+            </button>
+          </div>
           {enriched.map((item) => {
             const effectiveStock = Math.max(
               0,
@@ -525,6 +539,15 @@ function CartViewInner() {
         )}
         {showSuccessModal && (
           <OrderSuccessModal onClose={() => setShowSuccessModal(false)} />
+        )}
+        {showClearCartModal && (
+          <ClearCartModal
+            onClose={() => setShowClearCartModal(false)}
+            onConfirm={async () => {
+              await clearCart();
+              setShowClearCartModal(false);
+            }}
+          />
         )}
       </div>
     </div>
