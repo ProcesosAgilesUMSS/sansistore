@@ -576,7 +576,7 @@ function FeaturedProductsInner({
             className={`inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-bold transition-all sm:w-auto ${
               favoritesOnly
                 ? 'border border-border-light text-text-light hover:border-primary hover:text-primary'
-                : 'bg-primary text-bg-light shadow-lg shadow-primary/20 hover:-translate-y-0.5 hover:brightness-105'
+                : 'bg-primary text-text-light shadow-lg shadow-primary/20 hover:-translate-y-0.5 hover:brightness-105'
             }`}
           >
             {favoritesOnly ? <ChevronLeft size={18} /> : <Heart size={18} />}
@@ -617,7 +617,7 @@ function FeaturedProductsInner({
               }
               className={`inline-flex items-center justify-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition-all duration-200 ${
                 showOffersOnly
-                  ? 'border-primary bg-primary text-bg-light shadow-md shadow-primary/20 hover:brightness-105'
+                  ? 'border-primary bg-primary text-text-light shadow-md shadow-primary/20 hover:brightness-105'
                   : 'border-border-light text-text-light hover:border-primary hover:text-primary'
               }`}
             >
@@ -830,7 +830,7 @@ function FeaturedProductsInner({
               </p>
               <a
                 href="/productos"
-                className="mt-4 inline-flex rounded-full bg-primary px-5 py-2 text-sm font-semibold text-bg-light transition-all hover:brightness-105"
+                className="mt-4 inline-flex rounded-full bg-primary px-5 py-2 text-sm font-semibold text-text-light transition-all hover:brightness-105"
               >
                 Ver catálogo
               </a>
@@ -934,7 +934,7 @@ function FeaturedProductsInner({
                           }}
                           className={`absolute right-3 top-3 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-all active:scale-95 ${
                             productIsFavorite
-                              ? 'border-primary bg-primary text-bg-light shadow-md shadow-primary/25'
+                              ? 'border-primary bg-primary text-text-light shadow-md shadow-primary/25'
                               : 'border-border-light bg-card-bg-light/90 text-text-light hover:border-primary hover:text-primary'
                           }`}
                         >
@@ -1065,7 +1065,7 @@ function FeaturedProductsInner({
                           }}
                           className={`rounded-full px-3 py-2 text-sm font-semibold transition-all ${
                             currentPage === pageNum
-                              ? 'bg-primary text-bg-light'
+                              ? 'bg-primary text-text-light'
                               : 'border border-border-light text-text-light hover:border-primary hover:text-primary'
                           }`}
                         >
