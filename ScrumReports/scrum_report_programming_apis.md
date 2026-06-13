@@ -430,6 +430,12 @@
 - **Today:** Realizar el trello para el sprint retrospective
 - **Blockers:** None.
 
+### Adrian
+
+- **Yesterday:** Estuve trabajando en la hu asignada
+- **Today:** Termine de corregir un bug que salia.
+- **Blockers:** None.
+
 ## 11-06-2026
 
 ### Jhoel Gustavo Aiza Arce
@@ -451,3 +457,9 @@
 - **Yesterday:** Documenté las historias de usuario para este sprint 4
 - **Today:** Refinaremos el sprint planning para poder empezar a desarrollar el sprint 4
 - **Blockers:** Las funcionalidades que estaban en el git son deprecadas, duplicadas, o en estado "not to release", por lo tanto, tuvimos que planear nuevas HU's en base a indicaciones del ingeniero.
+
+### Adrian
+
+- **Yesterday:** Estuve planificando que hu hare.
+- **Today:** Hablare con mi grupo para ver que hacer.
+- **Blockers:** None.
