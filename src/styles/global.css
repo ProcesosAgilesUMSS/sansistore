@@ -14,6 +14,15 @@
         --theme-success: #15803d;
         --theme-success-bg: #f0fdf4;
         --theme-success-border: #bbf7d0;
+        --theme-warning: #b45309;
+        --theme-warning-bg: #fffbeb;
+        --theme-warning-border: #fde68a;
+        --theme-info: #1d4ed8;
+        --theme-info-bg: #eff6ff;
+        --theme-info-border: #bfdbfe;
+        --theme-danger: #b91c1c;
+        --theme-danger-bg: #fef2f2;
+        --theme-danger-border: #fecaca;
     }
 
     html[data-theme='dark'] {
@@ -29,13 +38,28 @@
         --theme-success: #86efac;
         --theme-success-bg: #052e16;
         --theme-success-border: #166534;
+        --theme-warning: #fcd34d;
+        --theme-warning-bg: #422006;
+        --theme-warning-border: #92400e;
+        --theme-info: #93c5fd;
+        --theme-info-bg: #172554;
+        --theme-info-border: #1e40af;
+        --theme-danger: #fca5a5;
+        --theme-danger-bg: #450a0a;
+        --theme-danger-border: #7f1d1d;
     }
 
     html,
     body {
         background-color: var(--theme-bg);
         color: var(--theme-text);
+        font-family: 'Inter', system-ui, sans-serif;
     }
+}
+
+@theme {
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-display: 'Inter', system-ui, sans-serif;
 }
 
 @keyframes fadeIn {
@@ -73,6 +97,15 @@
         --color-success: var(--theme-success);
         --color-success-bg: var(--theme-success-bg);
         --color-success-border: var(--theme-success-border);
+        --color-warning: var(--theme-warning);
+        --color-warning-bg: var(--theme-warning-bg);
+        --color-warning-border: var(--theme-warning-border);
+        --color-info: var(--theme-info);
+        --color-info-bg: var(--theme-info-bg);
+        --color-info-border: var(--theme-info-border);
+        --color-danger: var(--theme-danger);
+        --color-danger-bg: var(--theme-danger-bg);
+        --color-danger-border: var(--theme-danger-border);
 }
 
 @layer utilities {

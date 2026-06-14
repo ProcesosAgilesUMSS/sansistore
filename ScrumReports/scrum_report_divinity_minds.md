@@ -459,3 +459,11 @@
 - **Yesterday:** Creé el archivo de estándar de diseño para definir lineamientos visuales y buenas prácticas del proyecto.
 - **Today:** Validar los seeders en conjunto con las pruebas y apoyar en la revisión de PRs.
 - **Blockers:** n/a.
+
+# 06/13/2026
+
+## Velasquez Vela Marcos
+
+- **Yesterday:** Unifiqué el sistema de UI para corregir la inconsistencia visual del sitio: documenté el estándar en un único archivo `UI.md`, agregué los tokens de color faltantes (warning, info, danger) en `global.css`, dejé una sola fuente (Inter) cargada de forma centralizada y rediseñé el logo de marca y el footer (con íconos reales de redes) usando los tokens del tema para que respeten el dark mode.
+- **Today:** Apoyar a los equipos en la migración de los colores hardcodeados a los tokens y validar que las pantallas cumplan el estándar de header/footer y ancho.
+- **Blockers:** n/a.
