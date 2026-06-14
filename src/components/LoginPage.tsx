@@ -161,7 +161,7 @@ export default function LoginPage() {
 								onClick={() => {
 									void performEmailLogin();
 								}}
-								className="w-full py-2 px-4 rounded-full uppercase font-semibold text-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed bg-primary text-bg-light hover:bg-primary/90"
+								className="w-full py-2 px-4 rounded-full uppercase font-semibold text-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed bg-primary text-text-light hover:bg-primary/90"
 							>
 								{loading ? "Ingresando..." : "Iniciar sesión"}
 							</button>

@@ -76,7 +76,7 @@ export const StockMovementForm: React.FC = () => {
       // Actualización atómica
       batch.set(inventoryRef, {
         stockTotal: increment(qtyChange),
-        stockAvailable: increment(qtyChange),
+        stockAvailable: increment(qtyChange),// el disponible tambien debberia ser incrementado
         updatedAt: serverTimestamp(),
         enabled: true
       }, { merge: true });

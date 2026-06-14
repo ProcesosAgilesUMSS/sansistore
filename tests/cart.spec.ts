@@ -127,6 +127,43 @@ async function updateTestInventory(productId: string, data: Record<string, unkno
   await mirrorDocumentToDefaultEmulator('inventory', productId, data);
 }
 
+async function createTestAuthUser({
+  uid,
+  email,
+  displayName,
+}: {
+  uid: string;
+  email: string;
+  displayName: string;
+}) {
+  if (admin.apps.length === 0) {
+    admin.initializeApp({ projectId: PROJECT_ID });
+  }
+
+  process.env.FIREBASE_AUTH_EMULATOR_HOST =
+    process.env.FIREBASE_AUTH_EMULATOR_HOST || '127.0.0.1:9199';
+
+  try {
+    await admin.auth().createUser({
+      uid,
+      email,
+      password: '12345678',
+      displayName,
+    });
+  } catch {
+    // Ignore if already created
+  }
+
+  const db = admin.firestore();
+  await db.collection('users').doc(uid).set({
+    uid,
+    email,
+    displayName,
+    roles: ['comprador'],
+    isActive: true,
+  });
+}
+
 async function seedLocalCart(
   page: Page,
   productId: string,
@@ -407,5 +444,89 @@ test.describe('Cart - Carrito', () => {
     });
 
     await expect(page.getByTestId(`cart-item-image-fallback-${productId}`)).toBeVisible();
+  });
+
+  test('should clear local storage cart for guest/anonymous user', async ({ page }) => {
+    await page.goto('/productos/leche-pil-natural-900-ml');
+    const addToCartBtn = page.getByRole('button', { name: 'Agregar al carrito' });
+    await expect(addToCartBtn).toBeVisible();
+    await addToCartBtn.click();
+    await expect(page.getByLabel(/Carrito, [^0]/)).toBeVisible({ timeout: 10_000 });
+
+    await page.goto('/carrito');
+    await expectFilledCartPage(page);
+    
+    await expect(page.locator('a').filter({ hasText: 'Leche PIL Natural 900 ml' }).first()).toBeVisible();
+    const clearCartBtn = page.getByRole('button', { name: 'Vaciar carrito' });
+    await expect(clearCartBtn).toBeVisible();
+
+    await clearCartBtn.click();
+    const modal = page.locator('[role="dialog"]');
+    await expect(modal).toBeVisible();
+    await expect(modal.getByRole('heading', { name: 'Vaciar carrito' })).toBeVisible();
+
+    await modal.getByRole('button', { name: 'Cancelar' }).click();
+    await expect(modal).not.toBeVisible();
+    await expect(page.locator('a').filter({ hasText: 'Leche PIL Natural 900 ml' }).first()).toBeVisible();
+
+    await clearCartBtn.click();
+    await expect(modal).toBeVisible();
+    await modal.getByRole('button', { name: 'Vaciar' }).click();
+
+    await expect(modal).not.toBeVisible();
+    await expect(page.getByText('Tu carrito está vacío')).toBeVisible();
+    
+    const localStorageCart = await page.evaluate((key) => window.localStorage.getItem(key), CART_KEY);
+    expect(localStorageCart === null || JSON.parse(localStorageCart).length === 0).toBe(true);
+  });
+
+  test('should clear Firestore cart for authenticated user', async ({ page }, testInfo) => {
+    const workerId = testInfo.workerIndex;
+    const uid = `user-clear-cart-${workerId}`;
+    const email = `clear.cart.${workerId}@est.umss.edu`;
+    const displayName = `Test Clear Cart ${workerId}`;
+    const productId = `test-clear-prod-${workerId}`;
+    const productName = `Product Clear Cart ${workerId}`;
+
+    await createTestAuthUser({ uid, email, displayName });
+
+    await createTestProduct({
+      productId,
+      name: productName,
+      price: 15,
+    });
+
+    const db = getTestDb();
+    await db.collection('users').doc(uid).collection('cartItems').doc(productId).set({
+      cartItemId: `cart-${uid}-1`,
+      userId: uid,
+      productId,
+      quantity: 3,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    await loginWithEmail(page, email);
+
+    await page.goto('/carrito');
+    await expectFilledCartPage(page);
+    await expect(page.locator('a').filter({ hasText: productName }).first()).toBeVisible();
+    
+    const clearCartBtn = page.getByRole('button', { name: 'Vaciar carrito' });
+    await expect(clearCartBtn).toBeVisible();
+
+    await clearCartBtn.click();
+    const modal = page.locator('[role="dialog"]');
+    await expect(modal).toBeVisible();
+    await modal.getByRole('button', { name: 'Vaciar' }).click();
+
+    await expect(modal).not.toBeVisible();
+    await expect(page.getByText('Tu carrito está vacío')).toBeVisible();
+
+    await expect.poll(async () => {
+      const snap = await db.collection('users').doc(uid).collection('cartItems').get();
+      return snap.empty;
+    }, {
+      timeout: 15_000,
+    }).toBe(true);
   });
 });

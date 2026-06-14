@@ -201,7 +201,7 @@ export default function ProductInfoSection({ product, loading }: ProductInfoSect
         <button
           type="button"
           onClick={() => addToCart(product.id, effectiveStock, currentPrice)}
-          className="mt-4 inline-flex w-fit items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95"
+          className="mt-4 inline-flex w-fit items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-text-light transition-all hover:opacity-90 active:scale-95"
         >
           <FaCartPlus size={16} />
           Agregar al carrito
