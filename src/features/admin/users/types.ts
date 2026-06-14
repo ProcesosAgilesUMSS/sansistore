@@ -21,6 +21,8 @@ export interface User {
   email: string;
   displayName: string;
   phoneNumber?: string;
+  ci?: string;
+  internalPhone?: string;
   roles: UserRole[];
   isActive: boolean;
   createdBy?: string;
@@ -32,6 +34,8 @@ export interface CreateUserPayload {
   displayName: string;
   email: string;
   phoneNumber: string;
+  ci: string;
+  internalPhone?: string;
   roles: UserRole[];
 }
 

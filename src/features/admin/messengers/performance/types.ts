@@ -5,9 +5,12 @@ export interface MessengerOption {
 
 export interface MessengerDeliveryPerformance {
   orderId: string;
+  messengerId?: string;
+  messengerName?: string;
   assignedAt: string;
   deliveredAt: string;
   elapsedTimeMinutes: number;
+  status?: string;
 }
 
 export interface MessengerPerformanceReport {

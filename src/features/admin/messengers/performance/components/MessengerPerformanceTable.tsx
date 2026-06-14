@@ -14,9 +14,10 @@ const formatElapsedTime = (minutes: number): string =>
 
 interface Props {
   deliveries: MessengerDeliveryPerformance[];
+  showMessenger?: boolean;
 }
 
-export default function MessengerPerformanceTable({ deliveries }: Props) {
+export default function MessengerPerformanceTable({ deliveries, showMessenger = false }: Props) {
   return (
     <div className="border border-[var(--theme-border)] rounded-xl overflow-x-auto">
       <table className="w-full border-collapse min-w-[720px]">
@@ -25,6 +26,11 @@ export default function MessengerPerformanceTable({ deliveries }: Props) {
             <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">
               Pedido
             </th>
+            {showMessenger && (
+              <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">
+                Mensajero
+              </th>
+            )}
             <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">
               Fecha/Hora de asignación
             </th>
@@ -45,6 +51,11 @@ export default function MessengerPerformanceTable({ deliveries }: Props) {
               <td className="px-4 py-2.5 font-mono text-[10px] text-[var(--theme-text)]/50">
                 {delivery.orderId}
               </td>
+              {showMessenger && (
+                <td className="px-4 py-2.5 text-[12px] font-medium text-[var(--theme-text)]">
+                  {delivery.messengerName ?? 'Mensajero'}
+                </td>
+              )}
               <td className="px-4 py-2.5 text-[12px] text-[var(--theme-text)]">
                 {formatDateTime(delivery.assignedAt)}
               </td>

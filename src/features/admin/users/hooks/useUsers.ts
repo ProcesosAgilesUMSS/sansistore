@@ -68,11 +68,12 @@ export function useUsers() {
       showToast(`Usuario "${payload.displayName}" registrado exitosamente.`, 'success');
       return true;
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'No se pudo registrar el usuario.';
       showToast(
-        error instanceof Error ? error.message : 'No se pudo registrar el usuario.',
+        message,
         'error',
       );
-      return false;
+      throw new Error(message);
     }
   };
 

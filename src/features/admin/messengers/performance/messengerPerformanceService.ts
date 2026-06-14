@@ -3,7 +3,11 @@ import {
   doc,
   getDoc,
   getDocs,
+  limit,
+  onSnapshot,
+  orderBy,
   query,
+  type Unsubscribe,
   where,
 } from 'firebase/firestore';
 import { db } from '../../../../lib/firebase';
@@ -16,6 +20,9 @@ import type {
 const DELIVERIES_COLLECTION = 'deliveries';
 const USERS_COLLECTION = 'users';
 const COMPLETED_DELIVERY_STATUSES = ['delivered', 'DELIVERED'];
+const RECENT_COMPLETED_DELIVERIES_LIMIT = 10;
+const RECENT_COMPLETED_DELIVERIES_QUERY_LIMIT = 30;
+const userDisplayNameCache = new Map<string, string>();
 
 const toDate = (value: unknown): Date | null => {
   if (!value) return null;
@@ -27,7 +34,19 @@ const toDate = (value: unknown): Date | null => {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
 
-const toDateInputValue = (date: Date): string => date.toISOString().split('T')[0];
+const REPORT_TIME_ZONE = 'America/La_Paz';
+
+const toDateInputValue = (date: Date): string => {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: REPORT_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(date);
+
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+};
 
 const isSameInputDay = (date: Date, inputDate: string): boolean =>
   toDateInputValue(date) === inputDate;
@@ -36,11 +55,45 @@ const getElapsedMinutes = (assignedAt: Date, deliveredAt: Date): number =>
   Math.max(0, Math.round((deliveredAt.getTime() - assignedAt.getTime()) / 60000));
 
 const getUserDisplayName = async (messengerId: string): Promise<string> => {
+  if (userDisplayNameCache.has(messengerId)) {
+    return userDisplayNameCache.get(messengerId)!;
+  }
+
   const userSnap = await getDoc(doc(db, USERS_COLLECTION, messengerId));
   if (!userSnap.exists()) return 'Mensajero';
 
   const user = userSnap.data();
-  return user.displayName ?? user.name ?? user.email ?? 'Mensajero';
+  const displayName = user.displayName ?? user.name ?? user.email ?? 'Mensajero';
+  userDisplayNameCache.set(messengerId, displayName);
+  return displayName;
+};
+
+const mapDeliveryPerformance = async (
+  deliveryId: string,
+  delivery: Record<string, unknown>,
+  includeMessenger = false
+): Promise<MessengerDeliveryPerformance | null> => {
+  const assignedAt = toDate(delivery.assignedAt) ?? toDate(delivery.createdAt);
+  const deliveredAt = toDate(delivery.deliveredAt);
+  const courierId = typeof delivery.courierId === 'string' ? delivery.courierId : '';
+
+  if (
+    !assignedAt ||
+    !deliveredAt ||
+    !COMPLETED_DELIVERY_STATUSES.includes(String(delivery.status))
+  ) {
+    return null;
+  }
+
+  return {
+    orderId: String(delivery.orderId || delivery.orderCode || deliveryId),
+    messengerId: courierId || undefined,
+    messengerName: includeMessenger && courierId ? await getUserDisplayName(courierId) : undefined,
+    assignedAt: assignedAt.toISOString(),
+    deliveredAt: deliveredAt.toISOString(),
+    elapsedTimeMinutes: getElapsedMinutes(assignedAt, deliveredAt),
+    status: String(delivery.status),
+  };
 };
 
 export const getMessengers = async (): Promise<MessengerOption[]> => {
@@ -63,6 +116,45 @@ export const getMessengers = async (): Promise<MessengerOption[]> => {
     .sort((a, b) => a.name.localeCompare(b.name));
 };
 
+export const listenRecentCompletedDeliveries = (
+  callback: (deliveries: MessengerDeliveryPerformance[]) => void,
+  onError?: (error: Error) => void
+): Unsubscribe => {
+  const recentDeliveriesQuery = query(
+    collection(db, DELIVERIES_COLLECTION),
+    orderBy('deliveredAt', 'desc'),
+    limit(RECENT_COMPLETED_DELIVERIES_QUERY_LIMIT)
+  );
+
+  return onSnapshot(
+    recentDeliveriesQuery,
+    (snapshot) => {
+      void Promise.all(
+        snapshot.docs.map((deliveryDoc) =>
+          mapDeliveryPerformance(deliveryDoc.id, deliveryDoc.data(), true)
+        )
+      )
+        .then((deliveries) => {
+          callback(
+            deliveries
+              .filter((delivery): delivery is MessengerDeliveryPerformance => Boolean(delivery))
+              .sort(
+                (a, b) =>
+                  new Date(b.deliveredAt).getTime() - new Date(a.deliveredAt).getTime()
+              )
+              .slice(0, RECENT_COMPLETED_DELIVERIES_LIMIT)
+          );
+        })
+        .catch((error) => {
+          onError?.(error instanceof Error ? error : new Error('Recent deliveries query failed'));
+        });
+    },
+    (error) => {
+      onError?.(error);
+    }
+  );
+};
+
 export const getMessengerPerformanceByDay = async (
   messengerId: string,
   date: string
@@ -81,14 +173,14 @@ export const getMessengerPerformanceByDay = async (
     const deliveries: MessengerDeliveryPerformance[] = deliveriesSnapshot.docs
       .map((deliveryDoc) => {
         const delivery = deliveryDoc.data();
-        const assignedAt = toDate(delivery.assignedAt);
+        const assignedAt = toDate(delivery.assignedAt) ?? toDate(delivery.createdAt);
         const deliveredAt = toDate(delivery.deliveredAt);
 
         if (
           !assignedAt ||
           !deliveredAt ||
           !COMPLETED_DELIVERY_STATUSES.includes(String(delivery.status)) ||
-          !isSameInputDay(assignedAt, date)
+          !isSameInputDay(deliveredAt, date)
         ) {
           return null;
         }

@@ -26,8 +26,10 @@ export default function RegisterUserModal({
   onRegister,
 }: RegisterUserModalProps) {
   const [displayName, setDisplayName] = useState('');
+  const [ci, setCi] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [internalPhone, setInternalPhone] = useState('');
   const [selectedRoles, setSelectedRoles] = useState<UserRole[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -50,6 +52,20 @@ export default function RegisterUserModal({
     const limited = digitsOnly.slice(0, 8);
     setPhoneNumber(limited);
     if (errors.phoneNumber) setErrors((prev) => ({ ...prev, phoneNumber: '' }));
+    if (serverError) setServerError('');
+  };
+
+  const handleCiChange = (value: string) => {
+    const digitsOnly = value.replace(/[^0-9]/g, '');
+    setCi(digitsOnly.slice(0, 12));
+    if (errors.ci) setErrors((prev) => ({ ...prev, ci: '' }));
+    if (serverError) setServerError('');
+  };
+
+  const handleInternalPhoneChange = (value: string) => {
+    const digitsOnly = value.replace(/[^0-9]/g, '');
+    setInternalPhone(digitsOnly.slice(0, 10));
+    if (errors.internalPhone) setErrors((prev) => ({ ...prev, internalPhone: '' }));
     if (serverError) setServerError('');
   };
 
@@ -88,6 +104,13 @@ export default function RegisterUserModal({
       newErrors.displayName = 'Error: El formato de nombre no permite espacios excesivos.';
     }
 
+    const trimmedCi = ci.trim();
+    if (!trimmedCi) {
+      newErrors.ci = 'La cédula de identidad es obligatoria.';
+    } else if (!/^\d+$/.test(trimmedCi)) {
+      newErrors.ci = 'La cédula de identidad debe contener solo números.';
+    }
+
     // 2. Email validation - allow institutional UMSS domains
     const trimmedEmail = email.trim().toLowerCase();
     const allowedDomains = [
@@ -121,6 +144,10 @@ export default function RegisterUserModal({
       newErrors.phoneNumber = 'Número no válido. Debe iniciar con 6 o 7.';
     }
 
+    if (internalPhone && !/^\d+$/.test(internalPhone)) {
+      newErrors.internalPhone = 'El teléfono interno debe contener solo números.';
+    }
+
     // 4. Role validation
     if (selectedRoles.length === 0) {
       newErrors.role = 'Debe asignar al menos un rol al usuario.';
@@ -145,6 +172,8 @@ export default function RegisterUserModal({
         displayName: cleanName,
         email: email.trim().toLowerCase(),
         phoneNumber: phoneNumber.trim(),
+        ci: ci.trim(),
+        ...(internalPhone.trim() && { internalPhone: internalPhone.trim() }),
         roles: selectedRoles,
       });
 
@@ -163,8 +192,10 @@ export default function RegisterUserModal({
 
   const resetForm = () => {
     setDisplayName('');
+    setCi('');
     setEmail('');
     setPhoneNumber('');
+    setInternalPhone('');
     setSelectedRoles([]);
     setErrors({});
     setServerError('');
@@ -247,6 +278,36 @@ export default function RegisterUserModal({
             )}
           </div>
 
+          {/* Cédula de identidad */}
+          <div>
+            <label className="block text-[13px] font-medium text-(--theme-text) mb-1.5">
+              Cédula de identidad <span className="text-red-400">*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Ej: 13718205"
+              value={ci}
+              disabled={isLoading}
+              onChange={(e) => handleCiChange(e.target.value)}
+              inputMode="numeric"
+              className={`
+                w-full px-4 py-2.5 rounded-xl text-[13px]
+                bg-(--theme-bg) border
+                text-(--theme-text)
+                placeholder:text-(--theme-text)/30
+                outline-none transition-colors duration-150
+                disabled:opacity-50 disabled:cursor-not-allowed
+                ${errors.ci
+                  ? 'border-red-400 focus:border-red-400'
+                  : 'border-(--theme-border) focus:border-primary'
+                }
+              `}
+            />
+            {errors.ci && (
+              <p className="mt-1 text-[11px] text-red-500">{errors.ci}</p>
+            )}
+          </div>
+
           {/* Email */}
           <div>
             <label className="block text-[13px] font-medium text-(--theme-text) mb-1.5">
@@ -315,6 +376,36 @@ export default function RegisterUserModal({
             </p>
             {errors.phoneNumber && (
               <p className="mt-0.5 text-[11px] text-red-500">{errors.phoneNumber}</p>
+            )}
+          </div>
+
+          {/* Teléfono interno */}
+          <div>
+            <label className="block text-[13px] font-medium text-(--theme-text) mb-1.5">
+              Teléfono interno
+            </label>
+            <input
+              type="tel"
+              placeholder="Ej: 4253210"
+              value={internalPhone}
+              disabled={isLoading}
+              onChange={(e) => handleInternalPhoneChange(e.target.value)}
+              inputMode="numeric"
+              className={`
+                w-full px-4 py-2.5 rounded-xl text-[13px]
+                bg-(--theme-bg) border
+                text-(--theme-text)
+                placeholder:text-(--theme-text)/30
+                outline-none transition-colors duration-150
+                disabled:opacity-50 disabled:cursor-not-allowed
+                ${errors.internalPhone
+                  ? 'border-red-400 focus:border-red-400'
+                  : 'border-(--theme-border) focus:border-primary'
+                }
+              `}
+            />
+            {errors.internalPhone && (
+              <p className="mt-1 text-[11px] text-red-500">{errors.internalPhone}</p>
             )}
           </div>
 

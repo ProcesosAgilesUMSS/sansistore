@@ -14,6 +14,8 @@ interface CreateUserRequest {
   displayName?: string;
   email?: string;
   phoneNumber?: string;
+  ci?: string;
+  internalPhone?: string;
   role?: string;
   roles?: string[];
 }
@@ -108,10 +110,16 @@ function isValidPhoneNumber(phoneNumber: string) {
   return phoneNumber.length === 8 && /^[67]/.test(phoneNumber);
 }
 
+function isNumeric(value: string) {
+  return /^\d+$/.test(value);
+}
+
 function validateCreateUserPayload(payload: CreateUserRequest) {
   const displayName = payload.displayName?.trim();
   const email = payload.email?.trim().toLowerCase();
   const phoneNumber = payload.phoneNumber?.trim();
+  const ci = payload.ci?.trim();
+  const internalPhone = payload.internalPhone?.trim();
   const roles = Array.isArray(payload.roles)
     ? payload.roles.map((role) => role.trim())
     : payload.role
@@ -119,6 +127,10 @@ function validateCreateUserPayload(payload: CreateUserRequest) {
       : [];
 
   if (!displayName) return { error: 'El nombre es obligatorio.' };
+  if (!ci) return { error: 'La cédula de identidad es obligatoria.' };
+  if (!isNumeric(ci)) {
+    return { error: 'La cédula de identidad debe contener solo números.' };
+  }
   if (!email) return { error: 'El correo electronico es obligatorio.' };
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return { error: 'Ingrese un correo electronico valido.' };
@@ -135,6 +147,9 @@ function validateCreateUserPayload(payload: CreateUserRequest) {
       error: 'El telefono debe tener 8 digitos e iniciar con 6 o 7.',
     };
   }
+  if (internalPhone && !isNumeric(internalPhone)) {
+    return { error: 'El teléfono interno debe contener solo números.' };
+  }
   if (roles.length === 0) return { error: 'El rol es obligatorio.' };
   if (roles.some((role) => !ALLOWED_ROLES.includes(role as AllowedRole))) {
     return { error: 'El rol seleccionado no es valido.' };
@@ -145,6 +160,8 @@ function validateCreateUserPayload(payload: CreateUserRequest) {
       displayName,
       email,
       phoneNumber,
+      ci,
+      internalPhone,
       roles: roles as AllowedRole[],
     },
   };
@@ -224,6 +241,8 @@ function serializeUser(uid: string, data: FirebaseFirestore.DocumentData) {
     email: data.email ?? '',
     displayName: data.displayName ?? '',
     phoneNumber: data.phoneNumber ?? '',
+    ci: data.ci ?? '',
+    internalPhone: data.internalPhone ?? '',
     roles: Array.isArray(data.roles) ? data.roles : [],
     isActive: data.isActive ?? false,
     createdBy: data.createdBy,
@@ -248,6 +267,26 @@ async function emailExistsInFirestore(email: string, excludeUid?: string) {
 
   if (snapshot.empty) return false;
   // Si el único resultado es el mismo usuario que estamos editando, no hay conflicto
+  if (excludeUid && snapshot.docs[0].id === excludeUid) return false;
+  return true;
+}
+
+async function ciExistsInFirestore(ci: string, excludeUid?: string) {
+  let snapshot;
+
+  try {
+    snapshot = await adminDb
+      .collection('users')
+      .where('ci', '==', ci)
+      .limit(1)
+      .get();
+  } catch {
+    throw new ExternalServiceError(
+      'Firestore no esta disponible. Verifica que el emulador este encendido.',
+    );
+  }
+
+  if (snapshot.empty) return false;
   if (excludeUid && snapshot.docs[0].id === excludeUid) return false;
   return true;
 }
@@ -315,10 +354,17 @@ export const POST: APIRoute = async ({ request }) => {
       return jsonResponse({ message: validation.error }, 400);
     }
 
-    const { displayName, email, phoneNumber, roles } = validation.data;
+    const { displayName, email, phoneNumber, ci, internalPhone, roles } = validation.data;
 
     if (await emailExistsInFirestore(email)) {
       return jsonResponse({ message: 'El correo ya esta registrado.' }, 409);
+    }
+
+    if (await ciExistsInFirestore(ci)) {
+      return jsonResponse(
+        { message: 'Ya existe un usuario registrado con esta cédula de identidad.' },
+        409,
+      );
     }
 
     if (await emailExistsInAuth(email)) {
@@ -338,6 +384,8 @@ export const POST: APIRoute = async ({ request }) => {
       email,
       displayName,
       phoneNumber,
+      ci,
+      ...(internalPhone && { internalPhone }),
       roles,
       isActive: true,
       createdBy: admin.uid,

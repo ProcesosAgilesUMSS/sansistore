@@ -76,6 +76,8 @@ export async function createUser(
       displayName: payload.displayName,
       email: payload.email,
       phoneNumber: payload.phoneNumber,
+      ci: payload.ci,
+      ...(payload.internalPhone && { internalPhone: payload.internalPhone }),
       roles: payload.roles.map((role) => toBackendRole(role)),
     }),
   });
