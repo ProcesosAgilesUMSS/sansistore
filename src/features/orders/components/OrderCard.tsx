@@ -69,8 +69,7 @@ export default function OrderCard({ order }: OrderCardProps) {
 
   const isDelivered =
     order.status === 'ENTREGADO' ||
-    order.status === 'CERRADO' ||
-    order.status === 'COMPLETADO';
+    order.status === 'CERRADO';
   const withinWindow = isDelivered && isWithinReturnWindow(order);
 
   return (
