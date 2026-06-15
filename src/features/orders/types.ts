@@ -125,3 +125,33 @@ export interface ReturnRequest {
   status: ReturnStatus;
   createdAt: Timestamp;
 }
+
+export interface UserData {
+  displayName?: string;
+  email?: string;
+  institutionalId?: string;
+}
+
+export interface LocationData {
+  label: string;
+}
+
+export interface DeliveryData {
+  courierId?: string;
+  courierName?: string;
+}
+
+export interface OrderData {
+  locationId?: string;
+  buyerId: string;
+  deliveryId?: string;
+  total?: number;
+  paymentMethod?: string;
+  status: string;
+  deliveryStatus?: string;
+  paymentStatus?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  incidentReason?: string;
+  incidentNotes?: string;
+}
