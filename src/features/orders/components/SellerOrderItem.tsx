@@ -5,11 +5,10 @@ import { parseOrderId } from '@/features/cart/services/orderService';
 
 interface Props {
   order: Order;
-  index: number;
   selectOrder: () => void;
 }
 
-export default function SellerOrderItem({ order, index, selectOrder }: Props) {
+export default function SellerOrderItem({ order, selectOrder }: Props) {
   const updatedAt = timeAgo(order.updatedAt);
 
   return (

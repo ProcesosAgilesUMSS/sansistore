@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {
   cancelOrder,
+  markOrderAsPaid,
   paidOrder,
   readyOrder,
   reserveOrder,
@@ -99,6 +100,16 @@ export default function OrderActions({
 
   if (order.status === 'RESERVADO') {
     return <CancelOrderSection order={order} onSuccess={onSuccess} />;
+  }
+
+  if (order.status === 'RECHAZADO') {
+    return (
+      <RejectedOrderSection
+        order={order}
+        onSuccess={onSuccess}
+        onNotification={onNotification}
+      />
+    );
   }
 
   const showPaymentValidation = canValidatePayment(order);
@@ -236,6 +247,56 @@ function CancelOrderSection({
         onClick={() => setShowCancelForm(true)}
       >
         Cancelar orden
+      </button>
+    </div>
+  );
+}
+
+function RejectedOrderSection({
+  order,
+  onSuccess,
+  onNotification,
+}: {
+  order: Order;
+  onSuccess?: () => void;
+  onNotification?: (type: 'success' | 'error', message: string) => void;
+}) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleDeny = async () => {
+    setIsSubmitting(true);
+    try {
+      await markOrderAsPaid(order.id);
+      onNotification?.('success', 'Orden marcada como pagada.');
+      onSuccess?.();
+    } catch (error) {
+      console.error('Error al denegar rechazo:', error);
+      onNotification?.('error', 'Error al procesar la acción.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRefund = () => {
+    alert(
+      'Para procesar la devolución del dinero, por favor contacta al administrador o sigue el proceso de reembolso correspondiente.'
+    );
+  };
+
+  return (
+    <div className="flex justify-end gap-2">
+      <button
+        onClick={handleRefund}
+        className="rounded-full border border-(--theme-border) px-5 py-2.5 text-sm font-medium text-(--theme-text) transition hover:bg-(--theme-secondary-bg) cursor-pointer"
+      >
+        Devolver dinero
+      </button>
+      <button
+        onClick={handleDeny}
+        disabled={isSubmitting}
+        className="rounded-full bg-(--theme-danger) px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50 cursor-pointer"
+      >
+        {isSubmitting ? 'Procesando...' : 'Denegar'}
       </button>
     </div>
   );

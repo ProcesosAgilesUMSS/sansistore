@@ -120,7 +120,7 @@ export default function Orders() {
               )}
 
               {showFilters && (
-                <div className="bg-(--theme-card-bg) border border-(--theme-border) shadow-xl rounded-2xl p-2 absolute z-10 w-[18ch] top-full mt-2">
+                <div className="bg-(--theme-card-bg) border border-(--theme-border) shadow-xl rounded-2xl p-2 absolute z-10 w-[24ch] max-h-[250px] overflow-y-auto top-full mt-2">
                   {(Object.entries(STATUS_LABELS) as [OrderStatus, string][])
                     .filter(([status]) => status !== 'CREADO')
                     .map(([status]) => (
@@ -167,7 +167,6 @@ export default function Orders() {
               <SellerOrderItem
                 key={order.id}
                 order={order}
-                index={index}
                 selectOrder={() => setSelectedOrder(order)}
               />
             ))}
