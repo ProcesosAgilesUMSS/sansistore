@@ -51,6 +51,7 @@ function ProductThumbnail({
 
 const getStatusStyles = (status: string) => {
   switch (status) {
+    case 'CERRADO':
     case 'COMPLETADO':
     case 'PAGADO':
       return 'bg-[#88B04B]/10 text-[#4f7f24] border-[#88B04B]/20';
@@ -86,6 +87,7 @@ const getStatusLabel = (status: string) => {
     PENDIENTE: 'Pendiente',
     EMPAQUETADO: 'Empaquetado',
     LISTO: 'Listo',
+    CERRADO: 'Cerrado',
     COMPLETADO: 'Completado',
   };
   return labels[status] || status;
@@ -142,6 +144,7 @@ export default function OrderDetailsPanel({
   const isWithinTimeLimit = hoursSinceOrder <= 72;
   const isDelivered =
     order.status === 'ENTREGADO' ||
+    order.status === 'CERRADO' ||
     order.status === 'COMPLETADO' ||
     order.status === 'PAGADO' ||
     order.deliveryStatus === 'DELIVERED';
@@ -157,7 +160,7 @@ export default function OrderDetailsPanel({
       await confirmOrderReception(order.id, order.buyerId);
       const updatedOrder: Order = {
         ...order,
-        status: 'COMPLETADO',
+        status: 'CERRADO',
         buyerReceptionConfirmed: true,
         buyerReceptionConfirmedAt: Timestamp.fromDate(new Date()),
       };

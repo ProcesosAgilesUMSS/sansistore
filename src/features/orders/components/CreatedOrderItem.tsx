@@ -1,11 +1,11 @@
-import type { Order } from "@features/orders/types";
-import { formatCurrency } from "../utils/currency";
-import OrderStatusBadge from "./OrderStatusBadge";
+import type { Order } from '@features/orders/types';
+import { formatCurrency } from '../utils/currency';
+import OrderStatusBadge from './OrderStatusBadge';
 
 interface Props {
   order: Order;
   index: number;
-  selectOrder: () => void
+  selectOrder: () => void;
 }
 
 export default function CreatedOrderItem({ order, index, selectOrder }: Props) {
@@ -16,7 +16,7 @@ export default function CreatedOrderItem({ order, index, selectOrder }: Props) {
     >
       {/* Order ID */}
       <div className="col-span-full min-[570px]:col-start-1 min-[570px]:col-end-4 min-[775px]:col-end-3 flex items-center gap-x-2 text-sm font-mono">
-        <div className="size-1.5 bg-(--theme-text) opacity-70 shrink-0" />
+        <div className="size-1.5 bg-(--theme-text) opacity-60 shrink-0" />
         ORD-{(index + 1).toString().padStart(3, '0')}
       </div>
 
@@ -37,7 +37,7 @@ export default function CreatedOrderItem({ order, index, selectOrder }: Props) {
 
       {/* [VER] */}
       <div className="hidden min-[850px]:flex col-start-18 items-center justify-end">
-        <button className="rounded-full border border-(--theme-border) px-3 py-1 text-[10px] uppercase font-600 text-(--theme-text) opacity-70 hover:opacity-100 transition-colors">
+        <button className="rounded-full border border-(--theme-border) px-3 py-1 text-[10px] uppercase font-semibold text-(--theme-text) opacity-60 hover:opacity-100 transition-colors">
           Ver
         </button>
       </div>

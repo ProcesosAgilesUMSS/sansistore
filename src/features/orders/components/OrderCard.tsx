@@ -8,6 +8,7 @@ interface OrderCardProps {
 
 const getStatusStyles = (status: string) => {
   switch (status) {
+    case 'CERRADO':
     case 'COMPLETADO':
     case 'PAGADO':
       return 'bg-[#88B04B]/10 text-[#4f7f24] border-[#88B04B]/20';
@@ -43,6 +44,7 @@ const getStatusLabel = (status: string) => {
     PENDIENTE: 'Pendiente',
     EMPAQUETADO: 'Empaquetado',
     LISTO: 'Listo',
+    CERRADO: 'Cerrado',
     COMPLETADO: 'Completado',
   };
   return labels[status] || status;
@@ -65,7 +67,10 @@ export default function OrderCard({ order }: OrderCardProps) {
   const totalItemsCount = order.items.reduce((acc, item) => acc + item.quantity, 0);
   const { uuid, friendlyName } = parseOrderId(order.id);
 
-  const isDelivered = order.status === 'ENTREGADO' || order.status === 'COMPLETADO';
+  const isDelivered =
+    order.status === 'ENTREGADO' ||
+    order.status === 'CERRADO' ||
+    order.status === 'COMPLETADO';
   const withinWindow = isDelivered && isWithinReturnWindow(order);
 
   return (
