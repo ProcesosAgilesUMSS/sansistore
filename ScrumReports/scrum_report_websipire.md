@@ -412,3 +412,24 @@ por las dudas que se tienen.
 * **Yesterday:** Estuve presente en la demo realizada el día de ayer, revisando junto al equipo los avances alcanzados durante el sprint.
 * **Today:** Apoyar en la planificación de las historias de usuario pendientes, revisando posibles dependencias y su integración dentro del flujo de la aplicación.
 * **Blockers:** None.
+
+# Daily Reports - Team 3 Webspire 11/06/26
+
+## Dayana Saleth Ortuño Guzmán
+
+* **Yesterday:** Revise el tablero de github y puse los criterios de aceptacion a la HU designada.
+* **Today:** Comence con el desarrollo para el Sprint4.
+* **Blockers:** None.
+
+
+
+
+
+
+# Daily Reports - Team 3 Webspire 16/06/26
+
+## Dayana Saleth Ortuño Guzmán
+
+* **Yesterday:** Comence con la tarea que se nos asigno, de mejorar el diseño de una una vista, especificamente la que esta en: src/features/cobro/components/CheckoutSummaryPanel.tsx
+* **Today:** Comenzare con el desarrollo de mi HU Asiganada.
+* **Blockers:** None.
