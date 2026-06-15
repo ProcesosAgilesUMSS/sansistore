@@ -1,6 +1,7 @@
 import type { Order } from '@features/orders/types';
 import { formatCurrency } from '../utils/currency';
 import OrderStatusBadge from './OrderStatusBadge';
+import { parseOrderId } from '@/features/cart/services/orderService';
 
 interface Props {
   order: Order;
@@ -15,9 +16,8 @@ export default function CreatedOrderItem({ order, index, selectOrder }: Props) {
       className="grid grid-cols-subgrid col-span-full border-b border-dotted border-(--theme-border) py-3 hover:bg-(--theme-secondary-bg) cursor-pointer transition-colors items-center"
     >
       {/* Order ID */}
-      <div className="col-span-full min-[570px]:col-start-1 min-[570px]:col-end-4 min-[775px]:col-end-3 flex items-center gap-x-2 text-sm font-mono">
-        <div className="size-1.5 bg-(--theme-text) opacity-60 shrink-0" />
-        ORD-{(index + 1).toString().padStart(3, '0')}
+      <div className="col-span-full min-[570px]:col-start-1 min-[570px]:col-end-4 min-[775px]:col-end-3 text-sm font-mono truncate">
+        {parseOrderId(order.id).friendlyName}
       </div>
 
       {/* Destination */}

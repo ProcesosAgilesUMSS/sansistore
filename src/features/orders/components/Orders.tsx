@@ -163,7 +163,7 @@ export default function Orders() {
               </div>
             </li>
 
-            {filteredOrders.map((order, index) => (
+            {filteredOrders.map((order) => (
               <SellerOrderItem
                 key={order.id}
                 order={order}

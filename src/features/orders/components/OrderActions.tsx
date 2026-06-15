@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { UserRound } from 'lucide-react';
+import { useGetMessengers } from '@features/seller/hooks/useGetMessengers';
+import { useAssignOrdersToDelivery } from '@features/seller/hooks/useAssignOrdersToDelivery';
 import {
   cancelOrder,
   markOrderAsPaid,
@@ -100,6 +103,16 @@ export default function OrderActions({
 
   if (order.status === 'RESERVADO') {
     return <CancelOrderSection order={order} onSuccess={onSuccess} />;
+  }
+
+  if (order.status === 'LISTO') {
+    return (
+      <ReadyOrderSection
+        order={order}
+        onSuccess={onSuccess}
+        onNotification={onNotification}
+      />
+    );
   }
 
   if (order.status === 'RECHAZADO') {
@@ -298,6 +311,113 @@ function RejectedOrderSection({
       >
         {isSubmitting ? 'Procesando...' : 'Denegar'}
       </button>
+    </div>
+  );
+}
+
+function ReadyOrderSection({
+  order,
+  onSuccess,
+  onNotification,
+}: {
+  order: Order;
+  onSuccess?: () => void;
+  onNotification?: (type: 'success' | 'error', message: string) => void;
+}) {
+  const { messengers, loading: messengersLoading } = useGetMessengers();
+  const { assingToDelivery, isLoading: assignLoading } = useAssignOrdersToDelivery();
+  const [showList, setShowList] = useState(false);
+  const [selectedCourierId, setSelectedCourierId] = useState<string | null>(null);
+
+  const handleConfirm = async () => {
+    if (!selectedCourierId) return;
+    try {
+      await assingToDelivery(order.id, selectedCourierId);
+      onNotification?.('success', 'Mensajero asignado correctamente.');
+      onSuccess?.();
+    } catch {
+      onNotification?.('error', 'Error al asignar el mensajero.');
+    }
+  };
+
+  if (!showList) {
+    return (
+      <div className="text-right">
+        <button
+          onClick={() => setShowList(true)}
+          className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 cursor-pointer"
+        >
+          Asignar mensajero
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-3 mt-2">
+      {messengersLoading ? (
+        <div className="rounded-2xl border border-dashed border-(--theme-border) px-4 py-6 text-sm text-(--theme-text) opacity-50 text-center">
+          Cargando mensajeros…
+        </div>
+      ) : messengers.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-(--theme-border) px-4 py-6 text-sm text-(--theme-text) opacity-50 text-center">
+          No hay mensajeros disponibles.
+        </div>
+      ) : (
+        <div className="grid gap-2">
+          {messengers.map((messenger) => {
+            const isSelected = selectedCourierId === messenger.uid;
+            return (
+              <button
+                key={messenger.uid}
+                type="button"
+                onClick={() => setSelectedCourierId(messenger.uid)}
+                className={`flex items-center justify-between rounded-2xl border px-4 py-3 text-left transition hover:border-primary hover:bg-(--theme-secondary-bg) ${
+                  isSelected
+                    ? 'border-primary bg-primary/10 text-primary'
+                    : 'border-(--theme-border) bg-(--theme-card-bg) text-(--theme-text)'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${
+                      isSelected ? 'bg-primary text-white' : 'bg-(--theme-secondary-bg) text-(--theme-text)'
+                    }`}
+                  >
+                    <UserRound size={15} />
+                  </span>
+                  <div>
+                    <p className="font-semibold text-sm">{messenger.displayName}</p>
+                    <p className="text-xs opacity-55">
+                      {messenger.institutionalId || 'Sin CI institucional'}
+                    </p>
+                  </div>
+                </div>
+                <span className="text-xs font-semibold opacity-70">
+                  {isSelected ? 'Seleccionado' : 'Elegir'}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      <div className="flex justify-end gap-2">
+        <button
+          onClick={() => { setShowList(false); setSelectedCourierId(null); }}
+          disabled={assignLoading}
+          className="rounded-full border border-(--theme-border) px-5 py-2.5 text-sm font-medium text-(--theme-text) transition hover:bg-(--theme-secondary-bg) cursor-pointer disabled:opacity-50"
+        >
+          Cancelar
+        </button>
+        <button
+          onClick={handleConfirm}
+          disabled={!selectedCourierId || assignLoading}
+          className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50 cursor-pointer"
+        >
+          {assignLoading ? 'Asignando…' : 'Confirmar asignación'}
+        </button>
+      </div>
     </div>
   );
 }
