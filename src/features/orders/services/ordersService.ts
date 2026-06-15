@@ -56,6 +56,14 @@ function isDeliveredOrCompletedOrder(data: DocumentData): boolean {
 	);
 }
 
+export async function markOrderAsPaid(orderId: string): Promise<void> {
+	const orderRef = doc(db, "orders", orderId);
+	await updateDoc(orderRef, {
+		status: "PAGADO",
+		updatedAt: serverTimestamp(),
+	});
+}
+
 export async function paidOrder(orderId: string): Promise<void> {
 	const user = auth.currentUser;
 	if (!user) throw new Error("No autenticado");
