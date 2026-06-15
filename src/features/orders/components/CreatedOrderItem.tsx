@@ -1,7 +1,7 @@
-import type { Order } from '@features/orders/types';
-import { formatCurrency } from '../utils/currency';
-import OrderStatusBadge from './OrderStatusBadge';
-import { parseOrderId } from '@/features/cart/services/orderService';
+import type { Order } from "@features/orders/types";
+import { parseOrderId } from "@/features/cart/services/orderService";
+import { formatCurrency } from "../utils/currency";
+import OrderStatusBadge from "./OrderStatusBadge";
 
 interface Props {
   order: Order;
