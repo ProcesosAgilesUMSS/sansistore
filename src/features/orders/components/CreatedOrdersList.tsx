@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
-import type { Order } from '@features/orders/types';
-import { subscribeToCreatedOrders } from '@features/orders/services/ordersService';
-import CreatedOrderItem from './CreatedOrderItem';
-import OrderModal from './OrderModal';
-import Toast from '@features/admin/users/components/Toast';
-import { SectionHeader } from '../../seller/components/SectionHeader';
+import Toast from "@features/admin/users/components/Toast";
+import { subscribeToCreatedOrders } from "@features/orders/services/ordersService";
+import type { Order } from "@features/orders/types";
+import { useEffect, useState } from "react";
+import { SectionHeader } from "../../seller/components/SectionHeader";
+import CreatedOrderItem from "./CreatedOrderItem";
+import OrderModal from "./OrderModal";
 
 export default function CreatedOrdersList() {
   const [orders, setOrders] = useState<Order[]>([]);
