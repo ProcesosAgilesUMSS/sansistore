@@ -475,3 +475,8 @@
 - **Yesterday:** Analice mi hu designada para esta este sprint
 - **Today:** Continuar con la implementación de mi hu para este sprint.
 - **Blockers:** None.
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday:** Asignación y análisis de la HU #568 (Rechazar pedido asignado con motivo). La HU se encuentra en estado "In Progress".
+- **Today:** Continuar con el desarrollo de la HU #568.
+- **Blockers:** None.
