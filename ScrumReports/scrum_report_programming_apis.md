@@ -463,3 +463,10 @@
 - **Yesterday:** Estuve planificando que hu hare.
 - **Today:** Hablare con mi grupo para ver que hacer.
 - **Blockers:** None.
+
+## 16-06-2026
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Participé en el Sprint Planning 4 para continuar con el desarrollo de integración continua.
+- **Today:** Continuar con la implementación de la historia de usuario asignada y también verificar que errores se presentan durante el desarrollo.
+- **Blockers:** Cambiar la estética a la definida puede traer bugs de cualquier tipo, se debe tener cuidado.
