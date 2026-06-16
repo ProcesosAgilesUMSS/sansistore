@@ -65,23 +65,17 @@ export function AssignOrderCard({
   return (
     <div
       className={`overflow-hidden rounded-[1.25rem] bg-(--theme-card-bg) transition-all duration-200 hover:-translate-y-px hover:shadow-lg ${isSuccess
-        ? 'shadow-[0_0_0_3px_rgba(136,176,75,0.25)]'
+        ? 'shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-primary)_25%,transparent)]'
         : 'border-(--theme-border)'
         }`}
     >
       <div className="p-4">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <p
-              className="font-800 text-xs tracking-tight text-(--theme-text) pb-2"
-              style={{ fontFamily: 'Outfit, sans-serif' }}
-            >
+            <p className="pb-2 font-display text-xs font-800 tracking-tight text-(--theme-text)">
               # {order.orderId?.toUpperCase()}
             </p>
-            <p
-              className="font-800 text-lg tracking-tight text-(--theme-text)"
-              style={{ fontFamily: 'Outfit, sans-serif' }}
-            >
+            <p className="font-display text-lg font-800 tracking-tight text-(--theme-text)">
               {order.buyerName?.toUpperCase()}
             </p>
 
@@ -129,7 +123,7 @@ export function AssignOrderCard({
               <button
                 onClick={() => onUnassign(order.orderId, order.deliveryId ?? '')}
                 disabled={isAssigning}
-                className="flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-700 text-white transition hover:opacity-90 active:scale-95 disabled:opacity-50"
+                className="flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-700 text-primary-action transition hover:opacity-90 active:scale-95 disabled:opacity-50"
               >
                 {isAssigning ? 'Cancelando…' : 'Cancelar'}
               </button>
@@ -195,7 +189,7 @@ export function AssignOrderCard({
                 <button
                   onClick={() => onReassign(order.orderId, order.deliveryId ?? '', selectedCourierId ?? '')}
                   disabled={!selectedCourierId || isAssigning || !order.deliveryId}
-                  className="flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-700 text-white transition hover:opacity-90 active:scale-95 disabled:opacity-50"
+                  className="flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-700 text-primary-action transition hover:opacity-90 active:scale-95 disabled:opacity-50"
                 >
                   {isAssigning ? 'Reasignando…' : 'Reasignar'}
                 </button>
@@ -263,7 +257,7 @@ export function AssignOrderCard({
             <button
               onClick={() => onAssign(order.orderId, order.deliveryId ?? '')}
               disabled={!selectedCourierId || isAssigning || !order.deliveryId}
-              className="flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-700 text-white transition hover:opacity-90 active:scale-95 disabled:opacity-50"
+              className="flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-700 text-primary-action transition hover:opacity-90 active:scale-95 disabled:opacity-50"
             >
               {isAssigning ? (
                 <>
