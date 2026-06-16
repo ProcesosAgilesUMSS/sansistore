@@ -34,6 +34,8 @@ import CancelledOrdersReport from '../reports/components/CancelledOrdersReport.t
 import OrderHistory from '../pedidos/components/OrderHistory.tsx';
 // ── HU #160: Monitoreo de actividad de vendedores ──
 import SellerActivityPanel from '../monitoring/components/SellerActivityPanel.tsx';
+// ── HU #149: Demanda por horarios ──
+import DemandPanel from '../demand/components/DemandPanel.tsx';
 
 type Section =
   | 'dashboard'
@@ -49,6 +51,7 @@ type Section =
   | 'reportes-cancelados'   // ── HU #163 ──
   | 'bitacora'       
   | 'monitoreo'      // ── HU #160 ──
+  | 'demanda-horarios' // ── HU #149 ──
   | null;
 
 interface NavItem {
@@ -152,6 +155,8 @@ export default function AdminLayout() {
     bitacora: { title: 'Bitácora', subtitle: 'Registra actividad de inicio y cierre de sesión' },
     'reportes-cancelados': {title: 'Pedidos cancelados', subtitle: 'Reporte de órdenes canceladas por período'},
     monitoreo:              { title: 'Monitoreo de vendedores', subtitle: 'Bitácora de actividad y cambios de estado en pedidos' },
+    // ── HU #149 ──
+    'demanda-horarios':     { title: 'Demanda por horarios',    subtitle: 'Análisis de pedidos agrupados por franja horaria' },
   };
 
   const currentPage = pageTitles[activeSection ?? 'dashboard'];
@@ -347,6 +352,18 @@ export default function AdminLayout() {
                           >
                             Pedidos cancelados
                           </button>
+                          {/* ── HU #149 ── */}
+                          <button
+                            onClick={() => { setActiveSection('demanda-horarios'); setSidebarOpen(false); }}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
+                            transition-colors ${
+                              activeSection === 'demanda-horarios'
+                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
+                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
+                            }`}
+                          >
+                            Demanda por horarios
+                          </button>
                         </div>
                       )}
                     </div>
@@ -506,6 +523,8 @@ export default function AdminLayout() {
           {activeSection === 'reportes-cancelados' && <CancelledOrdersReport />}
           {/* ── HU #178 ── */}
           {activeSection === 'historial' && <OrderHistory />}
+          {/* ── HU #149: Demanda por horarios ── */}
+          {activeSection === 'demanda-horarios' && <DemandPanel />}
         </main>
 
       </div>
