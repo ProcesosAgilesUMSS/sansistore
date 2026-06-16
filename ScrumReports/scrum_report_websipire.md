@@ -421,9 +421,11 @@ por las dudas que se tienen.
 * **Today:** Comence con el desarrollo para el Sprint4.
 * **Blockers:** None.
 
+## Maria Victoria Grageda Vallejos
 
-
-
+* **Yesterday:** Revisé el tablero de GitHub y agregué los criterios de aceptación.
+* **Today:** Empecé con el desarrollo correspondiente al Sprint 4.
+* **Blockers:** None.
 
 
 # Daily Reports - Team 3 Webspire 16/06/26
@@ -432,4 +434,10 @@ por las dudas que se tienen.
 
 * **Yesterday:** Comence con la tarea que se nos asigno, de mejorar el diseño de una una vista, especificamente la que esta en: src/features/cobro/components/CheckoutSummaryPanel.tsx
 * **Today:** Comenzare con el desarrollo de mi HU Asiganada.
+* **Blockers:** None.
+
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Estuve trabajando en mi HU asignada, revisando los avances necesarios para continuar con su desarrollo.
+* **Today:** Continuaré trabajando en mi HU asignada.
 * **Blockers:** None.
