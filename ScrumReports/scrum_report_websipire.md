@@ -427,6 +427,11 @@ por las dudas que se tienen.
 * **Today:** Empecé con el desarrollo correspondiente al Sprint 4.
 * **Blockers:** None.
 
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Revisé los requerimientos de las HUs asignadas y validé los criterios de aceptación para iniciar su desarrollo.
+* **Today:** Comencé con la implementación de las funcionalidades correspondientes.
+* **Blockers:** None
 
 # Daily Reports - Team 3 Webspire 16/06/26
 
@@ -441,3 +446,9 @@ por las dudas que se tienen.
 * **Yesterday:** Estuve trabajando en mi HU asignada, revisando los avances necesarios para continuar con su desarrollo.
 * **Today:** Continuaré trabajando en mi HU asignada.
 * **Blockers:** None.
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Estuve trabajando en mi HU asignada, avanzando con la implementación de las funcionalidades.
+* **Today:** Continuaré con el desarrollo de mi HU, realizando pruebas y ajustes para asegurar su correcto funcionamiento.
+* **Blockers:** None
