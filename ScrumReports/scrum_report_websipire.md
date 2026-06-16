@@ -412,3 +412,67 @@ por las dudas que se tienen.
 * **Yesterday:** Estuve presente en la demo realizada el día de ayer, revisando junto al equipo los avances alcanzados durante el sprint.
 * **Today:** Apoyar en la planificación de las historias de usuario pendientes, revisando posibles dependencias y su integración dentro del flujo de la aplicación.
 * **Blockers:** None.
+
+# Daily Reports - Team 3 Webspire 11/06/26
+
+## Dayana Saleth Ortuño Guzmán
+
+* **Yesterday:** Revise el tablero de github y puse los criterios de aceptacion a la HU designada.
+* **Today:** Comence con el desarrollo para el Sprint4.
+* **Blockers:** None.
+
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Revisé el tablero de GitHub y agregué los criterios de aceptación.
+* **Today:** Empecé con el desarrollo correspondiente al Sprint 4.
+* **Blockers:** None.
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Revisé los requerimientos de las HUs asignadas y validé los criterios de aceptación para iniciar su desarrollo.
+* **Today:** Comencé con la implementación de las funcionalidades correspondientes.
+* **Blockers:** None
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Estuve presente en la asignacion de hus para ver el funcionamiento que tendra que tener.
+* **Today:** Contribui con la asignacion de criterios de aceptacion de mis his asignadas
+* **Blockers:** none
+  
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Revisé los requerimientos de las HUs asignadas y confirmé los criterios de aceptación necesarios para comenzar con el desarrollo.
+* **Today:** Inicié la implementación de las funcionalidades correspondientes a mi HU asignada.
+* **Blockers:** None
+  
+# Daily Reports - Team 3 Webspire 16/06/26
+
+## Dayana Saleth Ortuño Guzmán
+
+* **Yesterday:** Comence con la tarea que se nos asigno, de mejorar el diseño de una una vista, especificamente la que esta en: src/features/cobro/components/CheckoutSummaryPanel.tsx
+* **Today:** Comenzare con el desarrollo de mi HU Asiganada.
+* **Blockers:** None.
+
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Estuve trabajando en mi HU asignada, revisando los avances necesarios para continuar con su desarrollo.
+* **Today:** Continuaré trabajando en mi HU asignada.
+* **Blockers:** None.
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Estuve trabajando en mi HU asignada, avanzando con la implementación de las funcionalidades.
+* **Today:** Continuaré con el desarrollo de mi HU, realizando pruebas y ajustes para asegurar su correcto funcionamiento.
+* **Blockers:** None
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Trabaje en el avance del mockup de la Hu que me toco para este sprint. 
+* **Today:**  Avance con el desarrollo de mi hu asignada.
+* **Blockers:** none
+
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Estuve avanzando en mi HU asignada, desarrollando parte de las funcionalidades planificadas.
+* **Today:** Continuaré con la implementación de mi HU, realizando pruebas y ajustes para asegurar su correcto funcionamiento.
+* **Blockers:** None
