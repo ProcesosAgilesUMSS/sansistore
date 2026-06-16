@@ -472,3 +472,11 @@
 - **Yesterday:** Unifiqué el sistema de UI para corregir la inconsistencia visual del sitio: documenté el estándar en un único archivo `UI.md`, agregué los tokens de color faltantes (warning, info, danger) en `global.css`, dejé una sola fuente (Inter) cargada de forma centralizada y rediseñé el logo de marca y el footer (con íconos reales de redes) usando los tokens del tema para que respeten el dark mode.
 - **Today:** Apoyar a los equipos en la migración de los colores hardcodeados a los tokens y validar que las pantallas cumplan el estándar de header/footer y ancho.
 - **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Validé el flujo completo de autenticación con roles, asegurando coherencia en los mensajes para cada tipo de usuario.
+- **Today:** Revisé el flujo general de la aplicación y ayudé a detectar inconsistencias visuales (contrastes, alineaciones, espaciados).
+- **Blockers:** n/a.
+
+
