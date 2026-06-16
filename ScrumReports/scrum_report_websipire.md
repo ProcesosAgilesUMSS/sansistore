@@ -438,7 +438,13 @@ por las dudas que se tienen.
 * **Yesterday:** Estuve presente en la asignacion de hus para ver el funcionamiento que tendra que tener.
 * **Today:** Contribui con la asignacion de criterios de aceptacion de mis his asignadas
 * **Blockers:** none
+  
+## Jose Brandon Pinedo Gonzales
 
+* **Yesterday:** Revisé los requerimientos de las HUs asignadas y confirmé los criterios de aceptación necesarios para comenzar con el desarrollo.
+* **Today:** Inicié la implementación de las funcionalidades correspondientes a mi HU asignada.
+* **Blockers:** None
+  
 # Daily Reports - Team 3 Webspire 16/06/26
 
 ## Dayana Saleth Ortuño Guzmán
@@ -464,3 +470,9 @@ por las dudas que se tienen.
 * **Yesterday:** Trabaje en el avance del mockup de la Hu que me toco para este sprint. 
 * **Today:**  Avance con el desarrollo de mi hu asignada.
 * **Blockers:** none
+
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Estuve avanzando en mi HU asignada, desarrollando parte de las funcionalidades planificadas.
+* **Today:** Continuaré con la implementación de mi HU, realizando pruebas y ajustes para asegurar su correcto funcionamiento.
+* **Blockers:** None
