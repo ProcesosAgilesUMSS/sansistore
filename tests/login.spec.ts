@@ -20,9 +20,9 @@ test.describe('Auth - Login', () => {
                 ?.querySelector('button[type="button"]');
               return Boolean(
                 button &&
-                  Object.keys(button).some((key) =>
-                    key.startsWith('__reactProps')
-                  )
+                Object.keys(button).some((key) =>
+                  key.startsWith('__reactProps')
+                )
               );
             });
           } catch (e) {
@@ -93,8 +93,12 @@ test.describe('Auth - Login', () => {
     await expect(page).not.toHaveURL(/\/login/, { timeout: 30_000 });
 
     await page.goto('/me');
-    await expect(page.getByText('No autenticado')).toBeHidden({ timeout: 15_000 });
-    await expect(page.locator('dd', { hasText: 'juan.paredes@est.umss.edu' })).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('No autenticado')).toBeHidden({
+      timeout: 15_000,
+    });
+    await expect(
+      page.locator('dd', { hasText: 'juan.paredes@est.umss.edu' })
+    ).toBeVisible({ timeout: 15_000 });
   });
 
   test('should show "No autenticado" on /me when not authenticated', async ({
@@ -107,7 +111,7 @@ test.describe('Auth - Login', () => {
     });
 
     await expect(
-      page.getByRole('link', { name: 'Iniciar sesión' })
+      page.locator('main').getByRole('link', { name: 'Iniciar sesión' })
     ).toBeVisible();
   });
 
@@ -123,7 +127,9 @@ test.describe('Auth - Login', () => {
     await expect(page.getByLabel('Correo electrónico')).toBeVisible();
     await expect(page.locator('#password')).toBeVisible();
     await expect(
-      page.locator('form').getByRole('button', { name: 'Iniciar sesión', exact: true })
+      page
+        .locator('form')
+        .getByRole('button', { name: 'Iniciar sesión', exact: true })
     ).toBeVisible();
   });
 });
