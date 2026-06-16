@@ -460,7 +460,12 @@
 - **Today:** Validar los seeders en conjunto con las pruebas y apoyar en la revisión de PRs.
 - **Blockers:** n/a.
 
-# 06/13/2026
+# 06/15/2026
+
+## Castro Tejada Steven Lisandro
+- **Yesterday:** Completé y mergeé dos Pull Requests críticas para la aplicación: la PR #562 (*Add clear cart feature and tests*) que cierra las HUs #554 y #555 (vaciado de carrito y sus pruebas e2e con Playwright); y la PR #561 (*Mejoras de estilos, favoritos y dropdown*) que resuelve las issues de diseño/funcionalidad #557, #558, #559 y #560 (favoritos en detalle de producto, etiquetas de stock agotado/no disponible y contrastes de botones).
+- **Today:** Diseñé, creé y configuré en GitHub la nueva issue de Flow #564 (*Calificación promedio de entregas para Mensajero en /me*). La asigné en el tablero de proyectos (Sprint 4, Team: `flow`, Area: `usuarios`, Status: `ToDO`, Priority: `P2`, Severity: `Minor`) y la vinculé como sub-issue/tarea hija de la HU contenedora Padre #490 actualizando su descripción y checklist en GitHub.
+- **Blockers:** n/a.
 
 ## Velasquez Vela Marcos
 
