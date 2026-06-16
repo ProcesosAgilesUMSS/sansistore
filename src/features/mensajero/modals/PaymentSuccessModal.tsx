@@ -46,7 +46,7 @@ export default function PaymentSuccessModal({ onClose }: Props) {
           <button
             type="button"
             onClick={onClose}
-            className="flex w-full items-center justify-center rounded-full bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90 active:scale-95"
+            className="flex w-full items-center justify-center rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-action transition hover:opacity-90 active:scale-95"
           >
             Aceptar
           </button>
