@@ -507,7 +507,7 @@ function PendingOrderCard({
 
                     {order.deliveryStatus === 'accepted' && (
                         <button
-                            className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 text-sm font-bold text-white shadow-lg transition hover:scale-[1.02] hover:bg-blue-700"
+                            className="messenger-transit-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold shadow-lg transition hover:scale-[1.02]"
                             onClick={() => onInTransit(order.id)}
                             type="button"
                         >
@@ -605,7 +605,7 @@ function OrderDetailModal({
                 if (event.target === event.currentTarget) onClose();
             }}
         >
-            <section className="max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-[28px] border border-border-light bg-card-bg-light text-text-light shadow-2xl">
+            <section className="max-h-[92vh] w-full max-w-6xl overflow-y-auto rounded-[28px] border border-border-light bg-card-bg-light text-text-light shadow-2xl">
                 <header className="flex items-start justify-between gap-4 border-b border-border-light px-6 py-5">
                     <div>
                         <h2 className="text-2xl font-black tracking-normal">
@@ -782,7 +782,7 @@ function OrderDetailModal({
 
                             {canCancelByNoPayment(order) && (
                                 <button
-                                    className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-red-500 bg-red-50 px-6 text-sm font-bold text-red-600 transition hover:bg-red-100 active:scale-95"
+                                    className="messenger-reject-button inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition active:scale-95"
                                     onClick={() => {
                                         onClose();
                                         onCancelNoPayment(order);
@@ -797,7 +797,7 @@ function OrderDetailModal({
                             {(order.deliveryStatus === 'accepted' ||
                                 order.deliveryStatus === 'in_transit') && (
                                     <button
-                                        className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-red-500 bg-red-50 px-6 text-sm font-bold text-red-600 transition hover:bg-red-100 active:scale-95"
+                                        className="messenger-reject-button inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition active:scale-95"
                                         onClick={() => {
                                             onClose();
                                             onNotDelivered(order);
