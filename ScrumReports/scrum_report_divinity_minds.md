@@ -473,6 +473,12 @@
 - **Today:** Apoyar a los equipos en la migración de los colores hardcodeados a los tokens y validar que las pantallas cumplan el estándar de header/footer y ancho.
 - **Blockers:** n/a.
 
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Revisé las HUs de operador y comprador, detectando un bug de visualización en la interfaz del comprador que ya fue reportado
+- **Today:** Continuaré con la revisión de más HUs para analizar la lógica completa de los bugs.
+- **Blockers:** La falta de detalle en algunas HUs complica su revisión.
+
 ## Merino Vidal Mateo Alejandro
 
 - **Yesterday:** Validé el flujo completo de autenticación con roles, asegurando coherencia en los mensajes para cada tipo de usuario.
