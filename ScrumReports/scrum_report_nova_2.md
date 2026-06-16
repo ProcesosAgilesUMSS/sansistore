@@ -344,3 +344,61 @@
 - **Yesterday:** finalización del desarrollo de mi hu#164
 - **Today:** arreglo del bug reportado y implementación del seed del formulario de registro 
 - **Blockers:** none
+
+# 09/06/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+* **Yesterday:** estaba coordinando con mi equipo para el ultimo sprint
+* **Today:** empezamos a coordinar con mi grupo para la realizacion del scrum retrospective
+* **Blockers:** none.
+
+## Fabricio Javier Cordova Caceres 
+* **Yesterday:** estaba coordinando con mi equipo la planificación de la próximo sprint 
+* **Today:** empezamos a coordinar con mi equipo para la realizacion del scrum retrospective
+* **Blockers:** none.
+
+## Dylan Coca Beltran
+- **Yesterday:** revise algunos bugs de las hu pasadas y trate de solucionarlos
+- **Today:** solucione algunos bugs y coordine con mi equipo que hu podriamos hacer este sprint
+- **Blockers:** none
+
+## Jherlan Marcelo Calero Sardan
+* **Yesterday:**  Estaba coordinando con el grupo la planificación del siguiente sprint. 
+* **Today:** hice algunos cambios en mi HU #159. 
+* **Blockers:** none.
+
+## Camila Wara Fernandez Sandoval 
+* **Yesterday:**  Participe en las reuniones con mi grupo para la planificación del siguiente sprint
+* **Today:** coordine con mi grupo para realizar el scrum restrospective
+* **Blockers:** none.
+
+# 11/06/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+* **Yesterday:** estaba coordinando con mi equipo para sortear las hus y asignaciones en este sprint 4
+* **Today:** empece a refinar la hu #149 
+* **Blockers:** none.
+
+## Jherlan Marcelo Calero Sardan 
+* **Yesterday:** estaba coordinando con mi equipo para sortear las hus y asignaciones en este sprint 4
+* **Today:** empece a refinar la hu #149 coordinando con mi compañero 
+* **Blockers:** none.
+
+## Camila Wara Fernandez Sandoval 
+* **Yesterday:** Me reuní con mi equipo para sortear las hus de este sprint 
+* **Today:** Revise y empecé con los criterios de aceptación de la Hu #145 
+* **Blockers:** none.
+
+## Dylan Coca Beltran
+- **Yesterday:** me reuni con mi equipo para coordinar las historias de usuario y refinarlo
+- **Today:** comence a trabajar en mi hu la parte del frontend y ver lo que necesitare de la base de datos para el backend
+- **Blockers:** none
+
+## Fabricio Javier Cordova Caceres 
+* **Yesterday:** Me reuní con mi equipo paradefinirs responsables de hu
+* **Today:** Revise y empecé con los criterios de aceptación de mi HU
+* **Blockers:** none.

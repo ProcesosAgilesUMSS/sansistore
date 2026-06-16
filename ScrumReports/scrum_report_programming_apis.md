@@ -401,3 +401,65 @@
 - **Yesterday:** Trabaje en mis HU asignadas y mi issue asignado
 - **Today:** Preveo terminar mi HU y bug asignado
 - **Blockers:** None.
+
+***
+
+# Sprint 4
+
+## 09-06-2026
+
+### José Daniel Virreira Rufino
+
+- **Yesterday:** Participé en la demo, presentación y finalización de todo el Sprint 3
+- **Today:** Trabajaré en el sprint retrospective, en el sprint planning para esta cuarta iteración y empezaré con la implementación de las siguientes historias de usuario.
+- **Blockers:** Encontrar posibles dependencias para este sprint sobre nuestras historias de usuario.
+
+### Efrain Peralta Felipe
+
+- **Yesterday:** Encontre una hus posiblemente duplicada en las hus que nos faltan.
+- **Today:** Trabajare en la hu del sprint 4.
+- **Blockers:** None
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday:** Cierre del Sprint 3, verificación de que todos los PRs estén mergeados en `main` y preparación para la retrospectiva.
+- **Today:** Participar en el sprint retrospective y en el sprint planning para esta cuarta iteración.
+- **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+- **Yesterday:** Verifique las funcionalidades añadidas por nuestro team para el sprint 3
+- **Today:** Realizar el trello para el sprint retrospective
+- **Blockers:** None.
+
+### Adrian
+
+- **Yesterday:** Estuve trabajando en la hu asignada
+- **Today:** Termine de corregir un bug que salia.
+- **Blockers:** None.
+
+## 11-06-2026
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday:** Cierre del Sprint 3 y preparación para el Sprint 4.
+- **Today:** Inicio del desarrollo de las historias de usuario asignadas para el Sprint 4.
+- **Blockers:** None.
+
+### Efrain Peralta Felipe
+- **Yesterday:** Preparación del sprint 4.
+- **Today:** Comenzar con el desarrollo de la hu del sprint 4.
+- **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+- **Yesterday:** Empece la preparacion de las HU para el sprint 4.
+- **Today:** Comenzare con el desarrollo de HU para el sprint 4 y correccion de bugs
+- **Blockers:** None.
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Documenté las historias de usuario para este sprint 4
+- **Today:** Refinaremos el sprint planning para poder empezar a desarrollar el sprint 4
+- **Blockers:** Las funcionalidades que estaban en el git son deprecadas, duplicadas, o en estado "not to release", por lo tanto, tuvimos que planear nuevas HU's en base a indicaciones del ingeniero.
+
+### Adrian
+
+- **Yesterday:** Estuve planificando que hu hare.
+- **Today:** Hablare con mi grupo para ver que hacer.
+- **Blockers:** None.

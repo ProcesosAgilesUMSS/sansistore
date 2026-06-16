@@ -11,9 +11,6 @@
 - [Commits](./commits.md)
 - [Pull Requests](./pull-requests.md)
 
-## Frontend System
-- [Design System](./frontend/design-system.md)
-
 - [Seeding](./seed.md)
 
 ## Reports

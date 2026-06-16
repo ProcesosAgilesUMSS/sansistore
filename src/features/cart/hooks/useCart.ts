@@ -10,8 +10,8 @@ import {
   onSnapshot,
 } from 'firebase/firestore';
 import { auth, db } from '../../../lib/firebase';
-import { getLocalCart, addToLocalCart, updateLocalCartQuantity, setQuantityLocalCart, removeFromLocalCart, getTotalUnits, saveLocalCart } from '../utils/localCart';
-import { syncCartToFirestore, upsertCartItem, deleteCartItem } from '../services/cartFirestore';
+import { getLocalCart, addToLocalCart, updateLocalCartQuantity, setQuantityLocalCart, removeFromLocalCart, getTotalUnits, saveLocalCart, clearLocalCart } from '../utils/localCart';
+import { syncCartToFirestore, upsertCartItem, deleteCartItem, clearCartFirestore } from '../services/cartFirestore';
 import { notifyCartUpdate } from '../store/cartStore';
 import type { LocalCartItem, CartProduct, CartItemWithProduct } from '../types';
 
@@ -331,6 +331,20 @@ export function useCart() {
 
   const clearError = useCallback(() => setError(null), []);
 
+  const clearCart = useCallback(async () => {
+    clearLocalCart();
+    setItems([]);
+    setTotalUnits(0);
+    notifyCartUpdate(0);
+    if (uidRef.current) {
+      try {
+        await clearCartFirestore(uidRef.current);
+      } catch (error) {
+        console.error('Failed to clear firestore cart:', error);
+      }
+    }
+  }, []);
+
   return {
     items,
     itemsWithProducts,
@@ -341,6 +355,7 @@ export function useCart() {
     updateQuantity,
     setQuantity,
     removeItem,
+    clearCart,
     clearError,
   };
 }

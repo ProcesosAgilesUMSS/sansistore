@@ -195,6 +195,8 @@ async function seedFirestoreUsers() {
       displayName: user.displayName,
       photoURL: user.photoURL,
       phoneNumber: user.phoneNumber ?? null,
+      ci: user.ci ?? null,
+      internalPhone: user.internalPhone ?? null,
       roles: user.roles,
       institutionalId: user.institutionalId,
       isActive: user.isActive,

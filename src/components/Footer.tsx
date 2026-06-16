@@ -1,31 +1,44 @@
+import { ShoppingBag } from 'lucide-react';
+import { FaInstagram, FaTiktok, FaFacebookF } from 'react-icons/fa6';
+
+const SOCIALS = [
+  { label: 'Instagram', href: '#', Icon: FaInstagram },
+  { label: 'TikTok', href: '#', Icon: FaTiktok },
+  { label: 'Facebook', href: '#', Icon: FaFacebookF },
+];
+
 export default function Footer({ className = '' }: { className?: string }) {
   return (
-    <footer className={`border-t border-border-light bg-bg-light font-sans ${className}`}>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 flex flex-col sm:flex-row items-center justify-between gap-6">
+    <footer className={`border-t border-(--theme-border) bg-(--theme-bg) font-sans ${className}`}>
+      <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 py-9 flex flex-col sm:flex-row items-center justify-between gap-3">
 
         {/* Brand */}
-        <span className="font-black tracking-tight text-[16px] text-text-light">
-          sansi<span className="text-primary">store</span>
-        </span>
+        <a href="/" aria-label="SansiStore — inicio" className="group flex items-center gap-2">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-white shadow-sm shadow-primary/30 transition-transform group-hover:scale-105 group-active:scale-95">
+            <ShoppingBag size={15} strokeWidth={2.4} />
+          </span>
+          <span className="font-display font-black tracking-tight text-[16px] leading-none text-(--theme-text)">
+            Sansi<span className="text-primary">Store</span>
+          </span>
+        </a>
 
         {/* Copyright */}
-        <p className="text-text-light opacity-[0.55] text-[12px] tracking-[0.02em]">
-          © 2026 Sansistore. Todos los derechos reservados.
+        <p className="text-(--theme-text) opacity-55 text-[12px] tracking-[0.02em]">
+          © 2026 SansiStore. Todos los derechos reservados.
         </p>
 
-        {/* Social links */}
-        <div className="flex items-center gap-6">
-
-          {['Instagram', 'TikTok', 'Facebook'].map((s) => (
+        {/* Redes */}
+        <div className="flex items-center gap-2">
+          {SOCIALS.map(({ label, href, Icon }) => (
             <a
-              key={s}
-              href="#"
-              className="text-[12px] text-text-light opacity-[0.55] font-semibold tracking-[0.05em] transition-all hover:text-primary hover:opacity-100"
+              key={label}
+              href={href}
+              aria-label={label}
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-(--theme-border) text-(--theme-text) opacity-70 transition-all hover:border-primary hover:bg-primary hover:text-white hover:opacity-100 hover:scale-105"
             >
-              {s}
+              <Icon size={15} />
             </a>
           ))}
-
         </div>
       </div>
     </footer>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-// Añadidos writeBatch e increment para la actualización atómica del stock
 import { collection, query, where, onSnapshot, getDocs, doc, updateDoc, serverTimestamp, getDoc, writeBatch, increment } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth'; // Para obtener el operador actual
+import { getAuth } from 'firebase/auth'; // Operador actual
 import { db } from '@/lib/firebase';
 import { PackageSearch, PackageCheck, AlertCircle, CheckCircle2, Play, X, ListFilter, User, ArchiveRestore, CheckSquare } from 'lucide-react';
 import { parseOrderId } from '@/features/cart/services/orderService';
@@ -145,15 +144,16 @@ export const OrderDispatch: React.FC = () => {
 
       const orderRef = doc(db, 'orders', order.id);
       batch.update(orderRef, {
-        status: 'PEDIDO_CERRADO', 
+        status: 'CERRADO', 
         stockReturnedAt: serverTimestamp(),
         returnedByOperator: operatorName
       });
 
       order.items.forEach((item) => {
-        const productRef = doc(db, 'products', item.productId);
+        const productRef = doc(db, 'inventory', item.productId);
         batch.update(productRef, {
-          stock: increment(item.quantity)
+          stockTotal: increment(item.quantity),
+          stockAvailable: increment(item.quantity)
         });
 
         const movementRef = doc(collection(db, 'inventoryMovements'));

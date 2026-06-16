@@ -19,15 +19,16 @@ test.describe('Home Page', () => {
     await expect(page).toHaveTitle(/Sansistore/);
   });
 
-  test('displays welcome heading', async ({ page }) => {
+  test('redirects to products catalog', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByRole('heading', { name: 'Bienvenido a Sansistore' })).toBeVisible();
+    await expect(page).toHaveURL('/productos');
+    await expect(
+      page.getByRole('heading', { name: 'Productos disponibles' })
+    ).toBeVisible();
   });
 
-  test('has products link', async ({ page }) => {
+  test('shows products page after entering home', async ({ page }) => {
     await page.goto('/');
-    const link = page.getByRole('link', { name: 'Ver Productos' });
-    await expect(link).toBeVisible();
-    await expect(link).toHaveAttribute('href', '/productos');
+    await expect(page).toHaveTitle(/Productos \| Sansistore/);
   });
 });

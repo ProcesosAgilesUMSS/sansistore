@@ -427,3 +427,43 @@
 - **Yesterday:** Preparó el reporte del equipo, creó la rama de trabajo y ordenó algunas HUs para que quedaran más claras dentro del sprint.
 - **Today:** Participar en la retrospectiva y registrar los compromisos que salgan para darles seguimiento.
 - **Blockers:** n/a.
+
+# 06/11/2026
+
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Realicé la revisión de las HUs del Sprint 4 y documenté los criterios de aceptación pendientes en el tablero.
+- **Today:** Dar soporte en la validación de los PRs abiertos y coordinar la asignación de tareas del sprint.
+- **Blockers:** n/a.
+
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Refactoricé los tests automatizados para mejorar la escalabilidad, separando responsabilidades y reduciendo duplicación en los casos de prueba.
+- **Today:** Continuar con la migración de los tests restantes al nuevo esquema y actualizar el workflow de CI.
+- **Blockers:** n/a.
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Refactoricé la estructura de los tests de integración para que sean más modulares y reutilizables entre HUs.
+- **Today:** Escribir nuevos casos de prueba para las funcionalidades del Sprint 4 usando la nueva estructura.
+- **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Revisé el flujo de autenticación y reporté inconsistencias en los mensajes de error.
+- **Today:** Corregir los mensajes de error en el login y validar el flujo completo con roles.
+- **Blockers:** n/a.
+
+## Velasquez Vela Marcos
+
+- **Yesterday:** Creé el archivo de estándar de diseño para definir lineamientos visuales y buenas prácticas del proyecto.
+- **Today:** Validar los seeders en conjunto con las pruebas y apoyar en la revisión de PRs.
+- **Blockers:** n/a.
+
+# 06/13/2026
+
+## Velasquez Vela Marcos
+
+- **Yesterday:** Unifiqué el sistema de UI para corregir la inconsistencia visual del sitio: documenté el estándar en un único archivo `UI.md`, agregué los tokens de color faltantes (warning, info, danger) en `global.css`, dejé una sola fuente (Inter) cargada de forma centralizada y rediseñé el logo de marca y el footer (con íconos reales de redes) usando los tokens del tema para que respeten el dark mode.
+- **Today:** Apoyar a los equipos en la migración de los colores hardcodeados a los tokens y validar que las pantallas cumplan el estándar de header/footer y ancho.
+- **Blockers:** n/a.

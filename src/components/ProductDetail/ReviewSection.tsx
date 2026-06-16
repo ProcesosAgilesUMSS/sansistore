@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, ChevronDown } from 'lucide-react';
 import type { Review, ReviewSortKey } from './types';
 import { REVIEW_PAGE_SIZE } from './types';
 import { renderStars, sortReviews, areSetsEqual } from './utils';
@@ -42,11 +42,23 @@ export default function ReviewSection({
   onCancelDelete,
 }: ReviewSectionProps) {
   const [reviewSort, setReviewSort] = useState<ReviewSortKey>('recent');
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [visibleReviewsCount, setVisibleReviewsCount] = useState(REVIEW_PAGE_SIZE);
   const [expandedReviews, setExpandedReviews] = useState<Set<string>>(new Set());
   const [truncatedReviews, setTruncatedReviews] = useState<Set<string>>(new Set());
 
   const reviewRefs = useRef<Map<string, HTMLParagraphElement>>(new Map());
+  const sortRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (sortRef.current && !sortRef.current.contains(event.target as Node)) {
+        setShowSortDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
 
   const sortedReviews = useMemo(() => sortReviews(reviews, reviewSort), [reviews, reviewSort]);
   const visibleReviews = useMemo(
@@ -111,23 +123,42 @@ export default function ReviewSection({
           <h2 className="text-xl font-black text-text-light">Comentarios del producto</h2>
         </div>
         {reviewsCount > 0 && (
-          <label className="flex items-center gap-2 text-sm font-medium text-text-light">
+          <div className="flex items-center gap-2 text-sm font-medium text-text-light">
             <span className="opacity-70">Ordenar por</span>
-            <select
-              value={reviewSort}
-              onChange={(event) => {
-                setReviewSort(event.target.value as ReviewSortKey);
-                setVisibleReviewsCount(REVIEW_PAGE_SIZE);
-              }}
-              className="rounded-full border border-border-light bg-secondary-bg-light px-4 py-2 text-sm text-text-light outline-none transition-colors hover:border-primary focus:border-primary"
-            >
-              {reviewSortOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
+            <div ref={sortRef} className="relative shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowSortDropdown(!showSortDropdown)}
+                className="flex items-center gap-2 rounded-full border border-border-light bg-card-bg-light px-4 py-2 text-sm font-semibold text-text-light transition-all hover:border-primary hover:text-primary"
+              >
+                <span>{reviewSortOptions.find((opt) => opt.value === reviewSort)?.label ?? 'Más recientes'}</span>
+                <ChevronDown size={16} className={`transition-transform duration-200 ${showSortDropdown ? 'rotate-180' : ''}`} />
+              </button>
+
+              {showSortDropdown && (
+                <div className="absolute right-0 top-full mt-1 min-w-48 rounded-lg border border-border-light bg-card-bg-light py-1 shadow-lg z-20">
+                  {reviewSortOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => {
+                        setReviewSort(option.value);
+                        setVisibleReviewsCount(REVIEW_PAGE_SIZE);
+                        setShowSortDropdown(false);
+                      }}
+                      className={`w-full px-4 py-2 text-left text-sm font-medium transition-colors ${
+                        reviewSort === option.value
+                          ? 'bg-primary/15 text-primary'
+                          : 'text-text-light hover:bg-secondary-bg-light'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         )}
       </div>
 
