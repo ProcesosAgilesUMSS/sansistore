@@ -470,3 +470,8 @@
 - **Yesterday:** Participé en el Sprint Planning 4 para continuar con el desarrollo de integración continua.
 - **Today:** Continuar con la implementación de la historia de usuario asignada y también verificar que errores se presentan durante el desarrollo.
 - **Blockers:** Cambiar la estética a la definida puede traer bugs de cualquier tipo, se debe tener cuidado.
+
+### Efrain Peralta Felipe
+- **Yesterday:** Analice mi hu designada para esta este sprint
+- **Today:** Continuar con la implementación de mi hu para este sprint.
+- **Blockers:** None.
