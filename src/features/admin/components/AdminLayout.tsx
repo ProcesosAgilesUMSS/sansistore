@@ -36,6 +36,8 @@ import OrderHistory from '../pedidos/components/OrderHistory.tsx';
 import SellerActivityPanel from '../monitoring/components/SellerActivityPanel.tsx';
 // ── HU #149: Demanda por horarios ──
 import DemandPanel from '../demand/components/DemandPanel.tsx';
+// ── HU #145: Auditoría de cobros ──
+import PaymentAuditPanel from '../pedidos/payment-audit/components/PaymentAuditPanel.tsx';
 
 type Section =
   | 'dashboard'
@@ -49,9 +51,10 @@ type Section =
   | 'parametros'     // ── HU #152 ──
   | 'reportes'       // ── HU #161 ──
   | 'reportes-cancelados'   // ── HU #163 ──
-  | 'bitacora'       
+  | 'bitacora'
   | 'monitoreo'      // ── HU #160 ──
   | 'demanda-horarios' // ── HU #149 ──
+  | 'auditoria-cobros' // ── HU #145 ──
   | null;
 
 interface NavItem {
@@ -126,9 +129,9 @@ export default function AdminLayout() {
     {
       title: 'Analítica',
       items: [
-        { label: 'Ventas',     icon: <BarChart2 size={15} />, section: 'ventas-diarias' },
-        { label: 'Inventario', icon: <Package size={15} />,   section: null, disabled: true },
-        { label: 'Mensajeros', icon: <Bike size={15} />,      section: null, disabled: true },
+        { label: 'Ventas', icon: <BarChart2 size={15} />, section: 'ventas-diarias' },
+        { label: 'Inventario', icon: <Package size={15} />, section: null, disabled: true },
+        { label: 'Mensajeros', icon: <Bike size={15} />, section: null, disabled: true },
         {
           // ── HU #161: habilitado ──
           label: 'Reportes',
@@ -140,23 +143,25 @@ export default function AdminLayout() {
   ];
 
   const pageTitles: Record<string, { title: string; subtitle: string }> = {
-    dashboard:              { title: 'Dashboard',              subtitle: 'Panel de administración' },
-    pedidos:                { title: 'Pedidos',                subtitle: 'Validación de recepción por comprador' },
-    historial:              { title: 'Historial de pedido',    subtitle: 'Auditoría completa del pedido' },
-    usuarios:               { title: 'Gestión de usuarios',    subtitle: 'Registra y administra usuarios' },
-    categorias:             { title: 'Categorías',             subtitle: 'Gestiona las categorías de productos' },
-    'ventas-diarias':       { title: 'Ventas diarias',         subtitle: 'Monitorea el rendimiento diario de ventas' },
+    dashboard: { title: 'Dashboard', subtitle: 'Panel de administración' },
+    pedidos: { title: 'Pedidos', subtitle: 'Validación de recepción por comprador' },
+    historial: { title: 'Historial de pedido', subtitle: 'Auditoría completa del pedido' },
+    usuarios: { title: 'Gestión de usuarios', subtitle: 'Registra y administra usuarios' },
+    categorias: { title: 'Categorías', subtitle: 'Gestiona las categorías de productos' },
+    'ventas-diarias': { title: 'Ventas diarias', subtitle: 'Monitorea el rendimiento diario de ventas' },
     'mensajeros-desempeno': { title: 'Desempeño de mensajeros', subtitle: 'Métricas de eficiencia por mensajero' },
-    'mas-vendidos':         { title: 'Más vendidos',           subtitle: 'Productos con más unidades vendidas' },
+    'mas-vendidos': { title: 'Más vendidos', subtitle: 'Productos con más unidades vendidas' },
     // ── HU #152 ──
-    parametros:             { title: 'Parámetros del sistema', subtitle: 'Configura los parámetros globales del sistema' },
+    parametros: { title: 'Parámetros del sistema', subtitle: 'Configura los parámetros globales del sistema' },
     // ── HU #161 ──
     reportes: { title: 'Reportes de ventas', subtitle: 'Genera reportes de ventas por rango de fechas' },
     bitacora: { title: 'Bitácora', subtitle: 'Registra actividad de inicio y cierre de sesión' },
-    'reportes-cancelados': {title: 'Pedidos cancelados', subtitle: 'Reporte de órdenes canceladas por período'},
-    monitoreo:              { title: 'Monitoreo de vendedores', subtitle: 'Bitácora de actividad y cambios de estado en pedidos' },
+    'reportes-cancelados': { title: 'Pedidos cancelados', subtitle: 'Reporte de órdenes canceladas por período' },
+    monitoreo: { title: 'Monitoreo de vendedores', subtitle: 'Bitácora de actividad y cambios de estado en pedidos' },
     // ── HU #149 ──
-    'demanda-horarios':     { title: 'Demanda por horarios',    subtitle: 'Análisis de pedidos agrupados por franja horaria' },
+    'demanda-horarios': { title: 'Demanda por horarios', subtitle: 'Análisis de pedidos agrupados por franja horaria' },
+    // ── HU #145 ──
+    'auditoria-cobros': { title: 'Auditoría de cobros', subtitle: 'Registro detallado de cobros confirmados por pedido' },
   };
 
   const currentPage = pageTitles[activeSection ?? 'dashboard'];
@@ -226,11 +231,10 @@ export default function AdminLayout() {
                               setSidebarOpen(false);
                             }}
                             className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
-                            transition-colors ${
-                              activeSection === 'pedidos'
+                            transition-colors ${activeSection === 'pedidos'
                                 ? 'bg-[#88b04b]/15 text-[#88b04b]'
                                 : 'text-white/40 hover:text-white/80 hover:bg-white/5'
-                            }`}
+                              }`}
                           >
                             Recepción
                           </button>
@@ -242,14 +246,28 @@ export default function AdminLayout() {
                               setSidebarOpen(false);
                             }}
                             className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
-                            transition-colors flex items-center gap-1.5 ${
-                              activeSection === 'historial'
+                            transition-colors flex items-center gap-1.5 ${activeSection === 'historial'
                                 ? 'bg-[#88b04b]/15 text-[#88b04b]'
                                 : 'text-white/40 hover:text-white/80 hover:bg-white/5'
-                            }`}
+                              }`}
                           >
                             <ClipboardList size={11} />
                             Historial
+                          </button>
+
+                          {/* ── HU #145: Auditoría de cobros ── */}
+                          <button
+                            onClick={() => {
+                              setActiveSection('auditoria-cobros');
+                              setSidebarOpen(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
+                            transition-colors ${activeSection === 'auditoria-cobros'
+                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
+                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
+                              }`}
+                          >
+                            Auditoría de cobros
                           </button>
                         </div>
                       )}
@@ -282,11 +300,10 @@ export default function AdminLayout() {
                               setSidebarOpen(false);
                             }}
                             className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
-                            transition-colors ${
-                              activeSection === 'ventas-diarias'
+                            transition-colors ${activeSection === 'ventas-diarias'
                                 ? 'bg-[#88b04b]/15 text-[#88b04b]'
                                 : 'text-white/40 hover:text-white/80 hover:bg-white/5'
-                            }`}
+                              }`}
                           >
                             Ventas diarias
                           </button>
@@ -297,11 +314,10 @@ export default function AdminLayout() {
                               setSidebarOpen(false);
                             }}
                             className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
-                            transition-colors ${
-                              activeSection === 'mas-vendidos'
+                            transition-colors ${activeSection === 'mas-vendidos'
                                 ? 'bg-[#88b04b]/15 text-[#88b04b]'
                                 : 'text-white/40 hover:text-white/80 hover:bg-white/5'
-                            }`}
+                              }`}
                           >
                             Más vendidos
                           </button>
@@ -333,22 +349,20 @@ export default function AdminLayout() {
                           <button
                             onClick={() => { setActiveSection('reportes'); setSidebarOpen(false); }}
                             className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
-                            transition-colors ${
-                              activeSection === 'reportes'
+                            transition-colors ${activeSection === 'reportes'
                                 ? 'bg-[#88b04b]/15 text-[#88b04b]'
                                 : 'text-white/40 hover:text-white/80 hover:bg-white/5'
-                            }`}
+                              }`}
                           >
                             Ventas por fecha
                           </button>
                           <button
                             onClick={() => { setActiveSection('reportes-cancelados'); setSidebarOpen(false); }}
                             className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
-                            transition-colors ${
-                              activeSection === 'reportes-cancelados'
+                            transition-colors ${activeSection === 'reportes-cancelados'
                                 ? 'bg-[#88b04b]/15 text-[#88b04b]'
                                 : 'text-white/40 hover:text-white/80 hover:bg-white/5'
-                            }`}
+                              }`}
                           >
                             Pedidos cancelados
                           </button>
@@ -356,11 +370,10 @@ export default function AdminLayout() {
                           <button
                             onClick={() => { setActiveSection('demanda-horarios'); setSidebarOpen(false); }}
                             className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
-                            transition-colors ${
-                              activeSection === 'demanda-horarios'
+                            transition-colors ${activeSection === 'demanda-horarios'
                                 ? 'bg-[#88b04b]/15 text-[#88b04b]'
                                 : 'text-white/40 hover:text-white/80 hover:bg-white/5'
-                            }`}
+                              }`}
                           >
                             Demanda por horarios
                           </button>
@@ -391,11 +404,10 @@ export default function AdminLayout() {
                           <button
                             onClick={() => { setActiveSection('mensajeros-desempeno'); setSidebarOpen(false); }}
                             className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
-                            transition-colors ${
-                              activeSection === 'mensajeros-desempeno'
+                            transition-colors ${activeSection === 'mensajeros-desempeno'
                                 ? 'bg-[#88b04b]/15 text-[#88b04b]'
                                 : 'text-white/40 hover:text-white/80 hover:bg-white/5'
-                            }`}
+                              }`}
                           >
                             Desempeño
                           </button>
@@ -421,8 +433,8 @@ export default function AdminLayout() {
                       ${isActive
                         ? 'bg-[#88b04b]/15 text-[#88b04b]'
                         : item.disabled
-                        ? 'text-white/20 cursor-not-allowed'
-                        : 'text-white/50 hover:text-white/80 hover:bg-white/5 cursor-pointer'
+                          ? 'text-white/20 cursor-not-allowed'
+                          : 'text-white/50 hover:text-white/80 hover:bg-white/5 cursor-pointer'
                       }
                     `}
                   >
@@ -518,13 +530,15 @@ export default function AdminLayout() {
           {activeSection === 'bitacora' && <AccessLogPanel />}
           {/* ── HU #160 ── */}
           {activeSection === 'monitoreo' && <SellerActivityPanel />}
-          
+
           {/* Reportes de pedidos cancelados — HU #163 */}
           {activeSection === 'reportes-cancelados' && <CancelledOrdersReport />}
           {/* ── HU #178 ── */}
           {activeSection === 'historial' && <OrderHistory />}
           {/* ── HU #149: Demanda por horarios ── */}
           {activeSection === 'demanda-horarios' && <DemandPanel />}
+          {/* ── HU #145: Auditoría de cobros ── */}
+          {activeSection === 'auditoria-cobros' && <PaymentAuditPanel />}
         </main>
 
       </div>
