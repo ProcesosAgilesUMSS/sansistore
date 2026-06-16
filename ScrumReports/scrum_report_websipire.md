@@ -433,6 +433,12 @@ por las dudas que se tienen.
 * **Today:** Comencé con la implementación de las funcionalidades correspondientes.
 * **Blockers:** None
 
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Estuve presente en la asignacion de hus para ver el funcionamiento que tendra que tener.
+* **Today:** Contribui con la asignacion de criterios de aceptacion de mis his asignadas
+* **Blockers:** none
+
 # Daily Reports - Team 3 Webspire 16/06/26
 
 ## Dayana Saleth Ortuño Guzmán
@@ -452,3 +458,9 @@ por las dudas que se tienen.
 * **Yesterday:** Estuve trabajando en mi HU asignada, avanzando con la implementación de las funcionalidades.
 * **Today:** Continuaré con el desarrollo de mi HU, realizando pruebas y ajustes para asegurar su correcto funcionamiento.
 * **Blockers:** None
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Trabaje en el avance del mockup de la Hu que me toco para este sprint. 
+* **Today:**  Avance con el desarrollo de mi hu asignada.
+* **Blockers:** none
