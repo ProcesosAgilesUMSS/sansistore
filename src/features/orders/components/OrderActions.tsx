@@ -296,10 +296,21 @@ function RejectedOrderSection({
 		}
 	};
 
-	const handleRefund = () => {
-		alert(
-			"Para procesar la devolución del dinero, por favor contacta al administrador o sigue el proceso de reembolso correspondiente.",
-		);
+	const handleRefund = async () => {
+		setIsSubmitting(true);
+		try {
+			await returnOrder(order.id);
+			onNotification?.(
+				"success",
+				"Dinero devuelto y orden marcada como devuelta.",
+			);
+			onSuccess?.();
+		} catch (error) {
+			console.error("Error al devolver dinero:", error);
+			onNotification?.("error", "Error al procesar la devolución de dinero.");
+		} finally {
+			setIsSubmitting(false);
+		}
 	};
 
 	return (
@@ -307,9 +318,10 @@ function RejectedOrderSection({
 			<button
 				type="button"
 				onClick={handleRefund}
-				className="rounded-full border border-(--theme-border) px-5 py-2.5 text-sm font-medium text-(--theme-text) transition hover:bg-(--theme-secondary-bg) cursor-pointer"
+				disabled={isSubmitting}
+				className="rounded-full border border-(--theme-border) px-5 py-2.5 text-sm font-medium text-(--theme-text) transition hover:bg-(--theme-secondary-bg) cursor-pointer disabled:opacity-50"
 			>
-				Devolver dinero
+				{isSubmitting ? "Procesando..." : "Devolver dinero"}
 			</button>
 			<button
 				type="button"
