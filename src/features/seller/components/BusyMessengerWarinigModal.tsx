@@ -1,6 +1,6 @@
-import { createPortal } from 'react-dom'
-import { AlertTriangle, X } from 'lucide-react'
-import type { Messenger } from '../types';
+import { AlertTriangle, X } from "lucide-react";
+import { createPortal } from "react-dom";
+import type { Messenger } from "../types";
 
 interface Props {
   messenger: Messenger;
