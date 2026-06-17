@@ -24,7 +24,7 @@ export const getMessengers = async (db: Firestore): Promise<Messenger[]> => {
       const activeQ = query(
         collection(db, 'deliveries'),
         where('courierId', '==', m.uid),
-        where('status', 'in', ['ready', 'in_transit']),
+        where('status', 'in', ['accepted', 'in_transit']),
       );
       const activeSnap = await getDocs(activeQ);
 
