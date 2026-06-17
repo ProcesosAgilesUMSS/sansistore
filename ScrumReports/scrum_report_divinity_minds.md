@@ -460,18 +460,18 @@
 - **Today:** Validar los seeders en conjunto con las pruebas y apoyar en la revisión de PRs.
 - **Blockers:** n/a.
 
-# 06/15/2026
+# 06/16/2026
 
 ## Castro Tejada Steven Lisandro
 - **Yesterday:** Completé y mergeé dos Pull Requests críticas para la aplicación: la PR #562 (*Add clear cart feature and tests*) que cierra las HUs #554 y #555 (vaciado de carrito y sus pruebas e2e con Playwright); y la PR #561 (*Mejoras de estilos, favoritos y dropdown*) que resuelve las issues de diseño/funcionalidad #557, #558, #559 y #560 (favoritos en detalle de producto, etiquetas de stock agotado/no disponible y contrastes de botones).
 - **Today:** Diseñé, creé y configuré en GitHub la nueva issue de Flow #564 (*Calificación promedio de entregas para Mensajero en /me*). La asigné en el tablero de proyectos (Sprint 4, Team: `flow`, Area: `usuarios`, Status: `ToDO`, Priority: `P2`, Severity: `Minor`) y la vinculé como sub-issue/tarea hija de la HU contenedora Padre #490 actualizando su descripción y checklist en GitHub.
 - **Blockers:** n/a.
 
-## Velasquez Vela Marcos
+## Gutierrez Hinojosa Jhon Deymar
 
-- **Yesterday:** Unifiqué el sistema de UI para corregir la inconsistencia visual del sitio: documenté el estándar en un único archivo `UI.md`, agregué los tokens de color faltantes (warning, info, danger) en `global.css`, dejé una sola fuente (Inter) cargada de forma centralizada y rediseñé el logo de marca y el footer (con íconos reales de redes) usando los tokens del tema para que respeten el dark mode.
-- **Today:** Apoyar a los equipos en la migración de los colores hardcodeados a los tokens y validar que las pantallas cumplan el estándar de header/footer y ancho.
-- **Blockers:** n/a.
+- **Yesterday:** Organice los pr con su issue para tener un mejor tracking de los trabajos de los demas equipos.
+- **Today:** Revisare los bugs corregidos y pr nuevos.
+- **Blockers:** Los demas equipos no detallan su pr para revisar y tampoco linkean el issue que resolvieron.
 
 ## Merudia Calderon Dayeza
 
@@ -485,4 +485,8 @@
 - **Today:** Revisé el flujo general de la aplicación y ayudé a detectar inconsistencias visuales (contrastes, alineaciones, espaciados).
 - **Blockers:** n/a.
 
+## Velasquez Vela Marcos
 
+- **Yesterday:** Unifiqué el sistema de UI para corregir la inconsistencia visual del sitio: documenté el estándar en un único archivo `UI.md`, agregué los tokens de color faltantes (warning, info, danger) en `global.css`, dejé una sola fuente (Inter) cargada de forma centralizada y rediseñé el logo de marca y el footer (con íconos reales de redes) usando los tokens del tema para que respeten el dark mode.
+- **Today:** Apoyar a los equipos en la migración de los colores hardcodeados a los tokens y validar que las pantallas cumplan el estándar de header/footer y ancho.
+- **Blockers:** n/a.
