@@ -54,9 +54,6 @@ export function OrderDetailsModal({ order, onClose }: Props) {
         <header className="border-b border-(--theme-border) px-6 py-5">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <p className="text-xs text-(--theme-text) opacity-50">
-                {parseOrderId(order.orderId).uuid}
-              </p>
               <h2
                 id="order-details-title"
                 className="mt-2 text-2xl font-bold tracking-tight text-(--theme-text)"

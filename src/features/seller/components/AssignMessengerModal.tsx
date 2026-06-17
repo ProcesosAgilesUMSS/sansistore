@@ -40,9 +40,6 @@ export function AssignMessengerModal({
         <section className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-[28px] border border-(--theme-border) bg-(--theme-card-bg) shadow-2xl">
           <header className="flex items-start justify-between gap-4 border-b border-(--theme-border) px-6 py-5">
             <div>
-              <p className="text-xs text-(--theme-text) opacity-50">
-                {parseOrderId(order.orderId).uuid}
-              </p>
               <h2
                 id="order-details-title"
                 className="mt-2 text-2xl font-bold tracking-tight text-(--theme-text)"
@@ -127,8 +124,8 @@ export function AssignMessengerModal({
                             {messenger.displayName}
                             <span
                               className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-700 uppercase tracking-wide ${messenger.isAvailable
-                                  ? 'bg-success-bg text-success border border-success-border'
-                                  : 'bg-danger-bg text-danger border border-danger-border'
+                                ? 'bg-success-bg text-success border border-success-border'
+                                : 'bg-danger-bg text-danger border border-danger-border'
                                 }`}
                             >
                               {messenger.isAvailable ? 'Disponible' : 'Ocupado'}
