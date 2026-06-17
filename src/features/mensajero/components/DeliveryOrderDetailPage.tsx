@@ -282,11 +282,12 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
     if (!order) return;
 
     const previousOrder = order;
+    const rejectionReason = (order as any).rejectionReason;
     const updatedOrder = { ...order, deliveryStatus: status };
     
     // Si es rechazo y hay motivo, incluirlo
-    if (status === 'pending_reassignment' && (order as any).rejectionReason) {
-      updatedOrder.rejectionReason = (order as any).rejectionReason;
+    if (status === 'pending_reassignment' && rejectionReason) {
+      updatedOrder.rejectionReason = rejectionReason;
     }
 
     setOrder(updatedOrder);
@@ -294,8 +295,12 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
     setError('');
 
     try {
-      await setMessengerOrderStatus(previousOrder, status);
-      // TODO: Guardar rejectionReason en Firestore si existe
+      // Pasar el motivo a Firestore si es rechazo
+      await setMessengerOrderStatus(
+        previousOrder,
+        status,
+        status === 'pending_reassignment' ? rejectionReason : undefined
+      );
       setMessage(getStatusUpdateMessage(status));
       await loadOrder({ showLoading: false });
     } catch (statusError) {
