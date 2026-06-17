@@ -485,3 +485,8 @@
 - **Yesterday:** Desarrollo de la HU asignada, la cual restringe al mensajero de aceptar un nuevo pedido si ya tiene una entrega activa.
 - **Today:** Continuar con la implementación de la HU para este sprint.
 - **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+- **Yesterday:** Empece el desarrollo de la HU 570 liberar disponibilidad
+- **Today:** Continuar con la implementación de la HU para este sprint.
+- **Blockers:** None.
