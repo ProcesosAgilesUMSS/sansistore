@@ -16,6 +16,10 @@ import { db } from '../../../lib/firebase';
 import { getCurrentZone } from '../../location/utils/zoneLimits';
 import type { MessengerOrder, MessengerOrderItem, MessengerShiftClosure, MessengerShiftOrderSnapshot,} from '../types';
 import { getVisibleMessengerOrders } from '../utils/orderVisibility';
+import {
+  ACCEPT_BLOCKED_BY_ACTIVE_DELIVERY_MESSAGE,
+  isActiveDelivery,
+} from '../utils/acceptEligibility';
 import { isMessengerOrderCollected, isSameLocalDay, } from '../utils/collectionSummary';
 import {
   assertCanTransitionDeliveryStatus,
@@ -146,7 +150,7 @@ const formatCourierZoneName = (zoneName: string | null): string | undefined => {
 
 const readOrderDisplayId = (orderId: string): string | undefined => {
   const [, friendlyName] = orderId.split('_');
-  return asString(friendlyName) ?? asString(orderId);
+  return asString(friendlyName) ?? asString(orderId) ?? undefined;
 };
 
 const readPayment = async (paymentId: string | null): Promise<PaymentData> => {
@@ -300,6 +304,35 @@ export function subscribeToMessengerOrders(
       onError?.(error);
     }
   );
+}
+
+/**
+ * Lanza un error si el mensajero ya tiene una entrega activa
+ * (estado `accepted` o `in_transit`) distinta a la que intenta aceptar.
+ * Se consulta por `courierId` y se filtra en memoria para no requerir
+ * un índice compuesto en Firestore.
+ */
+export async function assertCanAcceptMessengerOrder(
+  courierId: string,
+  deliveryId: string
+): Promise<void> {
+  const deliveriesQuery = query(
+    collection(db, 'deliveries'),
+    where('courierId', '==', courierId)
+  );
+  const snapshot = await getDocs(deliveriesQuery);
+
+  const hasActiveDelivery = snapshot.docs.some(
+    (deliveryDoc) =>
+      deliveryDoc.id !== deliveryId &&
+      isActiveDelivery({
+        deliveryStatus: normalizeDeliveryStatus(deliveryDoc.data().status),
+      })
+  );
+
+  if (hasActiveDelivery) {
+    throw new Error(ACCEPT_BLOCKED_BY_ACTIVE_DELIVERY_MESSAGE);
+  }
 }
 
 const getStatusForORder = (status: DeliveryStatus) => {
