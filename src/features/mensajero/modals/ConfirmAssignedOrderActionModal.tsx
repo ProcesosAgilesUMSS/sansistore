@@ -20,7 +20,7 @@ const actionConfig = {
     buttonLabel: 'Confirmar',
     Icon: CheckCircle2,
     iconClassName: 'bg-primary/15 text-primary',
-    buttonClassName: 'bg-primary text-black hover:opacity-90',
+    buttonClassName: 'bg-primary text-primary-action hover:opacity-90',
     warning:
       'El pedido pasará a Pedidos aceptados y quedará bajo tu responsabilidad.',
   },
@@ -29,8 +29,8 @@ const actionConfig = {
     description: 'Confirma que no podrás atender este pedido asignado.',
     buttonLabel: 'Confirmar',
     Icon: XCircle,
-    iconClassName: 'bg-red-500/10 text-red-600',
-    buttonClassName: 'bg-red-600 text-white hover:bg-red-700',
+    iconClassName: 'bg-(--theme-error-bg) text-(--theme-error)',
+    buttonClassName: 'bg-(--theme-error) text-(--theme-bg) hover:opacity-90',
     warning:
       'El pedido quedará pendiente de reasignación para que el vendedor seleccione otro mensajero.',
   },

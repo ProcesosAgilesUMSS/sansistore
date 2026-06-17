@@ -167,7 +167,7 @@ function DetailActions({
 
       {order.deliveryStatus === 'accepted' && (
         <button
-          className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 text-sm font-bold text-white shadow-lg transition hover:bg-blue-700"
+          className="messenger-transit-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold shadow-lg transition"
           onClick={onInTransit}
           type="button"
         >
@@ -397,7 +397,7 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
 
   if (loading) {
     return (
-      <section className="mx-auto flex min-h-[55vh] max-w-5xl items-center justify-center px-4">
+      <section className="mx-auto flex min-h-[55vh] max-w-6xl items-center justify-center px-4">
         <div className="messenger-order-card flex items-center gap-3 rounded-[28px] border p-8 text-sm font-bold">
           <LoaderCircle className="animate-spin" size={20} />
           Cargando detalle del pedido...
@@ -408,7 +408,7 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
 
   if (!order) {
     return (
-      <section className="mx-auto max-w-5xl px-4 py-10">
+      <section className="mx-auto max-w-6xl px-4 py-10">
         <a
           className="messenger-map-button mb-6 inline-flex h-11 items-center justify-center gap-2 rounded-2xl border-2 px-5 text-sm font-bold transition"
           href="/courier"
@@ -463,7 +463,7 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
           <div
             className={`mt-6 rounded-2xl border px-4 py-3 text-sm font-bold ${
               error
-                ? 'border-red-500/40 bg-red-500/10 text-red-500'
+                ? 'border-(--theme-error-border) bg-(--theme-error-bg) text-(--theme-error)'
                 : 'border-primary/30 bg-primary/10 text-primary'
             }`}
           >

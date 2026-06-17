@@ -42,7 +42,7 @@ export default function CancelNoPaymentModal({
       <section className="w-full max-w-lg overflow-hidden rounded-[28px] border border-border-light bg-card-bg-light text-text-light shadow-2xl">
         <header className="flex items-start justify-between gap-4 border-b border-border-light px-6 py-5">
           <div className="flex items-center gap-4">
-            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-500/10 text-red-600">
+            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-(--theme-error-bg) text-(--theme-error)">
               <DollarSign size={24} />
             </span>
 
@@ -84,7 +84,7 @@ export default function CancelNoPaymentModal({
             </div>
           </div>
 
-          <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm font-semibold text-red-600">
+          <div className="rounded-2xl border border-(--theme-error-border) bg-(--theme-error-bg) p-4 text-sm font-semibold text-(--theme-error)">
             El pedido será marcado como CANCELADO porque el cliente no realizó
             el pago contra entrega.
           </div>
@@ -92,7 +92,7 @@ export default function CancelNoPaymentModal({
           <label className="block text-sm font-bold">
             Observaciones adicionales
             <textarea
-              className="mt-2 min-h-24 w-full resize-none rounded-2xl border border-border-light bg-secondary-bg-light px-4 py-3 text-sm font-medium outline-none focus:border-red-500"
+              className="mt-2 min-h-24 w-full resize-none rounded-2xl border border-border-light bg-secondary-bg-light px-4 py-3 text-sm font-medium outline-none focus:border-(--theme-error-border)"
               onChange={(event) => setNotes(event.target.value)}
               placeholder="Ej: El cliente indicó que no realizará el pago..."
               value={notes}
@@ -110,7 +110,7 @@ export default function CancelNoPaymentModal({
           </button>
 
           <button
-            className="inline-flex h-12 flex-[1.4] items-center justify-center gap-2 rounded-full bg-red-600 px-5 text-sm font-black uppercase text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex h-12 flex-[1.4] items-center justify-center gap-2 rounded-full bg-(--theme-error) px-5 text-sm font-black uppercase text-(--theme-bg) transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             disabled={isSaving}
             onClick={confirmCancellation}
             type="button"

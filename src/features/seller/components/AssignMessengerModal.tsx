@@ -39,8 +39,7 @@ export function AssignMessengerModal({
             <div>
               <h2
                 id="assign-messenger-title"
-                className="mt-2 text-2xl font-bold tracking-tight text-(--theme-text)"
-                style={{ fontFamily: 'Outfit, sans-serif' }}
+                className="mt-2 font-display text-2xl font-bold tracking-tight text-(--theme-text)"
               >
                 #{order.orderId}
               </h2>
@@ -96,7 +95,7 @@ export function AssignMessengerModal({
                         }`}
                     >
                       <div className="flex items-center gap-3">
-                        <span className={`flex h-10 w-10 items-center justify-center rounded-full ${isSelected ? 'bg-primary text-white' : 'bg-(--theme-secondary-bg)'}`}>
+                        <span className={`flex h-10 w-10 items-center justify-center rounded-full ${isSelected ? 'bg-primary text-primary-action' : 'bg-(--theme-secondary-bg)'}`}>
                           <UserRound size={16} />
                         </span>
                         <div>
@@ -129,7 +128,7 @@ export function AssignMessengerModal({
                 type="button"
                 onClick={onConfirm}
                 disabled={!selectedCourierId || isLoading || messengersLoading}
-                className="rounded-full bg-primary px-5 py-2.5 text-sm font-800 text-white transition hover:opacity-90 disabled:opacity-50"
+                className="rounded-full bg-primary px-5 py-2.5 text-sm font-800 text-primary-action transition hover:opacity-90 disabled:opacity-50"
               >
                 {isLoading ? 'Asignando…' : 'Confirmar asignación'}
               </button>
