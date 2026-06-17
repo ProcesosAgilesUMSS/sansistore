@@ -45,7 +45,7 @@
 - **Today:** Revisaré los criterios de aceptación y tareas de las historias asignadas para organizar el trabajo del sprint.
 - **Blockers:** Ninguno.
 
-# 06/26/2026
+# 05/26/2026
 
 ## José Ignacio Jaldin Janko
 
