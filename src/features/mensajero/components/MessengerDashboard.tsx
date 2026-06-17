@@ -54,6 +54,7 @@ import ConfirmPaymentModal from '../modals/Confirmpaymentmodal';
 import ConfirmAssignedOrderActionModal, {
     type AssignedOrderAction,
 } from '../modals/ConfirmAssignedOrderActionModal';
+import AcceptBlockedModal from '../modals/AcceptBlockedModal';
 
 const DEV_COURIER_ID = 'user-nadia';
 
@@ -338,6 +339,7 @@ function PendingOrderCard({
     acceptDisabledReason?: string;
 }) {
     const [sellerLocationUrl, setSellerLocationUrl] = useState<string | null>(null);
+    const [showAcceptBlockedModal, setShowAcceptBlockedModal] = useState(false);
     const customerLocationUrl = useMemo(() => {
         return buildBuyerMapUrl(order);
     }, [order]);
@@ -495,22 +497,24 @@ function PendingOrderCard({
 
                     {order.deliveryStatus === 'assigned' && (
                         <>
-                            <span
-                                className="inline-flex"
-                                title={acceptDisabled ? acceptDisabledReason : undefined}
+                            <button
+                                aria-disabled={acceptDisabled}
+                                className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
+                                onClick={() => {
+                                    if (acceptDisabled) {
+                                        setShowAcceptBlockedModal(true);
+                                    } else {
+                                        onAccept(order.id);
+                                    }
+                                }}
+                                type="button"
                             >
-                                <button
-                                    aria-disabled={acceptDisabled}
-                                    className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-60"
-                                    disabled={acceptDisabled}
-                                    onClick={() => onAccept(order.id)}
-                                    title={acceptDisabled ? acceptDisabledReason : undefined}
-                                    type="button"
-                                >
-                                    <CheckCircle2 size={17} />
-                                    Aceptar pedido
-                                </button>
-                            </span>
+                                <CheckCircle2 size={17} />
+                                Aceptar pedido
+                            </button>
+                            {showAcceptBlockedModal && (
+                                <AcceptBlockedModal onClose={() => setShowAcceptBlockedModal(false)} />
+                            )}
                             <button
                                 className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
                                 onClick={() => onReject(order.id)}

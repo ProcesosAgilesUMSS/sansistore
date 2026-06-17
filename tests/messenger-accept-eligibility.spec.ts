@@ -53,8 +53,47 @@ test.describe('messenger accept eligibility', () => {
   });
 
   test('exposes a human readable reason for the block', () => {
-    expect(ACCEPT_BLOCKED_BY_ACTIVE_DELIVERY_MESSAGE).toContain(
-      'entrega activa'
+    expect(ACCEPT_BLOCKED_BY_ACTIVE_DELIVERY_MESSAGE).toBe(
+      'Ya tienes una entrega activa (aceptada o en camino). Termínala antes de aceptar otro pedido.'
     );
+  });
+
+  test('allows accepting when previous deliveries are in terminal states', () => {
+    const orders = [
+      orderWith('delivered'),
+      orderWith('not_delivered'),
+      orderWith('cancelled'),
+      orderWith('pending_reassignment'),
+      orderWith('reprogrammed'),
+      orderWith('assigned'),
+    ];
+
+    expect(hasActiveMessengerDelivery(orders)).toBe(false);
+    expect(canAcceptAssignedOrder(orders)).toBe(true);
+  });
+
+  test('blocks accepting when there are several active deliveries', () => {
+    const orders = [orderWith('accepted'), orderWith('in_transit')];
+
+    expect(hasActiveMessengerDelivery(orders)).toBe(true);
+    expect(canAcceptAssignedOrder(orders)).toBe(false);
+  });
+
+  test('allows accepting when the messenger has no orders at all', () => {
+    const orders: ReturnType<typeof orderWith>[] = [];
+
+    expect(hasActiveMessengerDelivery(orders)).toBe(false);
+    expect(canAcceptAssignedOrder(orders)).toBe(true);
+  });
+
+  test('a single active delivery among completed ones still blocks', () => {
+    const orders = [
+      orderWith('delivered'),
+      orderWith('in_transit'),
+      orderWith('assigned'),
+    ];
+
+    expect(hasActiveMessengerDelivery(orders)).toBe(true);
+    expect(canAcceptAssignedOrder(orders)).toBe(false);
   });
 });

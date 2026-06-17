@@ -20,15 +20,18 @@ import CancelNoPaymentModal from '../modals/CancelNoPaymentModal';
 import ConfirmAssignedOrderActionModal, {
   type AssignedOrderAction,
 } from '../modals/ConfirmAssignedOrderActionModal';
+import AcceptBlockedModal from '../modals/AcceptBlockedModal';
 import { auth } from '../../../lib/firebase';
 import { parseOrderId } from '../../cart/services/orderService';
 import {
   getMessengerOrderById,
+  getMessengerOrders,
   markMessengerOrderAsCancelledByNoPayment,
   markMessengerOrderAsNotDelivered,
   registerMessengerCashPayment,
   setMessengerOrderStatus,
 } from '../services/messengerOrdersService';
+import { hasActiveMessengerDelivery } from '../utils/acceptEligibility';
 import type { MessengerOrder } from '../types';
 import { getDeliveryStatusLabel } from '../utils/deliveryStatusFlow';
 import { formatBolivianos } from '../utils/money';
@@ -127,7 +130,7 @@ function DetailActions({
   onNotDelivered,
 }: {
   order: MessengerOrder;
-  onAssignedAction: (action: AssignedOrderAction) => void;
+  onAssignedAction: (action: AssignedOrderAction) => void | Promise<void>;
   onCancelNoPayment: () => void;
   onDelivered: () => void;
   onInTransit: () => void;
@@ -223,6 +226,7 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
     action: AssignedOrderAction;
   } | null>(null);
   const [savingAssignedAction, setSavingAssignedAction] = useState(false);
+  const [acceptBlockedOpen, setAcceptBlockedOpen] = useState(false);
   const [undeliveredOrder, setUndeliveredOrder] = useState<MessengerOrder | null>(null);
   const [savingUndelivered, setSavingUndelivered] = useState(false);
   const [cancelNoPaymentOrder, setCancelNoPaymentOrder] =
@@ -502,7 +506,17 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
 
             <DetailActions
               order={order}
-              onAssignedAction={(action) => setPendingAssignedAction({ order, action })}
+              onAssignedAction={async (action) => {
+                if (action === 'accept' && courierId) {
+                  const allOrders = await getMessengerOrders(courierId);
+                  const others = allOrders.filter((o) => o.id !== order.id);
+                  if (hasActiveMessengerDelivery(others)) {
+                    setAcceptBlockedOpen(true);
+                    return;
+                  }
+                }
+                setPendingAssignedAction({ order, action });
+              }}
               onCancelNoPayment={() => setCancelNoPaymentOrder(order)}
               onDelivered={() => setConfirmPaymentOrder(order)}
               onInTransit={() => void updateStatus('in_transit')}
@@ -588,6 +602,10 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
 
       {paymentSuccessOpen && (
         <PaymentSuccessModal onClose={() => setPaymentSuccessOpen(false)} />
+      )}
+
+      {acceptBlockedOpen && (
+        <AcceptBlockedModal onClose={() => setAcceptBlockedOpen(false)} />
       )}
     </section>
   );
