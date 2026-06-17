@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   LayoutDashboard,
   Users,
@@ -17,8 +17,9 @@ import {
   ClipboardList,
   Activity,
 } from 'lucide-react';
-import { signOut } from 'firebase/auth';
-import { auth } from '../../../lib/firebase';
+import { signOut, onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../../../lib/firebase';
 import UserManagement from '../users/components/UserManagement.tsx';
 import CategoryList from '../categories/components/CategoryList.tsx';
 import OrderReceptionPanel from '../orders/components/OrderReceptionPanel.tsx';
@@ -76,6 +77,30 @@ export default function AdminLayout() {
   const [reportesOpen, setReportesOpen] = useState(false);
   const [pedidosOpen, setPedidosOpen] = useState(true);
   const [mensajerosOpen, setMensajerosOpen] = useState(true);
+  const [userName, setUserName] = useState('Administrador');
+  const [userInitials, setUserInitials] = useState('AD');
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        const displayName = snap.exists()
+          ? (snap.data().displayName ?? user.displayName ?? 'Administrador')
+          : (user.displayName ?? 'Administrador');
+        setUserName(displayName);
+        const parts = displayName.trim().split(' ');
+        const initials = parts.length >= 2
+          ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+          : displayName.slice(0, 2).toUpperCase();
+        setUserInitials(initials);
+      } catch {
+        setUserName(user.displayName ?? 'Administrador');
+        setUserInitials((user.displayName ?? 'AD').slice(0, 2).toUpperCase());
+      }
+    });
+    return unsub;
+  }, []);
 
   const handleLogout = () => {
     signOut(auth)
@@ -330,10 +355,10 @@ export default function AdminLayout() {
         <div className="px-3 py-3 border-t border-(--theme-border)">
           <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg">
             <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-[11px] font-semibold text-primary flex-shrink-0">
-              AD
+              {userInitials}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[12px] text-(--theme-text) font-medium truncate">Admin</p>
+              <p className="text-[12px] text-(--theme-text) font-medium truncate">{userName}</p>
               <p className="text-[10px] text-(--theme-text)/30 truncate">Administrador</p>
             </div>
             <button
