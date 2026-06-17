@@ -1,7 +1,7 @@
-import { createPortal } from 'react-dom';
-import { X, UserRound } from 'lucide-react';
-import type { Messenger, Order } from '../types';
-import { parseOrderId } from '@/features/cart/services/orderService';
+import { UserRound, X } from "lucide-react";
+import { createPortal } from "react-dom";
+import { parseOrderId } from "@/features/cart/services/orderService";
+import type { Messenger, Order } from "../types";
 
 interface Props {
   order: Order;
