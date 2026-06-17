@@ -2,6 +2,41 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    function hasRole(role) {
+      return request.auth != null
+        && (
+          request.auth.token.role == role
+          || (request.auth.token.roles != null && request.auth.token.roles.hasAny([role]))
+          || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.hasAny([role])
+        );
+    }
+
+    function isValidPaymentActivityLog() {
+      return request.resource.data.keys().hasOnly([
+          'orderId',
+          'collectedBy',
+          'amount',
+          'paymentMethod',
+          'status',
+          'timestamp'
+        ])
+        && request.resource.data.orderId is string
+        && request.resource.data.collectedBy is map
+        && request.resource.data.collectedBy.keys().hasOnly(['id', 'nombre', 'email', 'rol'])
+        && request.resource.data.collectedBy.id is string
+        && request.resource.data.collectedBy.nombre is string
+        && request.resource.data.collectedBy.email is string
+        && request.resource.data.collectedBy.rol in ['VENDEDOR', 'MENSAJERO', 'ADMIN']
+        && request.resource.data.amount is number
+        && request.resource.data.paymentMethod in ['EFECTIVO', 'QR', 'TRANSFERENCIA', 'TARJETA']
+        && request.resource.data.status in ['VERIFICADO', 'PENDIENTE', 'RECHAZADO'];
+    }
+
+    match /paymentActivityLogs/{logId} {
+      allow read: if hasRole('admin');
+      allow create: if request.auth != null && isValidPaymentActivityLog();
+      allow update, delete: if false;
+    }
 
     // This rule allows anyone with your Firestore database reference to view, edit,
     // and delete all data in your Firestore database. It is useful for getting
@@ -12,8 +47,9 @@ service cloud.firestore {
     // Make sure to write security rules for your app before that time, or else
     // all client requests to your Firestore database will be denied until you Update
     // your rules
-    match /{document=**} {
-      allow read, write: if request.time < timestamp.date(2027, 5, 25);
+    match /{collection}/{document=**} {
+      allow read, write: if collection != 'paymentActivityLogs'
+        && request.time < timestamp.date(2027, 5, 25);
     }
   }
 }
