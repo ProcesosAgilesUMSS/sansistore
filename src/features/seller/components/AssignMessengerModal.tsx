@@ -24,7 +24,7 @@ export function AssignMessengerModal({
   onConfirm,
   onClose,
 }: Props) {
-  const availableCount = messengers.filter((m) => m.isAvailable).length;
+	const availableCount = messengers.filter((m) => m.isAvailable).length;
 
   return createPortal(
     (
