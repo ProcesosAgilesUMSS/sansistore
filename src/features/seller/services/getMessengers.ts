@@ -28,11 +28,11 @@ export const getMessengers = async (db: Firestore): Promise<Messenger[]> => {
       );
       const activeSnap = await getDocs(activeQ);
 
-      return {
-        ...m,
-        isAvailable: activeSnap.empty,
-      }
-    })
-  )
-  return withAvailability;
-}
+			return {
+				...m,
+				isAvailable: activeSnap.empty,
+			};
+		}),
+	);
+	return withAvailability;
+};
