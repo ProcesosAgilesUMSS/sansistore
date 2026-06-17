@@ -17,6 +17,8 @@ import {
   ClipboardList,
   Activity,
 } from 'lucide-react';
+import { signOut } from 'firebase/auth';
+import { auth } from '../../../lib/firebase';
 import UserManagement from '../users/components/UserManagement.tsx';
 import CategoryList from '../categories/components/CategoryList.tsx';
 import OrderReceptionPanel from '../orders/components/OrderReceptionPanel.tsx';
@@ -40,18 +42,18 @@ import DemandPanel from '../demand/components/DemandPanel.tsx';
 type Section =
   | 'dashboard'
   | 'pedidos'
-  | 'historial'        // ── HU #178 ──
+  | 'historial'
   | 'usuarios'
   | 'categorias'
   | 'ventas-diarias'
   | 'mas-vendidos'
   | 'mensajeros-desempeno'
-  | 'parametros'     // ── HU #152 ──
-  | 'reportes'       // ── HU #161 ──
-  | 'reportes-cancelados'   // ── HU #163 ──
-  | 'bitacora'       
-  | 'monitoreo'      // ── HU #160 ──
-  | 'demanda-horarios' // ── HU #149 ──
+  | 'parametros'
+  | 'reportes'
+  | 'reportes-cancelados'
+  | 'bitacora'
+  | 'monitoreo'
+  | 'demanda-horarios'
   | null;
 
 interface NavItem {
@@ -72,55 +74,31 @@ export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [ventasOpen, setVentasOpen] = useState(true);
   const [reportesOpen, setReportesOpen] = useState(false);
-  const [pedidosOpen, setPedidosOpen] = useState(true); // ── HU #178 ──
+  const [pedidosOpen, setPedidosOpen] = useState(true);
   const [mensajerosOpen, setMensajerosOpen] = useState(true);
+
+  const handleLogout = () => {
+    signOut(auth)
+      .then(() => { window.location.href = '/login'; })
+      .catch(console.error);
+  };
 
   const navSections: NavSection[] = [
     {
       title: 'Principal',
       items: [
-        {
-          label: 'Dashboard',
-          icon: <LayoutDashboard size={15} />,
-          section: 'dashboard',
-        },
-        {
-          label: 'Pedidos',
-          icon: <ShoppingBag size={15} />,
-          section: 'pedidos',
-        },
+        { label: 'Dashboard', icon: <LayoutDashboard size={15} />, section: 'dashboard' },
+        { label: 'Pedidos',   icon: <ShoppingBag size={15} />,    section: 'pedidos' },
       ],
     },
     {
       title: 'Configuración',
       items: [
-        {
-          label: 'Usuarios',
-          icon: <Users size={15} />,
-          section: 'usuarios',
-        },
-        {
-          label: 'Categorías',
-          icon: <Tag size={15} />,
-          section: 'categorias',
-        },
-        {
-          // ── HU #152: habilitado ──
-          label: 'Parámetros',
-          icon: <Settings size={15} />,
-          section: 'parametros',
-        },
-        {
-          label: 'Bitácora',
-          icon: <Settings size={15} />,
-          section: 'bitacora',
-        },
-        {
-          // ── HU #160: Monitoreo de vendedores ──
-          label: 'Monitoreo',
-          icon: <Activity size={15} />,
-          section: 'monitoreo',
-        },
+        { label: 'Usuarios',   icon: <Users size={15} />,    section: 'usuarios' },
+        { label: 'Categorías', icon: <Tag size={15} />,      section: 'categorias' },
+        { label: 'Parámetros', icon: <Settings size={15} />, section: 'parametros' },
+        { label: 'Bitácora',   icon: <ClipboardList size={15} />, section: 'bitacora' },
+        { label: 'Monitoreo',  icon: <Activity size={15} />, section: 'monitoreo' },
       ],
     },
     {
@@ -129,40 +107,38 @@ export default function AdminLayout() {
         { label: 'Ventas',     icon: <BarChart2 size={15} />, section: 'ventas-diarias' },
         { label: 'Inventario', icon: <Package size={15} />,   section: null, disabled: true },
         { label: 'Mensajeros', icon: <Bike size={15} />,      section: null, disabled: true },
-        {
-          // ── HU #161: habilitado ──
-          label: 'Reportes',
-          icon: <FileText size={15} />,
-          section: 'reportes',
-        },
+        { label: 'Reportes',   icon: <FileText size={15} />,  section: 'reportes' },
       ],
     },
   ];
 
   const pageTitles: Record<string, { title: string; subtitle: string }> = {
-    dashboard:              { title: 'Dashboard',              subtitle: 'Panel de administración' },
-    pedidos:                { title: 'Pedidos',                subtitle: 'Validación de recepción por comprador' },
-    historial:              { title: 'Historial de pedido',    subtitle: 'Auditoría completa del pedido' },
-    usuarios:               { title: 'Gestión de usuarios',    subtitle: 'Registra y administra usuarios' },
-    categorias:             { title: 'Categorías',             subtitle: 'Gestiona las categorías de productos' },
-    'ventas-diarias':       { title: 'Ventas diarias',         subtitle: 'Monitorea el rendimiento diario de ventas' },
+    dashboard:              { title: 'Dashboard',               subtitle: 'Panel de administración' },
+    pedidos:                { title: 'Pedidos',                 subtitle: 'Validación de recepción por comprador' },
+    historial:              { title: 'Historial de pedido',     subtitle: 'Auditoría completa del pedido' },
+    usuarios:               { title: 'Gestión de usuarios',     subtitle: 'Registra y administra usuarios' },
+    categorias:             { title: 'Categorías',              subtitle: 'Gestiona las categorías de productos' },
+    'ventas-diarias':       { title: 'Ventas diarias',          subtitle: 'Monitorea el rendimiento diario de ventas' },
     'mensajeros-desempeno': { title: 'Desempeño de mensajeros', subtitle: 'Métricas de eficiencia por mensajero' },
-    'mas-vendidos':         { title: 'Más vendidos',           subtitle: 'Productos con más unidades vendidas' },
-    // ── HU #152 ──
-    parametros:             { title: 'Parámetros del sistema', subtitle: 'Configura los parámetros globales del sistema' },
-    // ── HU #161 ──
-    reportes: { title: 'Reportes de ventas', subtitle: 'Genera reportes de ventas por rango de fechas' },
-    bitacora: { title: 'Bitácora', subtitle: 'Registra actividad de inicio y cierre de sesión' },
-    'reportes-cancelados': {title: 'Pedidos cancelados', subtitle: 'Reporte de órdenes canceladas por período'},
-    monitoreo:              { title: 'Monitoreo de vendedores', subtitle: 'Bitácora de actividad y cambios de estado en pedidos' },
-    // ── HU #149 ──
+    'mas-vendidos':         { title: 'Más vendidos',            subtitle: 'Productos con más unidades vendidas' },
+    parametros:             { title: 'Parámetros del sistema',  subtitle: 'Configura los parámetros globales del sistema' },
+    reportes:               { title: 'Reportes de ventas',      subtitle: 'Genera reportes de ventas por rango de fechas' },
+    bitacora:               { title: 'Bitácora',                subtitle: 'Registra actividad de inicio y cierre de sesión' },
+    'reportes-cancelados':  { title: 'Pedidos cancelados',      subtitle: 'Reporte de órdenes canceladas por período' },
+    monitoreo:              { title: 'Monitoreo de vendedores',  subtitle: 'Bitácora de actividad y cambios de estado en pedidos' },
     'demanda-horarios':     { title: 'Demanda por horarios',    subtitle: 'Análisis de pedidos agrupados por franja horaria' },
   };
 
   const currentPage = pageTitles[activeSection ?? 'dashboard'];
 
+  // Clases reutilizables para items del sidebar
+  const sidebarItemActive = 'bg-primary/15 text-primary';
+  const sidebarItemInactive = 'text-(--theme-text)/40 hover:text-(--theme-text)/80 hover:bg-(--theme-text)/5';
+  const sidebarSubItemClass = (active: boolean) =>
+    `w-full text-left px-3 py-2 rounded-lg text-[12px] transition-colors ${active ? sidebarItemActive : sidebarItemInactive}`;
+
   return (
-    <div className="flex h-screen overflow-hidden bg-[var(--theme-bg)]">
+    <div className="flex h-screen overflow-hidden bg-(--theme-bg)">
 
       {/* Overlay mobile */}
       {sidebarOpen && (
@@ -176,19 +152,19 @@ export default function AdminLayout() {
       <aside
         className={`
           fixed md:static z-30 h-full flex flex-col
-          w-[220px] bg-[#1a2318] border-r border-white/5
+          w-[220px] bg-(--theme-card-bg) border-r border-(--theme-border)
           transition-transform duration-300
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
         `}
       >
         {/* Logo */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-white/5">
-          <div className="w-8 h-8 rounded-lg bg-[#88b04b] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-(--theme-border)">
+          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
             S
           </div>
           <div className="flex flex-col leading-tight">
-            <span className="text-[13px] font-semibold text-white/90">SansiStore</span>
-            <span className="text-[10px] text-[#88b04b]/70 tracking-wide uppercase">Admin · Área 7</span>
+            <span className="text-[13px] font-semibold text-(--theme-text)">SansiStore</span>
+            <span className="text-[10px] text-primary/70 tracking-wide uppercase">Admin · Área 7</span>
           </div>
         </div>
 
@@ -196,60 +172,32 @@ export default function AdminLayout() {
         <nav className="flex-1 overflow-y-auto py-3 px-3">
           {navSections.map((section) => (
             <div key={section.title} className="mb-4">
-              <p className="text-[10px] uppercase tracking-widest text-white/25 px-3 mb-1">
+              <p className="text-[10px] uppercase tracking-widest text-(--theme-text)/25 px-3 mb-1">
                 {section.title}
               </p>
               {section.items.map((item) => {
 
-                // ── Menú Pedidos con submenú Historial ── HU #178 ──
+                // ── Pedidos con submenú ──
                 if (item.label === 'Pedidos') {
                   return (
                     <div key={item.label} className="mb-1">
                       <button
                         onClick={() => setPedidosOpen(!pedidosOpen)}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px]
-                        text-white/50 hover:text-white/80 hover:bg-white/5 transition-colors"
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-colors ${sidebarItemInactive}`}
                       >
                         <span>{item.icon}</span>
                         <span className="flex-1 text-left">Pedidos</span>
-                        <ChevronRight
-                          size={12}
-                          className={`transition-transform ${pedidosOpen ? 'rotate-90' : ''}`}
-                        />
+                        <ChevronRight size={12} className={`transition-transform ${pedidosOpen ? 'rotate-90' : ''}`} />
                       </button>
-
                       {pedidosOpen && (
                         <div className="ml-7 mt-1 space-y-1">
-                          <button
-                            onClick={() => {
-                              setActiveSection('pedidos');
-                              setSidebarOpen(false);
-                            }}
-                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
-                            transition-colors ${
-                              activeSection === 'pedidos'
-                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
-                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
-                            }`}
-                          >
+                          <button onClick={() => { setActiveSection('pedidos'); setSidebarOpen(false); }}
+                            className={sidebarSubItemClass(activeSection === 'pedidos')}>
                             Recepción
                           </button>
-
-                          {/* ── HU #178 ── */}
-                          <button
-                            onClick={() => {
-                              setActiveSection('historial');
-                              setSidebarOpen(false);
-                            }}
-                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
-                            transition-colors flex items-center gap-1.5 ${
-                              activeSection === 'historial'
-                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
-                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
-                            }`}
-                          >
-                            <ClipboardList size={11} />
-                            Historial
+                          <button onClick={() => { setActiveSection('historial'); setSidebarOpen(false); }}
+                            className={`${sidebarSubItemClass(activeSection === 'historial')} flex items-center gap-1.5`}>
+                            <ClipboardList size={11} /> Historial
                           </button>
                         </div>
                       )}
@@ -257,52 +205,26 @@ export default function AdminLayout() {
                   );
                 }
 
-                // ── Menú Ventas con submenú existente ──
+                // ── Ventas con submenú ──
                 if (item.label === 'Ventas') {
                   return (
                     <div key={item.label} className="mb-1">
                       <button
                         onClick={() => setVentasOpen(!ventasOpen)}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px]
-                        text-white/50 hover:text-white/80 hover:bg-white/5 transition-colors"
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-colors ${sidebarItemInactive}`}
                       >
                         <span>{item.icon}</span>
                         <span className="flex-1 text-left">Ventas</span>
-                        <ChevronRight
-                          size={12}
-                          className={`transition-transform ${ventasOpen ? 'rotate-90' : ''}`}
-                        />
+                        <ChevronRight size={12} className={`transition-transform ${ventasOpen ? 'rotate-90' : ''}`} />
                       </button>
-
                       {ventasOpen && (
                         <div className="ml-7 mt-1 space-y-1">
-                          <button
-                            onClick={() => {
-                              setActiveSection('ventas-diarias');
-                              setSidebarOpen(false);
-                            }}
-                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
-                            transition-colors ${
-                              activeSection === 'ventas-diarias'
-                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
-                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
-                            }`}
-                          >
+                          <button onClick={() => { setActiveSection('ventas-diarias'); setSidebarOpen(false); }}
+                            className={sidebarSubItemClass(activeSection === 'ventas-diarias')}>
                             Ventas diarias
                           </button>
-
-                          <button
-                            onClick={() => {
-                              setActiveSection('mas-vendidos');
-                              setSidebarOpen(false);
-                            }}
-                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
-                            transition-colors ${
-                              activeSection === 'mas-vendidos'
-                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
-                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
-                            }`}
-                          >
+                          <button onClick={() => { setActiveSection('mas-vendidos'); setSidebarOpen(false); }}
+                            className={sidebarSubItemClass(activeSection === 'mas-vendidos')}>
                             Más vendidos
                           </button>
                         </div>
@@ -311,57 +233,30 @@ export default function AdminLayout() {
                   );
                 }
 
-
+                // ── Reportes con submenú ──
                 if (item.label === 'Reportes') {
                   return (
                     <div key={item.label} className="mb-1">
                       <button
                         onClick={() => setReportesOpen(!reportesOpen)}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px]
-                        text-white/50 hover:text-white/80 hover:bg-white/5 transition-colors"
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-colors ${sidebarItemInactive}`}
                       >
                         <span>{item.icon}</span>
                         <span className="flex-1 text-left">Reportes</span>
-                        <ChevronRight
-                          size={12}
-                          className={`transition-transform ${reportesOpen ? 'rotate-90' : ''}`}
-                        />
+                        <ChevronRight size={12} className={`transition-transform ${reportesOpen ? 'rotate-90' : ''}`} />
                       </button>
-
                       {reportesOpen && (
                         <div className="ml-7 mt-1 space-y-1">
-                          <button
-                            onClick={() => { setActiveSection('reportes'); setSidebarOpen(false); }}
-                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
-                            transition-colors ${
-                              activeSection === 'reportes'
-                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
-                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
-                            }`}
-                          >
+                          <button onClick={() => { setActiveSection('reportes'); setSidebarOpen(false); }}
+                            className={sidebarSubItemClass(activeSection === 'reportes')}>
                             Ventas por fecha
                           </button>
-                          <button
-                            onClick={() => { setActiveSection('reportes-cancelados'); setSidebarOpen(false); }}
-                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
-                            transition-colors ${
-                              activeSection === 'reportes-cancelados'
-                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
-                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
-                            }`}
-                          >
+                          <button onClick={() => { setActiveSection('reportes-cancelados'); setSidebarOpen(false); }}
+                            className={sidebarSubItemClass(activeSection === 'reportes-cancelados')}>
                             Pedidos cancelados
                           </button>
-                          {/* ── HU #149 ── */}
-                          <button
-                            onClick={() => { setActiveSection('demanda-horarios'); setSidebarOpen(false); }}
-                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
-                            transition-colors ${
-                              activeSection === 'demanda-horarios'
-                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
-                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
-                            }`}
-                          >
+                          <button onClick={() => { setActiveSection('demanda-horarios'); setSidebarOpen(false); }}
+                            className={sidebarSubItemClass(activeSection === 'demanda-horarios')}>
                             Demanda por horarios
                           </button>
                         </div>
@@ -370,33 +265,22 @@ export default function AdminLayout() {
                   );
                 }
 
+                // ── Mensajeros con submenú ──
                 if (item.label === 'Mensajeros') {
                   return (
                     <div key={item.label} className="mb-1">
                       <button
                         onClick={() => setMensajerosOpen(!mensajerosOpen)}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px]
-                        text-white/50 hover:text-white/80 hover:bg-white/5 transition-colors"
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-colors ${sidebarItemInactive}`}
                       >
                         <span>{item.icon}</span>
                         <span className="flex-1 text-left">Mensajeros</span>
-                        <ChevronRight
-                          size={12}
-                          className={`transition-transform ${mensajerosOpen ? 'rotate-90' : ''}`}
-                        />
+                        <ChevronRight size={12} className={`transition-transform ${mensajerosOpen ? 'rotate-90' : ''}`} />
                       </button>
-
                       {mensajerosOpen && (
                         <div className="ml-7 mt-1 space-y-1">
-                          <button
-                            onClick={() => { setActiveSection('mensajeros-desempeno'); setSidebarOpen(false); }}
-                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
-                            transition-colors ${
-                              activeSection === 'mensajeros-desempeno'
-                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
-                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
-                            }`}
-                          >
+                          <button onClick={() => { setActiveSection('mensajeros-desempeno'); setSidebarOpen(false); }}
+                            className={sidebarSubItemClass(activeSection === 'mensajeros-desempeno')}>
                             Desempeño
                           </button>
                         </div>
@@ -405,6 +289,7 @@ export default function AdminLayout() {
                   );
                 }
 
+                // ── Item normal ──
                 const isActive = activeSection === item.section;
                 return (
                   <button
@@ -419,17 +304,17 @@ export default function AdminLayout() {
                       w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] mb-0.5
                       transition-colors duration-150 text-left
                       ${isActive
-                        ? 'bg-[#88b04b]/15 text-[#88b04b]'
+                        ? sidebarItemActive
                         : item.disabled
-                        ? 'text-white/20 cursor-not-allowed'
-                        : 'text-white/50 hover:text-white/80 hover:bg-white/5 cursor-pointer'
+                        ? 'text-(--theme-text)/20 cursor-not-allowed'
+                        : `${sidebarItemInactive} cursor-pointer`
                       }
                     `}
                   >
                     <span className="flex-shrink-0">{item.icon}</span>
                     <span className="flex-1">{item.label}</span>
                     {item.badge && (
-                      <span className="text-[10px] bg-[#88b04b] text-white px-1.5 py-0.5 rounded-full font-medium">
+                      <span className="text-[10px] bg-primary text-white px-1.5 py-0.5 rounded-full font-medium">
                         {item.badge}
                       </span>
                     )}
@@ -441,92 +326,89 @@ export default function AdminLayout() {
           ))}
         </nav>
 
-        {/* Footer */}
-        <div className="px-3 py-3 border-t border-white/5">
-          <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-white/5 cursor-pointer group">
-            <div className="w-7 h-7 rounded-full bg-[#88b04b]/20 flex items-center justify-center text-[11px] font-semibold text-[#88b04b] flex-shrink-0">
+        {/* Footer sidebar — usuario + logout */}
+        <div className="px-3 py-3 border-t border-(--theme-border)">
+          <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg">
+            <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-[11px] font-semibold text-primary flex-shrink-0">
               AD
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[12px] text-white/80 font-medium truncate">Admin Demo</p>
-              <p className="text-[10px] text-white/30 truncate">Administrador</p>
+              <p className="text-[12px] text-(--theme-text) font-medium truncate">Admin</p>
+              <p className="text-[10px] text-(--theme-text)/30 truncate">Administrador</p>
             </div>
-            <LogOut size={13} className="text-white/20 group-hover:text-white/50 transition-colors flex-shrink-0" />
+            <button
+              onClick={handleLogout}
+              title="Cerrar sesión"
+              className="p-1.5 rounded-lg text-(--theme-text)/30 hover:text-(--theme-error) hover:bg-(--theme-error-bg) transition-colors"
+            >
+              <LogOut size={14} />
+            </button>
           </div>
         </div>
       </aside>
 
       {/* Main */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#fafafa]">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-(--theme-bg)">
 
-        {/* Topbar */}
-        <header className="flex items-center justify-between px-6 py-5 md:px-10 md:py-6 bg-[#0a0a0a]">
-          <div className="flex items-center gap-4 md:gap-8">
+        {/* Topbar — más compacta y adaptada al tema */}
+        <header className="flex items-center justify-between px-6 py-3 md:px-8 md:py-3 bg-(--theme-card-bg) border-b border-(--theme-border)">
+          <div className="flex items-center gap-3 md:gap-6">
             <button
-              className="md:hidden p-1 text-white/50 hover:text-white transition-colors"
+              className="md:hidden p-1 text-(--theme-text)/50 hover:text-(--theme-text) transition-colors"
               onClick={() => setSidebarOpen(!sidebarOpen)}
             >
-              {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+              {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
 
-            <div className="flex items-center gap-4 md:gap-8">
-              {activeSection !== 'dashboard' && (
-                <button
-                  onClick={() => setActiveSection('dashboard')}
-                  className="hidden md:flex items-center gap-2 text-white/50 hover:text-white transition-colors text-sm font-medium"
-                >
-                  <ArrowLeft size={16} /> Dashboard
-                </button>
+            {activeSection !== 'dashboard' && (
+              <button
+                onClick={() => setActiveSection('dashboard')}
+                className="hidden md:flex items-center gap-1.5 text-(--theme-text)/40 hover:text-(--theme-text) transition-colors text-[13px] font-medium"
+              >
+                <ArrowLeft size={14} /> Dashboard
+              </button>
+            )}
+
+            <div>
+              <h1 className="text-[16px] md:text-[18px] font-bold text-(--theme-text) tracking-tight">
+                {currentPage?.title}
+              </h1>
+              {currentPage?.subtitle && (
+                <p className="hidden md:block text-[11px] text-(--theme-text)/40 mt-0.5">
+                  {currentPage.subtitle}
+                </p>
               )}
-              <div>
-                <h1 className="text-xl md:text-3xl font-bold text-white tracking-tight">
-                  {currentPage?.title}
-                </h1>
-                {currentPage?.subtitle && (
-                  <p className="hidden md:block text-xs text-white/30 mt-0.5">
-                    {currentPage.subtitle}
-                  </p>
-                )}
-              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="px-5 py-1.5 border border-[#88b04b] text-[#88b04b] rounded-full text-xs md:text-sm font-medium tracking-wide">
+          <div className="flex items-center gap-3">
+            <div className="px-4 py-1 border border-primary text-primary rounded-full text-[11px] font-medium tracking-wide">
               Área 7
             </div>
           </div>
         </header>
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto p-6 md:p-10">
+        <main className="flex-1 overflow-y-auto p-6 md:p-8">
           {activeSection === 'dashboard' && (
-            <div className="flex items-center justify-center h-full text-black/30 text-sm font-medium">
+            <div className="flex items-center justify-center h-full text-(--theme-text)/30 text-sm font-medium">
               Dashboard principal — Próximamente
             </div>
           )}
-          {activeSection === 'usuarios' && <UserManagement />}
-          {activeSection === 'pedidos' && <OrderReceptionPanel />}
-          {activeSection === 'categorias' && <CategoryList />}
-          {activeSection === 'ventas-diarias' && <DailySales />}
-          {activeSection === 'mas-vendidos' && <TopSellingProducts />}
-          {activeSection === 'mensajeros-desempeno' && <MessengerPerformancePage />}
-          {/*Parámetros del sistema*/}
-          {activeSection === 'parametros' && <ConfigPanel />}
-          {/*Reportes de ventas*/}
-          {activeSection === 'reportes' && <SalesReport />}
-          {activeSection === 'bitacora' && <AccessLogPanel />}
-          {/* ── HU #160 ── */}
-          {activeSection === 'monitoreo' && <SellerActivityPanel />}
-          
-          {/* Reportes de pedidos cancelados — HU #163 */}
-          {activeSection === 'reportes-cancelados' && <CancelledOrdersReport />}
-          {/* ── HU #178 ── */}
-          {activeSection === 'historial' && <OrderHistory />}
-          {/* ── HU #149: Demanda por horarios ── */}
-          {activeSection === 'demanda-horarios' && <DemandPanel />}
+          {activeSection === 'usuarios'              && <UserManagement />}
+          {activeSection === 'pedidos'               && <OrderReceptionPanel />}
+          {activeSection === 'categorias'            && <CategoryList />}
+          {activeSection === 'ventas-diarias'        && <DailySales />}
+          {activeSection === 'mas-vendidos'          && <TopSellingProducts />}
+          {activeSection === 'mensajeros-desempeno'  && <MessengerPerformancePage />}
+          {activeSection === 'parametros'            && <ConfigPanel />}
+          {activeSection === 'reportes'              && <SalesReport />}
+          {activeSection === 'bitacora'              && <AccessLogPanel />}
+          {activeSection === 'monitoreo'             && <SellerActivityPanel />}
+          {activeSection === 'reportes-cancelados'   && <CancelledOrdersReport />}
+          {activeSection === 'historial'             && <OrderHistory />}
+          {activeSection === 'demanda-horarios'      && <DemandPanel />}
         </main>
-
       </div>
     </div>
   );
