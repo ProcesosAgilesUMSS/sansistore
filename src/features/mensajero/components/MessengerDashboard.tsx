@@ -1405,18 +1405,15 @@ export default function MessengerDashboard({
         );
 
         try {
-            // Llamar al servicio con el motivo
-            if (status === 'pending_reassignment' && options.reason) {
-            // Aquí necesitas una función que guarde el motivo en Firestore
-            // Por ahora, solo cambiamos el estado
-            await setMessengerOrderStatus(targetOrder, status);
-            // TODO: Guardar rejectionReason en Firestore
-            } else {
-            await setMessengerOrderStatus(targetOrder, status);
-            }
+            // Pasar el motivo a Firestore si es rechazo
+            await setMessengerOrderStatus(
+                targetOrder,
+                status,
+                status === 'pending_reassignment' ? options.reason : undefined
+            );
             setMessage(getStatusUpdateMessage(status));
             if (options.redirectToDetail) {
-            navigateToDeliveryOrderDetail(orderId);
+                navigateToDeliveryOrderDetail(orderId);
             }
         } catch (error) {
             console.error(error);
