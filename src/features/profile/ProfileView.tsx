@@ -38,7 +38,6 @@ export default function ProfileView() {
 
         if (userDoc.exists()) {
           const data = userDoc.data();
-
           phone = data.phone || 'No registrado';
           secondaryMail = data.secondaryMail || 'No registrado';
         }
@@ -86,59 +85,55 @@ export default function ProfileView() {
   }
 
   return (
-    <>
-      {profile.photoURL && (
-        <div className="flex justify-center mb-6">
+    <section className="bg-card-bg-light border border-border-light rounded-[1.25rem] p-6 shadow-sm max-w-xl mx-auto">
+      {/* CABECERA OPTIMIZADA Y RESPONSIVA */}
+      <header className="flex flex-col items-center text-center pb-6 mb-6 border-b border-border-light">
+        {profile.photoURL ? (
           <img
             src={profile.photoURL}
             alt={profile.displayName}
-            className="size-24 rounded-full object-cover border-4 border-card-bg-light shadow-sm"
+            className="size-24 rounded-full object-cover shadow-sm ring-4 ring-primary/10 border border-border-light mb-4"
           />
-        </div>
-      )}
+        ) : (
+          <div className="size-24 rounded-full bg-border-light/40 flex items-center justify-center text-text-light/40 font-bold text-2xl shadow-sm mb-4">
+            {profile.displayName.charAt(0).toUpperCase()}
+          </div>
+        )}
+        <h1 className="text-xl font-black tracking-tight text-text-light mb-1">
+          {profile.displayName}
+        </h1>
+        <p className="text-[13px] font-medium text-text-light opacity-60">
+          {profile.email}
+        </p>
+      </header>
 
-      <section className="bg-card-bg-light border border-border-light rounded-[1.25rem] p-6 shadow-sm">
-        <dl className="flex flex-col">
+      {/* INFORMACIÓN COMPLEMENTARIA DEL PERFIL */}
+      <dl className="flex flex-col">
+        <dt className="text-[11px] font-bold uppercase tracking-wider text-text-light/50 mb-1">
+          Teléfono celular
+        </dt>
+        <dd className="text-base font-bold text-text-light pb-4 mb-4 border-b border-dotted border-border-light">
+          {profile.phone}
+        </dd>
 
-          <dt className="text-[11px] font-bold uppercase tracking-wider text-text-light/50 mb-1">
-            Nombre
-          </dt>
-          <dd className="text-base font-bold text-text-light pb-4 mb-4 border-b border-dotted border-border-light">
-            {profile.displayName}
-          </dd>
+        <dt className="text-[11px] font-bold uppercase tracking-wider text-text-light/50 mb-1">
+          Correo de respaldo
+        </dt>
+        <dd className="text-base font-bold text-text-light pb-4 mb-4">
+          {profile.secondaryMail}
+        </dd>
+        
+      </dl>
 
-          <dt className="text-[11px] font-bold uppercase tracking-wider text-text-light/50 mb-1">
-            Correo institucional
-          </dt>
-          <dd className="text-base font-bold text-text-light pb-4 mb-4 border-b border-dotted border-border-light">
-            {profile.email}
-          </dd>
-
-          <dt className="text-[11px] font-bold uppercase tracking-wider text-text-light/50 mb-1">
-            Teléfono celular
-          </dt>
-          <dd className="text-base font-bold text-text-light pb-4 mb-4 border-b border-dotted border-border-light">
-            {profile.phone}
-          </dd>
-
-          <dt className="text-[11px] font-bold uppercase tracking-wider text-text-light/50 mb-1">
-            Correo de respaldo
-          </dt>
-          <dd className="text-base font-bold text-text-light pb-6 mb-6 border-b border-dotted border-border-light">
-            {profile.secondaryMail}
-          </dd>
-
-        </dl>
-
-        <div className="flex justify-end mt-4">
-          <a
-            href="/edit-profile"
-            className="inline-flex items-center justify-center rounded-full bg-primary text-white px-6 py-3 text-xs uppercase font-bold tracking-wider hover:opacity-90 transition-all"
-          >
-            Editar perfil
-          </a>
-        </div>
-      </section>
-    </>
+      {/* ACCIONES */}
+      <div className="flex justify-end mt-6">
+        <a
+          href="/edit-profile"
+          className="inline-flex items-center justify-center rounded-full bg-primary text-white px-6 py-2.5 text-xs uppercase font-bold tracking-wider hover:opacity-90 transition-all"
+        >
+          Editar perfil
+        </a>
+      </div>
+    </section>
   );
 }
