@@ -77,8 +77,8 @@ export type OrderItemDoc = {
 };
 
 export interface Messenger {
-  uid: string;
-  displayName: string;
-  institutionalId: string;
-  isAvailable: boolean;
+	uid: string;
+	displayName: string;
+	institutionalId: string;
+	isAvailable: boolean;
 }
