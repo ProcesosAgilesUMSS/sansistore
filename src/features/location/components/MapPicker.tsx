@@ -72,7 +72,7 @@ export default function MapPicker({ onSave, editingLocation }: MapPickerProps) {
             </h1>
 
             {showError && errorMessage && (
-                <div className="bg-red-500 text-white px-3 py-3 rounded-xl mb-2.5 text-sm whitespace-pre-line">
+                <div className="bg-(--theme-danger-bg) text-white px-3 py-3 rounded-xl mb-2.5 text-sm whitespace-pre-line">
                     {errorMessage}
                 </div>
             )}
@@ -155,7 +155,7 @@ export default function MapPicker({ onSave, editingLocation }: MapPickerProps) {
             <button
                 type="submit"
                 disabled={isSaving}
-                className="bg-(--color-primary) text-white py-3 rounded-full font-bold mt-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-primary transition-all active:scale-95 text-white py-3 rounded-full font-bold mt-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 {isSaving ? "Guardando..." : (isEditMode ? "Actualizar" : "Guardar")}
             </button>
