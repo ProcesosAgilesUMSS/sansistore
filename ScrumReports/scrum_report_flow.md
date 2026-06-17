@@ -1,3 +1,120 @@
+
+
+## 16/06/2026
+
+### Leonel Zeballos Aldunate
+- **Yesterday:** Comencé con la implementación de las Tasks #493, identificando los componentes de Location a refactorizar y preparando la reubicación del botón de pedidos.
+- **Today:** Avanzaré con la refactorización visual de las pantallas de ubicaciones aplicando las variables nativas de Tailwind (Task #621) y ejecutaré la limpieza de enlaces globales en el Navbar (Task #493).
+- **Blockers:** Ninguno.
+
+### Anahi Sanabria Ugarte
+- **Yesterday:** revision de la HU #490 e inicio de desarrollo
+- **Today:** continuar con el desarrollo de la HU #490
+- **Blocker:** ninguno
+
+### Valery Dariana Ortuño Panozo
+- **Yesterday:** Continué revisando la estructura de pruebas automatizadas del proyecto y analizando los requerimientos de la Task #495 relacionados con autenticación, validaciones y control de acceso por roles.
+- **Today:** Avanzaré con la planificación e implementación de los casos de prueba de la Task #495, enfocándome en la gestión de perfil y la edición inline utilizando Playwright.
+- **Blockers:** Ninguno.
+
+### Sergio Maldonado Sejas
+- **Yesterday:** revision de la HU #564 e inicio de desarrollo
+- **Today:** continuar con el desarrollo de la HU #564
+- **Blocker:** ninguno
+
+### José Ignacio Jaldin Janko
+- **Yesterday:** Continué con la implementación de la HU #19, realizando ajustes en la integración con el backend y verificando el registro correcto de ubicaciones.
+- **Today:** Finalizaré la HU #19 completando las pruebas de integración y revisando la validación de datos en el formulario de registro de ubicaciones.
+- **Blockers:** Ninguno.
+
+---
+
+## 11/06/2026
+
+### Leonel Zeballos Aldunate
+- **Yesterday:** Participé en la Sprint Retrospective del equipo y revisé la lista de nuevas tareas asignadas para el inicio del presente sprint.
+- **Today:** Realizaré el análisis de alcance y revisión técnica de las Tasks #494 (Migrar acceso "Mis Pedidos" al perfil) y #621 (Alinear pantallas de ubicaciones con el Design System UI.md).
+- **Blockers:** Ninguno.
+
+### Anahi Sanabria Ugarte
+- **Yesterday:** terminar con la implementacion y pruebas de las HUs #491 y #492 y coordinar la dependencia
+- **Today:** revision de dependencias e inicio de las HU #490
+- **Blockers:** ninguno
+
+### Valery Dariana Ortuño Panozo
+- **Yesterday:** Participé en la Sprint Retrospective y revisé las nuevas tareas asignadas para el siguiente sprint.
+- **Today:** Iniciaré el análisis de la Task #495, investigando el funcionamiento de Playwright dentro del proyecto y revisando los casos de prueba existentes para comprender la estructura actual de testing.
+- **Blockers:** Ninguno.
+
+### Sergio Maldonado Sejas
+- **Yesterday:** terminar con la implementacion y pruebas de la HUs #22 y coordinar la dependencia
+- **Today:** revision de dependencias e inicio de las HU #564
+- **Blockers:** ninguno
+
+### José Ignacio Jaldin Janko
+- **Yesterday:** Participé en la Sprint Retrospective revisando los resultados del sprint y los puntos de mejora identificados por el equipo.
+- **Today:** Revisaré las nuevas tareas asignadas y planificaré la implementación de las próximas funcionalidades relacionadas con ubicaciones.
+- **Blockers:** Ninguno.
+
+---
+
+## 09/06/2026
+
+### Leonel Zeballos Aldunate
+- **Yesterday:** Concluí la validación del flujo de devoluciones y resolví de forma exitosa los conflictos de renderizado y roles en el Navbar (tanto en vista desktop como móvil).
+- **Today:** Participaré en la Sprint Retrospective junto al equipo para evaluar los resultados del sprint finalizado y analizar la distribución de las siguientes iteraciones.
+- **Blockers:** Ninguno.
+
+### Anahi Sanabria Ugarte
+- **Yesterday:** implementacion de las HUs #491 y #492
+- **Today:** continuar con la implementacion y realizar pruebas
+- **Blockers:** dependencia con la HU #564 (interno del equipo)
+
+### Valery Dariana Ortuño Panozo
+- **Yesterday:** Concluí la implementación y validación de las HU #17 y #24, revisando que los cambios realizados funcionen correctamente dentro del flujo del perfil.
+- **Today:** Participaré en la Sprint Retrospective junto al equipo para revisar los resultados del sprint y analizar oportunidades de mejora para las siguientes iteraciones.
+- **Blockers:** Ninguno.
+
+### Sergio Maldonado Sejas
+- **Yesterday:** implementacion de la HUs #22
+- **Today:** continuar con la implementacion y realizar pruebas
+- **Blockers:** ninguno
+
+### José Ignacio Jaldin Janko
+- **Yesterday:** Avancé con la implementación de la HU #19, integrando el registro de ubicaciones con el backend y realizando pruebas locales.
+- **Today:** Participaré en la Sprint Retrospective para evaluar el sprint finalizado y planificar los próximos objetivos del equipo.
+- **Blockers:** Ninguno.
+
+---
+
+## 04/06/2026
+
+### Leonel Zeballos Aldunate
+- **Yesterday:** Continué con la implementación del panel de "Mis Pedidos y Devoluciones", ajustando el flujo de estados y la visualización de órdenes para el rol de comprador.
+- **Today:** Finalizaré la integración del formulario de solicitudes de devolución y la sincronización visual de los estados (en revisión, aprobada, rechazada) con la base de datos.
+- **Blockers:** Ninguno.
+
+### Anahi Sanabria Ugarte
+- **Yesterday:** revision de historias de usuario para que nuevo sprint
+- **Today:** iniciar con la implementacion de la hu #491 y #492
+- **Blockers:** ninguno
+
+### Valery Dariana Ortuño Panozo
+- **Yesterday:** Continué con la implementación de las HU #17 y #24, realizando ajustes finales en la edición y visualización de información del perfil de usuario.
+- **Today:** Finalizaré las HU #17 y #24, verificando el correcto funcionamiento de la actualización de datos y la visualización de la información personal en el perfil.
+- **Blockers:** Ninguno.
+
+### Sergio Maldonado Sejas
+- **Yesterday:** revision de historias de usuario para que nuevo sprint
+- **Today:** iniciar con la implementacion de la hu #22
+- **Blockers:** ninguno
+
+### José Ignacio Jaldin Janko
+- **Yesterday:** Revisé la documentación y los criterios de aceptación de la HU #19 para preparar su implementación en el nuevo sprint.
+- **Today:** Iniciaré con la implementación de la HU #19, configurando la estructura necesaria y conectando con el backend para el registro de ubicaciones.
+- **Blockers:** Ninguno.
+
+
 # 06/02/2026
 
 ## José Ignacio Jaldin Janko
@@ -45,7 +162,7 @@
 - **Today:** Revisaré los criterios de aceptación y tareas de las historias asignadas para organizar el trabajo del sprint.
 - **Blockers:** Ninguno.
 
-# 06/26/2026
+# 05/26/2026
 
 ## José Ignacio Jaldin Janko
 
