@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../../lib/firebase';
+import { Package } from 'lucide-react';
 
 interface ProfileData {
   displayName: string;
@@ -21,6 +22,7 @@ export default function ProfileView() {
     secondaryMail: 'No registrado',
     photoURL: '',
   });
+  const [roles, setRoles] = useState<string[]>([]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -41,6 +43,7 @@ export default function ProfileView() {
 
           phone = data.phone || 'No registrado';
           secondaryMail = data.secondaryMail || 'No registrado';
+          setRoles(data.roles || []);
         }
 
         setProfile({
@@ -129,6 +132,35 @@ export default function ProfileView() {
           </dd>
 
         </dl>
+
+        {(() => {
+          const isComprador = roles.length === 0 || roles.includes('comprador') || roles.includes('admin');
+          if (!isComprador) return null;
+
+          return (
+            <div className="mb-6 rounded-2xl border border-border-light bg-bg-light p-4">
+              <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-text-light opacity-50">
+                Gestión de Compras
+              </h3>
+              <a
+                href="/mis-pedidos"
+                className="group flex items-center justify-between rounded-xl border border-border-light bg-card-bg-light p-3 transition-all hover:border-primary hover:shadow-sm"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+                    <Package size={18} />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-text-light text-sm">Mis pedidos y devoluciones</h4>
+                  </div>
+                </div>
+                <span className="text-primary font-bold opacity-50 transition-transform group-hover:translate-x-1 group-hover:opacity-100 pr-2">
+                  →
+                </span>
+              </a>
+            </div>
+          );
+        })()}
 
         <div className="flex justify-end mt-4">
           <a
