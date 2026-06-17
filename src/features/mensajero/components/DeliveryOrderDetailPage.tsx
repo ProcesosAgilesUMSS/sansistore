@@ -278,11 +278,13 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
     return { subtotal, deliveryCost };
   }, [order]);
 
-  const updateStatus = async (status: MessengerOrder['deliveryStatus']) => {
+  const updateStatus = async (
+    status: MessengerOrder['deliveryStatus'],
+    rejectionReason?: string
+  ) => {
     if (!order) return;
 
     const previousOrder = order;
-    const rejectionReason = (order as any).rejectionReason;
     const updatedOrder = { ...order, deliveryStatus: status };
     
     // Si es rechazo y hay motivo, incluirlo
@@ -295,7 +297,6 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
     setError('');
 
     try {
-      // Pasar el motivo a Firestore si es rechazo
       await setMessengerOrderStatus(
         previousOrder,
         status,
@@ -325,11 +326,7 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
 
     setSavingAssignedAction(true);
     try {
-      // Guardar motivo localmente antes de actualizar
-      if (action === 'reject' && reason) {
-        setOrder((prev) => prev ? { ...prev, rejectionReason: reason } : null);
-      }
-      await updateStatus(nextStatus);
+      await updateStatus(nextStatus, action === 'reject' ? reason : undefined);
       setPendingAssignedAction(null);
     } finally {
       setSavingAssignedAction(false);
