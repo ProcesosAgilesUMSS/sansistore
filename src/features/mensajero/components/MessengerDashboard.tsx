@@ -1380,38 +1380,54 @@ export default function MessengerDashboard({
     const updateOrderStatus = async (
         orderId: string,
         status: MessengerOrder['deliveryStatus'],
-        options: { redirectToDetail?: boolean } = {}
-    ) => {
+        options: { redirectToDetail?: boolean; reason?: string } = {}
+        ) => {
         const targetOrder = orders.find((order) => order.id === orderId);
         if (!targetOrder) return;
 
+        // Si es rechazo y hay motivo, guardarlo en el estado local
+        const updatedOrder = status === 'pending_reassignment' && options.reason
+            ? { ...targetOrder, rejectionReason: options.reason }
+            : targetOrder;
+
         setOrders((currentOrders) =>
             currentOrders.map((order) =>
-                order.id === orderId
-                    ? {
-                        ...order,
-                        deliveryStatus: status,
-                    }
-                    : order
+            order.id === orderId
+                ? {
+                    ...order,
+                    deliveryStatus: status,
+                    ...(status === 'pending_reassignment' && options.reason
+                    ? { rejectionReason: options.reason }
+                    : {}),
+                }
+                : order
             )
         );
 
         try {
+            // Llamar al servicio con el motivo
+            if (status === 'pending_reassignment' && options.reason) {
+            // Aquí necesitas una función que guarde el motivo en Firestore
+            // Por ahora, solo cambiamos el estado
             await setMessengerOrderStatus(targetOrder, status);
+            // TODO: Guardar rejectionReason en Firestore
+            } else {
+            await setMessengerOrderStatus(targetOrder, status);
+            }
             setMessage(getStatusUpdateMessage(status));
             if (options.redirectToDetail) {
-                navigateToDeliveryOrderDetail(orderId);
+            navigateToDeliveryOrderDetail(orderId);
             }
         } catch (error) {
             console.error(error);
             setMessage('No se pudo actualizar el estado en Firestore.');
             setOrders((currentOrders) =>
-                currentOrders.map((order) =>
-                    order.id === orderId ? targetOrder : order
-                )
+            currentOrders.map((order) =>
+                order.id === orderId ? targetOrder : order
+            )
             );
         }
-    };
+        };
 
     const markAsDelivered = (order: MessengerOrder) => {
         setConfirmPaymentOrder(order);
@@ -1488,20 +1504,31 @@ export default function MessengerDashboard({
         openAssignedActionConfirmation(orderId, 'reject');
     };
 
-    const confirmAssignedOrderAction = async () => {
+    const confirmAssignedOrderAction = async (reason?: string) => {
         if (!pendingAssignedAction || savingAssignedAction) return;
 
         const { order, action } = pendingAssignedAction;
-        const nextStatus =
-            action === 'accept' ? 'accepted' : 'pending_reassignment';
-
-        setSavingAssignedAction(true);
-        try {
-            await updateOrderStatus(order.id, nextStatus, { redirectToDetail: true });
-            setPendingAssignedAction(null);
-        } finally {
-            setSavingAssignedAction(false);
+        
+        // Si es rechazo y no hay motivo, no continuar
+        if (action === 'reject' && !reason?.trim()) {
+            setMessage('Debes seleccionar un motivo para rechazar el pedido.');
+            return;
         }
+
+    const nextStatus =
+        action === 'accept' ? 'accepted' : 'pending_reassignment';
+
+    setSavingAssignedAction(true);
+    try {
+        // Pasar el motivo al updateOrderStatus
+        await updateOrderStatus(order.id, nextStatus, { 
+        redirectToDetail: true,
+        reason: action === 'reject' ? reason : undefined 
+        });
+        setPendingAssignedAction(null);
+    } finally {
+        setSavingAssignedAction(false);
+    }
     };
 
     const registerUndeliveredOrder = async (reason: string, notes: string) => {

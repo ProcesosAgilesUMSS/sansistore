@@ -282,12 +282,20 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
     if (!order) return;
 
     const previousOrder = order;
-    setOrder({ ...order, deliveryStatus: status });
+    const updatedOrder = { ...order, deliveryStatus: status };
+    
+    // Si es rechazo y hay motivo, incluirlo
+    if (status === 'pending_reassignment' && (order as any).rejectionReason) {
+      updatedOrder.rejectionReason = (order as any).rejectionReason;
+    }
+
+    setOrder(updatedOrder);
     setMessage('');
     setError('');
 
     try {
       await setMessengerOrderStatus(previousOrder, status);
+      // TODO: Guardar rejectionReason en Firestore si existe
       setMessage(getStatusUpdateMessage(status));
       await loadOrder({ showLoading: false });
     } catch (statusError) {
@@ -297,14 +305,25 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
     }
   };
 
-  const confirmAssignedOrderAction = async () => {
+  const confirmAssignedOrderAction = async (reason?: string) => {
     if (!pendingAssignedAction || savingAssignedAction) return;
 
-    const nextStatus =
-      pendingAssignedAction.action === 'accept' ? 'accepted' : 'pending_reassignment';
+    const { action } = pendingAssignedAction;
+
+    // Validar motivo solo para rechazo
+    if (action === 'reject' && !reason?.trim()) {
+      setError('Debes seleccionar un motivo para rechazar el pedido.');
+      return;
+    }
+
+    const nextStatus = action === 'accept' ? 'accepted' : 'pending_reassignment';
 
     setSavingAssignedAction(true);
     try {
+      // Guardar motivo localmente antes de actualizar
+      if (action === 'reject' && reason) {
+        setOrder((prev) => prev ? { ...prev, rejectionReason: reason } : null);
+      }
       await updateStatus(nextStatus);
       setPendingAssignedAction(null);
     } finally {
