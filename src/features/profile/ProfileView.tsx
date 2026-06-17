@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../../lib/firebase';
-import { Pencil, Check, X, AlertCircle, CheckCircle } from 'lucide-react';
+import { Pencil, Check, X, AlertCircle, CheckCircle, MapPin, Package, Star } from 'lucide-react';
 
 interface ProfileData {
   displayName: string;
@@ -10,6 +10,8 @@ interface ProfileData {
   phone: string;
   secondaryMail: string;
   photoURL: string;
+  roles: string[];
+  deliveryRating?: number; // HU #564
 }
 
 export default function ProfileView() {
@@ -22,9 +24,10 @@ export default function ProfileView() {
     phone: 'No registrado',
     secondaryMail: 'No registrado',
     photoURL: '',
+    roles: [],
   });
 
-  // Estado unificado para el Toast flotante estilo Sansistore
+  // Estado del Toast flotante minimalista estilo Sansistore
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Estados para el modo edición inline
@@ -35,7 +38,7 @@ export default function ProfileView() {
   const [tempPhone, setTempPhone] = useState('');
   const [tempMail, setTempMail] = useState('');
 
-  // Errores locales de validación (debajo de los inputs)
+  // Errores locales de validación
   const [errors, setErrors] = useState<{ phone?: string; secondaryMail?: string }>({});
 
   useEffect(() => {
@@ -52,11 +55,15 @@ export default function ProfileView() {
         const userDoc = await getDoc(doc(db, 'users', user.uid));
         let phone = 'No registrado';
         let secondaryMail = 'No registrado';
+        let userRoles: string[] = [];
+        let deliveryRating = undefined;
 
         if (userDoc.exists()) {
           const data = userDoc.data();
           phone = data.phone || 'No registrado';
           secondaryMail = data.secondaryMail || 'No registrado';
+          userRoles = Array.isArray(data.roles) ? data.roles : [];
+          deliveryRating = data.deliveryRating ?? undefined;
         }
 
         setProfile({
@@ -65,6 +72,8 @@ export default function ProfileView() {
           phone,
           secondaryMail,
           photoURL: user.photoURL || '',
+          roles: userRoles,
+          deliveryRating,
         });
 
         setAuthenticated(true);
@@ -78,7 +87,7 @@ export default function ProfileView() {
     return unsubscribe;
   }, []);
 
-  // Lanzador del Toast (Desaparece automáticamente a los 4 segundos)
+  // Lanzador del Toast (Auto-ocultable a los 4 segundos)
   const showToast = (type: 'success' | 'error', message: string) => {
     setToast({ type, message });
     setTimeout(() => {
@@ -180,7 +189,7 @@ export default function ProfileView() {
         <p className="text-error font-semibold">No autenticado</p>
         <a
           href="/login"
-          className="rounded-full bg-primary text-white px-6 py-3 text-xs uppercase font-bold tracking-wider hover:opacity-90"
+          className="rounded-full bg-primary text-white px-6 py-3 text-xs uppercase font-bold tracking-wider hover:opacity-90 transition-all"
         >
           Iniciar sesión
         </a>
@@ -188,9 +197,14 @@ export default function ProfileView() {
     );
   }
 
+  // Lógica de condiciones de negocio del Navbar de la plataforma
+  const showMisDirecciones = profile.roles.length === 0 || profile.roles.includes('comprador');
+  const showMisPedidos = profile.roles.length > 0 && profile.roles.some(r => ['comprador', 'admin'].includes(r));
+  const showCalificacionMensajero = profile.roles.length > 0 && profile.roles.some(r => ['mensajero', 'admin'].includes(r));
+
   return (
     <>
-      {/* Toast Flotante Dinámico de la Plataforma */}
+      {/* Toast Flotante Unificado */}
       {toast && (
         <div 
           className={`fixed bottom-6 left-1/2 z-[200] flex -translate-x-1/2 items-center gap-2 rounded-full px-5 py-2.5 shadow-lg transition-all animate-fade-in ${
@@ -208,11 +222,11 @@ export default function ProfileView() {
         </div>
       )}
 
-      {/* Contenedor Principal de la Tarjeta */}
-      <section className="bg-card-bg-light border border-border-light rounded-[1.25rem] p-6 shadow-sm max-w-xl mx-auto">
+      {/* Contenedor Principal */}
+      <section className="bg-card-bg-light border border-border-light rounded-[1.25rem] p-6 shadow-sm max-w-xl mx-auto flex flex-col gap-6">
         
         {/* Cabecera del Perfil */}
-        <header className="flex flex-col items-center text-center pb-6 mb-6 border-b border-border-light pt-4">
+        <header className="flex flex-col items-center text-center pb-6 border-b border-border-light pt-4 relative">
           {profile.photoURL ? (
             <img
               src={profile.photoURL}
@@ -224,16 +238,25 @@ export default function ProfileView() {
               {profile.displayName.charAt(0).toUpperCase()}
             </div>
           )}
+          
           <h1 className="text-xl font-black tracking-tight text-text-light mb-1">
             {profile.displayName}
           </h1>
-          <p className="text-[13px] font-medium text-text-light opacity-60">
+          <p className="text-[13px] font-medium text-text-light opacity-60 mb-2">
             {profile.email}
           </p>
+
+          {/* HU #564: Calificación promedio para el Mensajero */}
+          {showCalificacionMensajero && profile.deliveryRating !== undefined && (
+            <div className="flex items-center gap-1 bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full text-xs font-bold mt-1">
+              <Star size={13} fill="currentColor" />
+              <span>Calificación: {profile.deliveryRating.toFixed(1)} / 5.0</span>
+            </div>
+          )}
         </header>
 
-        {/* Lista de Datos Interactivos Inline */}
-        <div className="flex flex-col gap-5">
+        {/* Datos de Contacto Inline */}
+        <div className="flex flex-col gap-5 pb-2">
           
           {/* Campo: Teléfono Celular */}
           <div className="flex flex-col">
@@ -350,8 +373,40 @@ export default function ProfileView() {
               </div>
             )}
           </div>
-
         </div>
+
+        {/* Sección de Accesos Directos Unificados (Condicionados por Rol) */}
+        <footer className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-border-light">
+          {showMisDirecciones && (
+            <a
+              href="/location"
+              className="flex items-center gap-3 px-4 py-3 text-[13px] font-bold text-text-light/80 rounded-xl border border-border-light bg-border-light/10 hover:bg-border-light/30 hover:text-primary hover:border-primary/30 transition-all group"
+            >
+              <div className="p-2 rounded-lg bg-bg-light border border-border-light text-text-light/50 group-hover:text-primary group-hover:border-primary/20 transition-colors">
+                <MapPin size={16} />
+              </div>
+              <div className="flex flex-col text-left">
+                <span>Mis direcciones</span>
+                <span className="text-[11px] font-medium text-text-light/40 group-hover:text-primary/60 transition-colors">Gestionar entrega</span>
+              </div>
+            </a>
+          )}
+
+          {showMisPedidos && (
+            <a
+              href="/mis-pedidos"
+              className="flex items-center gap-3 px-4 py-3 text-[13px] font-bold text-text-light/80 rounded-xl border border-border-light bg-border-light/10 hover:bg-border-light/30 hover:text-primary hover:border-primary/30 transition-all group"
+            >
+              <div className="p-2 rounded-lg bg-bg-light border border-border-light text-text-light/50 group-hover:text-primary group-hover:border-primary/20 transition-colors">
+                <Package size={16} />
+              </div>
+              <div className="flex flex-col text-left">
+                <span>Mis pedidos</span>
+                <span className="text-[11px] font-medium text-text-light/40 group-hover:text-primary/60 transition-colors">Ver mis compras</span>
+              </div>
+            </a>
+          )}
+        </footer>
       </section>
     </>
   );
