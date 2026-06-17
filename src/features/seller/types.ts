@@ -80,4 +80,5 @@ export interface Messenger {
   uid: string;
   displayName: string;
   institutionalId: string;
+  isAvailable: boolean;
 }

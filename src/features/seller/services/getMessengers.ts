@@ -9,12 +9,30 @@ export const getMessengers = async (db: Firestore): Promise<Messenger[]> => {
   );
 
   const snap = await getDocs(q);
-  return snap.docs.map((d) => {
+
+  const menssengers = snap.docs.map((d) => {
     const data = d.data();
     return {
       uid: d.id,
       displayName: data.displayName ?? data.email ?? 'Mensajero',
       institutionalId: data.institutionalId ?? '',
     };
-  });
+  })
+
+  const withAvailability: Messenger[] = await Promise.all(
+    menssengers.map(async (m) => {
+      const activeQ = query(
+        collection(db, 'deliveries'),
+        where('courierId', '==', m.uid),
+        where('status', 'in', ['ready', 'in_transit']),
+      );
+      const activeSnap = await getDocs(activeQ);
+
+      return {
+        ...m,
+        isAvailable: activeSnap.empty,
+      }
+    })
+  )
+  return withAvailability;
 }
