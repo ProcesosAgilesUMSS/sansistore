@@ -1,4 +1,4 @@
-import { CheckCircle2, LoaderCircle, PackageCheck, X, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, LoaderCircle, PackageCheck, X, XCircle } from 'lucide-react';
 import { useState } from 'react';
 import { parseOrderId } from '../../cart/services/orderService';
 import type { MessengerOrder } from '../types';
@@ -74,6 +74,7 @@ export default function ConfirmAssignedOrderActionModal({
   const [reason, setReason] = useState('');
   const [customReason, setCustomReason] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
+  const [errorModal, setErrorModal] = useState<string | null>(null);
 
   const confirmAction = async () => {
     if (isSaving) return;
@@ -82,7 +83,7 @@ export default function ConfirmAssignedOrderActionModal({
     if (action === 'reject') {
       const finalReason = reason === 'Otro motivo' ? customReason : reason;
       if (!finalReason.trim()) {
-        alert('Debes seleccionar o escribir un motivo para rechazar el pedido.');
+        setErrorModal('Debes seleccionar o escribir un motivo para rechazar el pedido.');
         return;
       }
       await onConfirm(finalReason);
@@ -102,138 +103,167 @@ export default function ConfirmAssignedOrderActionModal({
   const isRejectAction = action === 'reject';
 
   return (
-    <div
-      className="fixed inset-0 z-[999] flex items-center justify-center bg-black/65 p-4 backdrop-blur-sm"
-      onClick={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="assigned-order-action-title"
-    >
-      <section className="w-full max-w-lg overflow-hidden rounded-[28px] border border-border-light bg-card-bg-light text-text-light shadow-2xl">
-        <header className="flex items-start justify-between gap-4 border-b border-border-light px-6 py-5">
-          <div className="flex items-center gap-4">
-            <span
-              className={`flex h-12 w-12 items-center justify-center rounded-2xl ${config.iconClassName}`}
-            >
-              <Icon size={24} />
-            </span>
-
-            <div>
-              <h2
-                className="text-xl font-black tracking-normal"
-                id="assigned-order-action-title"
+    <>
+      <div
+        className="fixed inset-0 z-[999] flex items-center justify-center bg-black/65 p-4 backdrop-blur-sm"
+        onClick={(event) => {
+          if (event.target === event.currentTarget) onClose();
+        }}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="assigned-order-action-title"
+      >
+        <section className="w-full max-w-lg overflow-hidden rounded-[28px] border border-border-light bg-card-bg-light text-text-light shadow-2xl">
+          <header className="flex items-start justify-between gap-4 border-b border-border-light px-6 py-5">
+            <div className="flex items-center gap-4">
+              <span
+                className={`flex h-12 w-12 items-center justify-center rounded-2xl ${config.iconClassName}`}
               >
-                {config.title}
-              </h2>
-              <p className="text-sm font-medium opacity-70">
-                {config.description}
-              </p>
-            </div>
-          </div>
+                <Icon size={24} />
+              </span>
 
-          <button
-            aria-label="Cerrar"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-border-light bg-secondary-bg-light transition hover:text-primary"
-            disabled={isSaving}
-            onClick={onClose}
-            type="button"
-          >
-            <X size={16} />
-          </button>
-        </header>
-
-        <div className="space-y-6 px-6 py-6">
-          <div className="grid gap-3 rounded-2xl border border-border-light bg-secondary-bg-light/60 p-4 sm:grid-cols-2">
-            <div>
-              <p className="text-xs font-bold uppercase opacity-50">Pedido</p>
-              <p className="mt-1 text-sm font-bold">{displayId}</p>
-            </div>
-
-            <div>
-              <p className="text-xs font-bold uppercase opacity-50">Cliente</p>
-              <p className="mt-1 text-sm font-bold">{order.customerName}</p>
-            </div>
-
-            <div>
-              <p className="text-xs font-bold uppercase opacity-50">Zona</p>
-              <p className="mt-1 text-sm font-bold">{order.city}</p>
-            </div>
-
-            <div>
-              <p className="text-xs font-bold uppercase opacity-50">
-                Monto a cobrar
-              </p>
-              <p className="mt-1 text-sm font-bold">
-                {formatBolivianos(order.cashToCollect)}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex gap-3 rounded-2xl border border-border-light bg-secondary-bg-light/60 p-4 text-sm font-semibold">
-            <PackageCheck className="mt-0.5 shrink-0 text-primary" size={18} />
-            <p>{config.warning}</p>
-          </div>
-
-          {/* Campo de motivo - solo para rechazo */}
-          {isRejectAction && (
-            <div className="space-y-3 rounded-2xl border border-border-light bg-secondary-bg-light/60 p-4">
-              <p className="text-sm font-bold">Motivo del rechazo:</p>
-              <div className="flex flex-wrap gap-2">
-                {rejectionReasons.map((reasonOption) => (
-                  <button
-                    key={reasonOption}
-                    className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
-                      reason === reasonOption
-                        ? 'border-primary bg-primary/10 text-primary'
-                        : 'border-border-light hover:border-primary/50'
-                    }`}
-                    onClick={() => handleReasonSelect(reasonOption)}
-                    type="button"
-                  >
-                    {reasonOption}
-                  </button>
-                ))}
+              <div>
+                <h2
+                  className="text-xl font-black tracking-normal"
+                  id="assigned-order-action-title"
+                >
+                  {config.title}
+                </h2>
+                <p className="text-sm font-medium opacity-70">
+                  {config.description}
+                </p>
               </div>
-              {showCustomInput && (
-                <textarea
-                  placeholder="Escribe tu motivo..."
-                  className="w-full rounded-xl border border-border-light p-3 text-sm"
-                  value={customReason}
-                  onChange={(e) => setCustomReason(e.target.value)}
-                  rows={2}
-                />
-              )}
             </div>
-          )}
-        </div>
 
-        <footer className="flex flex-col gap-3 border-t border-border-light bg-secondary-bg-light/50 px-6 py-5 sm:flex-row">
-          <button
-            className="inline-flex h-12 flex-1 items-center justify-center rounded-full border border-border-light bg-card-bg-light text-sm font-black uppercase disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={isSaving}
-            onClick={onClose}
-            type="button"
-          >
-            Cancelar
-          </button>
+            <button
+              aria-label="Cerrar"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-border-light bg-secondary-bg-light transition hover:text-primary"
+              disabled={isSaving}
+              onClick={onClose}
+              type="button"
+            >
+              <X size={16} />
+            </button>
+          </header>
 
-          <button
-            className={`inline-flex h-12 flex-[1.4] items-center justify-center gap-2 rounded-full px-5 text-sm font-black uppercase transition disabled:cursor-not-allowed disabled:opacity-50 ${config.buttonClassName}`}
-            disabled={isSaving}
-            onClick={confirmAction}
-            type="button"
-          >
-            {isSaving ? (
-              <LoaderCircle className="animate-spin" size={16} />
-            ) : (
-              <Icon size={16} />
+          <div className="space-y-6 px-6 py-6">
+            <div className="grid gap-3 rounded-2xl border border-border-light bg-secondary-bg-light/60 p-4 sm:grid-cols-2">
+              <div>
+                <p className="text-xs font-bold uppercase opacity-50">Pedido</p>
+                <p className="mt-1 text-sm font-bold">{displayId}</p>
+              </div>
+
+              <div>
+                <p className="text-xs font-bold uppercase opacity-50">Cliente</p>
+                <p className="mt-1 text-sm font-bold">{order.customerName}</p>
+              </div>
+
+              <div>
+                <p className="text-xs font-bold uppercase opacity-50">Zona</p>
+                <p className="mt-1 text-sm font-bold">{order.city}</p>
+              </div>
+
+              <div>
+                <p className="text-xs font-bold uppercase opacity-50">
+                  Monto a cobrar
+                </p>
+                <p className="mt-1 text-sm font-bold">
+                  {formatBolivianos(order.cashToCollect)}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3 rounded-2xl border border-border-light bg-secondary-bg-light/60 p-4 text-sm font-semibold">
+              <PackageCheck className="mt-0.5 shrink-0 text-primary" size={18} />
+              <p>{config.warning}</p>
+            </div>
+
+            {/* Campo de motivo - solo para rechazo */}
+            {isRejectAction && (
+              <div className="space-y-3 rounded-2xl border border-border-light bg-secondary-bg-light/60 p-4">
+                <p className="text-sm font-bold">Motivo del rechazo:</p>
+                <div className="flex flex-wrap gap-2">
+                  {rejectionReasons.map((reasonOption) => (
+                    <button
+                      key={reasonOption}
+                      className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
+                        reason === reasonOption
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-border-light hover:border-primary/50'
+                      }`}
+                      onClick={() => handleReasonSelect(reasonOption)}
+                      type="button"
+                    >
+                      {reasonOption}
+                    </button>
+                  ))}
+                </div>
+                {showCustomInput && (
+                  <textarea
+                    placeholder="Escribe tu motivo..."
+                    className="w-full rounded-xl border border-border-light p-3 text-sm"
+                    value={customReason}
+                    onChange={(e) => setCustomReason(e.target.value)}
+                    rows={2}
+                  />
+                )}
+              </div>
             )}
-            {config.buttonLabel}
-          </button>
-        </footer>
-      </section>
-    </div>
+          </div>
+
+          <footer className="flex flex-col gap-3 border-t border-border-light bg-secondary-bg-light/50 px-6 py-5 sm:flex-row">
+            <button
+              className="inline-flex h-12 flex-1 items-center justify-center rounded-full border border-border-light bg-card-bg-light text-sm font-black uppercase disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={isSaving}
+              onClick={onClose}
+              type="button"
+            >
+              Cancelar
+            </button>
+
+            <button
+              className={`inline-flex h-12 flex-[1.4] items-center justify-center gap-2 rounded-full px-5 text-sm font-black uppercase transition disabled:cursor-not-allowed disabled:opacity-50 ${config.buttonClassName}`}
+              disabled={isSaving}
+              onClick={confirmAction}
+              type="button"
+            >
+              {isSaving ? (
+                <LoaderCircle className="animate-spin" size={16} />
+              ) : (
+                <Icon size={16} />
+              )}
+              {config.buttonLabel}
+            </button>
+          </footer>
+        </section>
+      </div>
+
+      {/* Modal de error */}
+      {errorModal && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/65 p-4 backdrop-blur-sm"
+          onClick={() => setErrorModal(null)}
+        >
+          <div className="w-full max-w-md rounded-[28px] border border-(--theme-error-border) bg-card-bg-light p-6 shadow-2xl">
+            <div className="flex items-center gap-4">
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-(--theme-error-bg) text-(--theme-error)">
+                <AlertTriangle size={24} />
+              </span>
+              <div>
+                <h3 className="text-lg font-black">Error</h3>
+                <p className="text-sm font-semibold opacity-80">{errorModal}</p>
+              </div>
+            </div>
+            <button
+              className="mt-6 w-full rounded-full border border-border-light bg-card-bg-light py-3 text-sm font-black uppercase transition hover:bg-secondary-bg-light"
+              onClick={() => setErrorModal(null)}
+              type="button"
+            >
+              Entendido
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
