@@ -21,6 +21,7 @@ interface Movement {
   reason: string;
   operatorId?: string;
   createdAt: any;
+  sequence?: number; // Agregado para que TypeScript reconozca el campo
 }
 
 export const MovementHistory: React.FC = () => {
@@ -32,7 +33,7 @@ export const MovementHistory: React.FC = () => {
   const [page, setPage] = useState(1);
   const [isNextPageAvailable, setIsNextPageAvailable] = useState(false);
   
-  //useRef para guardar los cursores de cada página sin re-renderizar
+  // useRef para guardar los cursores de cada página sin re-renderizar
   const cursorsRef = useRef<Record<number, DocumentSnapshot>>({});
 
   const MOVEMENTS_PER_PAGE = 10;
@@ -69,14 +70,14 @@ export const MovementHistory: React.FC = () => {
   useEffect(() => {
     setLoading(true);
 
-    // Consulta base para la página 1
+    // Consulta base para la página 1 (QUITAMOS el orderBy sequence)
     let q = query(
       collection(db, 'inventoryMovements'),
       orderBy('createdAt', 'desc'),
       limit(MOVEMENTS_PER_PAGE + 1)
     );
 
-    //sSi estamos en la pag 2 o mayor, usamos el cursor guardado de la página anterior
+    // Si estamos en la pag 2 o mayor, usamos el cursor guardado
     if (page > 1 && cursorsRef.current[page - 1]) {
       q = query(
         collection(db, 'inventoryMovements'),
@@ -100,13 +101,28 @@ export const MovementHistory: React.FC = () => {
           ...doc.data()
         })) as Movement[];
 
+        //DESEMPATE EN EL CLIENT
+        data.sort((a, b) => {
+          //Extraemos los milisegundos de la fecha
+          const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+          const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+          
+          //Si las fechas son diferentes, ordenamos normal
+          if (timeB !== timeA) {
+            return timeB - timeA; 
+          }
+          
+          //Si es un EMPATE EXACTO (mismo milisegundo por el batch), usamos sequence
+          const seqA = a.sequence || 0;
+          const seqB = b.sequence || 0;
+          return seqB - seqA;
+        });
+        // ----------------------------------------
+
         setMovements(data);
         
-        //guardamos el último documento de la página actual en nuestro diccionario de cursores
-        // Así, cuando queramos ir a la (page + 1), ya sabremos dónde empezar
         cursorsRef.current[page] = visibleDocs[visibleDocs.length - 1];
 
-        // Resolvemos nombres después de tener los movimientos
         await resolveOperatorNames(data);
       } else {
         setMovements([]);
@@ -126,7 +142,6 @@ export const MovementHistory: React.FC = () => {
     if (page > 1) setPage(prev => prev - 1);
   };
 
-  // Configuración visual por tipo de movimiento
   const typeConfig = {
     ENTRADA: {
       icon: <ArrowDownRight className="w-4 h-4" />,
