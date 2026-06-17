@@ -278,16 +278,30 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
     return { subtotal, deliveryCost };
   }, [order]);
 
-  const updateStatus = async (status: MessengerOrder['deliveryStatus']) => {
+  const updateStatus = async (
+    status: MessengerOrder['deliveryStatus'],
+    rejectionReason?: string
+  ) => {
     if (!order) return;
 
     const previousOrder = order;
-    setOrder({ ...order, deliveryStatus: status });
+    const updatedOrder = { ...order, deliveryStatus: status };
+    
+    // Si es rechazo y hay motivo, incluirlo
+    if (status === 'pending_reassignment' && rejectionReason) {
+      updatedOrder.rejectionReason = rejectionReason;
+    }
+
+    setOrder(updatedOrder);
     setMessage('');
     setError('');
 
     try {
-      await setMessengerOrderStatus(previousOrder, status);
+      await setMessengerOrderStatus(
+        previousOrder,
+        status,
+        status === 'pending_reassignment' ? rejectionReason : undefined
+      );
       setMessage(getStatusUpdateMessage(status));
       await loadOrder({ showLoading: false });
     } catch (statusError) {
@@ -297,15 +311,22 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
     }
   };
 
-  const confirmAssignedOrderAction = async () => {
+  const confirmAssignedOrderAction = async (reason?: string) => {
     if (!pendingAssignedAction || savingAssignedAction) return;
 
-    const nextStatus =
-      pendingAssignedAction.action === 'accept' ? 'accepted' : 'pending_reassignment';
+    const { action } = pendingAssignedAction;
+
+    // Validar motivo solo para rechazo
+    if (action === 'reject' && !reason?.trim()) {
+      setError('Debes seleccionar un motivo para rechazar el pedido.');
+      return;
+    }
+
+    const nextStatus = action === 'accept' ? 'accepted' : 'pending_reassignment';
 
     setSavingAssignedAction(true);
     try {
-      await updateStatus(nextStatus);
+      await updateStatus(nextStatus, action === 'reject' ? reason : undefined);
       setPendingAssignedAction(null);
     } finally {
       setSavingAssignedAction(false);

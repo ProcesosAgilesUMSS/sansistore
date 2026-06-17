@@ -325,7 +325,8 @@ const getStatusForORder = (status: DeliveryStatus) => {
 
 export async function setMessengerOrderStatus(
   order: MessengerOrder,
-  status: DeliveryStatus
+  status: DeliveryStatus,
+  rejectionReason?: string
 ) {
   assertCanTransitionDeliveryStatus(order.deliveryStatus, status);
 
@@ -334,6 +335,12 @@ export async function setMessengerOrderStatus(
     status,
     updatedAt: serverTimestamp(),
   };
+
+  // Si es rechazo y hay motivo, guardarlo
+  if (status === 'pending_reassignment' && rejectionReason) {
+    dataToUpdate.rejectionReason = rejectionReason;
+    dataToUpdate.rejectedAt = serverTimestamp();
+  }
 
   if (status === 'in_transit') {
     dataToUpdate.inTransitAt = serverTimestamp();
@@ -348,11 +355,18 @@ export async function setMessengerOrderStatus(
   await updateDoc(deliveryRef, dataToUpdate);
 
   if (order.id) {
-    await updateDoc(doc(db, 'orders', order.id), {
+    const orderUpdateData: Record<string, unknown> = {
       status: getOrderStatusForDeliveryStatus(status),
       deliveryStatus: getOrderDeliveryStatusForDeliveryStatus(status),
       updatedAt: serverTimestamp(),
-    });
+    };
+
+    if (status === 'pending_reassignment' && rejectionReason) {
+      orderUpdateData.rejectionReason = rejectionReason;
+      orderUpdateData.rejectedAt = serverTimestamp();
+    }
+
+    await updateDoc(doc(db, 'orders', order.id), orderUpdateData);
   }
 }
 
