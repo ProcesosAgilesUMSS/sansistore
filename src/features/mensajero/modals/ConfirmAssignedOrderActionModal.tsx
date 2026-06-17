@@ -1,4 +1,5 @@
 import { CheckCircle2, LoaderCircle, PackageCheck, X, XCircle } from 'lucide-react';
+import { useState } from 'react';
 import { parseOrderId } from '../../cart/services/orderService';
 import type { MessengerOrder } from '../types';
 import { formatBolivianos } from '../utils/money';
@@ -10,7 +11,7 @@ interface ConfirmAssignedOrderActionModalProps {
   action: AssignedOrderAction;
   isSaving: boolean;
   onClose: () => void;
-  onConfirm: () => Promise<void>;
+  onConfirm: (reason?: string) => Promise<void>;
 }
 
 const actionConfig = {
@@ -47,6 +48,15 @@ const actionConfig = {
   }
 >;
 
+const rejectionReasons = [
+  'Pedido muy lejos de mi zona',
+  'No tengo disponibilidad horaria',
+  'El pedido es demasiado grande para mi vehículo',
+  'Problemas con mi vehículo',
+  'No conozco la zona de entrega',
+  'Otro motivo',
+];
+
 export type { AssignedOrderAction };
 
 export default function ConfirmAssignedOrderActionModal({
@@ -61,10 +71,35 @@ export default function ConfirmAssignedOrderActionModal({
   const displayId = order.displayId ?? friendlyName;
   const Icon = config.Icon;
 
+  const [reason, setReason] = useState('');
+  const [customReason, setCustomReason] = useState('');
+  const [showCustomInput, setShowCustomInput] = useState(false);
+
   const confirmAction = async () => {
     if (isSaving) return;
-    await onConfirm();
+
+    // Validar motivo solo para rechazo
+    if (action === 'reject') {
+      const finalReason = reason === 'Otro motivo' ? customReason : reason;
+      if (!finalReason.trim()) {
+        alert('Debes seleccionar o escribir un motivo para rechazar el pedido.');
+        return;
+      }
+      await onConfirm(finalReason);
+    } else {
+      await onConfirm();
+    }
   };
+
+  const handleReasonSelect = (selectedReason: string) => {
+    setReason(selectedReason);
+    setShowCustomInput(selectedReason === 'Otro motivo');
+    if (selectedReason !== 'Otro motivo') {
+      setCustomReason('');
+    }
+  };
+
+  const isRejectAction = action === 'reject';
 
   return (
     <div
@@ -140,6 +175,38 @@ export default function ConfirmAssignedOrderActionModal({
             <PackageCheck className="mt-0.5 shrink-0 text-primary" size={18} />
             <p>{config.warning}</p>
           </div>
+
+          {/* Campo de motivo - solo para rechazo */}
+          {isRejectAction && (
+            <div className="space-y-3 rounded-2xl border border-border-light bg-secondary-bg-light/60 p-4">
+              <p className="text-sm font-bold">Motivo del rechazo:</p>
+              <div className="flex flex-wrap gap-2">
+                {rejectionReasons.map((reasonOption) => (
+                  <button
+                    key={reasonOption}
+                    className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
+                      reason === reasonOption
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-border-light hover:border-primary/50'
+                    }`}
+                    onClick={() => handleReasonSelect(reasonOption)}
+                    type="button"
+                  >
+                    {reasonOption}
+                  </button>
+                ))}
+              </div>
+              {showCustomInput && (
+                <textarea
+                  placeholder="Escribe tu motivo..."
+                  className="w-full rounded-xl border border-border-light p-3 text-sm"
+                  value={customReason}
+                  onChange={(e) => setCustomReason(e.target.value)}
+                  rows={2}
+                />
+              )}
+            </div>
+          )}
         </div>
 
         <footer className="flex flex-col gap-3 border-t border-border-light bg-secondary-bg-light/50 px-6 py-5 sm:flex-row">
