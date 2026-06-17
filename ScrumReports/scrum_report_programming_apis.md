@@ -463,3 +463,30 @@
 - **Yesterday:** Estuve planificando que hu hare.
 - **Today:** Hablare con mi grupo para ver que hacer.
 - **Blockers:** None.
+
+## 16-06-2026
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Participé en el Sprint Planning 4 para continuar con el desarrollo de integración continua.
+- **Today:** Continuar con la implementación de la historia de usuario asignada y también verificar que errores se presentan durante el desarrollo.
+- **Blockers:** Cambiar la estética a la definida puede traer bugs de cualquier tipo, se debe tener cuidado.
+
+### Efrain Peralta Felipe
+- **Yesterday:** Analice mi hu designada para esta este sprint
+- **Today:** Continuar con la implementación de mi hu para este sprint.
+- **Blockers:** None.
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday:** Asignación y análisis de la HU #568 (Rechazar pedido asignado con motivo). La HU se encuentra en estado "In Progress".
+- **Today:** Continuar con el desarrollo de la HU #568.
+- **Blockers:** None.
+
+### Adrián
+- **Yesterday:** Desarrollo de la HU asignada, la cual restringe al mensajero de aceptar un nuevo pedido si ya tiene una entrega activa.
+- **Today:** Continuar con la implementación de la HU para este sprint.
+- **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+- **Yesterday:** Empece el desarrollo de la HU 570 liberar disponibilidad
+- **Today:** Continuar con la implementación de la HU para este sprint.
+- **Blockers:** None.
