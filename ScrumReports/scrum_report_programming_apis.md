@@ -480,3 +480,8 @@
 - **Yesterday:** Asignación y análisis de la HU #568 (Rechazar pedido asignado con motivo). La HU se encuentra en estado "In Progress".
 - **Today:** Continuar con el desarrollo de la HU #568.
 - **Blockers:** None.
+
+### Adrián
+- **Yesterday:** Desarrollo de la HU asignada, la cual restringe al mensajero de aceptar un nuevo pedido si ya tiene una entrega activa.
+- **Today:** Continuar con la implementación de la HU para este sprint.
+- **Blockers:** None.
