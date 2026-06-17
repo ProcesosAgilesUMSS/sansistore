@@ -75,11 +75,11 @@ export function AssignMessengerModal({
               </p>
             </div>
 
-            {!messengersLoading && messengers.length > 0 && (
-              <p className="mt-4 text-xs text-(--theme-text) opacity-50">
-                {availableCount} de {messengers.length} mensajeros disponibles
-              </p>
-            )}
+					{!messengersLoading && messengers.length > 0 && (
+						<p className="mt-4 text-xs text-(--theme-text) opacity-50">
+							{availableCount} de {messengers.length} mensajeros disponibles
+						</p>
+					)}
 
             <div className="mt-3 grid gap-3">
               {messengersLoading ? (
