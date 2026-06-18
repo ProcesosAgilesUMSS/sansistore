@@ -52,4 +52,10 @@ export const sections = [
     label: 'Historial de pedidos',
     route: '/seller/order-history',
   },
+
+    {
+    id: 'Registrar motivo de fallo',
+    label: 'Registrar motivo de fallo',
+    route: '/seller/failure-reasons',
+  },
 ];
