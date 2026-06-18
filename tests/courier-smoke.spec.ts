@@ -1,40 +1,16 @@
 import { expect, test, type Page } from '@playwright/test';
+import { LoginPage } from './pages/login.page';
 
 const acceptedOrderCode = 'pu4-qsc';
 const juanOrderCustomer = 'Juan Paredes';
 const carlosOrderCustomer = 'Carlos Flores';
 
 async function loginAsCourier(page: Page, email = 'luis.mensajero@est.umss.edu') {
-  await page.goto('/login');
-
-  const loginButton = page
-    .locator('form')
-    .getByRole('button', { name: /Iniciar/ });
-
-  await expect(loginButton).toBeEnabled({ timeout: 15_000 });
-  await expect(page.locator('#email')).toBeEditable();
-  await expect(page.locator('#password')).toBeEditable();
-  await expect
-    .poll(
-      async () =>
-        page.evaluate(() => {
-          const button = document
-            .querySelector('form')
-            ?.querySelector('button[type="button"]');
-
-          return Boolean(
-            button &&
-            Object.keys(button).some((key) => key.startsWith('__reactProps'))
-          );
-        }),
-      { timeout: 15_000 }
-    )
-    .toBe(true);
-
-  await page.locator('#email').fill(email);
-  await page.locator('#password').fill('12345678');
-  await loginButton.click({ noWaitAfter: true });
-
+  const loginPage = new LoginPage(page);
+  await loginPage.goto();
+  await loginPage.waitForReady();
+  await loginPage.fillCredentials(email);
+  await loginPage.loginButton.click({ noWaitAfter: true });
   await expect(page).not.toHaveURL(/\/login/, { timeout: 30_000 });
 }
 

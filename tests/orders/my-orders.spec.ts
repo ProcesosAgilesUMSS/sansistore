@@ -1,28 +1,21 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { LoginPage } from '../pages/login.page';
 
 const ANA_EMAIL = 'ana.comprador@est.umss.edu';
-
-async function login(page: Page, email: string) {
-  await page.goto('/login', { waitUntil: 'domcontentloaded' });
-  const loginButton = page
-    .locator('form')
-    .getByRole('button', { name: 'Iniciar sesión', exact: true });
-  const emailField = page.getByLabel('Correo electrónico');
-  const passwordField = page.locator('#password');
-  // ponytail: React hidrata lento en Firefox/WebKit; rellenar+enviar hasta salir de /login.
-  await expect(async () => {
-    await emailField.fill(email);
-    await passwordField.fill('12345678');
-    await loginButton.click({ noWaitAfter: true });
-    await expect(page).not.toHaveURL(/\/login/, { timeout: 8_000 });
-  }).toPass({ timeout: 40_000 });
-}
 
 test.describe('Mis pedidos - comprador (Ana Mamani)', () => {
   test.describe.configure({ mode: 'serial', timeout: 60_000 });
 
   test.beforeEach(async ({ page }) => {
-    await login(page, ANA_EMAIL);
+    const login = new LoginPage(page);
+    await login.goto();
+    await login.waitForReady();
+    // ponytail: toPass retries fill+click+URL hasta salir de /login.
+    await expect(async () => {
+      await login.fillCredentials(ANA_EMAIL);
+      await login.loginButton.click({ noWaitAfter: true });
+      await expect(page).not.toHaveURL(/\/login/, { timeout: 8_000 });
+    }).toPass({ timeout: 40_000 });
   });
 
   test('el menu lleva a Mi Perfil y de ahi a Mis pedidos', async ({ page }) => {
