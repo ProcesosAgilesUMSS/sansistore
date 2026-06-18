@@ -11,6 +11,10 @@ import {
   type QueryDocumentSnapshot,
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
+import {
+  normalizePaymentMethod,
+  registrarActividadCobroActual,
+} from '../../admin/pedidos/payment-audit/services/paymentAuditService';
 import { parseOrderId } from '../../cart/services/orderService';
 import type {
   CourierDashboardStats,
@@ -169,4 +173,12 @@ export const registerPayment = async (order: CourierOrder) => {
     paymentCollectedAt: collectedAt,
     updatedAt: collectedAt,
   });
+
+  registrarActividadCobroActual({
+    orderId: order.id,
+    amount: order.total,
+    paymentMethod: normalizePaymentMethod(order.paymentMethod),
+    status: 'VERIFICADO',
+    fallbackRole: 'MENSAJERO',
+  }).catch((err) => console.error('Error al registrar auditoria de cobro:', err));
 };

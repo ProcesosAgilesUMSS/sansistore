@@ -9,6 +9,7 @@ import { deliveryList } from './data/deliveries.mjs';
 import { run as seedCartItems } from './data/cart.mjs';
 import { inventoryMovements } from './data/inventoryMovements.mjs';
 import { activityLogList } from './data/activityLogs.mjs';
+import { paymentActivityLogList } from './data/paymentActivityLogs.mjs';
 import { readFileSync, existsSync } from 'node:fs';
 
 const envPath = new URL('../.env', import.meta.url);
@@ -425,6 +426,17 @@ async function seedActivityLogs() {
   console.log('activity logs seeded');
 }
 
+async function seedPaymentActivityLogs() {
+  for (const log of paymentActivityLogList) {
+    const { id, ...data } = log;
+    await setDoc('paymentActivityLogs', id, {
+      ...data,
+      timestamp: toTimestamp(data.timestamp),
+    });
+  }
+  console.log('payment activity logs seeded');
+}
+
 async function clearAllData() {
   console.log('\n Clearing existing data...');
 
@@ -454,6 +466,7 @@ async function main() {
   await seedDeliveries();
   await seedMovements();
   await seedActivityLogs();
+  await seedPaymentActivityLogs();
 
   if (isProduction) {
     console.log('\n Production seed complete!\n');

@@ -26,6 +26,10 @@ import { auth, db } from "@/lib/firebase";
 
 // ── HU #160: Monitoreo de actividad de vendedores ──
 import { registrarActividadVendedor } from "../../admin/monitoring/services/sellerActivityService";
+import {
+	normalizePaymentMethod,
+	registrarActividadCobroActual,
+} from "../../admin/pedidos/payment-audit/services/paymentAuditService";
 
 // --- Seller Actions ---
 const SELLER_VALIDATED_PAYMENT_STATUSES = new Set([
@@ -74,6 +78,8 @@ export async function paidOrder(orderId: string): Promise<void> {
 		itemId: doc.id,
 		...(doc.data() as Omit<OrderItem, "itemId">),
 	}));
+	let auditAmount = 0;
+	let auditMethod = "cash_on_delivery";
 
 	await runTransaction(db, async (transaction) => {
 		const orderSnap = await transaction.get(orderRef);
@@ -111,6 +117,18 @@ export async function paidOrder(orderId: string): Promise<void> {
 		);
 
 		const verifiedAt = serverTimestamp();
+		auditAmount =
+			typeof orderData.total === "number"
+				? orderData.total
+				: typeof paymentData?.amount === "number"
+					? paymentData.amount
+					: 0;
+		auditMethod =
+			typeof paymentData?.method === "string"
+				? paymentData.method
+				: typeof orderData.paymentMethod === "string"
+					? orderData.paymentMethod
+					: "cash_on_delivery";
 
 		transaction.update(orderRef, {
 			status: "PAGADO",
@@ -170,6 +188,14 @@ export async function paidOrder(orderId: string): Promise<void> {
 		previousStatus: "ENTREGADO",
 		newStatus: "PAGADO",
 	}).catch((err) => console.error("❌ ERROR al registrar actividad:", err));
+
+	registrarActividadCobroActual({
+		orderId,
+		amount: auditAmount,
+		paymentMethod: normalizePaymentMethod(auditMethod),
+		status: "VERIFICADO",
+		fallbackRole: "VENDEDOR",
+	}).catch((err) => console.error("Error al registrar auditoria de cobro:", err));
 }
 
 export async function returnOrder(orderId: string): Promise<void> {
@@ -480,6 +506,8 @@ async function processQuerySnapshot(
 				id: orderDoc.id,
 				...data,
 				buyerName: buyer?.displayName || "Usuario desconocido",
+				buyerPhoneNumber: buyer?.phoneNumber,
+				buyerInstitutionalId: buyer?.institutionalId,
 				delivery,
 				items,
 				incidentReason: data.incidentReason,
@@ -553,6 +581,15 @@ export async function confirmOrderReception(orderId: string, buyerId: string) {
 			updatedAt: confirmedAt,
 		});
 	});
+}
+
+export async function rejectOrder(orderId: string, reason: string): Promise<void> {
+  const orderRef = doc(db, "orders", orderId);
+  await updateDoc(orderRef, {
+    status: "RECHAZADO",
+    incidentReason: reason,
+    updatedAt: serverTimestamp(),
+  });
 }
 
 export async function createReturnRequest(

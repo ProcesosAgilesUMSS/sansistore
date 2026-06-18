@@ -79,6 +79,8 @@ export interface Order {
 	secret?: string;
 	buyerId: string;
 	buyerName?: string;
+	buyerPhoneNumber?: string;
+	buyerInstitutionalId?: string;
 	sellerId?: string;
 	status: OrderStatus;
 	buyerReceptionConfirmed?: boolean;

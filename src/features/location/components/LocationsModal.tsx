@@ -44,10 +44,10 @@ export default function LocationsModal({
             onClick={onClose}
         >
             <div
-                className="w-full max-w-sm overflow-hidden rounded-[2.5rem] border border-[#88B04B]/20 bg-(--theme-card-bg) shadow-2xl transition-colors duration-300"
+                className="w-full max-w-sm overflow-hidden rounded-[2.5rem] border border-(--theme-border) bg-(--theme-card-bg) shadow-2xl transition-colors duration-300"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="flex items-center justify-between border-b border-[#88B04B]/10 px-7 py-5">
+                <div className="flex items-center justify-between border-b border-(--theme-border) px-7 py-5">
                     <h2 className="font-outfit text-lg font-black tracking-tight text-(--theme-text) transition-colors duration-300">
                         Mis Ubicaciones
                     </h2>
@@ -57,7 +57,7 @@ export default function LocationsModal({
                         className="
                             flex h-9 w-9 items-center justify-center rounded-full
                             bg-(--theme-secondary-bg) text-(--theme-text)
-                            hover:bg-[#88B04B] hover:text-white transition-all duration-200
+                            hover:bg-primary hover:text-white transition-all duration-200
                         "
                     >
                         <X size={18} />
@@ -67,12 +67,12 @@ export default function LocationsModal({
                 <div className="flex max-h-[22rem] flex-col gap-3 overflow-y-auto p-5 custom-scrollbar">
                     {loading ? (
                         <div className="flex flex-col items-center gap-3 py-12 text-(--theme-text)/40">
-                            <Loader2 size={28} className="animate-spin text-[#88B04B]/60" />
+                            <Loader2 size={28} className="animate-spin text-primary/60" />
                             <p className="font-outfit text-sm font-bold">Cargando ubicaciones...</p>
                         </div>
                     ) : locations.length === 0 ? (
                         <div className="flex flex-col items-center gap-3 py-12 text-(--theme-text)/40">
-                            <MapPin size={32} className="text-[#88B04B]/40" />
+                            <MapPin size={32} className="text-primary/40" />
                             <p className="font-outfit text-sm font-bold">No hay destinos guardados</p>
                         </div>
                     ) : (
@@ -95,9 +95,9 @@ export default function LocationsModal({
                         onClick={onAddNew}
                         className="
                             flex w-full items-center justify-center gap-2 rounded-full
-                            border-2 border-[#88B04B]/40 py-3
-                            font-outfit text-[11px] font-black uppercase tracking-[0.15em] text-[#88B04B]
-                            transition-all hover:border-[#88B04B] hover:bg-[#88B04B]/5 active:scale-95
+                            border-2 border-primary/40 py-3
+                            text-[11px] font-black uppercase tracking-[0.15em] text-primary
+                            transition-all hover:border-primary hover:bg-primary/5 active:scale-95
                         "
                     >
                         <Plus size={16} strokeWidth={3} />
@@ -109,8 +109,8 @@ export default function LocationsModal({
                         onClick={handleConfirm}
                         className="
                             flex w-full items-center justify-center rounded-full py-3
-                            font-outfit text-[11px] font-black uppercase tracking-[0.15em] text-white
-                            bg-[#88B04B] transition-all active:scale-95
+                            text-[11px] font-black uppercase tracking-[0.15em] text-white
+                            bg-primary transition-all active:scale-95
                             disabled:opacity-40 disabled:cursor-not-allowed
                         "
                     >
