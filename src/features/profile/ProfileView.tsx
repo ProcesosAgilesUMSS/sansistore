@@ -11,7 +11,7 @@ interface ProfileData {
   secondaryMail: string;
   photoURL: string;
   roles: string[];
-  deliveryRating?: number; // HU #564
+  deliveryRating?: number;
 }
 
 export default function ProfileView() {
@@ -26,7 +26,6 @@ export default function ProfileView() {
     photoURL: '',
     roles: [],
   });
-  const [roles, setRoles] = useState<string[]>([]);
 
   // Estado del Toast flotante minimalista estilo Sansistore
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -63,7 +62,6 @@ export default function ProfileView() {
           const data = userDoc.data();
           phone = data.phone || 'No registrado';
           secondaryMail = data.secondaryMail || 'No registrado';
-          setRoles(data.roles || []);
           userRoles = Array.isArray(data.roles) ? data.roles : [];
           deliveryRating = data.deliveryRating ?? undefined;
         }
@@ -199,9 +197,9 @@ export default function ProfileView() {
     );
   }
 
-  // Lógica de condiciones de negocio del Navbar de la plataforma
+  // Lógica de condiciones de negocio unificada
   const showMisDirecciones = profile.roles.length === 0 || profile.roles.includes('comprador');
-  const showMisPedidos = profile.roles.length > 0 && profile.roles.some(r => ['comprador', 'admin'].includes(r));
+  const showMisPedidos = profile.roles.length === 0 || profile.roles.some(r => ['comprador', 'admin'].includes(r));
   const showCalificacionMensajero = profile.roles.length > 0 && profile.roles.some(r => ['mensajero', 'admin'].includes(r));
 
   return (
@@ -245,12 +243,10 @@ export default function ProfileView() {
             {profile.displayName}
           </h1>
           
-          {/* Agregamos el <dd> para mantener la compatibilidad con el selector de Playwright */}
           <dd className="text-[13px] font-medium text-text-light opacity-60 mb-2">
             {profile.email}
           </dd>
 
-          {/* HU #564: Calificación promedio para el Mensajero */}
           {showCalificacionMensajero && profile.deliveryRating !== undefined && (
             <div className="flex items-center gap-1 bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full text-xs font-bold mt-1">
               <Star size={13} fill="currentColor" />
@@ -288,7 +284,6 @@ export default function ProfileView() {
                   <button
                     type="button"
                     onClick={handleSavePhone}
-                    aria-label="Confirmar teléfono"
                     className="p-1.5 rounded-md text-text-light/60 hover:text-primary hover:bg-border-light/40 transition-all"
                   >
                     <Check size={16} />
@@ -296,7 +291,6 @@ export default function ProfileView() {
                   <button
                     type="button"
                     onClick={() => setIsEditingPhone(false)}
-                    aria-label="Cancelar edición de teléfono"
                     className="p-1.5 rounded-md text-text-light/40 hover:text-error hover:bg-border-light/40 transition-all"
                   >
                     <X size={16} />
@@ -310,7 +304,6 @@ export default function ProfileView() {
                 <button
                   type="button"
                   onClick={handleStartEditPhone}
-                  aria-label="Editar teléfono"
                   className="p-1.5 text-text-light/40 hover:text-primary rounded-md hover:bg-border-light/20 transition-all"
                 >
                   <Pencil size={13} />
@@ -345,7 +338,6 @@ export default function ProfileView() {
                   <button
                     type="button"
                     onClick={handleSaveMail}
-                    aria-label="Confirmar correo"
                     className="p-1.5 rounded-md text-text-light/60 hover:text-primary hover:bg-border-light/40 transition-all"
                   >
                     <Check size={16} />
@@ -353,7 +345,6 @@ export default function ProfileView() {
                   <button
                     type="button"
                     onClick={() => setIsEditingMail(false)}
-                    aria-label="Cancelar edición de correo"
                     className="p-1.5 rounded-md text-text-light/40 hover:text-error hover:bg-border-light/40 transition-all"
                   >
                     <X size={16} />
@@ -369,7 +360,6 @@ export default function ProfileView() {
                 <button
                   type="button"
                   onClick={handleStartEditMail}
-                  aria-label="Editar correo de respaldo"
                   className="p-1.5 text-text-light/40 hover:text-primary rounded-md hover:bg-border-light/20 transition-all"
                 >
                   <Pencil size={13} />
@@ -379,16 +369,14 @@ export default function ProfileView() {
           </div>
         </div>
 
-        {/* Sección agregada por tu compañero: Gestión de Compras */}
-        {(() => {
-          const isComprador = roles.length === 0 || roles.includes('comprador') || roles.includes('admin');
-          if (!isComprador) return null;
-
-          return (
-            <div className="mb-2 rounded-2xl border border-border-light bg-bg-light p-4">
-              <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-text-light opacity-50">
-                Gestión de Compras
-              </h3>
+        {/* Sección Unificada: Gestión de Cuenta (Rediseño aplicado) */}
+        {(showMisPedidos || showMisDirecciones) && (
+          <div className="mb-2 rounded-2xl border border-border-light bg-bg-light p-4 flex flex-col gap-3">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-text-light opacity-50 mb-1">
+              Gestión de Cuenta
+            </h3>
+            
+            {showMisPedidos && (
               <a
                 href="/mis-pedidos"
                 className="group flex items-center justify-between rounded-xl border border-border-light bg-card-bg-light p-3 transition-all hover:border-primary hover:shadow-sm"
@@ -397,59 +385,39 @@ export default function ProfileView() {
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
                     <Package size={18} />
                   </div>
-                  <div>
+                  <div className="flex flex-col">
                     <h4 className="font-bold text-text-light text-sm">Mis pedidos y devoluciones</h4>
+                    <span className="text-[11px] text-text-light/50 font-medium">Ver el historial de mis compras</span>
                   </div>
                 </div>
                 <span className="text-primary font-bold opacity-50 transition-transform group-hover:translate-x-1 group-hover:opacity-100 pr-2">
                   →
                 </span>
               </a>
-            </div>
-          );
-        })()}
+            )}
 
-        <div className="flex justify-end mt-2">
-          <a
-            href="/edit-profile"
-            className="inline-flex items-center justify-center rounded-full bg-primary text-white px-6 py-3 text-xs uppercase font-bold tracking-wider hover:opacity-90 transition-all"
-          >
-            Editar perfil
-          </a>
-        </div>
+            {showMisDirecciones && (
+              <a
+                href="/location"
+                className="group flex items-center justify-between rounded-xl border border-border-light bg-card-bg-light p-3 transition-all hover:border-primary hover:shadow-sm"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+                    <MapPin size={18} />
+                  </div>
+                  <div className="flex flex-col">
+                    <h4 className="font-bold text-text-light text-sm">Mis direcciones</h4>
+                    <span className="text-[11px] text-text-light/50 font-medium">Gestionar mis lugares de entrega</span>
+                  </div>
+                </div>
+                <span className="text-primary font-bold opacity-50 transition-transform group-hover:translate-x-1 group-hover:opacity-100 pr-2">
+                  →
+                </span>
+              </a>
+            )}
+          </div>
+        )}
 
-        {/* Sección de Accesos Directos Unificados (Condicionados por Rol) */}
-        <footer className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-border-light">
-          {showMisDirecciones && (
-            <a
-              href="/location"
-              className="flex items-center gap-3 px-4 py-3 text-[13px] font-bold text-text-light/80 rounded-xl border border-border-light bg-border-light/10 hover:bg-border-light/30 hover:text-primary hover:border-primary/30 transition-all group"
-            >
-              <div className="p-2 rounded-lg bg-bg-light border border-border-light text-text-light/50 group-hover:text-primary group-hover:border-primary/20 transition-colors">
-                <MapPin size={16} />
-              </div>
-              <div className="flex flex-col text-left">
-                <span>Mis direcciones</span>
-                <span className="text-[11px] font-medium text-text-light/40 group-hover:text-primary/60 transition-colors">Gestionar entrega</span>
-              </div>
-            </a>
-          )}
-
-          {showMisPedidos && (
-            <a
-              href="/mis-pedidos"
-              className="flex items-center gap-3 px-4 py-3 text-[13px] font-bold text-text-light/80 rounded-xl border border-border-light bg-border-light/10 hover:bg-border-light/30 hover:text-primary hover:border-primary/30 transition-all group"
-            >
-              <div className="p-2 rounded-lg bg-bg-light border border-border-light text-text-light/50 group-hover:text-primary group-hover:border-primary/20 transition-colors">
-                <Package size={16} />
-              </div>
-              <div className="flex flex-col text-left">
-                <span>Mis pedidos</span>
-                <span className="text-[11px] font-medium text-text-light/40 group-hover:text-primary/60 transition-colors">Ver mis compras</span>
-              </div>
-            </a>
-          )}
-        </footer>
       </section>
     </>
   );
