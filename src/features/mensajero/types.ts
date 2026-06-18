@@ -83,21 +83,21 @@ export interface MessengerOrder {
 }
 
 export interface MessengerShiftOrderSnapshot {
-    id: string;
-    deliveryId: string;
-    customerName: string;
-    buyerName: string;
-    phone: string;
-    address: string;
-    city: string;
-    deliveryStatus: MessengerOrder['deliveryStatus'];
-    paymentStatus: string;
-    paymentStatusLabel: string;
-    cashToCollect: number;
-    paymentCollectedAt: Date | null;
-    assignedAt: Date | null;
-    updatedAt: Date | null;
-    items: MessengerOrderItem[];
+	id: string;
+	deliveryId: string;
+	customerName: string;
+	buyerName: string;
+	phone: string;
+	address: string;
+	city: string;
+	deliveryStatus: MessengerOrder["deliveryStatus"];
+	paymentStatus: string;
+	paymentStatusLabel: string;
+	cashToCollect: number;
+	paymentCollectedAt: Date | null;
+	assignedAt: Date | null;
+	updatedAt: Date | null;
+	items: MessengerOrderItem[];
 }
 
 export interface MessengerShiftSummary {
