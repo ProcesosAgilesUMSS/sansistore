@@ -506,6 +506,8 @@ async function processQuerySnapshot(
 				id: orderDoc.id,
 				...data,
 				buyerName: buyer?.displayName || "Usuario desconocido",
+				buyerPhoneNumber: buyer?.phoneNumber,
+				buyerInstitutionalId: buyer?.institutionalId,
 				delivery,
 				items,
 				incidentReason: data.incidentReason,
