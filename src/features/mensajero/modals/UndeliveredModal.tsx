@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import {
+  DollarSign,
   HandMetal,
   LoaderCircle,
   MapPinOff,
@@ -29,6 +30,11 @@ const reasons = [
     id: 'acceso_restringido',
     label: 'Acceso restringido',
     icon: ShieldAlert,
+  },
+  {
+    id: 'falta_pago_cliente',
+    label: 'Falta de pago del cliente',
+    icon: DollarSign,
   },
   { id: 'cliente_rechazo', label: 'Cliente rechazo pedido', icon: HandMetal },
   { id: 'otro', label: 'Otro motivo', icon: MoreHorizontal },

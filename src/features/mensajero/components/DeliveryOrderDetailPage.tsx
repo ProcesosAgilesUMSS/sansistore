@@ -4,7 +4,6 @@ import {
   AlertTriangle,
   ArrowLeft,
   CheckCircle2,
-  DollarSign,
   LoaderCircle,
   MapPin,
   Package,
@@ -16,7 +15,6 @@ import {
 import PaymentSuccessModal from '../modals/PaymentSuccessModal';
 import ConfirmPaymentModal from '../modals/Confirmpaymentmodal';
 import UndeliveredModal from '../modals/UndeliveredModal';
-import CancelNoPaymentModal from '../modals/CancelNoPaymentModal';
 import ConfirmAssignedOrderActionModal, {
   type AssignedOrderAction,
 } from '../modals/ConfirmAssignedOrderActionModal';
@@ -24,7 +22,6 @@ import { auth } from '../../../lib/firebase';
 import { parseOrderId } from '../../cart/services/orderService';
 import {
   getMessengerOrderById,
-  markMessengerOrderAsCancelledByNoPayment,
   markMessengerOrderAsNotDelivered,
   registerMessengerCashPayment,
   setMessengerOrderStatus,
@@ -85,19 +82,6 @@ const getStatusUpdateMessage = (status: MessengerOrder['deliveryStatus']) => {
   return `Estado actualizado a ${getDeliveryStatusLabel(status)}.`;
 };
 
-const canCancelByNoPayment = (order: MessengerOrder) => {
-  const paymentText = `${order.paymentStatus} ${order.paymentStatusLabel}`
-    .toLowerCase()
-    .trim();
-
-  return (
-    (order.deliveryStatus === 'accepted' || order.deliveryStatus === 'in_transit') &&
-    !paymentText.includes('cobrado') &&
-    !paymentText.includes('pagado') &&
-    !paymentText.includes('cancelado')
-  );
-};
-
 function CopyableOrderId({ order }: { order: MessengerOrder }) {
   const { uuid, friendlyName } = parseOrderId(order.id);
   const displayId = order.displayId ?? friendlyName;
@@ -121,22 +105,20 @@ function CopyableOrderId({ order }: { order: MessengerOrder }) {
 function DetailActions({
   order,
   onAssignedAction,
-  onCancelNoPayment,
   onDelivered,
   onInTransit,
   onNotDelivered,
 }: {
   order: MessengerOrder;
   onAssignedAction: (action: AssignedOrderAction) => void;
-  onCancelNoPayment: () => void;
   onDelivered: () => void;
   onInTransit: () => void;
   onNotDelivered: () => void;
 }) {
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
       <a
-        className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+        className="messenger-map-button inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 px-4 text-sm font-bold transition"
         href={buildBuyerMapUrl(order)}
         onClick={() => storeBuyerMapOrder(order)}
       >
@@ -147,7 +129,7 @@ function DetailActions({
       {order.deliveryStatus === 'assigned' && (
         <>
           <button
-            className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
+            className="messenger-deliver-button inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-4 text-sm font-bold transition"
             onClick={() => onAssignedAction('accept')}
             type="button"
           >
@@ -155,7 +137,7 @@ function DetailActions({
             Aceptar pedido
           </button>
           <button
-            className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+            className="messenger-reject-button inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 px-4 text-sm font-bold transition"
             onClick={() => onAssignedAction('reject')}
             type="button"
           >
@@ -167,7 +149,7 @@ function DetailActions({
 
       {order.deliveryStatus === 'accepted' && (
         <button
-          className="messenger-transit-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold shadow-lg transition"
+          className="messenger-transit-button inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-4 text-sm font-bold shadow-lg transition"
           onClick={onInTransit}
           type="button"
         >
@@ -178,7 +160,7 @@ function DetailActions({
 
       {order.deliveryStatus === 'in_transit' && (
         <button
-          className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
+          className="messenger-deliver-button inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-4 text-sm font-bold transition"
           onClick={onDelivered}
           type="button"
         >
@@ -189,7 +171,7 @@ function DetailActions({
 
       {(order.deliveryStatus === 'accepted' || order.deliveryStatus === 'in_transit') && (
         <button
-          className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+          className="messenger-reject-button inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 px-4 text-sm font-bold transition"
           onClick={onNotDelivered}
           type="button"
         >
@@ -198,16 +180,6 @@ function DetailActions({
         </button>
       )}
 
-      {canCancelByNoPayment(order) && (
-        <button
-          className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-          onClick={onCancelNoPayment}
-          type="button"
-        >
-          <DollarSign size={17} />
-          Cancelar por falta de pago
-        </button>
-      )}
     </div>
   );
 }
@@ -225,9 +197,6 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
   const [savingAssignedAction, setSavingAssignedAction] = useState(false);
   const [undeliveredOrder, setUndeliveredOrder] = useState<MessengerOrder | null>(null);
   const [savingUndelivered, setSavingUndelivered] = useState(false);
-  const [cancelNoPaymentOrder, setCancelNoPaymentOrder] =
-    useState<MessengerOrder | null>(null);
-  const [savingCancelNoPayment, setSavingCancelNoPayment] = useState(false);
   const [confirmPaymentOrder, setConfirmPaymentOrder] = useState<MessengerOrder | null>(
     null
   );
@@ -356,36 +325,6 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
       setError('No se pudo registrar el incidente.');
     } finally {
       setSavingUndelivered(false);
-    }
-  };
-
-  const registerCancelNoPayment = async (notes: string) => {
-    if (!cancelNoPaymentOrder) return;
-
-    const previousOrder = cancelNoPaymentOrder;
-    setSavingCancelNoPayment(true);
-    setOrder({
-      ...previousOrder,
-      deliveryStatus: 'cancelled',
-      paymentStatus: 'CANCELADO',
-      paymentStatusLabel: 'Cancelado por falta de pago',
-    });
-
-    try {
-      await markMessengerOrderAsCancelledByNoPayment({
-        order: previousOrder,
-        notes,
-        courierId,
-      });
-      setMessage(getStatusUpdateMessage('cancelled'));
-      setCancelNoPaymentOrder(null);
-      await loadOrder({ showLoading: false });
-    } catch (cancelError) {
-      console.error(cancelError);
-      setOrder(previousOrder);
-      setError('No se pudo cancelar el pedido por falta de pago.');
-    } finally {
-      setSavingCancelNoPayment(false);
     }
   };
 
@@ -524,7 +463,6 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
             <DetailActions
               order={order}
               onAssignedAction={(action) => setPendingAssignedAction({ order, action })}
-              onCancelNoPayment={() => setCancelNoPaymentOrder(order)}
               onDelivered={() => setConfirmPaymentOrder(order)}
               onInTransit={() => void updateStatus('in_transit')}
               onNotDelivered={() => setUndeliveredOrder(order)}
@@ -587,15 +525,6 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
           order={undeliveredOrder}
           onClose={() => setUndeliveredOrder(null)}
           onConfirm={registerUndeliveredOrder}
-        />
-      )}
-
-      {cancelNoPaymentOrder && (
-        <CancelNoPaymentModal
-          isSaving={savingCancelNoPayment}
-          order={cancelNoPaymentOrder}
-          onClose={() => setCancelNoPaymentOrder(null)}
-          onConfirm={registerCancelNoPayment}
         />
       )}
 
