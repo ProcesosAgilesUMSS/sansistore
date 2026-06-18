@@ -21,7 +21,6 @@ import { auth } from '../../../lib/firebase';
 import { parseOrderId } from '../../cart/services/orderService';
 import {
     closeMessengerShift,
-    markMessengerOrderAsCancelledByNoPayment,
     markMessengerOrderAsNotDelivered,
     registerMessengerCashPayment,
     setMessengerOrderStatus,
@@ -43,7 +42,6 @@ import {
 import { formatBolivianos } from '../utils/money';
 import UndeliveredModal from '../modals/UndeliveredModal';
 
-import CancelNoPaymentModal from '../modals/CancelNoPaymentModal';
 import './MessengerDashboard.css';
 import ConfirmPaymentModal from '../modals/Confirmpaymentmodal';
 import ConfirmAssignedOrderActionModal, {
@@ -185,19 +183,6 @@ const openDeliveryMap = (order: MessengerOrder) => {
     window.location.href = buildBuyerMapUrl(order);
 };
 
-const canCancelByNoPayment = (order: MessengerOrder) => {
-    const paymentText = `${order.paymentStatus} ${order.paymentStatusLabel}`
-        .toLowerCase()
-        .trim();
-
-    return (
-        (order.deliveryStatus === 'accepted' || order.deliveryStatus === 'in_transit') &&
-        !paymentText.includes('cobrado') &&
-        !paymentText.includes('pagado') &&
-        !paymentText.includes('cancelado')
-    );
-};
-
 function MessageToast({ message, onDismiss }: { message: string; onDismiss: () => void }) {
     useEffect(() => {
         const timer = setTimeout(onDismiss, 3000);
@@ -313,7 +298,6 @@ function PendingOrderCard({
     order,
     onAccept,
     onDelivered,
-    onCancelNoPayment,
     onDetail,
     onInTransit,
     onNotDelivered,
@@ -322,7 +306,6 @@ function PendingOrderCard({
     order: MessengerOrder;
     onAccept: (orderId: string) => void;
     onDelivered: (order: MessengerOrder) => void;
-    onCancelNoPayment: (order: MessengerOrder) => void;
     onDetail: (order: MessengerOrder) => void;
     onInTransit: (orderId: string) => void;
     onNotDelivered: (order: MessengerOrder) => void;
@@ -583,13 +566,11 @@ function OrderDetailModal({
     order,
     onClose,
     onDelivered,
-    onCancelNoPayment,
     onNotDelivered,
 }: {
     order: MessengerOrder;
     onClose: () => void;
     onDelivered: (order: MessengerOrder) => void;
-    onCancelNoPayment: (order: MessengerOrder) => void;
     onNotDelivered: (order: MessengerOrder) => void;
 }) {
     const subtotal = order.items.reduce(
@@ -777,20 +758,6 @@ function OrderDetailModal({
                                 >
                                     <CheckCircle2 size={18} />
                                     <span>Registrar pago</span>
-                                </button>
-                            )}
-
-                            {canCancelByNoPayment(order) && (
-                                <button
-                                    className="messenger-reject-button inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition active:scale-95"
-                                    onClick={() => {
-                                        onClose();
-                                        onCancelNoPayment(order);
-                                    }}
-                                    type="button"
-                                >
-                                    <DollarSign size={18} />
-                                    <span>Cancelar por falta de pago</span>
                                 </button>
                             )}
 
@@ -1099,9 +1066,6 @@ export default function MessengerDashboard({
     const [undeliveredOrder, setUndeliveredOrder] =
         useState<MessengerOrder | null>(null);
     const [savingUndelivered, setSavingUndelivered] = useState(false);
-    const [cancelNoPaymentOrder, setCancelNoPaymentOrder] =
-        useState<MessengerOrder | null>(null);
-    const [savingCancelNoPayment, setSavingCancelNoPayment] = useState(false);
     const [confirmPaymentOrder, setConfirmPaymentOrder] = useState<MessengerOrder | null>(null);
     const [paymentSuccessOrder, setPaymentSuccessOrder] = useState<MessengerOrder | null>(null);
     const [pendingAssignedAction, setPendingAssignedAction] = useState<{
@@ -1380,24 +1344,37 @@ export default function MessengerDashboard({
     const updateOrderStatus = async (
         orderId: string,
         status: MessengerOrder['deliveryStatus'],
-        options: { redirectToDetail?: boolean } = {}
-    ) => {
+        options: { redirectToDetail?: boolean; reason?: string } = {}
+        ) => {
         const targetOrder = orders.find((order) => order.id === orderId);
         if (!targetOrder) return;
 
+        // Si es rechazo y hay motivo, guardarlo en el estado local
+        const updatedOrder = status === 'pending_reassignment' && options.reason
+            ? { ...targetOrder, rejectionReason: options.reason }
+            : targetOrder;
+
         setOrders((currentOrders) =>
             currentOrders.map((order) =>
-                order.id === orderId
-                    ? {
-                        ...order,
-                        deliveryStatus: status,
-                    }
-                    : order
+            order.id === orderId
+                ? {
+                    ...order,
+                    deliveryStatus: status,
+                    ...(status === 'pending_reassignment' && options.reason
+                    ? { rejectionReason: options.reason }
+                    : {}),
+                }
+                : order
             )
         );
 
         try {
-            await setMessengerOrderStatus(targetOrder, status);
+            // Pasar el motivo a Firestore si es rechazo
+            await setMessengerOrderStatus(
+                targetOrder,
+                status,
+                status === 'pending_reassignment' ? options.reason : undefined
+            );
             setMessage(getStatusUpdateMessage(status));
             if (options.redirectToDetail) {
                 navigateToDeliveryOrderDetail(orderId);
@@ -1406,12 +1383,12 @@ export default function MessengerDashboard({
             console.error(error);
             setMessage('No se pudo actualizar el estado en Firestore.');
             setOrders((currentOrders) =>
-                currentOrders.map((order) =>
-                    order.id === orderId ? targetOrder : order
-                )
+            currentOrders.map((order) =>
+                order.id === orderId ? targetOrder : order
+            )
             );
         }
-    };
+        };
 
     const markAsDelivered = (order: MessengerOrder) => {
         setConfirmPaymentOrder(order);
@@ -1488,20 +1465,31 @@ export default function MessengerDashboard({
         openAssignedActionConfirmation(orderId, 'reject');
     };
 
-    const confirmAssignedOrderAction = async () => {
+    const confirmAssignedOrderAction = async (reason?: string) => {
         if (!pendingAssignedAction || savingAssignedAction) return;
 
         const { order, action } = pendingAssignedAction;
-        const nextStatus =
-            action === 'accept' ? 'accepted' : 'pending_reassignment';
-
-        setSavingAssignedAction(true);
-        try {
-            await updateOrderStatus(order.id, nextStatus, { redirectToDetail: true });
-            setPendingAssignedAction(null);
-        } finally {
-            setSavingAssignedAction(false);
+        
+        // Si es rechazo y no hay motivo, no continuar
+        if (action === 'reject' && !reason?.trim()) {
+            setMessage('Debes seleccionar un motivo para rechazar el pedido.');
+            return;
         }
+
+    const nextStatus =
+        action === 'accept' ? 'accepted' : 'pending_reassignment';
+
+    setSavingAssignedAction(true);
+    try {
+        // Pasar el motivo al updateOrderStatus
+        await updateOrderStatus(order.id, nextStatus, { 
+        redirectToDetail: true,
+        reason: action === 'reject' ? reason : undefined 
+        });
+        setPendingAssignedAction(null);
+    } finally {
+        setSavingAssignedAction(false);
+    }
     };
 
     const registerUndeliveredOrder = async (reason: string, notes: string) => {
@@ -1546,49 +1534,6 @@ export default function MessengerDashboard({
         }
     };
 
-    const registerCancelNoPayment = async (notes: string) => {
-        if (!cancelNoPaymentOrder) return;
-
-        const targetOrder = cancelNoPaymentOrder;
-        setSavingCancelNoPayment(true);
-
-        setOrders((currentOrders) =>
-            currentOrders.map((order) =>
-                order.id === targetOrder.id
-                    ? {
-                        ...order,
-                        deliveryStatus: 'cancelled',
-                        paymentStatus: 'CANCELADO',
-                        paymentStatusLabel: 'Cancelado por falta de pago',
-                    }
-                    : order
-            )
-        );
-
-        try {
-            await markMessengerOrderAsCancelledByNoPayment({
-                order: targetOrder,
-                notes,
-                courierId: currentCourierId,
-            });
-
-            setMessage('Pedido cancelado por falta de pago.');
-            setCancelNoPaymentOrder(null);
-            navigateToDeliveryOrderDetail(targetOrder.id);
-        } catch (error) {
-            console.error(error);
-            setMessage('No se pudo cancelar el pedido por falta de pago.');
-
-            setOrders((currentOrders) =>
-                currentOrders.map((order) =>
-                    order.id === targetOrder.id ? targetOrder : order
-                )
-            );
-        } finally {
-            setSavingCancelNoPayment(false);
-        }
-    };
-        
     const confirmCloseShift = async () => {
         if (!currentCourierId) {
             setMessage('No se pudo identificar al mensajero para cerrar la jornada.');
@@ -1780,7 +1725,6 @@ export default function MessengerDashboard({
                                             key={`${clientSection}-${order.deliveryId || order.id}`}
                                             order={order}
                                             onAccept={acceptOrder}
-                                            onCancelNoPayment={setCancelNoPaymentOrder}
                                             onDelivered={markAsDelivered}
                                             onDetail={(order) =>
                                                 navigateToDeliveryOrderDetail(order.id)
@@ -1961,7 +1905,6 @@ export default function MessengerDashboard({
                 <OrderDetailModal
                     order={detailOrder}
                     onClose={() => setDetailOrder(null)}
-                    onCancelNoPayment={setCancelNoPaymentOrder}
                     onDelivered={markAsDelivered}
                     onNotDelivered={setUndeliveredOrder}
                 />
@@ -1973,14 +1916,6 @@ export default function MessengerDashboard({
                     order={undeliveredOrder}
                     onClose={() => setUndeliveredOrder(null)}
                     onConfirm={registerUndeliveredOrder}
-                />
-            )}
-            {cancelNoPaymentOrder && (
-                <CancelNoPaymentModal
-                    isSaving={savingCancelNoPayment}
-                    order={cancelNoPaymentOrder}
-                    onClose={() => setCancelNoPaymentOrder(null)}
-                    onConfirm={registerCancelNoPayment}
                 />
             )}
             {pendingAssignedAction && (

@@ -76,11 +76,12 @@ export interface MessengerOrder {
   assignedAt: Date | null;
   createdAt: Date | null;
   updatedAt: Date | null;
-
   reprogrammedAt: Date | null;
   newDeliveryAt: Date | null;
   reprogramReason: string | null;
+  rejectionReason?: string;
 }
+
 export interface MessengerShiftOrderSnapshot {
   id: string;
   deliveryId: string;

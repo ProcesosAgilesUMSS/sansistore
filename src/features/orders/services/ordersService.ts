@@ -174,7 +174,7 @@ export async function paidOrder(orderId: string): Promise<void> {
 
 export async function returnOrder(orderId: string): Promise<void> {
 	const user = auth.currentUser;
-	if (!user) throw new Error("Debe estar autenticado para reservar un pedido.");
+	if (!user) throw new Error("Debe estar autenticado para devolver un pedido.");
 
 	const orderRef = doc(db, "orders", orderId);
 	await updateDoc(orderRef, {
