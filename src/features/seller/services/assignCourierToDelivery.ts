@@ -81,7 +81,7 @@ export const reassignCourierToDelivery = async (db: Firestore, deliveryId: strin
     const orderData: any = orderSnap.data();
     sellerId = orderData.sellerId ?? '';
 
-    if (orderData.status !== 'PENDIENTE REASIGNACION') {
+    if (orderData.status !== 'PENDIENTE-ASIGNACION') {
       throw new Error('No se puede asignar mensajero a un pedido que no está en estado ASIGNADO.');
     }
 
@@ -110,7 +110,7 @@ export const reassignCourierToDelivery = async (db: Firestore, deliveryId: strin
       sellerEmail: sellerData.email ?? '',
       actionType: 'REASIGNAR',
       orderId,
-      previousStatus: 'PENDIENTE REASIGNACION',
+      previousStatus: 'PENDIENTE-ASIGNACION',
       newStatus: 'ASIGNADO',
     }).catch((err) => console.error('No se pudo registrar  la actividad del vendedor:', err));
   }
