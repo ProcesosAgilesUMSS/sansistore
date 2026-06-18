@@ -16,6 +16,7 @@ import {
   ArrowLeft,
   ClipboardList,
   Activity,
+  Receipt,
 } from 'lucide-react';
 import UserManagement from '../users/components/UserManagement.tsx';
 import CategoryList from '../categories/components/CategoryList.tsx';
@@ -23,6 +24,8 @@ import OrderReceptionPanel from '../orders/components/OrderReceptionPanel.tsx';
 import DailySales from '../ventas/components/DailySales.tsx';
 import TopSellingProducts from '../ventas/top-products/components/TopSellingProducts.tsx';
 import MessengerPerformancePage from '../messengers/performance/MessengerPerformancePage.tsx';
+// ── HU #142: Validar cierres de jornada de mensajeros ──
+import CourierSessionsValidation from '../messengers/sessions/components/CourierSessionsValidation.tsx';
 // ── HU #152: Parámetros del sistema ──
 import ConfigPanel from '../settings/components/ConfigPanel.tsx';
 // ── HU #161: Reportes de ventas ──
@@ -46,6 +49,7 @@ type Section =
   | 'ventas-diarias'
   | 'mas-vendidos'
   | 'mensajeros-desempeno'
+  | 'mensajeros-cierres'   // ── HU #142 ──
   | 'parametros'     // ── HU #152 ──
   | 'reportes'       // ── HU #161 ──
   | 'reportes-cancelados'   // ── HU #163 ──
@@ -147,6 +151,8 @@ export default function AdminLayout() {
     categorias:             { title: 'Categorías',             subtitle: 'Gestiona las categorías de productos' },
     'ventas-diarias':       { title: 'Ventas diarias',         subtitle: 'Monitorea el rendimiento diario de ventas' },
     'mensajeros-desempeno': { title: 'Desempeño de mensajeros', subtitle: 'Métricas de eficiencia por mensajero' },
+    // ── HU #142 ──
+    'mensajeros-cierres':   { title: 'Validar cierres de jornada', subtitle: 'Audita el dinero recaudado por cada mensajero' },
     'mas-vendidos':         { title: 'Más vendidos',           subtitle: 'Productos con más unidades vendidas' },
     // ── HU #152 ──
     parametros:             { title: 'Parámetros del sistema', subtitle: 'Configura los parámetros globales del sistema' },
@@ -399,6 +405,19 @@ export default function AdminLayout() {
                           >
                             Desempeño
                           </button>
+                          {/* ── HU #142 ── */}
+                          <button
+                            onClick={() => { setActiveSection('mensajeros-cierres'); setSidebarOpen(false); }}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-[12px]
+                            transition-colors flex items-center gap-1.5 ${
+                              activeSection === 'mensajeros-cierres'
+                                ? 'bg-[#88b04b]/15 text-[#88b04b]'
+                                : 'text-white/40 hover:text-white/80 hover:bg-white/5'
+                            }`}
+                          >
+                            <Receipt size={11} />
+                            Validar cierres
+                          </button>
                         </div>
                       )}
                     </div>
@@ -511,6 +530,8 @@ export default function AdminLayout() {
           {activeSection === 'ventas-diarias' && <DailySales />}
           {activeSection === 'mas-vendidos' && <TopSellingProducts />}
           {activeSection === 'mensajeros-desempeno' && <MessengerPerformancePage />}
+          {/* ── HU #142 ── */}
+          {activeSection === 'mensajeros-cierres' && <CourierSessionsValidation />}
           {/*Parámetros del sistema*/}
           {activeSection === 'parametros' && <ConfigPanel />}
           {/*Reportes de ventas*/}
