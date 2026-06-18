@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import admin from 'firebase-admin';
+import { LoginPage } from '../pages/login.page';
 
 const CART_KEY = 'sansistore_cart';
 const PROJECT_ID = 'sansistore';
@@ -216,59 +217,11 @@ test.describe('Cart - Carrito', () => {
   test.setTimeout(90_000);
 
   async function loginWithEmail(page: Page, email: string) {
-    await page.goto('/login');
-    const loginButton = page.locator('form').getByRole('button', {
-      name: 'Iniciar sesión',
-      exact: true,
-    });
-
-    await expect(loginButton).toBeEnabled({ timeout: 15_000 });
-    await expect(page.getByLabel('Correo electrónico')).toBeEditable();
-    await expect(page.locator('#password')).toBeEditable();
-    await expect
-      .poll(
-        async () => {
-          try {
-            return await page.evaluate(() => {
-              const button = document
-                .querySelector('form')
-                ?.querySelector('button[type="button"]');
-              return Boolean(
-                button &&
-                Object.keys(button).some((key) =>
-                  key.startsWith('__reactProps')
-                )
-              );
-            });
-          } catch (e) {
-            return false;
-          }
-        },
-        { timeout: 15_000 }
-      )
-      .toBe(true);
-
-    const emailField = page.getByLabel('Correo electrónico');
-    const passwordField = page.locator('#password');
-
-    // Fill right before clicking to minimize autofill interference window
-    await emailField.fill(email);
-    await passwordField.fill('12345678');
-
-    // Retry if autofill overwrites the values
-    for (let attempt = 0; attempt < 3; attempt++) {
-      const currentEmail = await emailField.inputValue();
-      const currentPass = await passwordField.inputValue();
-      if (currentEmail === email && currentPass === '12345678') break;
-      await emailField.fill(email);
-      await passwordField.fill('12345678');
-      await page.waitForTimeout(150);
-    }
-
-    await page
-      .locator('form')
-      .getByRole('button', { name: 'Iniciar sesión', exact: true })
-      .click();
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.waitForReady();
+    await loginPage.fillCredentials(email);
+    await loginPage.loginButton.click();
     await expect(page).toHaveURL(/\/(?:productos)?$/, { timeout: 30_000 });
   }
 

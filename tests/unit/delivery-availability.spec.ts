@@ -1,12 +1,12 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, describe } from 'vitest';
 import {
   ACTIVE_DELIVERY_STATUSES,
   countActiveDeliveriesByCourier,
   isActiveDeliveryStatus,
   isCourierAvailableFromActiveCount,
-} from '../src/lib/deliveryAvailability';
+} from '@/lib/deliveryAvailability';
 
-test.describe('delivery availability rules', () => {
+describe('delivery availability rules', () => {
   test('marks only accepted and in transit deliveries as active', () => {
     expect(ACTIVE_DELIVERY_STATUSES).toEqual(['accepted', 'in_transit']);
     expect(isActiveDeliveryStatus('accepted')).toBe(true);

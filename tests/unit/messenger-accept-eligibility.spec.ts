@@ -1,11 +1,11 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, describe } from 'vitest';
 import {
   ACCEPT_BLOCKED_BY_ACTIVE_DELIVERY_MESSAGE,
   canAcceptAssignedOrder,
   hasActiveMessengerDelivery,
   isActiveDelivery,
-} from '../src/features/mensajero/utils/acceptEligibility';
-import type { MessengerOrder } from '../src/features/mensajero/types';
+} from '../../src/features/mensajero/utils/acceptEligibility';
+import type { MessengerOrder } from '../../src/features/mensajero/types';
 
 type DeliveryStatus = MessengerOrder['deliveryStatus'];
 
@@ -13,7 +13,7 @@ const order = (deliveryStatus: DeliveryStatus): Pick<MessengerOrder, 'deliverySt
   deliveryStatus,
 });
 
-test.describe('messenger accept eligibility', () => {
+describe('messenger accept eligibility', () => {
   test('solo accepted e in_transit cuentan como entrega activa', () => {
     expect(isActiveDelivery(order('accepted'))).toBe(true);
     expect(isActiveDelivery(order('in_transit'))).toBe(true);

@@ -1,9 +1,9 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, describe } from 'vitest';
 import {
   getMessengerOrderAgeTimestamp,
   sortAcceptedOrdersByAge,
-} from '../src/features/mensajero/utils/acceptedOrderSorting';
-import type { MessengerOrder } from '../src/features/mensajero/types';
+} from '@features/mensajero/utils/acceptedOrderSorting';
+import type { MessengerOrder } from '@features/mensajero/types';
 
 const baseOrder: MessengerOrder = {
   id: 'order-base',
@@ -40,7 +40,7 @@ function buildOrder(
   };
 }
 
-test.describe('accepted delivery sorting', () => {
+describe('accepted delivery sorting', () => {
   test('sorts accepted orders from oldest to newest by effective date', () => {
     const oldest = buildOrder('oldest', {
       assignedAt: new Date('2026-05-20T08:00:00.000Z'),
@@ -53,10 +53,7 @@ test.describe('accepted delivery sorting', () => {
       updatedAt: null,
     });
 
-    const sorted = sortAcceptedOrdersByAge(
-      [newest, oldest],
-      'oldest-first'
-    );
+    const sorted = sortAcceptedOrdersByAge([newest, oldest], 'oldest-first');
 
     expect(sorted.map((order) => order.id)).toEqual(['oldest', 'newest']);
   });
@@ -73,10 +70,7 @@ test.describe('accepted delivery sorting', () => {
       updatedAt: null,
     });
 
-    const sorted = sortAcceptedOrdersByAge(
-      [oldest, newest],
-      'newest-first'
-    );
+    const sorted = sortAcceptedOrdersByAge([oldest, newest], 'newest-first');
 
     expect(sorted.map((order) => order.id)).toEqual(['newest', 'oldest']);
   });

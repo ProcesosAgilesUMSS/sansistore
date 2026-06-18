@@ -1,4 +1,5 @@
-import { test, expect, defineConfig, type Page } from '@playwright/test';
+import { test, expect, defineConfig } from '@playwright/test';
+import { LoginPage } from '../pages/login.page';
 
 test.afterEach(async ({ page }, testInfo) => {
   if (true) {
@@ -23,42 +24,12 @@ export default defineConfig({
 });
 
 test.describe('Post and Manage Reviews', () => {
-  async function waitForLoginForm(page: Page) {
-    const loginButton = page.locator('form').getByRole('button', {
-      name: 'Iniciar sesión',
-      exact: true,
-    });
-
-    await expect(loginButton).toBeEnabled();
-    await expect(page.getByLabel('Correo electrónico')).toBeEditable();
-    await expect(page.locator('#password')).toBeEditable();
-  }
-
-  async function fillLoginCredentials(page: Page, email: string) {
-    const emailField = page.getByLabel('Correo electrónico');
-    const passwordField = page.locator('#password');
-
-    await emailField.click();
-    await emailField.clear();
-
-    await emailField.pressSequentially(email, { delay: 50 });
-    await emailField.blur();
-
-    await passwordField.click();
-    await passwordField.clear();
-    await passwordField.fill('12345678');
-
-    await expect(emailField).toHaveValue(email);
-    await expect(passwordField).toHaveValue('12345678');
-
-    return { emailField, passwordField };
-  }
-
   test.beforeEach(async ({ page }) => {
-    await page.goto('/login');
-    await waitForLoginForm(page);
-    await fillLoginCredentials(page, 'juan.paredes@est.umss.edu');
-    await page.locator('form').getByRole('button', { name: 'Iniciar sesión', exact: true }).click();
+    const login = new LoginPage(page);
+    await login.goto();
+    await login.waitForReady();
+    await login.fillCredentials('juan.paredes@est.umss.edu');
+    await login.loginButton.click();
     await expect(page).not.toHaveURL(/.*\/login/);
   });
 
