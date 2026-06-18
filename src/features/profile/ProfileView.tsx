@@ -7,12 +7,13 @@ import { Pencil, Check, X, AlertCircle, CheckCircle, MapPin, Package, Star } fro
 
 interface ProfileData {
     displayName: string;
+    ci: string;
     email: string;
     phone: string;
     secondaryMail: string;
     photoURL: string;
     roles: string[];
-    deliveryRating?: number; // HU #564
+    deliveryRating?: number;
 }
 
 // ── NUEVO ──────────────────────────────────────────────────────────
@@ -31,6 +32,7 @@ export default function ProfileView() {
     const [uid, setUid] = useState<string | null>(null);
     const [profile, setProfile] = useState<ProfileData>({
         displayName: '',
+        ci: 'No registrado',
         email: '',
         phone: 'No registrado',
         secondaryMail: 'No registrado',
@@ -39,7 +41,7 @@ export default function ProfileView() {
     });
     const [roles, setRoles] = useState<string[]>([]);
 
-    // ── NUEVO ──────────────────────────────────────────────────────────
+    // ── NUEVO ──────────────────────────────────────────────────────
     const [deliveryStats, setDeliveryStats] = useState<DeliveryStatsData>({
         totalDelivered: 0,
         totalNotDelivered: 0,
@@ -47,14 +49,19 @@ export default function ProfileView() {
         deliveryRate: 0,
         isLoading: true,
     });
-    // ──────────────────────────────────────────────────────────────────
+    // ──────────────────────────────────────────────────────────────
 
     const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
     const [isEditingPhone, setIsEditingPhone] = useState(false);
     const [isEditingMail, setIsEditingMail] = useState(false);
+    const [isEditingCi, setIsEditingCi] = useState(false);
+
     const [tempPhone, setTempPhone] = useState('');
     const [tempMail, setTempMail] = useState('');
-    const [errors, setErrors] = useState<{ phone?: string; secondaryMail?: string }>({});
+    const [tempCi, setTempCi] = useState('');
+
+    const [errors, setErrors] = useState<{ phone?: string; secondaryMail?: string; ci?: string }>({});
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -70,6 +77,7 @@ export default function ProfileView() {
                 const userDoc = await getDoc(doc(db, 'users', user.uid));
                 let phone = 'No registrado';
                 let secondaryMail = 'No registrado';
+                let ci = 'No registrado';
                 let userRoles: string[] = [];
                 let deliveryRating = undefined;
 
@@ -77,6 +85,7 @@ export default function ProfileView() {
                     const data = userDoc.data();
                     phone = data.phone || 'No registrado';
                     secondaryMail = data.secondaryMail || 'No registrado';
+                    ci = data.ci ? String(data.ci) : 'No registrado';
                     setRoles(data.roles || []);
                     userRoles = Array.isArray(data.roles) ? data.roles : [];
                     deliveryRating = data.deliveryRating ?? undefined;
@@ -84,6 +93,7 @@ export default function ProfileView() {
 
                 setProfile({
                     displayName: user.displayName || 'Sin nombre',
+                    ci,
                     email: user.email || 'No disponible',
                     phone,
                     secondaryMail,
@@ -161,6 +171,23 @@ export default function ProfileView() {
         return true;
     };
 
+    const validateCi = (value: string): boolean => {
+        setErrors((prev) => ({ ...prev, ci: undefined }));
+        if (!value || value.trim() === '' || value === 'No registrado') {
+            setErrors((prev) => ({ ...prev, ci: 'El carnet de identidad es obligatorio.' }));
+            return false;
+        }
+        if (!/^\d+$/.test(value)) {
+            setErrors((prev) => ({ ...prev, ci: 'El CI solo debe contener números.' }));
+            return false;
+        }
+        if (value.length < 5 || value.length > 10) {
+            setErrors((prev) => ({ ...prev, ci: 'El CI debe tener entre 5 y 10 dígitos.' }));
+            return false;
+        }
+        return true;
+    };
+
     const handleStartEditPhone = () => {
         setTempPhone(profile.phone === 'No registrado' ? '' : profile.phone);
         setErrors((prev) => ({ ...prev, phone: undefined }));
@@ -173,11 +200,16 @@ export default function ProfileView() {
         setIsEditingMail(true);
     };
 
+    const handleStartEditCi = () => {
+        setTempCi(profile.ci === 'No registrado' ? '' : profile.ci);
+        setErrors((prev) => ({ ...prev, ci: undefined }));
+        setIsEditingCi(true);
+    };
+
     const handleSavePhone = async () => {
         if (!validatePhone(tempPhone) || !uid) return;
         try {
-            const userRef = doc(db, 'users', uid);
-            await setDoc(userRef, { phone: tempPhone }, { merge: true });
+            await setDoc(doc(db, 'users', uid), { phone: tempPhone }, { merge: true });
             setProfile((prev) => ({ ...prev, phone: tempPhone }));
             setIsEditingPhone(false);
             showToast('success', 'Teléfono celular actualizado correctamente');
@@ -191,14 +223,26 @@ export default function ProfileView() {
         if (!validateMail(tempMail) || !uid) return;
         const finalMail = tempMail.trim() === '' ? 'No registrado' : tempMail;
         try {
-            const userRef = doc(db, 'users', uid);
-            await setDoc(userRef, { secondaryMail: finalMail }, { merge: true });
+            await setDoc(doc(db, 'users', uid), { secondaryMail: finalMail }, { merge: true });
             setProfile((prev) => ({ ...prev, secondaryMail: finalMail }));
             setIsEditingMail(false);
             showToast('success', 'Correo de respaldo actualizado correctamente');
         } catch (error) {
             console.error(error);
             showToast('error', 'Ocurrió un error al guardar el correo');
+        }
+    };
+
+    const handleSaveCi = async () => {
+        if (!validateCi(tempCi) || !uid) return;
+        try {
+            await setDoc(doc(db, 'users', uid), { ci: tempCi }, { merge: true });
+            setProfile((prev) => ({ ...prev, ci: tempCi }));
+            setIsEditingCi(false);
+            showToast('success', 'Carnet de identidad actualizado correctamente');
+        } catch (error) {
+            console.error(error);
+            showToast('error', 'Ocurrió un error al guardar el CI');
         }
     };
 
@@ -220,7 +264,7 @@ export default function ProfileView() {
                 >
                     Iniciar sesión
                 </a>
-            </div >
+            </div>
         );
     }
 
@@ -231,7 +275,6 @@ export default function ProfileView() {
 
     return (
         <>
-            {/* Toast Flotante Unificado */}
             {toast && (
                 <div
                     className={`fixed bottom-6 left-1/2 z-[200] flex -translate-x-1/2 items-center gap-2 rounded-full px-5 py-2.5 shadow-lg transition-all animate-fade-in ${toast.type === 'success' ? 'bg-[#88B04B]' : 'bg-red-500'
@@ -248,10 +291,8 @@ export default function ProfileView() {
                 </div>
             )}
 
-            {/* Contenedor Principal */}
             <section className="bg-card-bg-light border border-border-light rounded-[1.25rem] p-6 shadow-sm max-w-xl mx-auto flex flex-col gap-6">
 
-                {/* Cabecera del Perfil */}
                 <header className="flex flex-col items-center text-center pb-6 border-b border-border-light pt-4 relative">
                     {profile.photoURL ? (
                         <img
@@ -273,7 +314,6 @@ export default function ProfileView() {
                         {profile.email}
                     </dd>
 
-                    {/* HU #564: Calificación promedio para el Mensajero */}
                     {showCalificacionMensajero && profile.deliveryRating !== undefined && (
                         <div className="flex items-center gap-1 bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full text-xs font-bold mt-1">
                             <Star size={13} fill="currentColor" />
@@ -282,8 +322,49 @@ export default function ProfileView() {
                     )}
                 </header>
 
-                {/* Datos de Contacto Inline */}
                 <div className="flex flex-col gap-5 pb-2">
+
+                    {/* Campo: CI */}
+                    <div className="flex flex-col">
+                        <label className="text-[11px] font-bold uppercase tracking-wider text-text-light/50 mb-1.5">
+                            Carnet de identidad
+                        </label>
+                        {isEditingCi ? (
+                            <div className="flex flex-col gap-1">
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="text"
+                                        value={tempCi}
+                                        onChange={(e) => setTempCi(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') handleSaveCi();
+                                            if (e.key === 'Escape') setIsEditingCi(false);
+                                        }}
+                                        autoFocus
+                                        className={`flex-1 px-3 py-1.5 text-sm font-semibold rounded-md border bg-transparent text-text-light focus:outline-none focus:ring-2 focus:ring-primary/20 ${errors.ci ? 'border-error focus:border-error' : 'border-border-light focus:border-primary'}`}
+                                        placeholder="Ej. 12345678"
+                                    />
+                                    <button type="button" onClick={handleSaveCi} aria-label="Confirmar CI"
+                                        className="p-1.5 rounded-md text-text-light/60 hover:text-primary hover:bg-border-light/40 transition-all">
+                                        <Check size={16} />
+                                    </button>
+                                    <button type="button" onClick={() => setIsEditingCi(false)} aria-label="Cancelar edición de CI"
+                                        className="p-1.5 rounded-md text-text-light/40 hover:text-error hover:bg-border-light/40 transition-all">
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                                {errors.ci && <span className="text-[11px] font-medium text-error mt-0.5">{errors.ci}</span>}
+                            </div>
+                        ) : (
+                            <div className="flex items-center justify-between group pb-3 border-b border-dotted border-border-light">
+                                <span className="text-sm font-bold text-text-light">{profile.ci}</span>
+                                <button type="button" onClick={handleStartEditCi} aria-label="Editar CI"
+                                    className="p-1.5 text-text-light/40 hover:text-primary rounded-md hover:bg-border-light/20 transition-all">
+                                    <Pencil size={13} />
+                                </button>
+                            </div>
+                        )}
+                    </div>
 
                     {/* Campo: Teléfono Celular */}
                     <div className="flex flex-col">
@@ -302,8 +383,7 @@ export default function ProfileView() {
                                             if (e.key === 'Escape') setIsEditingPhone(false);
                                         }}
                                         autoFocus
-                                        className={`flex-1 px-3 py-1.5 text-sm font-semibold rounded-md border bg-transparent text-text-light focus:outline-none focus:ring-2 focus:ring-primary/20 ${errors.phone ? 'border-error focus:border-error' : 'border-border-light focus:border-primary'
-                                            }`}
+                                        className={`flex-1 px-3 py-1.5 text-sm font-semibold rounded-md border bg-transparent text-text-light focus:outline-none focus:ring-2 focus:ring-primary/20 ${errors.phone ? 'border-error focus:border-error' : 'border-border-light focus:border-primary'}`}
                                         placeholder="Ej. 71234567"
                                     />
                                     <button type="button" onClick={handleSavePhone} aria-label="Confirmar teléfono"
@@ -345,8 +425,7 @@ export default function ProfileView() {
                                             if (e.key === 'Escape') setIsEditingMail(false);
                                         }}
                                         autoFocus
-                                        className={`flex-1 px-3 py-1.5 text-sm font-semibold rounded-md border bg-transparent text-text-light focus:outline-none focus:ring-2 focus:ring-primary/20 ${errors.secondaryMail ? 'border-error focus:border-error' : 'border-border-light focus:border-primary'
-                                            }`}
+                                        className={`flex-1 px-3 py-1.5 text-sm font-semibold rounded-md border bg-transparent text-text-light focus:outline-none focus:ring-2 focus:ring-primary/20 ${errors.secondaryMail ? 'border-error focus:border-error' : 'border-border-light focus:border-primary'}`}
                                         placeholder="ejemplo@correo.com"
                                     />
                                     <button type="button" onClick={handleSaveMail} aria-label="Confirmar correo"
@@ -410,7 +489,7 @@ export default function ProfileView() {
                 )}
                 {/* ─────────────────────────────────────────────────────────────── */}
 
-                {/* Sección agregada por tu compañero: Gestión de Compras */}
+                {/* Gestión de Compras */}
                 {(() => {
                     const isComprador = roles.length === 0 || roles.includes('comprador') || roles.includes('admin');
                     if (!isComprador) return null;
@@ -439,9 +518,16 @@ export default function ProfileView() {
                     );
                 })()}
 
+                <div className="flex justify-end mt-2">
+                    <a
+                        href="/edit-profile"
+                        className="inline-flex items-center justify-center rounded-full bg-primary text-white px-6 py-3 text-xs uppercase font-bold tracking-wider hover:opacity-90 transition-all"
+                    >
+                        Editar perfil
+                    </a>
+                </div >
 
-                {/* Sección de Accesos Directos Unificados (Condicionados por Rol) */}
-                < footer className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-border-light" >
+                <footer className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-border-light">
                     {showMisDirecciones && (
                         <a
                             href="/location"
@@ -454,7 +540,7 @@ export default function ProfileView() {
                                 <span>Mis direcciones</span>
                                 <span className="text-[11px] font-medium text-text-light/40 group-hover:text-primary/60 transition-colors">Gestionar entrega</span>
                             </div>
-                        </a >
+                        </a>
                     )
                     }
 
