@@ -18,11 +18,11 @@ interface ProfileData {
 
 // ── NUEVO ──────────────────────────────────────────────────────────
 interface DeliveryStatsData {
-    totalDelivered: number;
-    totalNotDelivered: number;
-    total: number;
-    deliveryRate: number;
-    isLoading: boolean;
+	totalDelivered: number;
+	totalNotDelivered: number;
+	total: number;
+	deliveryRate: number;
+	isLoading: boolean;
 }
 // ──────────────────────────────────────────────────────────────────
 
