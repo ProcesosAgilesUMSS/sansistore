@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import {
   Activity,
   ArrowLeft,
@@ -18,9 +19,9 @@ import {
   Users,
   X,
 } from 'lucide-react';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
 import { auth, db } from '../../../lib/firebase';
+import SalesReport from '../analytics/components/SalesReport.tsx';
 import AccessLogPanel from '../audit/components/AccessLogPanel.tsx';
 import CategoryList from '../categories/components/CategoryList.tsx';
 import DemandPanel from '../demand/components/DemandPanel.tsx';
@@ -31,7 +32,6 @@ import OrderHistory from '../pedidos/components/OrderHistory.tsx';
 import PaymentAuditPanel from '../pedidos/payment-audit/components/PaymentAuditPanel.tsx';
 import PaymentReconciliationPanel from '../reconciliation/components/PaymentReconciliationPanel.tsx';
 import CancelledOrdersReport from '../reports/components/CancelledOrdersReport.tsx';
-import SalesReport from '../analytics/components/SalesReport.tsx';
 import ConfigPanel from '../settings/components/ConfigPanel.tsx';
 import UserManagement from '../users/components/UserManagement.tsx';
 import DailySales from '../ventas/components/DailySales.tsx';
@@ -228,7 +228,7 @@ export default function AdminLayout() {
                             className={sidebarSubItemClass(activeSection === 'auditoria-cobros')}>
                             Auditoría de cobros
                           </button>
-                          <button onClick={() => { setActiveSection('conciliacion-pagos'); setSidebarOpen(false); }}
+                          <button type="button" onClick={() => { setActiveSection('conciliacion-pagos'); setSidebarOpen(false); }}
                             className={`${sidebarSubItemClass(activeSection === 'conciliacion-pagos')} flex items-center gap-1.5`}>
                             <Scale size={11} /> Conciliacion
                           </button>
