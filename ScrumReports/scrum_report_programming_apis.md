@@ -502,3 +502,8 @@
 - **Yesterday:** ver qué debería considerar para la implementación de mi hu.
 - **Today:** Terminé con la implementación de mi hu para este sprint.
 - **Blockers:** None.
+
+### Adrián Said Andrade Medina
+- **Yesterday:** Implementé mi HU correspondiente al Sprint 4.
+- **Today:** Verificar que todo funcione correctamente antes de la demo de mañana.
+- **Blockers:** None.
