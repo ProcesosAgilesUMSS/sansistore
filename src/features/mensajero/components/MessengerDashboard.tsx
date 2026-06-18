@@ -18,6 +18,10 @@ import {
 import { onAuthStateChanged } from 'firebase/auth';
 import { getSellerData } from '../../location/services/locationService';
 import { auth } from '../../../lib/firebase';
+import {
+    countActiveDeliveriesByCourier,
+    isCourierAvailableFromActiveCount,
+} from '../../../lib/deliveryAvailability';
 import { parseOrderId } from '../../cart/services/orderService';
 import {
     closeMessengerShift,
@@ -1309,6 +1313,21 @@ export default function MessengerDashboard({
         currentShiftPendingOrders.length +
         currentShiftNotDeliveredOrders.length +
         currentShiftCancelledOrders.length;
+    const currentCourierActiveDeliveryCount = useMemo(() => {
+        if (!currentCourierId) return 0;
+
+        const counts = countActiveDeliveriesByCourier(
+            orders.map((order) => ({
+                courierId: currentCourierId,
+                status: order.deliveryStatus,
+            }))
+        );
+
+        return counts[currentCourierId] ?? 0;
+    }, [currentCourierId, orders]);
+    const isCurrentCourierAvailable = isCourierAvailableFromActiveCount(
+        currentCourierActiveDeliveryCount
+    );
 
     const notDeliveredOrders = useMemo(
         () =>
@@ -1680,6 +1699,19 @@ export default function MessengerDashboard({
                                         0
                                     )
                                 )}
+                            />
+                            <SummaryCard
+                                icon={
+                                    isCurrentCourierAvailable ? (
+                                        <CheckCircle2 size={20} />
+                                    ) : (
+                                        <Truck size={20} />
+                                    )
+                                }
+                                label="Disponibilidad"
+                                value={
+                                    isCurrentCourierAvailable ? 'Disponible' : 'Ocupado'
+                                }
                             />
                         </section>
 
