@@ -48,7 +48,7 @@ const expectedMappings: Array<{
   {
     status: 'pending_reassignment',
     label: 'Pendiente de reasignacion',
-    orderStatus: 'PENDIENTE REASIGNACION',
+    orderStatus: 'PENDIENTE-ASIGNACION',
     orderDeliveryStatus: 'PENDING_REASSIGNMENT',
   },
   {
