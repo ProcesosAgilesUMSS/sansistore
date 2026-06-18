@@ -18,6 +18,10 @@ import {
 import { onAuthStateChanged } from 'firebase/auth';
 import { getSellerData } from '../../location/services/locationService';
 import { auth } from '../../../lib/firebase';
+import {
+    countActiveDeliveriesByCourier,
+    isCourierAvailableFromActiveCount,
+} from '../../../lib/deliveryAvailability';
 import { parseOrderId } from '../../cart/services/orderService';
 import {
     closeMessengerShift,
@@ -311,7 +315,6 @@ function PendingOrderCard({
     onNotDelivered: (order: MessengerOrder) => void;
     onReject: (orderId: string) => void;
 }) {
-    const [sellerLocationUrl, setSellerLocationUrl] = useState<string | null>(null);
     const customerLocationUrl = useMemo(() => {
         return buildBuyerMapUrl(order);
     }, [order]);
@@ -1150,6 +1153,7 @@ export default function MessengerDashboard({
 
     useEffect(() => {
         if (!currentCourierId) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setShiftReports([]);
             return;
         }
@@ -1207,6 +1211,7 @@ export default function MessengerDashboard({
             } catch { /* ignorar */ }
             notifiedOrderIdsRef.current = new Set(updatedIds);
 
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setNewOrderCount(currentOrderIds.length);
             return;
         }
@@ -1309,6 +1314,21 @@ export default function MessengerDashboard({
         currentShiftPendingOrders.length +
         currentShiftNotDeliveredOrders.length +
         currentShiftCancelledOrders.length;
+    const currentCourierActiveDeliveryCount = useMemo(() => {
+        if (!currentCourierId) return 0;
+
+        const counts = countActiveDeliveriesByCourier(
+            orders.map((order) => ({
+                courierId: currentCourierId,
+                status: order.deliveryStatus,
+            }))
+        );
+
+        return counts[currentCourierId] ?? 0;
+    }, [currentCourierId, orders]);
+    const isCurrentCourierAvailable = isCourierAvailableFromActiveCount(
+        currentCourierActiveDeliveryCount
+    );
 
     const notDeliveredOrders = useMemo(
         () =>
@@ -1348,11 +1368,6 @@ export default function MessengerDashboard({
         ) => {
         const targetOrder = orders.find((order) => order.id === orderId);
         if (!targetOrder) return;
-
-        // Si es rechazo y hay motivo, guardarlo en el estado local
-        const updatedOrder = status === 'pending_reassignment' && options.reason
-            ? { ...targetOrder, rejectionReason: options.reason }
-            : targetOrder;
 
         setOrders((currentOrders) =>
             currentOrders.map((order) =>
@@ -1680,6 +1695,19 @@ export default function MessengerDashboard({
                                         0
                                     )
                                 )}
+                            />
+                            <SummaryCard
+                                icon={
+                                    isCurrentCourierAvailable ? (
+                                        <CheckCircle2 size={20} />
+                                    ) : (
+                                        <Truck size={20} />
+                                    )
+                                }
+                                label="Disponibilidad"
+                                value={
+                                    isCurrentCourierAvailable ? 'Disponible' : 'Ocupado'
+                                }
                             />
                         </section>
 
