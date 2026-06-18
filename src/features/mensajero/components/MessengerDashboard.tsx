@@ -315,7 +315,6 @@ function PendingOrderCard({
     onNotDelivered: (order: MessengerOrder) => void;
     onReject: (orderId: string) => void;
 }) {
-    const [sellerLocationUrl, setSellerLocationUrl] = useState<string | null>(null);
     const customerLocationUrl = useMemo(() => {
         return buildBuyerMapUrl(order);
     }, [order]);
@@ -1154,6 +1153,7 @@ export default function MessengerDashboard({
 
     useEffect(() => {
         if (!currentCourierId) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setShiftReports([]);
             return;
         }
@@ -1211,6 +1211,7 @@ export default function MessengerDashboard({
             } catch { /* ignorar */ }
             notifiedOrderIdsRef.current = new Set(updatedIds);
 
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setNewOrderCount(currentOrderIds.length);
             return;
         }
@@ -1367,11 +1368,6 @@ export default function MessengerDashboard({
         ) => {
         const targetOrder = orders.find((order) => order.id === orderId);
         if (!targetOrder) return;
-
-        // Si es rechazo y hay motivo, guardarlo en el estado local
-        const updatedOrder = status === 'pending_reassignment' && options.reason
-            ? { ...targetOrder, rejectionReason: options.reason }
-            : targetOrder;
 
         setOrders((currentOrders) =>
             currentOrders.map((order) =>
