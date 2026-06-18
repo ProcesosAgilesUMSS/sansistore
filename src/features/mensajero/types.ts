@@ -101,11 +101,11 @@ export interface MessengerShiftOrderSnapshot {
 }
 
 export interface MessengerShiftSummary {
-    completedCount: number;
-    pendingCount: number;
-    notDeliveredCount: number;
-    cancelledCount: number;
-    totalCollected: number;
+	completedCount: number;
+	pendingCount: number;
+	notDeliveredCount: number;
+	cancelledCount: number;
+	totalCollected: number;
 }
 
 export interface MessengerShiftClosure {
