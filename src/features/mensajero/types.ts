@@ -35,10 +35,10 @@ export interface CourierDashboardStats {
 }
 
 export interface MessengerOrderItem {
-    id: string;
-    name: string;
-    quantity: number;
-    price: number;
+	id: string;
+	name: string;
+	quantity: number;
+	price: number;
 }
 
 export interface MessengerOrder {
