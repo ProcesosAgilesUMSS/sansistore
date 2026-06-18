@@ -230,42 +230,41 @@ export async function getDeliveryStatsWithUserInfo(
     courierId: string,
     userId: string
 ): Promise<DeliveryStatsWithUser> {
-    try {
-        // Obtener estadísticas de delivery
-        const deliveryStats = await getDeliveryStatsByCourier(courierId);
+	try {
+		// Obtener estadísticas de delivery
+		const deliveryStats = await getDeliveryStatsByCourier(courierId);
 
-        // Obtener datos del usuario
-        const userData = await getUserData(userId);
+		// Obtener datos del usuario
+		const userData = await getUserData(userId);
 
-        // Si no hay usuario, devolver solo estadísticas con valores por defecto
-        if (!userData) {
-            return {
-                ...deliveryStats,
-                userRoles: [],
-                userRole: null,
-                isCourier: false,
-                userData: null,
-            };
-        }
+		// Si no hay usuario, devolver solo estadísticas con valores por defecto
+		if (!userData) {
+			return {
+				...deliveryStats,
+				userRoles: [],
+				userRole: null,
+				isCourier: false,
+				userData: null,
+			};
+		}
 
-        // Determinar si es courier/repartidor
-        const isCourier = userData.roles.some(role =>
-            role === 'repartidor' ||
-            role === 'courier' ||
-            role === 'delivery'
-        );
+		// Determinar si es courier/repartidor
+		const isCourier = userData.roles.some(
+			(role) =>
+				role === "repartidor" || role === "courier" || role === "delivery",
+		);
 
-        return {
-            ...deliveryStats,
-            userRoles: userData.roles,
-            userRole: userData.roles.length > 0 ? userData.roles[0] : null,
-            isCourier,
-            userData,
-        };
-    } catch (error) {
-        console.error("Error fetching delivery stats with user info:", error);
-        throw error;
-    }
+		return {
+			...deliveryStats,
+			userRoles: userData.roles,
+			userRole: userData.roles.length > 0 ? userData.roles[0] : null,
+			isCourier,
+			userData,
+		};
+	} catch (error) {
+		console.error("Error fetching delivery stats with user info:", error);
+		throw error;
+	}
 }
 
 // ============================================
