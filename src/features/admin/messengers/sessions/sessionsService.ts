@@ -3,9 +3,9 @@
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../../../../lib/firebase';
 import type {
-  CourierSessionsListResponse,
-  ValidateCourierSessionPayload,
-  ValidateCourierSessionResponse,
+  ShiftClosuresListResponse,
+  ValidateShiftClosurePayload,
+  ValidateShiftClosureResponse,
 } from './types';
 
 async function getAuthorizationHeader(): Promise<Record<string, string>> {
@@ -22,14 +22,14 @@ async function getAuthorizationHeader(): Promise<Record<string, string>> {
   });
 }
 
-interface GetSessionsParams {
+interface GetClosuresParams {
   limit?: number;
   cursor?: string | null;
 }
 
-export async function getPendingSessions(
-  params: GetSessionsParams = {}
-): Promise<CourierSessionsListResponse> {
+export async function getPendingClosures(
+  params: GetClosuresParams = {}
+): Promise<ShiftClosuresListResponse> {
   const headers = await getAuthorizationHeader();
   const query = new URLSearchParams({
     status: 'closed',
@@ -44,12 +44,12 @@ export async function getPendingSessions(
     throw new Error(err.message ?? `Error ${response.status}`);
   }
 
-  return response.json() as Promise<CourierSessionsListResponse>;
+  return response.json() as Promise<ShiftClosuresListResponse>;
 }
 
-export async function validateCourierSession(
-  payload: ValidateCourierSessionPayload
-): Promise<ValidateCourierSessionResponse> {
+export async function validateShiftClosure(
+  payload: ValidateShiftClosurePayload
+): Promise<ValidateShiftClosureResponse> {
   const headers = await getAuthorizationHeader();
 
   const response = await fetch('/api/admin/courier_sessions', {
@@ -66,5 +66,5 @@ export async function validateCourierSession(
     throw new Error(err.message ?? `Error ${response.status}`);
   }
 
-  return response.json() as Promise<ValidateCourierSessionResponse>;
+  return response.json() as Promise<ValidateShiftClosureResponse>;
 }

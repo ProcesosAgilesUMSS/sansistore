@@ -1,25 +1,25 @@
 // src/features/admin/messengers/sessions/useSessions.ts
 
 import { useState, useEffect, useCallback } from 'react';
-import { getPendingSessions, validateCourierSession } from './sessionsService';
-import type { CourierSession, CourierSessionAction } from './types';
+import { getPendingClosures, validateShiftClosure } from './sessionsService';
+import type { ShiftClosure, ShiftClosureAction } from './types';
 
 interface UseSessionsResult {
-  sessions: CourierSession[];
+  closures: ShiftClosure[];
   loading: boolean;
   loadingMore: boolean;
   error: string | null;
   hasMore: boolean;
   loadMore: () => void;
   refresh: () => void;
-  validating: string | null; // sessionId que se está procesando actualmente
+  validating: string | null; // closureId que se está procesando
   validateError: string | null;
-  approve: (sessionId: string) => Promise<boolean>;
-  reject: (sessionId: string, rejectionReason: string) => Promise<boolean>;
+  approve: (closureId: string) => Promise<boolean>;
+  reject: (closureId: string, rejectionReason: string) => Promise<boolean>;
 }
 
 export function useSessions(): UseSessionsResult {
-  const [sessions, setSessions]       = useState<CourierSession[]>([]);
+  const [closures, setClosures]       = useState<ShiftClosure[]>([]);
   const [loading, setLoading]         = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError]             = useState<string | null>(null);
@@ -29,10 +29,13 @@ export function useSessions(): UseSessionsResult {
   const [validating, setValidating]       = useState<string | null>(null);
   const [validateError, setValidateError] = useState<string | null>(null);
 
-  const fetchSessions = useCallback(async (cursorId: string | null, append: boolean) => {
+  const fetchClosures = useCallback(async (
+    cursorId: string | null,
+    append: boolean
+  ) => {
     try {
-      const data = await getPendingSessions({ limit: 20, cursor: cursorId });
-      setSessions((prev) => (append ? [...prev, ...data.sessions] : data.sessions));
+      const data = await getPendingClosures({ limit: 20, cursor: cursorId });
+      setClosures((prev) => append ? [...prev, ...data.closures] : data.closures);
       setHasMore(data.hasMore);
       setCursor(data.nextCursor);
     } catch (err: any) {
@@ -43,33 +46,33 @@ export function useSessions(): UseSessionsResult {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetchSessions(null, false).finally(() => setLoading(false));
-  }, [fetchSessions]);
+    fetchClosures(null, false).finally(() => setLoading(false));
+  }, [fetchClosures]);
 
   function loadMore() {
     if (!hasMore || loadingMore || !cursor) return;
     setLoadingMore(true);
-    fetchSessions(cursor, true).finally(() => setLoadingMore(false));
+    fetchClosures(cursor, true).finally(() => setLoadingMore(false));
   }
 
   function refresh() {
     setLoading(true);
     setError(null);
     setCursor(null);
-    fetchSessions(null, false).finally(() => setLoading(false));
+    fetchClosures(null, false).finally(() => setLoading(false));
   }
 
   async function runValidation(
-    sessionId: string,
-    action: CourierSessionAction,
+    closureId: string,
+    action: ShiftClosureAction,
     rejectionReason?: string
   ): Promise<boolean> {
-    setValidating(sessionId);
+    setValidating(closureId);
     setValidateError(null);
     try {
-      await validateCourierSession({ sessionId, action, rejectionReason });
-      // Quitar de la lista local ya que deja de estar "pendiente"
-      setSessions((prev) => prev.filter((s) => s.sessionId !== sessionId));
+      await validateShiftClosure({ closureId, action, rejectionReason });
+      // Quitar de la lista local — ya no está "pendiente"
+      setClosures((prev) => prev.filter((c) => c.id !== closureId));
       return true;
     } catch (err: any) {
       setValidateError(err.message ?? 'Error al procesar el cierre');
@@ -79,16 +82,16 @@ export function useSessions(): UseSessionsResult {
     }
   }
 
-  function approve(sessionId: string) {
-    return runValidation(sessionId, 'approve');
+  function approve(closureId: string) {
+    return runValidation(closureId, 'approve');
   }
 
-  function reject(sessionId: string, rejectionReason: string) {
-    return runValidation(sessionId, 'reject', rejectionReason);
+  function reject(closureId: string, rejectionReason: string) {
+    return runValidation(closureId, 'reject', rejectionReason);
   }
 
   return {
-    sessions,
+    closures,
     loading,
     loadingMore,
     error,
