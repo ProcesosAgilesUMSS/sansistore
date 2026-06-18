@@ -480,6 +480,9 @@ por las dudas que se tienen.
 
 ## Dayana Saleth Ortuño Guzmán
 
+* **Yesterday:** Implemente una parte de mu HU asignada.
+* **Today:** Revise lo que mi compañera implemento para finalizar la HU "Registrar el motivo de fallos de entrega para análisis"
+* **Blockers:** Al principio tuve la duda si tenia que registra el pedido fallido del mensajero o del comprador, pero una vez preguntando y entendiendo ya puede comprender.
 
 ## Maria Victoria Grageda Vallejos
 * **Yesterday:** Trabajé en mi HU asignada: registrar el motivo de fallos de entrega para análisis. Revisé la vista, el servicio y la lógica para guardar el motivo del pedido en base de datos.

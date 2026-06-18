@@ -17,7 +17,7 @@ export const DELIVERY_FAILURE_REASON_OPTIONS = [
   'Cliente ausente',
   'Direccion incorrecta',
   'Producto rechazado por el cliente',
-  'Producto danado o incompleto',
+  'Producto dañado o incompleto',
   'Error en el pedido',
   'Otro',
 ] as const;
