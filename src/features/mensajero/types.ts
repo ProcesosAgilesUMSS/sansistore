@@ -29,9 +29,9 @@ export interface CourierOrder {
 }
 
 export interface CourierDashboardStats {
-    pendingCount: number;
-    deliveredTodayCount: number;
-    pendingCashTotal: number;
+	pendingCount: number;
+	deliveredTodayCount: number;
+	pendingCashTotal: number;
 }
 
 export interface MessengerOrderItem {
