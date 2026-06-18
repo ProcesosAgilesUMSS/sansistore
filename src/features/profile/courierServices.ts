@@ -14,33 +14,33 @@ import { db } from "../../lib/firebase";
 // ============================================
 
 export interface DeliveryDoc {
-    deliveryId: string;
-    deliveryCode: string;
-    orderCode: string;
-    orderId: string;
-    status: string;
-    courierId: string;
-    amountCollected: number;
-    createdAt: Timestamp | null;
-    assignedAt: Timestamp | null;
-    pickedUpAt: Timestamp | null;
-    deliveredAt: Timestamp | null;
-    cancelledAt: Timestamp | null;
-    failedAt: Timestamp | null;
-    inTransitAt: Timestamp | null;
-    reprogrammedAt: Timestamp | null;
-    newDeliveryAt: Timestamp | null;
-    customerConfirmedAt: Timestamp | null;
-    updatedAt: Timestamp | null;
-    attemptNumber: number;
-    customerConfirmed: boolean;
-    cancellationReason: string | null;
-    cancellationNotes: string | null;
-    failureReason: string | null;
-    incidentReason: string | null;
-    incidentNotes: string | null;
-    reprogramReason: string | null;
-    evidenceUrl: string | null;
+	deliveryId: string;
+	deliveryCode: string;
+	orderCode: string;
+	orderId: string;
+	status: string;
+	courierId: string;
+	amountCollected: number;
+	createdAt: Timestamp | null;
+	assignedAt: Timestamp | null;
+	pickedUpAt: Timestamp | null;
+	deliveredAt: Timestamp | null;
+	cancelledAt: Timestamp | null;
+	failedAt: Timestamp | null;
+	inTransitAt: Timestamp | null;
+	reprogrammedAt: Timestamp | null;
+	newDeliveryAt: Timestamp | null;
+	customerConfirmedAt: Timestamp | null;
+	updatedAt: Timestamp | null;
+	attemptNumber: number;
+	customerConfirmed: boolean;
+	cancellationReason: string | null;
+	cancellationNotes: string | null;
+	failureReason: string | null;
+	incidentReason: string | null;
+	incidentNotes: string | null;
+	reprogramReason: string | null;
+	evidenceUrl: string | null;
 }
 
 export interface UserDoc {
