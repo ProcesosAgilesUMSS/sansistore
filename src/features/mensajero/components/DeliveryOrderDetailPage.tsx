@@ -21,6 +21,7 @@ import ConfirmAssignedOrderActionModal, {
 import { auth } from '../../../lib/firebase';
 import { parseOrderId } from '../../cart/services/orderService';
 import {
+  acceptMessengerOrder,
   getMessengerOrderById,
   markMessengerOrderAsNotDelivered,
   registerMessengerCashPayment,
@@ -29,6 +30,8 @@ import {
 import type { MessengerOrder } from '../types';
 import { getDeliveryStatusLabel } from '../utils/deliveryStatusFlow';
 import { formatBolivianos } from '../utils/money';
+import { ACCEPT_BLOCKED_BY_ACTIVE_DELIVERY_MESSAGE } from '../utils/acceptEligibility';
+import AcceptBlockedModal from '../modals/AcceptBlockedModal';
 import './MessengerDashboard.css';
 
 const DEV_COURIER_ID = 'user-nadia';
@@ -201,6 +204,7 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
     null
   );
   const [paymentSuccessOpen, setPaymentSuccessOpen] = useState(false);
+  const [acceptBlockedOpen, setAcceptBlockedOpen] = useState(false);
 
   useEffect(() => {
     return onAuthStateChanged(auth, (user) => {
@@ -266,17 +270,40 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
     setError('');
 
     try {
-      await setMessengerOrderStatus(
-        previousOrder,
-        status,
-        status === 'pending_reassignment' ? rejectionReason : undefined
-      );
+      if (status === 'accepted') {
+        // Mismo punto único que el dashboard: revalida contra Firestore que no
+        // haya otra entrega activa antes de aceptar, sin importar desde qué
+        // pantalla se dispare la acción.
+        if (!courierId) {
+          throw new Error('No se pudo identificar al mensajero.');
+        }
+        await acceptMessengerOrder(previousOrder, courierId);
+      } else {
+        await setMessengerOrderStatus(
+          previousOrder,
+          status,
+          status === 'pending_reassignment' ? rejectionReason : undefined
+        );
+      }
       setMessage(getStatusUpdateMessage(status));
       await loadOrder({ showLoading: false });
     } catch (statusError) {
       console.error(statusError);
       setOrder(previousOrder);
-      setError('No se pudo actualizar el estado del pedido.');
+      if (
+        statusError instanceof Error &&
+        statusError.message === ACCEPT_BLOCKED_BY_ACTIVE_DELIVERY_MESSAGE
+      ) {
+        // Misma UX que el dashboard: si el servicio bloquea por tener otra
+        // entrega activa, mostramos la modal en lugar de un error suelto.
+        setAcceptBlockedOpen(true);
+      } else {
+        setError(
+          statusError instanceof Error
+            ? statusError.message
+            : 'No se pudo actualizar el estado del pedido.'
+        );
+      }
     }
   };
 
@@ -538,6 +565,10 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
 
       {paymentSuccessOpen && (
         <PaymentSuccessModal onClose={() => setPaymentSuccessOpen(false)} />
+      )}
+
+      {acceptBlockedOpen && (
+        <AcceptBlockedModal onClose={() => setAcceptBlockedOpen(false)} />
       )}
     </section>
   );

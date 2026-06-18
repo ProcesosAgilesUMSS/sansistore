@@ -62,6 +62,29 @@ export default function OrderModal({
 					<div className="leading-[140%] col-start-7  min-[765px]:col-start-5 col-end-21">
 						{order.buyerName}
 					</div>
+
+					{/* INFO EXTRA CLIENTE */}
+					{order.buyerInstitutionalId && (
+						<>
+							<div className="leading-[140%] col-start-1 col-end-4 text-(--theme-text) opacity-60">
+								Carnet:
+							</div>
+							<div className="leading-[140%] col-start-7  min-[765px]:col-start-5 col-end-21">
+								{order.buyerInstitutionalId}
+							</div>
+						</>
+					)}
+					{order.buyerPhoneNumber && (
+						<>
+							<div className="leading-[140%] col-start-1 col-end-4 text-(--theme-text) opacity-60">
+								Teléfono:
+							</div>
+							<div className="leading-[140%] col-start-7  min-[765px]:col-start-5 col-end-21">
+								{order.buyerPhoneNumber}
+							</div>
+						</>
+					)}
+
 					<div className="leading-[140%] col-start-1 col-end-4 text-(--theme-text) opacity-60">
 						Creado:
 					</div>

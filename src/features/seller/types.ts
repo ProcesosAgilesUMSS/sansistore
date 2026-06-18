@@ -9,7 +9,13 @@ export type OrderStatus =
   | 'ENTREGADO'
   | 'PAGADO'
   | 'CANCELADO'
-  | 'NO ENTREGADO';
+  | 'NO ENTREGADO'
+  | 'DEVUELTO'
+  | 'CERRADO'
+  | 'RECHAZADO'
+  | 'PENDIENTE REASIGNACION'
+  | 'PENDIENTE-ASIGNACION'
+  | 'ACEPTADO';
 
 export interface OrderItem {
   itemId: string;
@@ -42,6 +48,8 @@ export interface Order {
   deliveryCourierName?: string | null;
   deliveryCourierInstitutionalId?: string | null;
   incidentReason: string | null;
+  deliveryFailureReason?: string | null;
+  deliveryFailureDescription?: string | null;
   confirmedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
@@ -62,6 +70,8 @@ export type OrderDoc = {
   deliveryCode: string | null;
   deliveryStatus: string | null;
   incidentReason: string | null;
+  deliveryFailureReason?: string | null;
+  deliveryFailureDescription?: string | null;
   confirmedAt: Date | null;
   cancelledAt: Date | null;
   createdAt: Date;
@@ -77,7 +87,8 @@ export type OrderItemDoc = {
 };
 
 export interface Messenger {
-  uid: string;
-  displayName: string;
-  institutionalId: string;
+	uid: string;
+	displayName: string;
+	institutionalId: string;
+	isAvailable: boolean;
 }

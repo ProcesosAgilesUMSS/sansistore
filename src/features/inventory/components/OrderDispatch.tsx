@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { collection, query, where, onSnapshot, getDocs, doc, updateDoc, serverTimestamp, getDoc, writeBatch, increment } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '@/lib/firebase';
-import { PackageSearch, PackageCheck, AlertCircle, CheckCircle2, Play, X, ListFilter, User, ArchiveRestore, CheckSquare, ChevronRight, ArrowLeft, AlertTriangle } from 'lucide-react';
+import { PackageSearch, PackageCheck, AlertCircle, CheckCircle2, Play, X, ListFilter, ArchiveRestore, CheckSquare, ChevronRight, ArrowLeft, AlertTriangle } from 'lucide-react';
 import { parseOrderId } from '@/features/cart/services/orderService';
 
 interface OrderItem {
@@ -95,6 +95,7 @@ export const OrderDispatch: React.FC = () => {
         } as Order;
       }));
 
+      // LÓGICA DE ORDENAMIENTO (MÁS RECIENTES PRIMERO)
       const sortedOrders = fetchedOrders.sort((a, b) => {
         const timeA = a.date?.toMillis ? a.date.toMillis() : new Date(a.date || 0).getTime();
         const timeB = b.date?.toMillis ? b.date.toMillis() : new Date(b.date || 0).getTime();
@@ -167,7 +168,7 @@ export const OrderDispatch: React.FC = () => {
         const verification = returnVerifications[index];
         if (!verification) return;
 
-        //Actualizar el stock fisicamente (sse suman los que estan en buen estado)
+        //Actualizar el stock fisicamente (se suman los que estan en buen estado)
         const productRef = doc(db, 'inventory', item.productId);
         batch.update(productRef, {
           stockTotal: increment(verification.good),
@@ -183,7 +184,7 @@ export const OrderDispatch: React.FC = () => {
           quantity: item.quantity,
           reason: `Devolución de Pedido #${friendlyOrderId}`,
           type: 'ENTRADA',
-          sequence: 1 /// primero la ENTRADA
+          sequence: 1 // primero la ENTRADA
         });
 
         // SALIDA de inventario (si hay productos en MAL ESTADO)
@@ -368,7 +369,7 @@ export const OrderDispatch: React.FC = () => {
               </button>
             )}
 
-            {/* LISTADO DE PRODUCTOS */}
+            {/* LISTADO DE PRODUCTOS EN EL MODAL */}
             {verifyingIndex === null ? (
               <>
                 <div className="mb-4">
@@ -442,13 +443,36 @@ export const OrderDispatch: React.FC = () => {
                   })}
                 </div>
 
+                {/* AQUÍ ESTÁN LOS BOTONES RESTAURADOS PARA LOS OTROS ESTADOS */}
                 <div className="pt-4 mt-4 border-t border-(--theme-border)/50">
-                  {/* Botonera original omitida por brevedad para estados RESERVADO, PENDIENTE, EMPAQUETADO... */}
-                  {activeOrderForModal.status === 'DEVUELTO' && (
-                    <div className="flex gap-3">
-                      <button onClick={() => setActiveOrderForModal(null)} className="flex-1 px-4 py-3 rounded-2xl font-['Outfit'] font-bold text-sm border border-(--theme-border) text-(--theme-text) opacity-70 hover:opacity-100 transition">
-                        Cerrar
+                  <div className="flex gap-3">
+                    <button onClick={() => setActiveOrderForModal(null)} className="flex-1 px-4 py-3 rounded-2xl font-['Outfit'] font-bold text-sm border border-(--theme-border) text-(--theme-text) opacity-70 hover:opacity-100 transition">
+                      Cerrar
+                    </button>
+
+                    {activeOrderForModal.status === 'RESERVADO' && (
+                      <button
+                        disabled={processingId === activeOrderForModal.id}
+                        onClick={() => handleStartPicking(activeOrderForModal)}
+                        className="flex-[1.3] px-4 py-3 rounded-2xl font-['Outfit'] font-bold text-sm transition-all bg-green-500 text-white shadow-lg shadow-green-500/20 hover:brightness-110 flex justify-center items-center gap-2"
+                      >
+                        <Play className="w-5 h-5" />
+                        {processingId === activeOrderForModal.id ? 'Procesando...' : 'EMPEZAR A BUSCAR'}
                       </button>
+                    )}
+
+                    {activeOrderForModal.status === 'PENDIENTE' && (
+                      <button
+                        disabled={processingId === activeOrderForModal.id}
+                        onClick={() => handleFinishPacking(activeOrderForModal.id)}
+                        className="flex-[1.3] px-4 py-3 rounded-2xl font-['Outfit'] font-bold text-sm transition-all bg-amber-500 text-white shadow-lg shadow-amber-500/20 hover:brightness-110 flex justify-center items-center gap-2"
+                      >
+                        <PackageCheck className="w-5 h-5" />
+                        {processingId === activeOrderForModal.id ? 'Procesando...' : 'EMPAQUETAR'}
+                      </button>
+                    )}
+
+                    {activeOrderForModal.status === 'DEVUELTO' && (
                       <button
                         disabled={!isAllVerified || processingId === activeOrderForModal.id}
                         onClick={() => handleReturnStock(activeOrderForModal)}
@@ -461,8 +485,8 @@ export const OrderDispatch: React.FC = () => {
                         <ArchiveRestore className="w-5 h-5" />
                         {processingId === activeOrderForModal.id ? 'Procesando...' : 'DEVOLVER A STOCK'}
                       </button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </>
             ) : (

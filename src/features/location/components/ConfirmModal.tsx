@@ -29,11 +29,11 @@ export default function ConfirmModal({
             onClick={onCancel}
         >
             <div
-                className="w-full max-w-sm overflow-hidden rounded-2xl bg-(--theme-card-bg) border border-[#88B04B]/20 shadow-xl"
+                className="w-full max-w-sm overflow-hidden rounded-2xl bg-(--theme-card-bg) border border-(--theme-border) shadow-xl"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="flex items-center justify-between border-b border-[#88B04B]/10 px-5 py-4">
-                    <h3 className="font-outfit font-bold text-(--theme-text) text-lg">
+                <div className="flex items-center justify-between border-b border-(--theme-border) px-5 py-4">
+                    <h3 className="font-bold text-(--theme-text) text-lg">
                         {title}
                     </h3>
                     <button
@@ -45,7 +45,7 @@ export default function ConfirmModal({
                 </div>
 
                 <div className="px-5 py-4">
-                    <p className="font-inter text-(--theme-text)/80">
+                    <p className="text-(--theme-text)/80">
                         {message}
                     </p>
                 </div>
@@ -53,13 +53,13 @@ export default function ConfirmModal({
                 <div className="flex gap-3 px-5 pb-5 pt-2">
                     <button
                         onClick={onCancel}
-                        className="flex-1 rounded-full border border-[#88B04B]/40 py-2.5 font-outfit text-xs font-bold uppercase tracking-wider text-[#88B04B] transition-all hover:bg-[#88B04B]/5"
+                        className="flex-1 rounded-full border border-(--theme-border) py-2.5 text-xs font-bold uppercase tracking-wider text-(--theme-text) transition-all hover:bg-(--theme-secondary-bg)"
                     >
                         {cancelText}
                     </button>
                     <button
                         onClick={onConfirm}
-                        className="flex-1 rounded-full bg-red-500 py-2.5 font-outfit text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-red-600"
+                        className="flex-1 rounded-full bg-(--theme-danger) text-white hover:opacity-90 py-2.5 text-xs font-bold uppercase tracking-wider transition-all"
                     >
                         {confirmText}
                     </button>
