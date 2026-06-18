@@ -25,11 +25,6 @@ export default function Orders() {
 	const filterRef = useRef<HTMLDivElement>(null);
 
 	const showNotification = (type: "success" | "error", message: string) => {
-		const allowedMessages = [
-			"Pedido marcado como listo.",
-			"Pago validado correctamente.",
-		];
-		if (type === "success" && !allowedMessages.includes(message)) return;
 		setToast({ message, type });
 	};
 

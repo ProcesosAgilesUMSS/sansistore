@@ -102,7 +102,13 @@ export default function OrderActions({
 	};
 
 	if (order.status === "RESERVADO") {
-		return <CancelOrderSection order={order} onSuccess={onSuccess} />;
+		return (
+			<CancelOrderSection
+				order={order}
+				onSuccess={onSuccess}
+				onNotification={onNotification}
+			/>
+		);
 	}
 
 	if (order.status === "LISTO") {
@@ -195,9 +201,11 @@ export default function OrderActions({
 function CancelOrderSection({
 	order,
 	onSuccess,
+	onNotification,
 }: {
 	order: Order;
 	onSuccess?: () => void;
+	onNotification?: (type: "success" | "error", message: string) => void;
 }) {
 	const [showCancelForm, setShowCancelForm] = useState(false);
 	const [incidentNotes, setIncidentNotes] = useState("");
@@ -216,11 +224,12 @@ function CancelOrderSection({
 				"Reserva cancelada por vendedor",
 				incidentNotes,
 			);
+			onNotification?.("success", "Orden cancelada correctamente.");
 			setShowCancelForm(false);
 			onSuccess?.();
 		} catch (error) {
 			console.error("Error al cancelar la orden:", error);
-			alert("Error al cancelar la orden.");
+			onNotification?.("error", "Error al cancelar la orden.");
 		} finally {
 			setIsSubmitting(false);
 		}

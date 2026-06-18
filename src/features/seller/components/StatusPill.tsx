@@ -12,6 +12,10 @@ export const StatusPill = ({ status }: Props) => {
       'border border-(--theme-border) bg-(--theme-secondary-bg) text-(--theme-text)',
     'NO ENTREGADO':
       'border border-(--theme-warning-border) bg-(--theme-warning-bg) text-(--theme-warning)',
+    DEVUELTO:
+      'border border-(--theme-warning-border) bg-(--theme-warning-bg) text-(--theme-warning)',
+    RECHAZADO:
+      'border border-(--theme-error-border) bg-(--theme-error-bg) text-(--theme-error)',
     CANCELADO:
       'border border-(--theme-error-border) bg-(--theme-error-bg) text-(--theme-error)',
   };
@@ -27,9 +31,13 @@ export const StatusPill = ({ status }: Props) => {
               ? 'bg-(--theme-bg)'
               : status === 'NO ENTREGADO'
                 ? 'bg-(--theme-warning)'
-                : status === 'CANCELADO'
-                  ? 'bg-(--theme-error)'
-                  : 'bg-primary'
+                : status === 'DEVUELTO'
+                  ? 'bg-(--theme-warning)'
+                  : status === 'RECHAZADO'
+                    ? 'bg-(--theme-error)'
+                    : status === 'CANCELADO'
+                      ? 'bg-(--theme-error)'
+                      : 'bg-primary'
         }`}
       />
       {status}

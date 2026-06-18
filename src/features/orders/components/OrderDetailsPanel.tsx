@@ -12,7 +12,7 @@ import { useState } from "react";
 import { parseOrderId } from "../../cart/services/orderService";
 import {
 	confirmOrderReception,
-	createReturnRequest,
+	rejectOrder,
 } from "../services/ordersService";
 import type { Order, ReturnItem, ReturnReason } from "../types";
 import { RETURN_REASON_LABELS } from "../types";
@@ -68,11 +68,12 @@ const getStatusStyles = (status: string) => {
 			return "bg-amber-500/10 text-amber-700 border-amber-500/20";
 		case "CANCELADO":
 		case "NO ENTREGADO":
-			return "bg-red-500/10 text-red-600 border-red-500/20";
+		case "RECHAZADO":
+			return "bg-red-500/10 text-red-500 border-red-500/20";
 		case "CREADO":
 			return "bg-sky-500/10 text-sky-700 border-sky-500/20";
 		default:
-			return "bg-gray-500/10 text-gray-600 border-gray-500/20";
+			return "bg-gray-500/10 text-gray-500 border-gray-500/20";
 	}
 };
 
@@ -85,6 +86,7 @@ const getStatusLabel = (status: string) => {
 		PAGADO: "Pagado",
 		CANCELADO: "Cancelado",
 		"NO ENTREGADO": "No entregado",
+		RECHAZADO: "Rechazado",
 		RESERVADO: "Reservado",
 		PENDIENTE: "Pendiente",
 		EMPAQUETADO: "Empaquetado",
@@ -225,42 +227,23 @@ export default function OrderDetailsPanel({
 		setIsSubmitting(true);
 		setSubmitError(null);
 
-		const items: ReturnItem[] = Object.entries(selectedItems)
-			.filter(([, qty]) => qty > 0)
-			.map(([productId, quantity]) => {
-				const orderItem = order.items.find((i) => i.productId === productId);
-				return {
-					productId,
-					productName: orderItem?.productName ?? "Producto desconocido",
-					quantity,
-				};
-			});
-
-		for (const item of items) {
-			const ordered = order.items.find((i) => i.productId === item.productId);
-			if (ordered && item.quantity > ordered.quantity) {
-				setSubmitError(
-					`No puedes devolver más productos de los que pediste (${ordered.productName}: máx. ${ordered.quantity}).`,
-				);
-				setIsSubmitting(false);
-				return;
-			}
-		}
-
 		try {
-			const returnId = await createReturnRequest({
-				orderId: order.id,
-				buyerId: order.buyerId,
-				items,
-				reason: returnReason as ReturnReason,
-				description: description.trim() || undefined,
-			});
-			setReturnSuccess(returnId);
+			const reasonText = RETURN_REASON_LABELS[returnReason as ReturnReason] || returnReason;
+			const fullReason = description.trim() ? `${reasonText} - ${description.trim()}` : reasonText;
+
+			await rejectOrder(order.id, fullReason);
+			setReturnSuccess(order.id);
+
+			if (onOrderConfirmed) {
+				onOrderConfirmed({
+					...order,
+					status: 'RECHAZADO',
+					incidentReason: fullReason,
+				});
+			}
 		} catch (err) {
 			console.error(err);
-			setSubmitError(
-				"Hubo un error al enviar tu solicitud. Inténtalo de nuevo.",
-			);
+			setSubmitError('Hubo un error al enviar tu solicitud. Inténtalo de nuevo.');
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -406,7 +389,8 @@ export default function OrderDetailsPanel({
 									setShowReceptionConfirm(true);
 									setReceptionError(null);
 								}}
-								className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-(--theme-bg) transition-all hover:brightness-105 active:scale-95"
+								disabled={showReturnForm}
+								className={`flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-(--theme-bg) transition-all ${showReturnForm ? 'opacity-50 cursor-not-allowed' : 'hover:brightness-105 active:scale-95'}`}
 							>
 								<CheckCircle size={16} /> Confirmar recepción
 							</button>

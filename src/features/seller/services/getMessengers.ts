@@ -6,6 +6,11 @@ import {
   type Firestore,
   type Unsubscribe,
 } from "firebase/firestore";
+import {
+  ACTIVE_DELIVERY_STATUSES,
+  countActiveDeliveriesByCourier,
+  isCourierAvailableFromActiveCount,
+} from "../../../lib/deliveryAvailability";
 import type { Messenger } from "../types";
 
 interface BaseMessenger {
@@ -31,7 +36,7 @@ export const subscribeToMessengers = (
       const activeCount = busyCourierCounts[m.uid] ?? 0;
       return {
         ...m,
-        isAvailable: activeCount === 0,
+        isAvailable: isCourierAvailableFromActiveCount(activeCount),
       };
     });
 
@@ -63,19 +68,15 @@ export const subscribeToMessengers = (
 
   const deliveriesQ = query(
     collection(db, "deliveries"),
-    where("status", "in", ["accepted", "in_transit"]),
+    where("status", "in", [...ACTIVE_DELIVERY_STATUSES]),
   );
 
   const unsubDeliveries = onSnapshot(
     deliveriesQ,
     (snap) => {
-      const counts: Record<string, number> = {};
-      for (const doc of snap.docs) {
-        const courierId = doc.data().courierId as string | undefined;
-        if (!courierId) continue;
-        counts[courierId] = (counts[courierId] ?? 0) + 1;
-      }
-      busyCourierCounts = counts;
+      busyCourierCounts = countActiveDeliveriesByCourier(
+        snap.docs.map((doc) => doc.data()),
+      );
       deliveriesLoaded = true;
       emit();
     },
