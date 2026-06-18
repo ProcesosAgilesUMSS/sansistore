@@ -44,19 +44,19 @@ export interface DeliveryDoc {
 }
 
 export interface UserDoc {
-    uid: string;
-    ci: string;
-    displayName: string;
-    email: string;
-    phoneNumber: string;
-    roles: string[];
-    isActive: boolean;
-    institutionalId?: string;
-    internalPhone?: string;
-    photoURL?: string;
-    createdAt?: Timestamp;
-    updatedAt?: Timestamp;
-    createdBy?: string;
+	uid: string;
+	ci: string;
+	displayName: string;
+	email: string;
+	phoneNumber: string;
+	roles: string[];
+	isActive: boolean;
+	institutionalId?: string;
+	internalPhone?: string;
+	photoURL?: string;
+	createdAt?: Timestamp;
+	updatedAt?: Timestamp;
+	createdBy?: string;
 }
 
 export interface DeliveryStats {
