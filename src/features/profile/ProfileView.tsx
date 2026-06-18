@@ -6,14 +6,14 @@ import { getDeliveryStatsByCourier } from './courierServices.ts'; // ← NUEVO
 import { Pencil, Check, X, AlertCircle, CheckCircle, MapPin, Package, Star } from 'lucide-react';
 
 interface ProfileData {
-    displayName: string;
-    ci: string;
-    email: string;
-    phone: string;
-    secondaryMail: string;
-    photoURL: string;
-    roles: string[];
-    deliveryRating?: number;
+	displayName: string;
+	ci: string;
+	email: string;
+	phone: string;
+	secondaryMail: string;
+	photoURL: string;
+	roles: string[];
+	deliveryRating?: number;
 }
 
 // ── NUEVO ──────────────────────────────────────────────────────────
