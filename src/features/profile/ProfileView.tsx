@@ -242,9 +242,11 @@ export default function ProfileView() {
           <h1 className="text-xl font-black tracking-tight text-text-light mb-1">
             {profile.displayName}
           </h1>
-          <p className="text-[13px] font-medium text-text-light opacity-60 mb-2">
+          
+          {/* Agregamos el <dd> para mantener la compatibilidad con el selector de Playwright */}
+          <dd className="text-[13px] font-medium text-text-light opacity-60 mb-2">
             {profile.email}
-          </p>
+          </dd>
 
           {/* HU #564: Calificación promedio para el Mensajero */}
           {showCalificacionMensajero && profile.deliveryRating !== undefined && (
