@@ -13,6 +13,10 @@ import {
   type Unsubscribe,
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
+import {
+  normalizePaymentMethod,
+  registrarActividadCobroActual,
+} from '../../admin/pedidos/payment-audit/services/paymentAuditService';
 import { getCurrentZone } from '../../location/utils/zoneLimits';
 import type { MessengerOrder, MessengerOrderItem, MessengerShiftClosure, MessengerShiftOrderSnapshot,} from '../types';
 import { getVisibleMessengerOrders } from '../utils/orderVisibility';
@@ -421,6 +425,14 @@ export async function registerMessengerCashPayment(
   );
 
   await batch.commit();
+
+  registrarActividadCobroActual({
+    orderId: order.id,
+    amount: order.cashToCollect,
+    paymentMethod: normalizePaymentMethod(order.paymentMethod),
+    status: 'VERIFICADO',
+    fallbackRole: 'MENSAJERO',
+  }).catch((err) => console.error('Error al registrar auditoria de cobro:', err));
 }
 
 export async function markMessengerOrderAsNotDelivered({

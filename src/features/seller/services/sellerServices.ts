@@ -9,6 +9,7 @@ import {
   type Firestore,
 } from 'firebase/firestore';
 import type { Order, OrderDoc } from '../types';
+import type { DeliveryData } from '../types/pendingOrders';
 
 
 function toDate(value: unknown): Date | null {
@@ -126,7 +127,7 @@ async function fetchLocationsData(
 export async function fetchDeliveryData(
   db: Firestore,
   deliveryId: string | null | undefined,
-): Promise<{ deliveryCode: string | null; deliveryCourierName: string | null; deliveryCourierInstitutionalId: string | null } | null> {
+): Promise<DeliveryData | null> {
   if (!deliveryId) return null;
 
   try {
@@ -152,7 +153,7 @@ export async function fetchDeliveryData(
       deliveryCourierName,
       deliveryCourierInstitutionalId,
       courierId: data.courierId ?? null,
-    } as any;
+    };
   } catch {
     return null;
   }
