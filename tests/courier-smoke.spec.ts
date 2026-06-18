@@ -109,6 +109,17 @@ test.describe('Courier smoke tests', () => {
     ).toHaveCount(1);
   });
 
+  test('shows courier as busy while an active delivery exists', async ({ page }) => {
+    await loginAsCourier(page);
+    await page.goto('/courier');
+    await selectCourierSection(page, 'Pedidos aceptados', 'Pedidos aceptados');
+
+    await expect(page.getByText('Disponibilidad')).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.getByText('Ocupado')).toBeVisible();
+  });
+
   test('opens buyer location in the internal Leaflet map', async ({ page }) => {
     await loginAsCourier(page);
     await page.goto('/courier');
