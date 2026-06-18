@@ -17,3 +17,10 @@ export interface PendingOrdersResponse {
   pedidos: PendingOrder[];
   total: number;
 }
+
+export interface DeliveryData {
+  deliveryCode: string | null;
+  deliveryCourierName: string | null;
+  deliveryCourierInstitutionalId: string | null;
+  courierId: string | null;
+}
