@@ -329,7 +329,7 @@ function CartViewInner() {
           {enriched.map((item) => {
             const effectiveStock = Math.max(
               0,
-              (item.product?.stockTotal ?? 0) -
+              (item.product?.stockAvailable ?? 0) -
               (item.product?.stockReserved ?? 0)
             );
             return (
