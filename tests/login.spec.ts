@@ -1,88 +1,29 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
+import { LoginPage } from './pages/login.page';
 
 test.describe('Auth - Login', () => {
-  async function waitForLoginForm(page: Page) {
-    const loginButton = page.locator('form').getByRole('button', {
-      name: 'Iniciar sesión',
-      exact: true,
-    });
-
-    await expect(loginButton).toBeEnabled({ timeout: 15_000 });
-    await expect(page.getByLabel('Correo electrónico')).toBeEditable();
-    await expect(page.locator('#password')).toBeEditable();
-    await expect
-      .poll(
-        async () => {
-          try {
-            return await page.evaluate(() => {
-              const button = document
-                .querySelector('form')
-                ?.querySelector('button[type="button"]');
-              return Boolean(
-                button &&
-                Object.keys(button).some((key) =>
-                  key.startsWith('__reactProps')
-                )
-              );
-            });
-          } catch (e) {
-            return false;
-          }
-        },
-        { timeout: 15_000 }
-      )
-      .toBe(true);
-  }
-
-  async function fillLoginCredentials(page: Page, email: string) {
-    const emailField = page.getByLabel('Correo electrónico');
-    const passwordField = page.locator('#password');
-
-    for (let attempt = 0; attempt < 3; attempt++) {
-      await emailField.fill(email);
-      await passwordField.fill('12345678');
-      await page.waitForTimeout(250);
-
-      if (
-        (await emailField.inputValue()) === email &&
-        (await passwordField.inputValue()) === '12345678'
-      ) {
-        return { emailField, passwordField };
-      }
-    }
-
-    await expect(emailField).toHaveValue(email, { timeout: 10_000 });
-    await expect(passwordField).toHaveValue('12345678', { timeout: 10_000 });
-    return { emailField, passwordField };
-  }
-
   test('should login with email/password and show user on /me', async ({
     page,
   }) => {
     test.setTimeout(60_000);
 
-    await page.goto('/login');
-    await waitForLoginForm(page);
+    const login = new LoginPage(page);
+    await login.goto();
+    await login.waitForReady();
 
-    const { emailField, passwordField } = await fillLoginCredentials(
-      page,
-      'juan.paredes@est.umss.edu'
-    );
+    const email = 'juan.paredes@est.umss.edu';
+    await login.fillCredentials(email);
 
-    expect(await emailField.inputValue()).toBe('juan.paredes@est.umss.edu');
-    expect(await passwordField.inputValue()).toBe('12345678');
-
-    const loginButton = page
-      .locator('form')
-      .getByRole('button', { name: 'Iniciar sesión', exact: true });
+    expect(await login.emailField.inputValue()).toBe(email);
+    expect(await login.passwordField.inputValue()).toBe('12345678');
 
     for (let attempt = 0; attempt < 3; attempt++) {
       if (!page.url().includes('/login')) {
         break;
       }
       try {
-        await loginButton.click({ noWaitAfter: true, timeout: 2000 });
-      } catch (error) {
+        await login.loginButton.click({ noWaitAfter: true, timeout: 2000 });
+      } catch {
         if (!page.url().includes('/login')) {
           break;
         }
@@ -118,18 +59,15 @@ test.describe('Auth - Login', () => {
   test('should show login form on /login when not authenticated', async ({
     page,
   }) => {
-    await page.goto('/login');
-    await waitForLoginForm(page);
+    const login = new LoginPage(page);
+    await login.goto();
+    await login.waitForReady();
     await expect(page).toHaveTitle('Iniciar sesión | SansiStore');
     await expect(
       page.getByRole('heading', { name: /sansistore/i })
     ).toBeVisible();
-    await expect(page.getByLabel('Correo electrónico')).toBeVisible();
-    await expect(page.locator('#password')).toBeVisible();
-    await expect(
-      page
-        .locator('form')
-        .getByRole('button', { name: 'Iniciar sesión', exact: true })
-    ).toBeVisible();
+    await expect(login.emailField).toBeVisible();
+    await expect(login.passwordField).toBeVisible();
+    await expect(login.loginButton).toBeVisible();
   });
 });
