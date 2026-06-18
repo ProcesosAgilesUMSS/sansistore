@@ -88,7 +88,7 @@ export function useCart() {
           : 0;
         const effectiveStock = Math.max(
           0,
-          (product?.stockTotal ?? 0) - (product?.stockReserved ?? 0)
+          (product?.stockAvailable ?? 0) - (product?.stockReserved ?? 0)
         );
 
         let availabilityMessage = '';

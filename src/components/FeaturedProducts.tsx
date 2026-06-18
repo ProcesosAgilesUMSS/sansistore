@@ -865,7 +865,7 @@ function FeaturedProductsInner({
                   const currentPrice = showOffer ? product.offerPrice! : product.price;
                   const effectiveStock = Math.max(
                     0,
-                    (product.stockTotal ?? 0) - (product.stockReserved ?? 0)
+                    (product.stockAvailable ?? 0) - (product.stockReserved ?? 0)
                   );
                   const isOutOfStock = effectiveStock <= 0;
                   const isDisabled = product.enabled === false;

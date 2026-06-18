@@ -60,7 +60,7 @@ test.describe('Avaiable product list', () => {
     await expect(
       page.getByRole('heading', { name: /Leche PIL Natural 900 ml/ })
     ).toBeVisible();
-    await expect(page.getByText('Stock: 36 disponibles')).toBeVisible();
+    await expect(page.getByText('Stock: 24 disponibles')).toBeVisible();
   });
 
   test('Search with URL params', async ({ page }) => {

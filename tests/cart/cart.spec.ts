@@ -407,7 +407,7 @@ test.describe('Cart - Carrito', () => {
     ).toBeEnabled();
 
     await updateTestInventory(productId, {
-      stockTotal: 0,
+      stockAvailable: 0,
     });
 
     await expect(page.getByText('Sin stock disponible.')).toBeVisible();

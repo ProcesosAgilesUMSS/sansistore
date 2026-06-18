@@ -215,7 +215,7 @@ export function getProductDerivedData(product: Product | null) {
   const currentPrice = showOffer ? (product?.offerPrice ?? 0) : (product?.price ?? 0);
   const effectiveStock = Math.max(
     0,
-    (product?.stockTotal ?? 0) - (product?.stockReserved ?? 0)
+    (product?.stockAvailable ?? 0) - (product?.stockReserved ?? 0)
   );
   const isAvailable =
     effectiveStock > 0 &&

@@ -75,7 +75,7 @@ export async function getUserCartItems(userId: string): Promise<CartDisplayItem[
           : null;
       const unitPrice = getProductPrice(product);
       const stockReserved = toPositiveStock(inventory?.stockReserved);
-      const stockAvailable = Math.max(0, toPositiveStock(inventory?.stockTotal) - stockReserved);
+      const stockAvailable = Math.max(0, toPositiveStock(inventory?.stockAvailable) - stockReserved);
       const availabilityMessage = getAvailabilityMessage({
         product,
         inventory,
