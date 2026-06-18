@@ -581,6 +581,15 @@ export async function confirmOrderReception(orderId: string, buyerId: string) {
 	});
 }
 
+export async function rejectOrder(orderId: string, reason: string): Promise<void> {
+  const orderRef = doc(db, "orders", orderId);
+  await updateDoc(orderRef, {
+    status: "RECHAZADO",
+    incidentReason: reason,
+    updatedAt: serverTimestamp(),
+  });
+}
+
 export async function createReturnRequest(
 	requestData: Omit<ReturnRequest, "id" | "createdAt" | "status">,
 ) {
