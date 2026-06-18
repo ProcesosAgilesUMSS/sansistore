@@ -109,15 +109,15 @@ export interface MessengerShiftSummary {
 }
 
 export interface MessengerShiftClosure {
-    id: string;
-    courierId: string;
-    dateKey: string;
-    status: 'closed';
-    startedAt: Date | null;
-    closedAt: Date | null;
-    createdAt: Date | null;
-    summary: MessengerShiftSummary;
-    completedOrders: MessengerShiftOrderSnapshot[];
-    pendingOrders: MessengerShiftOrderSnapshot[];
-    incidentOrders: MessengerShiftOrderSnapshot[];
+	id: string;
+	courierId: string;
+	dateKey: string;
+	status: "closed";
+	startedAt: Date | null;
+	closedAt: Date | null;
+	createdAt: Date | null;
+	summary: MessengerShiftSummary;
+	completedOrders: MessengerShiftOrderSnapshot[];
+	pendingOrders: MessengerShiftOrderSnapshot[];
+	incidentOrders: MessengerShiftOrderSnapshot[];
 }
