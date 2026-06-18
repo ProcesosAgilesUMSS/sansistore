@@ -105,7 +105,7 @@ export default function ConfirmAssignedOrderActionModal({
   return (
     <>
       <div
-        className="fixed inset-0 z-[999] flex items-center justify-center bg-black/65 p-4 backdrop-blur-sm"
+        className="fixed inset-0 z-[999] flex items-center justify-center overflow-y-auto bg-black/65 p-4 backdrop-blur-sm"
         onClick={(event) => {
           if (event.target === event.currentTarget) onClose();
         }}
@@ -113,8 +113,8 @@ export default function ConfirmAssignedOrderActionModal({
         aria-modal="true"
         aria-labelledby="assigned-order-action-title"
       >
-        <section className="w-full max-w-lg overflow-hidden rounded-[28px] border border-border-light bg-card-bg-light text-text-light shadow-2xl">
-          <header className="flex items-start justify-between gap-4 border-b border-border-light px-6 py-5">
+        <section className="flex max-h-[calc(100vh-2rem)] w-full max-w-lg flex-col overflow-hidden rounded-[28px] border border-border-light bg-card-bg-light text-text-light shadow-2xl">
+          <header className="shrink-0 flex items-start justify-between gap-4 border-b border-border-light px-6 py-5">
             <div className="flex items-center gap-4">
               <span
                 className={`flex h-12 w-12 items-center justify-center rounded-2xl ${config.iconClassName}`}
@@ -146,7 +146,7 @@ export default function ConfirmAssignedOrderActionModal({
             </button>
           </header>
 
-          <div className="space-y-6 px-6 py-6">
+          <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-6 py-6">
             <div className="grid gap-3 rounded-2xl border border-border-light bg-secondary-bg-light/60 p-4 sm:grid-cols-2">
               <div>
                 <p className="text-xs font-bold uppercase opacity-50">Pedido</p>
@@ -211,7 +211,7 @@ export default function ConfirmAssignedOrderActionModal({
             )}
           </div>
 
-          <footer className="flex flex-col gap-3 border-t border-border-light bg-secondary-bg-light/50 px-6 py-5 sm:flex-row">
+          <footer className="shrink-0 flex flex-col gap-3 border-t border-border-light bg-secondary-bg-light/50 px-6 py-5 sm:flex-row">
             <button
               className="inline-flex h-12 flex-1 items-center justify-center rounded-full border border-border-light bg-card-bg-light text-sm font-black uppercase disabled:cursor-not-allowed disabled:opacity-50"
               disabled={isSaving}

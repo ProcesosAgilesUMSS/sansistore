@@ -196,7 +196,6 @@ export default function Navbar() {
   const showOperadorInvFeatures = user && roles.length > 0 && roles.some(r => ['operador_inv', 'admin'].includes(r));
   const showMensajeroFeatures = user && roles.length > 0 && roles.some(r => ['mensajero', 'admin'].includes(r));
   const showAdminFeatures = user && roles.length > 0 && roles.some(r => ['admin'].includes(r));
-  const showMisPedidos = user && roles.length > 0 && roles.some(r => ['comprador', 'admin'].includes(r));
 
   return (
     <>
@@ -326,17 +325,6 @@ export default function Navbar() {
                           Mi Perfil
                         </a>
 
-                        {showMisPedidos && (
-                          <a
-                            role="menuitem"
-                            href="/mis-pedidos"
-                            className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light opacity-70 transition-colors hover:bg-border-light/40 hover:text-primary hover:opacity-100"
-                          >
-                            <Package size={14} />
-                            Mis pedidos
-                          </a>
-                        )}
-
                         {canAccessCourier && (
                           <a
                             role="menuitem"
@@ -441,15 +429,6 @@ export default function Navbar() {
                       className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
                     >
                       Mis direcciones
-                    </a>
-                  )}
-
-                  {showMisPedidos && (
-                    <a
-                      href="/mis-pedidos"
-                      className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
-                    >
-                      Mis pedidos
                     </a>
                   )}
 
