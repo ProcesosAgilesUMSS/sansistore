@@ -476,3 +476,12 @@ por las dudas que se tienen.
 * **Yesterday:** Estuve avanzando en mi HU asignada, desarrollando parte de las funcionalidades planificadas.
 * **Today:** Continuaré con la implementación de mi HU, realizando pruebas y ajustes para asegurar su correcto funcionamiento.
 * **Blockers:** None
+# Daily Reports - Team 3 Webspire 18/06/26
+
+## Dayana Saleth Ortuño Guzmán
+
+
+## Maria Victoria Grageda Vallejos
+* **Yesterday:** Trabajé en mi HU asignada: registrar el motivo de fallos de entrega para análisis. Revisé la vista, el servicio y la lógica para guardar el motivo del pedido en base de datos.
+* **Today:** Finalicé y ajusté mi HU para trabajar con el estado `RECHAZADO`, según la aclaración recibida. También validé que el flujo no duplique el registro del motivo cuando el cliente ya lo registró.
+* **Blockers:** Ninguno actualmente. La duda sobre el estado a usar (`DEVUELTO`, `NO ENTREGADO` o `RECHAZADO`) ya fue aclarada y se definió trabajar con `RECHAZADO`.
