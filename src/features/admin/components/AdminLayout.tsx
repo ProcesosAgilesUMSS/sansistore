@@ -1,49 +1,45 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  LayoutDashboard,
-  Users,
-  Tag,
-  Settings,
+  Activity,
+  ArrowLeft,
   BarChart2,
-  Package,
   Bike,
+  ChevronRight,
+  ClipboardList,
   FileText,
-  ShoppingBag,
+  LayoutDashboard,
   LogOut,
   Menu,
+  Package,
+  Settings,
+  ShoppingBag,
+  Tag,
+  Users,
   X,
-  ChevronRight,
-  ArrowLeft,
-  ClipboardList,
-  Activity,
 } from 'lucide-react';
-import { signOut, onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../../../lib/firebase';
-import UserManagement from '../users/components/UserManagement.tsx';
+import AccessLogPanel from '../audit/components/AccessLogPanel.tsx';
 import CategoryList from '../categories/components/CategoryList.tsx';
+import DemandPanel from '../demand/components/DemandPanel.tsx';
+import MessengerPerformancePage from '../messengers/performance/MessengerPerformancePage.tsx';
+import SellerActivityPanel from '../monitoring/components/SellerActivityPanel.tsx';
 import OrderReceptionPanel from '../orders/components/OrderReceptionPanel.tsx';
+import OrderHistory from '../pedidos/components/OrderHistory.tsx';
+import PaymentAuditPanel from '../pedidos/payment-audit/components/PaymentAuditPanel.tsx';
+import CancelledOrdersReport from '../reports/components/CancelledOrdersReport.tsx';
+import SalesReport from '../analytics/components/SalesReport.tsx';
+import ConfigPanel from '../settings/components/ConfigPanel.tsx';
+import UserManagement from '../users/components/UserManagement.tsx';
 import DailySales from '../ventas/components/DailySales.tsx';
 import TopSellingProducts from '../ventas/top-products/components/TopSellingProducts.tsx';
-import MessengerPerformancePage from '../messengers/performance/MessengerPerformancePage.tsx';
-// ── HU #152: Parámetros del sistema ──
-import ConfigPanel from '../settings/components/ConfigPanel.tsx';
-// ── HU #161: Reportes de ventas ──
-import SalesReport from '../analytics/components/SalesReport.tsx';
-import AccessLogPanel from '../audit/components/AccessLogPanel.tsx';
-// ── HU #163: Reportes de pedidos cancelados ──
-import CancelledOrdersReport from '../reports/components/CancelledOrdersReport.tsx';
-// ── HU #178: Historial de pedido ──
-import OrderHistory from '../pedidos/components/OrderHistory.tsx';
-// ── HU #160: Monitoreo de actividad de vendedores ──
-import SellerActivityPanel from '../monitoring/components/SellerActivityPanel.tsx';
-// ── HU #149: Demanda por horarios ──
-import DemandPanel from '../demand/components/DemandPanel.tsx';
 
 type Section =
   | 'dashboard'
   | 'pedidos'
   | 'historial'
+  | 'auditoria-cobros'
   | 'usuarios'
   | 'categorias'
   | 'ventas-diarias'
@@ -104,7 +100,9 @@ export default function AdminLayout() {
 
   const handleLogout = () => {
     signOut(auth)
-      .then(() => { window.location.href = '/login'; })
+      .then(() => {
+        window.location.href = '/login';
+      })
       .catch(console.error);
   };
 
@@ -113,50 +111,52 @@ export default function AdminLayout() {
       title: 'Principal',
       items: [
         { label: 'Dashboard', icon: <LayoutDashboard size={15} />, section: 'dashboard' },
-        { label: 'Pedidos',   icon: <ShoppingBag size={15} />,    section: 'pedidos' },
+        { label: 'Pedidos', icon: <ShoppingBag size={15} />, section: 'pedidos' },
       ],
     },
     {
       title: 'Configuración',
       items: [
-        { label: 'Usuarios',   icon: <Users size={15} />,    section: 'usuarios' },
-        { label: 'Categorías', icon: <Tag size={15} />,      section: 'categorias' },
+        { label: 'Usuarios', icon: <Users size={15} />, section: 'usuarios' },
+        { label: 'Categorías', icon: <Tag size={15} />, section: 'categorias' },
         { label: 'Parámetros', icon: <Settings size={15} />, section: 'parametros' },
-        { label: 'Bitácora',   icon: <ClipboardList size={15} />, section: 'bitacora' },
-        { label: 'Monitoreo',  icon: <Activity size={15} />, section: 'monitoreo' },
+        { label: 'Bitácora', icon: <ClipboardList size={15} />, section: 'bitacora' },
+        { label: 'Monitoreo', icon: <Activity size={15} />, section: 'monitoreo' },
       ],
     },
     {
       title: 'Analítica',
       items: [
-        { label: 'Ventas',     icon: <BarChart2 size={15} />, section: 'ventas-diarias' },
-        { label: 'Inventario', icon: <Package size={15} />,   section: null, disabled: true },
-        { label: 'Mensajeros', icon: <Bike size={15} />,      section: null, disabled: true },
-        { label: 'Reportes',   icon: <FileText size={15} />,  section: 'reportes' },
+        { label: 'Ventas', icon: <BarChart2 size={15} />, section: 'ventas-diarias' },
+        { label: 'Inventario', icon: <Package size={15} />, section: null, disabled: true },
+        { label: 'Mensajeros', icon: <Bike size={15} />, section: null, disabled: true },
+        { label: 'Reportes', icon: <FileText size={15} />, section: 'reportes' },
       ],
     },
   ];
 
   const pageTitles: Record<string, { title: string; subtitle: string }> = {
-    dashboard:              { title: 'Dashboard',               subtitle: 'Panel de administración' },
-    pedidos:                { title: 'Pedidos',                 subtitle: 'Validación de recepción por comprador' },
-    historial:              { title: 'Historial de pedido',     subtitle: 'Auditoría completa del pedido' },
-    usuarios:               { title: 'Gestión de usuarios',     subtitle: 'Registra y administra usuarios' },
-    categorias:             { title: 'Categorías',              subtitle: 'Gestiona las categorías de productos' },
-    'ventas-diarias':       { title: 'Ventas diarias',          subtitle: 'Monitorea el rendimiento diario de ventas' },
+    dashboard: { title: 'Dashboard', subtitle: 'Panel de administración' },
+    pedidos: { title: 'Pedidos', subtitle: 'Validación de recepción por comprador' },
+    historial: { title: 'Historial de pedido', subtitle: 'Auditoría completa del pedido' },
+    'auditoria-cobros': {
+      title: 'Auditoría de cobros',
+      subtitle: 'Registro detallado de cobros confirmados por pedido',
+    },
+    usuarios: { title: 'Gestión de usuarios', subtitle: 'Registra y administra usuarios' },
+    categorias: { title: 'Categorías', subtitle: 'Gestiona las categorías de productos' },
+    'ventas-diarias': { title: 'Ventas diarias', subtitle: 'Monitorea el rendimiento diario de ventas' },
     'mensajeros-desempeno': { title: 'Desempeño de mensajeros', subtitle: 'Métricas de eficiencia por mensajero' },
-    'mas-vendidos':         { title: 'Más vendidos',            subtitle: 'Productos con más unidades vendidas' },
-    parametros:             { title: 'Parámetros del sistema',  subtitle: 'Configura los parámetros globales del sistema' },
-    reportes:               { title: 'Reportes de ventas',      subtitle: 'Genera reportes de ventas por rango de fechas' },
-    bitacora:               { title: 'Bitácora',                subtitle: 'Registra actividad de inicio y cierre de sesión' },
-    'reportes-cancelados':  { title: 'Pedidos cancelados',      subtitle: 'Reporte de órdenes canceladas por período' },
-    monitoreo:              { title: 'Monitoreo de vendedores',  subtitle: 'Bitácora de actividad y cambios de estado en pedidos' },
-    'demanda-horarios':     { title: 'Demanda por horarios',    subtitle: 'Análisis de pedidos agrupados por franja horaria' },
+    'mas-vendidos': { title: 'Más vendidos', subtitle: 'Productos con más unidades vendidas' },
+    parametros: { title: 'Parámetros del sistema', subtitle: 'Configura los parámetros globales del sistema' },
+    reportes: { title: 'Reportes de ventas', subtitle: 'Genera reportes de ventas por rango de fechas' },
+    bitacora: { title: 'Bitácora', subtitle: 'Registra actividad de inicio y cierre de sesión' },
+    'reportes-cancelados': { title: 'Pedidos cancelados', subtitle: 'Reporte de órdenes canceladas por período' },
+    monitoreo: { title: 'Monitoreo de vendedores', subtitle: 'Bitácora de actividad y cambios de estado en pedidos' },
+    'demanda-horarios': { title: 'Demanda por horarios', subtitle: 'Análisis de pedidos agrupados por franja horaria' },
   };
 
   const currentPage = pageTitles[activeSection ?? 'dashboard'];
-
-  // Clases reutilizables para items del sidebar
   const sidebarItemActive = 'bg-primary/15 text-primary';
   const sidebarItemInactive = 'text-(--theme-text)/40 hover:text-(--theme-text)/80 hover:bg-(--theme-text)/5';
   const sidebarSubItemClass = (active: boolean) =>
@@ -164,8 +164,6 @@ export default function AdminLayout() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-(--theme-bg)">
-
-      {/* Overlay mobile */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-20 bg-black/40 md:hidden"
@@ -173,7 +171,6 @@ export default function AdminLayout() {
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={`
           fixed md:static z-30 h-full flex flex-col
@@ -182,7 +179,6 @@ export default function AdminLayout() {
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
         `}
       >
-        {/* Logo */}
         <div className="flex items-center gap-3 px-5 py-4 border-b border-(--theme-border)">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
             S
@@ -193,7 +189,6 @@ export default function AdminLayout() {
           </div>
         </div>
 
-        {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-3 px-3">
           {navSections.map((section) => (
             <div key={section.title} className="mb-4">
@@ -201,8 +196,6 @@ export default function AdminLayout() {
                 {section.title}
               </p>
               {section.items.map((item) => {
-
-                // ── Pedidos con submenú ──
                 if (item.label === 'Pedidos') {
                   return (
                     <div key={item.label} className="mb-1">
@@ -224,13 +217,16 @@ export default function AdminLayout() {
                             className={`${sidebarSubItemClass(activeSection === 'historial')} flex items-center gap-1.5`}>
                             <ClipboardList size={11} /> Historial
                           </button>
+                          <button onClick={() => { setActiveSection('auditoria-cobros'); setSidebarOpen(false); }}
+                            className={sidebarSubItemClass(activeSection === 'auditoria-cobros')}>
+                            Auditoría de cobros
+                          </button>
                         </div>
                       )}
                     </div>
                   );
                 }
 
-                // ── Ventas con submenú ──
                 if (item.label === 'Ventas') {
                   return (
                     <div key={item.label} className="mb-1">
@@ -258,7 +254,6 @@ export default function AdminLayout() {
                   );
                 }
 
-                // ── Reportes con submenú ──
                 if (item.label === 'Reportes') {
                   return (
                     <div key={item.label} className="mb-1">
@@ -290,7 +285,6 @@ export default function AdminLayout() {
                   );
                 }
 
-                // ── Mensajeros con submenú ──
                 if (item.label === 'Mensajeros') {
                   return (
                     <div key={item.label} className="mb-1">
@@ -314,7 +308,6 @@ export default function AdminLayout() {
                   );
                 }
 
-                // ── Item normal ──
                 const isActive = activeSection === item.section;
                 return (
                   <button
@@ -331,8 +324,8 @@ export default function AdminLayout() {
                       ${isActive
                         ? sidebarItemActive
                         : item.disabled
-                        ? 'text-(--theme-text)/20 cursor-not-allowed'
-                        : `${sidebarItemInactive} cursor-pointer`
+                          ? 'text-(--theme-text)/20 cursor-not-allowed'
+                          : `${sidebarItemInactive} cursor-pointer`
                       }
                     `}
                   >
@@ -351,7 +344,6 @@ export default function AdminLayout() {
           ))}
         </nav>
 
-        {/* Footer sidebar — usuario + logout */}
         <div className="px-3 py-3 border-t border-(--theme-border)">
           <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg">
             <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-[11px] font-semibold text-primary flex-shrink-0">
@@ -372,10 +364,7 @@ export default function AdminLayout() {
         </div>
       </aside>
 
-      {/* Main */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-(--theme-bg)">
-
-        {/* Topbar — más compacta y adaptada al tema */}
         <header className="flex items-center justify-between px-6 py-3 md:px-8 md:py-3 bg-(--theme-card-bg) border-b border-(--theme-border)">
           <div className="flex items-center gap-3 md:gap-6">
             <button
@@ -413,26 +402,26 @@ export default function AdminLayout() {
           </div>
         </header>
 
-        {/* Content */}
         <main className="flex-1 overflow-y-auto p-6 md:p-8">
           {activeSection === 'dashboard' && (
             <div className="flex items-center justify-center h-full text-(--theme-text)/30 text-sm font-medium">
               Dashboard principal — Próximamente
             </div>
           )}
-          {activeSection === 'usuarios'              && <UserManagement />}
-          {activeSection === 'pedidos'               && <OrderReceptionPanel />}
-          {activeSection === 'categorias'            && <CategoryList />}
-          {activeSection === 'ventas-diarias'        && <DailySales />}
-          {activeSection === 'mas-vendidos'          && <TopSellingProducts />}
-          {activeSection === 'mensajeros-desempeno'  && <MessengerPerformancePage />}
-          {activeSection === 'parametros'            && <ConfigPanel />}
-          {activeSection === 'reportes'              && <SalesReport />}
-          {activeSection === 'bitacora'              && <AccessLogPanel />}
-          {activeSection === 'monitoreo'             && <SellerActivityPanel />}
-          {activeSection === 'reportes-cancelados'   && <CancelledOrdersReport />}
-          {activeSection === 'historial'             && <OrderHistory />}
-          {activeSection === 'demanda-horarios'      && <DemandPanel />}
+          {activeSection === 'usuarios' && <UserManagement />}
+          {activeSection === 'pedidos' && <OrderReceptionPanel />}
+          {activeSection === 'categorias' && <CategoryList />}
+          {activeSection === 'ventas-diarias' && <DailySales />}
+          {activeSection === 'mas-vendidos' && <TopSellingProducts />}
+          {activeSection === 'mensajeros-desempeno' && <MessengerPerformancePage />}
+          {activeSection === 'parametros' && <ConfigPanel />}
+          {activeSection === 'reportes' && <SalesReport />}
+          {activeSection === 'bitacora' && <AccessLogPanel />}
+          {activeSection === 'monitoreo' && <SellerActivityPanel />}
+          {activeSection === 'reportes-cancelados' && <CancelledOrdersReport />}
+          {activeSection === 'historial' && <OrderHistory />}
+          {activeSection === 'demanda-horarios' && <DemandPanel />}
+          {activeSection === 'auditoria-cobros' && <PaymentAuditPanel />}
         </main>
       </div>
     </div>
