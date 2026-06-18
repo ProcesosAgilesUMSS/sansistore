@@ -24,6 +24,7 @@ import {
 } from '../../../lib/deliveryAvailability';
 import { parseOrderId } from '../../cart/services/orderService';
 import {
+    acceptMessengerOrder,
     closeMessengerShift,
     markMessengerOrderAsNotDelivered,
     registerMessengerCashPayment,
@@ -32,6 +33,8 @@ import {
     subscribeToMessengerShiftClosures,
 } from '../services/messengerOrdersService';
 import type { MessengerOrder, MessengerShiftClosure } from '../types';
+import { hasActiveMessengerDelivery } from '../utils/acceptEligibility';
+import AcceptBlockedModal from '../modals/AcceptBlockedModal';
 import {
     sortAcceptedOrdersByAge,
     type AcceptedOrderSort,
@@ -306,6 +309,7 @@ function PendingOrderCard({
     onInTransit,
     onNotDelivered,
     onReject,
+    acceptDisabled = false,
 }: {
     order: MessengerOrder;
     onAccept: (orderId: string) => void;
@@ -314,7 +318,9 @@ function PendingOrderCard({
     onInTransit: (orderId: string) => void;
     onNotDelivered: (order: MessengerOrder) => void;
     onReject: (orderId: string) => void;
+    acceptDisabled?: boolean;
 }) {
+    const [showAcceptBlockedModal, setShowAcceptBlockedModal] = useState(false);
     const customerLocationUrl = useMemo(() => {
         return buildBuyerMapUrl(order);
     }, [order]);
@@ -473,13 +479,23 @@ function PendingOrderCard({
                     {order.deliveryStatus === 'assigned' && (
                         <>
                             <button
+                                aria-disabled={acceptDisabled}
                                 className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
-                                onClick={() => onAccept(order.id)}
+                                onClick={() => {
+                                    if (acceptDisabled) {
+                                        setShowAcceptBlockedModal(true);
+                                    } else {
+                                        onAccept(order.id);
+                                    }
+                                }}
                                 type="button"
                             >
                                 <CheckCircle2 size={17} />
                                 Aceptar pedido
                             </button>
+                            {showAcceptBlockedModal && (
+                                <AcceptBlockedModal onClose={() => setShowAcceptBlockedModal(false)} />
+                            )}
                             <button
                                 className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
                                 onClick={() => onReject(order.id)}
@@ -1181,6 +1197,14 @@ export default function MessengerDashboard({
         [orders]
     );
 
+    // Un pedido `accepted` o `in_transit` cuenta como entrega activa y
+    // deshabilita la aceptación de otros pedidos asignados (pre-check de UX;
+    // la validación autoritativa vive en acceptMessengerOrder, en el servicio).
+    const hasActiveDelivery = useMemo(
+        () => hasActiveMessengerDelivery(orders),
+        [orders]
+    );
+
     const assignedOrderIdsKey = useMemo(
         () =>
             assignedOrders
@@ -1384,19 +1408,34 @@ export default function MessengerDashboard({
         );
 
         try {
-            // Pasar el motivo a Firestore si es rechazo
-            await setMessengerOrderStatus(
-                targetOrder,
-                status,
-                status === 'pending_reassignment' ? options.reason : undefined
-            );
+            if (status === 'accepted') {
+                // Aceptar pasa por el punto único del servicio, que revalida
+                // contra Firestore que no haya otra entrega activa antes de
+                // escribir. Así la regla se cumple aunque el estado local esté
+                // desactualizado (p. ej. otra pantalla abierta en paralelo).
+                if (!currentCourierId) {
+                    throw new Error('No se pudo identificar al mensajero.');
+                }
+                await acceptMessengerOrder(targetOrder, currentCourierId);
+            } else {
+                // Pasar el motivo a Firestore si es rechazo
+                await setMessengerOrderStatus(
+                    targetOrder,
+                    status,
+                    status === 'pending_reassignment' ? options.reason : undefined
+                );
+            }
             setMessage(getStatusUpdateMessage(status));
             if (options.redirectToDetail) {
                 navigateToDeliveryOrderDetail(orderId);
             }
         } catch (error) {
             console.error(error);
-            setMessage('No se pudo actualizar el estado en Firestore.');
+            setMessage(
+                error instanceof Error
+                    ? error.message
+                    : 'No se pudo actualizar el estado en Firestore.'
+            );
             setOrders((currentOrders) =>
             currentOrders.map((order) =>
                 order.id === orderId ? targetOrder : order
@@ -1753,6 +1792,7 @@ export default function MessengerDashboard({
                                             key={`${clientSection}-${order.deliveryId || order.id}`}
                                             order={order}
                                             onAccept={acceptOrder}
+                                            acceptDisabled={hasActiveDelivery}
                                             onDelivered={markAsDelivered}
                                             onDetail={(order) =>
                                                 navigateToDeliveryOrderDetail(order.id)
