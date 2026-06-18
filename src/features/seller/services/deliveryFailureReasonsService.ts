@@ -1,13 +1,17 @@
 import {
   collection,
   doc,
+  getDocs,
+  query,
   runTransaction,
   serverTimestamp,
   type Firestore,
   type Timestamp,
+  where,
 } from 'firebase/firestore';
 
 export const DELIVERY_FAILURE_REASONS_COLLECTION = 'deliveryFailures';
+export const DELIVERY_FAILURE_ORDER_STATUS = 'RECHAZADO';
 
 export const DELIVERY_FAILURE_REASON_OPTIONS = [
   'Cliente ausente',
@@ -58,6 +62,13 @@ export async function registerDeliveryFailureReason({
 }: RegisterDeliveryFailureReasonParams): Promise<void> {
   const orderRef = doc(db, 'orders', orderId);
   const failureRef = doc(collection(db, DELIVERY_FAILURE_REASONS_COLLECTION), orderId);
+  const customerReturnReasonsSnap = await getDocs(
+    query(collection(db, 'returns'), where('orderId', '==', orderId)),
+  );
+
+  if (!customerReturnReasonsSnap.empty) {
+    throw new Error('El cliente ya registro el motivo de este pedido.');
+  }
 
   await runTransaction(db, async (tx) => {
     const [orderSnap, failureSnap] = await Promise.all([
@@ -75,8 +86,8 @@ export async function registerDeliveryFailureReason({
       throw new Error('No puedes registrar motivos de pedidos de otro vendedor.');
     }
 
-    if (orderData.status !== 'DEVUELTO') {
-      throw new Error(`Solo se pueden registrar motivos de pedidos DEVUELTO. Estado actual: ${orderData.status}.`);
+    if (orderData.status !== DELIVERY_FAILURE_ORDER_STATUS) {
+      throw new Error(`Solo se pueden registrar motivos de pedidos ${DELIVERY_FAILURE_ORDER_STATUS}. Estado actual: ${orderData.status}.`);
     }
 
     if (failureSnap.exists()) {

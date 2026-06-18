@@ -20,6 +20,8 @@ import {
   type DeliveryFailureReason,
   type DeliveryFailureReasonRecord,
 } from '../services/deliveryFailureReasonsService';
+import type { CustomerReturnReasonRecord } from '../hooks/useDeliveryFailureReasons';
+import { RETURN_REASON_LABELS } from '@/features/orders/types';
 import { EmptyOrders } from './EmptyOrders';
 import { ErrorMessage } from './ErrorMessage';
 import { Header } from './Header';
@@ -124,7 +126,7 @@ function ReturnedOrderCard({
               </div>
 
               <span className="rounded-full border border-(--theme-border) bg-(--theme-card-bg) px-3 py-1 text-[11px] font-800 uppercase tracking-[0.18em] text-(--theme-text) opacity-70">
-                Devuelto
+                Rechazado
               </span>
             </div>
 
@@ -244,6 +246,68 @@ function RegisteredReasonCard({ reason }: { reason: DeliveryFailureReasonRecord 
   );
 }
 
+function CustomerReturnReasonCard({
+  reason,
+  order,
+}: {
+  reason: CustomerReturnReasonRecord;
+  order?: Order;
+}) {
+  const reasonLabel = RETURN_REASON_LABELS[reason.reason as keyof typeof RETURN_REASON_LABELS] ?? reason.reason;
+
+  return (
+    <article className="rounded-3xl border border-(--theme-info-border) bg-(--theme-info-bg) p-5 shadow-sm">
+      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3
+              className="text-lg font-900 tracking-tight text-(--theme-text)"
+              style={{ fontFamily: 'Outfit, sans-serif' }}
+            >
+              {parseOrderId(reason.orderId).friendlyName}
+            </h3>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-(--theme-info-border) bg-(--theme-card-bg) px-2.5 py-0.5 text-xs font-700 text-(--theme-info)">
+              <CheckCircle2 size={13} />
+              Motivo del cliente
+            </span>
+          </div>
+
+          <p className="mt-2 text-sm font-700 text-(--theme-text) opacity-80">
+            {order?.buyerName ?? reason.buyerId ?? 'Comprador desconocido'}
+          </p>
+          <p className="mt-3 text-sm font-800 text-(--theme-text)">
+            {reasonLabel}
+          </p>
+          {reason.description && (
+            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-(--theme-text) opacity-65">
+              {reason.description}
+            </p>
+          )}
+        </div>
+
+        <div className="shrink-0 rounded-2xl border border-(--theme-info-border) bg-(--theme-card-bg) px-4 py-3 md:text-right">
+          <p className="text-[11px] font-800 uppercase tracking-[0.22em] text-(--theme-text) opacity-45">
+            Solicitud
+          </p>
+          <p className="mt-1 text-sm font-700 text-(--theme-text)">
+            Cliente
+          </p>
+          <p className="mt-1 text-xs text-(--theme-text) opacity-55">
+            {reason.createdAt
+              ? reason.createdAt.toDate().toLocaleString('es-BO', {
+                  day: '2-digit',
+                  month: 'short',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })
+              : 'Pendiente'}
+          </p>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 function ReasonModal({
   order,
   isSubmitting,
@@ -318,7 +382,7 @@ function ReasonModal({
               className="text-xl font-900 tracking-tight text-(--theme-text)"
               style={{ fontFamily: 'Outfit, sans-serif' }}
             >
-              Registrar motivo de devolucion
+              Registrar motivo de rechazo
             </h2>
             <p className="mt-1 text-sm text-(--theme-text) opacity-60">
               {parseOrderId(order.orderId).friendlyName} - {order.buyerName ?? 'Comprador desconocido'}
@@ -339,7 +403,7 @@ function ReasonModal({
         <div className="max-h-[72vh] overflow-y-auto p-5 sm:p-6">
           <div className="rounded-2xl border border-(--theme-border) bg-(--theme-secondary-bg)/50 px-4 py-3">
             <p className="text-[11px] font-800 uppercase tracking-[0.22em] text-(--theme-text) opacity-45">
-              Pedido devuelto
+              Pedido rechazado
             </p>
             <div className="mt-2 flex flex-wrap items-center gap-3">
               <StatusPill status={order.status} />
@@ -446,10 +510,13 @@ export default function RegisterFailureReasons({
   const {
     user,
     ordersAwaitingReason,
+    returnedOrders,
     registeredReasons,
+    customerReturnReasons,
     loading,
     loadingOrders,
     loadingReasons,
+    loadingCustomerReturns,
     error,
     submitError,
     submittingOrderId,
@@ -475,7 +542,7 @@ export default function RegisterFailureReasons({
     >
       <Header
         title="Motivos de fallos de entrega"
-        description="Registra el motivo de pedidos devueltos para que el equipo pueda analizar las causas de fallo."
+        description="Registra el motivo de pedidos rechazados cuando el cliente no haya registrado ya la razon."
       />
 
       {!user && !loading && (
@@ -503,12 +570,12 @@ export default function RegisterFailureReasons({
 
       <div className="grid w-full gap-8">
         <section className="w-full rounded-3xl p-5">
-          <SectionHeader title="Devueltos pendientes" count={ordersAwaitingReason.length} />
+          <SectionHeader title="Rechazados pendientes" count={ordersAwaitingReason.length} />
 
           {loadingOrders ? (
             <SkeletonRows count={3} />
           ) : ordersAwaitingReason.length === 0 ? (
-            <EmptyOrders description="No hay pedidos devueltos pendientes de motivo." />
+            <EmptyOrders description="No hay pedidos rechazados pendientes de motivo." />
           ) : (
             <div className="grid gap-4">
               {ordersAwaitingReason.map((order) => (
@@ -518,6 +585,53 @@ export default function RegisterFailureReasons({
                   isSubmitting={submittingOrderId === order.orderId}
                   onViewDetails={setSelectedOrder}
                   onRegister={openRegisterModal}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="w-full rounded-3xl p-5">
+          <div className="mb-6 rounded-3xl border border-(--theme-border) bg-linear-to-r from-(--theme-card-bg) via-(--theme-card-bg) to-(--theme-secondary-bg)/55 p-4 shadow-sm">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-center gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-(--theme-info) text-white">
+                  <FileText size={22} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] font-800 uppercase tracking-[0.26em] text-(--theme-text) opacity-45">
+                    Cliente
+                  </p>
+                  <h2
+                    className="mt-1 text-base font-900 tracking-tight text-(--theme-text) md:text-lg"
+                    style={{ fontFamily: 'Outfit, sans-serif' }}
+                  >
+                    Motivos ya registrados por cliente
+                  </h2>
+                </div>
+              </div>
+
+              <span className="inline-flex items-center justify-center rounded-full border border-(--theme-border) bg-(--theme-secondary-bg) px-4 py-1.5 text-xs font-800 text-(--theme-text)">
+                {customerReturnReasons.length} registros
+              </span>
+            </div>
+          </div>
+
+          {loadingCustomerReturns ? (
+            <SkeletonRows count={2} />
+          ) : customerReturnReasons.length === 0 ? (
+            <div className="rounded-3xl border border-dashed border-(--theme-border) bg-(--theme-card-bg) p-8 text-center">
+              <p className="text-sm font-700 text-(--theme-text) opacity-65">
+                No hay pedidos rechazados con motivo registrado por el cliente.
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {customerReturnReasons.map((reason) => (
+                <CustomerReturnReasonCard
+                  key={reason.id}
+                  reason={reason}
+                  order={returnedOrders.find((order) => order.orderId === reason.orderId)}
                 />
               ))}
             </div>
@@ -580,7 +694,7 @@ export default function RegisterFailureReasons({
                 {ordersAwaitingReason.length} pendiente{ordersAwaitingReason.length === 1 ? '' : 's'}
               </p>
               <p className="truncate text-xs text-(--theme-text) opacity-55">
-                Selecciona un pedido devuelto para registrar el motivo.
+                Selecciona un pedido rechazado para registrar el motivo.
               </p>
             </div>
           </div>
