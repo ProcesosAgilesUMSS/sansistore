@@ -311,7 +311,7 @@ const getStatusForORder = (status: DeliveryStatus) => {
     case 'accepted':
       return 'ACEPTADO';
     case 'pending_reassignment':
-      return 'PENDIENTE REASIGNACION';
+      return 'PENDIENTE-ASIGNACION';
     case 'in_transit':
       return 'EN CAMINO';
     case 'delivered':
