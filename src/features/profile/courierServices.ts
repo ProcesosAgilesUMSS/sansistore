@@ -274,7 +274,7 @@ export async function getDeliveryStatsWithUserInfo(
 // ============================================
 
 export async function getCourierDeliveryStatsWithUserCheck(
-    userId: string
+	userId: string,
 ): Promise<DeliveryStatsWithUser | null> {
     try {
         // Primero obtener el usuario para verificar que existe
