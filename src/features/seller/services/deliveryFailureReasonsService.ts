@@ -22,7 +22,8 @@ export const DELIVERY_FAILURE_REASON_OPTIONS = [
   'Otro',
 ] as const;
 
-export type DeliveryFailureReason = (typeof DELIVERY_FAILURE_REASON_OPTIONS)[number];
+export type DeliveryFailureReason =
+	(typeof DELIVERY_FAILURE_REASON_OPTIONS)[number];
 
 export interface DeliveryFailureReasonRecord {
   id: string;
