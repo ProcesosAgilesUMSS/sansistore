@@ -36,6 +36,7 @@ import ConfigPanel from "../settings/components/ConfigPanel.tsx";
 import UserManagement from "../users/components/UserManagement.tsx";
 import DailySales from "../ventas/components/DailySales.tsx";
 import TopSellingProducts from "../ventas/top-products/components/TopSellingProducts.tsx";
+import CourierSessionsValidation from "../messengers/sessions/components/CourierSessionsValidation.tsx";
 
 type Section =
 	| "dashboard"
@@ -48,6 +49,7 @@ type Section =
 	| "ventas-diarias"
 	| "mas-vendidos"
 	| "mensajeros-desempeno"
+	| "mensajeros-cierres"
 	| "parametros"
 	| "reportes"
 	| "reportes-cancelados"
@@ -210,6 +212,10 @@ export default function AdminLayout() {
 		"mensajeros-desempeno": {
 			title: "Desempeño de mensajeros",
 			subtitle: "Métricas de eficiencia por mensajero",
+		},
+		"mensajeros-cierres": {
+			title: "Validar cierres de jornada",
+			subtitle: "Audita el dinero recaudado por cada mensajero",
 		},
 		"mas-vendidos": {
 			title: "Más vendidos",
@@ -490,6 +496,13 @@ export default function AdminLayout() {
 													>
 														Desempeño
 													</button>
+													<button
+														type="button"
+														onClick={() => { setActiveSection("mensajeros-cierres"); setSidebarOpen(false); }}
+														className={sidebarSubItemClass(activeSection === "mensajeros-cierres")}
+													>
+														Validar cierres
+													</button>
 												</div>
 											)}
 										</div>
@@ -615,6 +628,7 @@ export default function AdminLayout() {
 					{activeSection === "mensajeros-desempeno" && (
 						<MessengerPerformancePage />
 					)}
+					{activeSection === "mensajeros-cierres" && <CourierSessionsValidation />}
 					{activeSection === "parametros" && <ConfigPanel />}
 					{activeSection === "reportes" && <SalesReport />}
 					{activeSection === "bitacora" && <AccessLogPanel />}
