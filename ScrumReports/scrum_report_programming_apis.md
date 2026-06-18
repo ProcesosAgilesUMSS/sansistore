@@ -490,3 +490,10 @@
 - **Yesterday:** Empece el desarrollo de la HU 570 liberar disponibilidad
 - **Today:** Continuar con la implementación de la HU para este sprint.
 - **Blockers:** None.
+
+## 18-06-2026
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Implementé la HU correspondiente al Sprint, trabajé parcialmente como QA para validar que las funcionalidades de mis compañeros trabajen de la manera más correcta posible.
+- **Today:** Terminé con la implementación y revisión de las funcionalidades para este Sprint 4. Toca preparar toda la información y datos necesarios para la demo de mañana viernes.
+- **Blockers:** Necesitaríamos que más equipos también validen nuestros avances, tal como pasó en el grupo de Whatsapp.
