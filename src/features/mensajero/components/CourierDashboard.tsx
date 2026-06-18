@@ -80,7 +80,7 @@ function OrderDetailView({
 }) {
   return (
     <section className={pageClassName}>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <button
           type="button"
           onClick={onBack}
@@ -106,7 +106,7 @@ function OrderDetailView({
                 <h2 className="text-2xl font-black tracking-[-0.04em]">
                   {selectedOrder.displayId}
                 </h2>
-                <span className={`${badgeClass} bg-[#fff2b8] py-1 text-[#aa7300]`}>
+                <span className={`${badgeClass} bg-(--theme-warning-bg) py-1 text-(--theme-warning)`}>
                   Cobrar
                 </span>
                 <span className={`${badgeClass} bg-primary/10 py-1 text-primary`}>
@@ -122,7 +122,7 @@ function OrderDetailView({
               </div>
 
               {!selectedOrderHasValidAmount ? (
-                <div className="mt-5 rounded-2xl border border-[#f59e0b]/25 bg-[#fff7ed] px-4 py-3 text-sm font-semibold text-[#9a3412] dark:border-[#f59e0b]/20 dark:bg-[#2a2117] dark:text-[#fdba74]">
+                <div className="mt-5 rounded-2xl border border-(--theme-warning-border) bg-(--theme-warning-bg) px-4 py-3 text-sm font-semibold text-(--theme-warning)">
                   {INVALID_AMOUNT_MESSAGE}
                 </div>
               ) : null}
@@ -258,7 +258,7 @@ function OrderDetailView({
                   {formatMoney(selectedOrder.total)}
                 </p>
               ) : (
-                <p className="mt-2 text-base font-semibold leading-6 text-[#9a3412] dark:text-[#fdba74]">
+                <p className="mt-2 text-base font-semibold leading-6 text-(--theme-warning)">
                   {INVALID_AMOUNT_MESSAGE}
                 </p>
               )}
@@ -490,7 +490,7 @@ export default function CourierDashboard({ embedded = false }: { embedded?: bool
 
   return (
     <section className={getPageClass(embedded)}>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mb-10 flex flex-col gap-3">
           <p className="text-sm font-bold uppercase tracking-[0.28em] text-primary">
             Operacion de entregas
@@ -517,7 +517,7 @@ export default function CourierDashboard({ embedded = false }: { embedded?: bool
         <div className="mb-8 grid gap-5 lg:grid-cols-3">
           <article className={cardBaseClass}>
             <div className="flex items-center gap-5">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#fff2b8] text-[#d08a00]">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-(--theme-warning-bg) text-(--theme-warning)">
                 <Box className="h-8 w-8" />
               </div>
               <div>
@@ -575,7 +575,7 @@ export default function CourierDashboard({ embedded = false }: { embedded?: bool
           </div>
 
           {errorMessage ? (
-            <div className="border-b border-[#f97316]/15 bg-[#fff7ed] px-8 py-4 text-sm font-semibold text-[#9a3412] dark:border-[#f97316]/10 dark:bg-[#2a2117] dark:text-[#fdba74]">
+            <div className="border-b border-(--theme-warning-border) bg-(--theme-warning-bg) px-8 py-4 text-sm font-semibold text-(--theme-warning)">
               {errorMessage}
             </div>
           ) : null}
@@ -641,7 +641,7 @@ export default function CourierDashboard({ embedded = false }: { embedded?: bool
                         </td>
                         <td className="px-8 py-5">
                           <span
-                            className={`${badgeClass} bg-[#fff2b8] py-1 text-[#aa7300]`}
+                            className={`${badgeClass} bg-(--theme-warning-bg) py-1 text-(--theme-warning)`}
                           >
                             {order.paymentStatusLabel}
                           </span>
@@ -651,7 +651,7 @@ export default function CourierDashboard({ embedded = false }: { embedded?: bool
                             <button
                               type="button"
                               onClick={() => setSelectedOrder(order)}
-                              className="inline-flex items-center gap-2 rounded-2xl bg-text-light px-5 py-3 text-sm font-bold text-bg-light transition hover:opacity-90"
+                              className="inline-flex items-center gap-2 rounded-2xl bg-(--theme-text) px-5 py-3 text-sm font-bold text-(--theme-bg) transition hover:opacity-90"
                             >
                               <Eye className="h-4 w-4" />
                               Ver detalle

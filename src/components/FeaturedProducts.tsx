@@ -625,7 +625,10 @@ function FeaturedProductsInner({
             </button>
           </div>
           <div className="flex w-full flex-row items-center gap-3">
-            <div ref={searchRef} className="relative flex-1">
+            <div
+              ref={searchRef}
+              className={`relative flex-1 ${showSuggestions ? 'z-30' : ''}`}
+            >
               <Search
                 size={18}
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-text-light opacity-40"
@@ -657,7 +660,7 @@ function FeaturedProductsInner({
               )}
 
               {showSuggestions && searchSuggestions.length > 0 && (
-                <ul className="absolute top-full left-0 right-0 z-20 mt-1 max-h-60 overflow-y-auto rounded-lg border border-border-light bg-card-bg-light py-1 shadow-lg">
+                <ul className="absolute top-full left-0 right-0 z-30 mt-1 max-h-60 overflow-y-auto rounded-lg border border-border-light bg-card-bg-light py-1 shadow-lg">
                   {searchSuggestions.map((suggestion) => (
                     <li
                       key={
@@ -719,7 +722,7 @@ function FeaturedProductsInner({
                 </ul>
               )}
               {showSuggestions && searchSuggestions.length === 0 && searchTerm && (
-                <ul className="absolute top-full left-0 right-0 z-20 mt-1 rounded-lg border border-border-light bg-card-bg-light py-1 shadow-lg">
+                <ul className="absolute top-full left-0 right-0 z-30 mt-1 rounded-lg border border-border-light bg-card-bg-light py-1 shadow-lg">
                   <li>
                     <button
                       type="button"
@@ -862,7 +865,7 @@ function FeaturedProductsInner({
                   const currentPrice = showOffer ? product.offerPrice! : product.price;
                   const effectiveStock = Math.max(
                     0,
-                    (product.stockAvailable ?? 0) - (product.stockReserved ?? 0)
+                    (product.stockTotal ?? 0) - (product.stockReserved ?? 0)
                   );
                   const isOutOfStock = effectiveStock <= 0;
                   const isDisabled = product.enabled === false;

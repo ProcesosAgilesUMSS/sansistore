@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import {
+  DollarSign,
   HandMetal,
   LoaderCircle,
   MapPinOff,
@@ -29,6 +30,11 @@ const reasons = [
     id: 'acceso_restringido',
     label: 'Acceso restringido',
     icon: ShieldAlert,
+  },
+  {
+    id: 'falta_pago_cliente',
+    label: 'Falta de pago del cliente',
+    icon: DollarSign,
   },
   { id: 'cliente_rechazo', label: 'Cliente rechazo pedido', icon: HandMetal },
   { id: 'otro', label: 'Otro motivo', icon: MoreHorizontal },
@@ -175,7 +181,7 @@ export default function UndeliveredModal({
             Cancelar
           </button>
           <button
-            className="inline-flex h-12 flex-[1.2] items-center justify-center gap-2 rounded-full bg-primary px-5 text-sm font-black uppercase text-black transition disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex h-12 flex-[1.2] items-center justify-center gap-2 rounded-full bg-primary px-5 text-sm font-black uppercase text-primary-action transition disabled:cursor-not-allowed disabled:opacity-50"
             disabled={!canSubmit || isSaving}
             onClick={confirmIncident}
             type="button"

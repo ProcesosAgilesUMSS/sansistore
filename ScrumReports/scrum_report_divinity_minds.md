@@ -400,8 +400,8 @@
 
 ## Castro Tejada Steven Lisandro
 
-- **Yesterday:** En base a la reunión grupal, aporté con parte de las ideas para el Sprint Retrospective, registrando en tarjetas dentro del tablero del equipo en Trello (aspectos positivos, puntos de mejora, felicitaciones y acuerdos a seguir).
-- **Today:** Revisar y consolidar las tarjetas del retrospective junto al equipo para dejar acuerdos claros y accionables.
+- **Yesterday:** Revisó historias de usuario pendientes y ayudó a ordenar los puntos principales para llevarlos al tablero de Trello de la Sprint Retrospective.
+- **Today:** Participar en la retrospectiva y proponer acciones concretas para mejorar la coordinación del equipo.
 - **Blockers:** n/a.
 
 ## Gutierrez Hinojosa Jhon Deymar
@@ -460,7 +460,30 @@
 - **Today:** Validar los seeders en conjunto con las pruebas y apoyar en la revisión de PRs.
 - **Blockers:** n/a.
 
-# 06/13/2026
+# 06/16/2026
+
+## Castro Tejada Steven Lisandro
+- **Yesterday:** Completé y mergeé dos Pull Requests críticas para la aplicación: la PR #562 (*Add clear cart feature and tests*) que cierra las HUs #554 y #555 (vaciado de carrito y sus pruebas e2e con Playwright); y la PR #561 (*Mejoras de estilos, favoritos y dropdown*) que resuelve las issues de diseño/funcionalidad #557, #558, #559 y #560 (favoritos en detalle de producto, etiquetas de stock agotado/no disponible y contrastes de botones).
+- **Today:** Diseñé, creé y configuré en GitHub la nueva issue de Flow #564 (*Calificación promedio de entregas para Mensajero en /me*). La asigné en el tablero de proyectos (Sprint 4, Team: `flow`, Area: `usuarios`, Status: `ToDO`, Priority: `P2`, Severity: `Minor`) y la vinculé como sub-issue/tarea hija de la HU contenedora Padre #490 actualizando su descripción y checklist en GitHub.
+- **Blockers:** n/a.
+
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Organice los pr con su issue para tener un mejor tracking de los trabajos de los demas equipos.
+- **Today:** Revisare los bugs corregidos y pr nuevos.
+- **Blockers:** Los demas equipos no detallan su pr para revisar y tampoco linkean el issue que resolvieron.
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Revisé las HUs de operador y comprador, detectando un bug de visualización en la interfaz del comprador que ya fue reportado
+- **Today:** Continuaré con la revisión de más HUs para analizar la lógica completa de los bugs.
+- **Blockers:** La falta de detalle en algunas HUs complica su revisión.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Validé el flujo completo de autenticación con roles, asegurando coherencia en los mensajes para cada tipo de usuario.
+- **Today:** Revisé el flujo general de la aplicación y ayudé a detectar inconsistencias visuales (contrastes, alineaciones, espaciados).
+- **Blockers:** n/a.
 
 ## Velasquez Vela Marcos
 
