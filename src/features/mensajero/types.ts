@@ -7,25 +7,25 @@ export interface CourierOrderItem {
 }
 
 export interface CourierOrder {
-    id: string;
-    displayId: string;
-    buyerName: string;
-    deliveryZone: string;
-    productsTotal: number;
-    additionalCharges: number;
-    total: number;
-    status: string;
-    paymentStatus: string;
-    paymentStatusLabel: string;
-    paymentMethod: string;
-    deliveryMethod: string;
-    specialInstructions: string;
-    paymentId: string | null;
-    createdAt: Date | null;
-    deliveredAt: Date | null;
-    items: CourierOrderItem[];
-    paymentCollectedAt?: Date | null;  // NUEVO: Cuándo se registró el pago
-    collectedBy?: string;               // NUEVO: ID del mensajero que cobró
+	id: string;
+	displayId: string;
+	buyerName: string;
+	deliveryZone: string;
+	productsTotal: number;
+	additionalCharges: number;
+	total: number;
+	status: string;
+	paymentStatus: string;
+	paymentStatusLabel: string;
+	paymentMethod: string;
+	deliveryMethod: string;
+	specialInstructions: string;
+	paymentId: string | null;
+	createdAt: Date | null;
+	deliveredAt: Date | null;
+	items: CourierOrderItem[];
+	paymentCollectedAt?: Date | null; // NUEVO: Cuándo se registró el pago
+	collectedBy?: string; // NUEVO: ID del mensajero que cobró
 }
 
 export interface CourierDashboardStats {
