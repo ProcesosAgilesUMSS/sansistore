@@ -4,7 +4,7 @@ import {
   countActiveDeliveriesByCourier,
   isActiveDeliveryStatus,
   isCourierAvailableFromActiveCount,
-} from '../src/lib/deliveryAvailability';
+} from '../../src/lib/deliveryAvailability';
 
 test.describe('delivery availability rules', () => {
   test('marks only accepted and in transit deliveries as active', () => {

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { getVisibleMessengerOrders } from '../src/features/mensajero/utils/orderVisibility';
-import type { MessengerOrder } from '../src/features/mensajero/types';
+import { getVisibleMessengerOrders } from '../../src/features/mensajero/utils/orderVisibility';
+import type { MessengerOrder } from '../../src/features/mensajero/types';
 
 const baseOrder: MessengerOrder = {
   id: 'order-001',

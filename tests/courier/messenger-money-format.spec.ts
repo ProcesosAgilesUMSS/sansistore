@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import {
   formatBolivianos,
   roundMoney,
-} from '../src/features/mensajero/utils/money';
+} from '../../src/features/mensajero/utils/money';
 
 test.describe('messenger money formatting', () => {
   test('rounds floating point precision noise before rendering bolivianos', () => {

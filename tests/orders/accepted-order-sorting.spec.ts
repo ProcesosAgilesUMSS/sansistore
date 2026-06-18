@@ -2,8 +2,8 @@ import { expect, test } from '@playwright/test';
 import {
   getMessengerOrderAgeTimestamp,
   sortAcceptedOrdersByAge,
-} from '../src/features/mensajero/utils/acceptedOrderSorting';
-import type { MessengerOrder } from '../src/features/mensajero/types';
+} from '../../src/features/mensajero/utils/acceptedOrderSorting';
+import type { MessengerOrder } from '../../src/features/mensajero/types';
 
 const baseOrder: MessengerOrder = {
   id: 'order-base',

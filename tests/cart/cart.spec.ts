@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import admin from 'firebase-admin';
-import { LoginPage } from './pages/login.page';
+import { LoginPage } from '../pages/login.page';
 
 const CART_KEY = 'sansistore_cart';
 const PROJECT_ID = 'sansistore';

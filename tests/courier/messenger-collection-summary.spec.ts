@@ -1,11 +1,11 @@
 import { expect, test } from '@playwright/test';
-import type { MessengerOrder } from '../src/features/mensajero/types';
+import type { MessengerOrder } from '../../src/features/mensajero/types';
 import {
   getCollectedOrdersForDay,
   getCollectedTotal,
   getCollectedTotalForDay,
   isMessengerOrderCollected,
-} from '../src/features/mensajero/utils/collectionSummary';
+} from '../../src/features/mensajero/utils/collectionSummary';
 
 const baseOrder: MessengerOrder = {
   id: 'order-base',

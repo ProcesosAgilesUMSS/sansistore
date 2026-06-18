@@ -7,7 +7,7 @@ import {
   getOrderDeliveryStatusForDeliveryStatus,
   getOrderStatusForDeliveryStatus,
   type MessengerDeliveryStatus,
-} from '../src/features/mensajero/utils/deliveryStatusFlow';
+} from '../../src/features/mensajero/utils/deliveryStatusFlow';
 
 const expectedMappings: Array<{
   status: MessengerDeliveryStatus;

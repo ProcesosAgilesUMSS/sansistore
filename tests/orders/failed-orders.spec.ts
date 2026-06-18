@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { LoginPage } from './pages/login.page';
+import { LoginPage } from '../pages/login.page';
 
 const FIRESTORE_DOCUMENTS_URL =
   'http://127.0.0.1:8180/v1/projects/sansistore/databases/(default)/documents';
