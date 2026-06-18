@@ -36,9 +36,6 @@ export const CardOrder = ({
           <div className="min-w-0">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
-                <p className="text-xs text-(--theme-text) opacity-50">
-                   {parseOrderId(order.orderId).uuid}
-                </p>
                 <h3 className="mt-1 text-xl font-bold tracking-tight text-(--theme-text)" style={{ fontFamily: 'Outfit, sans-serif' }}>
                   {parseOrderId(order.orderId).friendlyName}
                 </h3>
