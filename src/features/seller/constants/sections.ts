@@ -54,8 +54,8 @@ export const sections = [
   },
 
     {
-    id: 'Registrar motivo de fallo',
-    label: 'Registrar motivo de fallo',
+    id: 'motivos-fallo',
+    label: 'Motivos de fallo',
     route: '/seller/failure-reasons',
   },
 ];

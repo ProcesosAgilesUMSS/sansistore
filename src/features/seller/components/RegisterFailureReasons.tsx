@@ -1,496 +1,591 @@
-import { useEffect, useMemo, useState } from "react";
-import {
-  collection,
-  query,
-  where,
-  orderBy,
-  onSnapshot,
-  addDoc,
-  serverTimestamp,
-  Timestamp,
-} from "firebase/firestore";
+import { useEffect, useState } from 'react';
 import {
   AlertCircle,
   CheckCircle2,
+  ClipboardList,
+  FileText,
   Loader2,
+  PackageCheck,
   PackageX,
   RotateCcw,
   X,
-} from "lucide-react";
-import { db } from "../../../lib/firebase";
-import { useAuthUser } from "@/hooks/useAuthUser";
-import Navbar from "@/components/Navbar";
+} from 'lucide-react';
+import { parseOrderId } from '@/features/cart/services/orderService';
+import { useDeliveryFailureReasons } from '../hooks/useDeliveryFailureReasons';
+import type { Order } from '../types';
+import { formatCurrency } from '../utils/currency';
+import { formatDate } from '../utils/formatDate';
+import {
+  DELIVERY_FAILURE_REASON_OPTIONS,
+  type DeliveryFailureReason,
+  type DeliveryFailureReasonRecord,
+} from '../services/deliveryFailureReasonsService';
+import { EmptyOrders } from './EmptyOrders';
+import { ErrorMessage } from './ErrorMessage';
+import { Header } from './Header';
+import { OrderDetailsModal } from './OrderDetailsModal';
+import { SectionHeader } from './SectionHeader';
+import { SkeletonRows } from './SkeletonRows';
+import { StatusPill } from './StatusPill';
 
-
-// ---------------------------------------------------------------------------
-// Configuración
-// ---------------------------------------------------------------------------
-
-// Estados de pedido que cuentan como "devuelto". Es un array porque la
-// consulta usa el operador "in": fácil agregar otro estado a futuro
-// (ej. "DEVUELTO_PARCIAL") sin tocar la lógica.
-const RETURNED_ORDER_STATUSES = ["DEVUELTO"] as const;
-
-const RETURN_REASONS = [
-  "Cliente ausente",
-  "Dirección incorrecta",
-  "Pedido rechazado",
-  "Falta de pago",
-  "Otro",
-] as const;
-
-type ReturnReason = (typeof RETURN_REASONS)[number];
-
-// ---------------------------------------------------------------------------
-// Tipos
-// ---------------------------------------------------------------------------
-
-interface OrderDoc {
-  id: string;
-  sellerId: string;
-  buyerId?: string;
-  buyerName?: string;
-  status: string;
-  createdAt?: Timestamp;
-  total?: number;
-}
-
-interface ReturnReasonDoc {
-  id: string;
-  orderId: string;
-  sellerId: string;
-  buyerId?: string | null;
-  reason: ReturnReason;
-  description?: string | null;
-  orderStatus: string;
-  registeredBy: string;
-  registeredByName: string;
-  registeredAt: Timestamp;
-}
-
-// ---------------------------------------------------------------------------
-// Componente principal
-// ---------------------------------------------------------------------------
-
-export default function RegisterFailureReasons() {
-  const { user } = useAuthUser();
-
-  const [returnedOrders, setReturnedOrders] = useState<OrderDoc[]>([]);
-  const [registeredReasons, setRegisteredReasons] = useState<ReturnReasonDoc[]>([]);
-  const [loadingOrders, setLoadingOrders] = useState(true);
-  const [loadingReasons, setLoadingReasons] = useState(true);
-  const [activeOrder, setActiveOrder] = useState<OrderDoc | null>(null);
-
-  // Pedidos devueltos del vendedor actual
-  useEffect(() => {
-    if (!user?.uid) return;
-
-    const q = query(
-      collection(db, "orders"),
-      where("sellerId", "==", user.uid),
-      where("status", "in", RETURNED_ORDER_STATUSES)
-    );
-
-    const unsub = onSnapshot(q, (snap) => {
-      setReturnedOrders(
-        snap.docs.map((d) => ({
-          id: d.id,
-          ...(d.data() as Omit<OrderDoc, "id">),
-        }))
-      );
-      setLoadingOrders(false);
-    });
-
-    return unsub;
-  }, [user?.uid]);
-
-  // Motivos de devolución registrados por el vendedor
-  useEffect(() => {
-    if (!user?.uid) return;
-
-    const q = query(
-      collection(db, "deliveryFailures"),
-      where("sellerId", "==", user.uid),
-      orderBy("registeredAt", "desc")
-    );
-
-    const unsub = onSnapshot(q, (snap) => {
-      setRegisteredReasons(
-        snap.docs.map((d) => ({
-          id: d.id,
-          ...(d.data() as Omit<ReturnReasonDoc, "id">),
-        }))
-      );
-      setLoadingReasons(false);
-    });
-
-    return unsub;
-  }, [user?.uid]);
-
-  // Pedidos devueltos que aún no tienen motivo registrado
-  const ordersAwaitingReason = useMemo(() => {
-    const registeredOrderIds = new Set(registeredReasons.map((r) => r.orderId));
-    return returnedOrders.filter((o) => !registeredOrderIds.has(o.id));
-  }, [returnedOrders, registeredReasons]);
-
-  // Si no hay usuario, mostrar mensaje (con Navbar/Footer igual)
-  if (!user) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Navbar />
-        <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 py-8">
-          <div className="rounded-2xl border border-(--theme-border) bg-(--theme-card-bg) p-8 text-center">
-            <p className="text-(--theme-text) opacity-60">
-              Inicia sesión para gestionar los motivos de devolución.
-            </p>
-          </div>
-        </main>
-
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-
-      <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-10">
-        <header>
-          <h1 className="text-2xl font-black text-(--theme-text)">
-            Motivos de devolución
-          </h1>
-          <p className="text-(--theme-text) opacity-60 mt-1">
-            Registra por qué se devolvió un pedido para poder analizarlo más adelante.
-          </p>
-        </header>
-
-        <PendingSection
-          orders={ordersAwaitingReason}
-          loading={loadingOrders}
-          onSelect={setActiveOrder}
-        />
-
-        <RegisteredSection
-          reasons={registeredReasons}
-          loading={loadingReasons}
-        />
-
-        {activeOrder && (
-          <ReasonModal
-            order={activeOrder}
-            sellerId={user.uid}
-            sellerName={user.displayName ?? user.email ?? "Vendedor"}
-            onClose={() => setActiveOrder(null)}
-          />
-        )}
-      </main>
-
-  
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Sección: pedidos devueltos pendientes
-// ---------------------------------------------------------------------------
-
-function PendingSection({
-  orders,
-  loading,
-  onSelect,
+function ReturnedOrderCard({
+  order,
+  isSubmitting,
+  onViewDetails,
+  onRegister,
 }: {
-  orders: OrderDoc[];
-  loading: boolean;
-  onSelect: (order: OrderDoc) => void;
+  order: Order;
+  isSubmitting: boolean;
+  onViewDetails: (order: Order) => void;
+  onRegister: (order: Order) => void;
 }) {
-  return (
-    <section>
-      <h2 className="text-lg font-bold text-(--theme-text) mb-4">
-        Pendientes de registrar ({orders.length})
-      </h2>
+  const items = order.items ?? [];
+  const visibleItems = items.slice(0, 3);
+  const hiddenItems = Math.max(items.length - visibleItems.length, 0);
 
-      {loading ? (
-        <div className="flex items-center justify-center py-8">
-          <Loader2 className="animate-spin text-primary" size={32} />
-        </div>
-      ) : orders.length === 0 ? (
-        <div className="rounded-2xl border border-(--theme-border) bg-(--theme-card-bg) p-8 text-center">
-          <PackageX className="mx-auto mb-3 opacity-40" size={32} />
-          <p className="text-(--theme-text) opacity-60">
-            No tienes pedidos devueltos pendientes de registrar.
-          </p>
-        </div>
-      ) : (
-        <ul className="space-y-3">
-          {orders.map((order) => (
-            <li
-              key={order.id}
-              className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-(--theme-border) bg-(--theme-card-bg) p-4 hover:border-primary/30 transition-colors"
-            >
+  return (
+    <article className="overflow-hidden rounded-3xl border border-(--theme-border) bg-linear-to-br from-(--theme-card-bg) to-(--theme-secondary-bg)/40 shadow-sm duration-200 hover:shadow-xl">
+      <div className="p-5">
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)]">
+          <div className="min-w-0">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
-                <p className="font-bold text-(--theme-text) truncate">
-                  Pedido #{order.id.slice(0, 8)}
+                <p className="text-xs text-(--theme-text) opacity-50">
+                  {parseOrderId(order.orderId).uuid}
                 </p>
-                <p className="text-sm text-(--theme-text) opacity-60 truncate">
-                  {order.buyerName ?? order.buyerId ?? "Comprador desconocido"}
-                </p>
-                {order.total && (
-                  <p className="text-sm text-(--theme-text) font-medium mt-1">
-                    Total: ${order.total.toFixed(2)}
-                  </p>
-                )}
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-(--theme-warning-bg) border border-(--theme-warning-border) text-(--theme-warning) px-3 py-1 text-xs font-bold">
-                  <RotateCcw size={14} />
-                  Devuelto
-                </span>
-                <button
-                  onClick={() => onSelect(order)}
-                  className="shrink-0 whitespace-nowrap rounded-full bg-primary text-white px-4 py-2 text-sm font-bold hover:opacity-90 transition hover:scale-105 active:scale-95"
+                <h3
+                  className="mt-1 text-xl font-bold tracking-tight text-(--theme-text)"
+                  style={{ fontFamily: 'Outfit, sans-serif' }}
                 >
-                  Registrar motivo
-                </button>
+                  {parseOrderId(order.orderId).friendlyName}
+                </h3>
+                <p className="mt-2 text-sm font-700 text-(--theme-text) opacity-80">
+                  {order.buyerName ?? 'Comprador desconocido'}
+                </p>
+                <p className="mt-1 text-xs text-(--theme-text) opacity-55">
+                  {order.buyerEmail ?? order.buyerInstitutionalId ?? 'Sin datos del comprador'}
+                </p>
               </div>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
+
+              <div className="text-left sm:text-right">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-(--theme-text) opacity-40">
+                  Total
+                </p>
+                <p className="font-900 text-2xl tracking-tight text-primary">
+                  {formatCurrency(order.total)}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <StatusPill status={order.status} />
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-(--theme-warning-border) bg-(--theme-warning-bg) px-2.5 py-0.5 text-xs font-700 text-(--theme-warning)">
+                <RotateCcw size={13} />
+                Motivo pendiente
+              </span>
+            </div>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-2xl border border-(--theme-border) bg-(--theme-secondary-bg)/60 px-4 py-3">
+                <p className="text-[11px] font-800 uppercase tracking-[0.22em] text-(--theme-text) opacity-45">
+                  Ubicacion
+                </p>
+                <p className="mt-1 text-sm font-700 text-(--theme-text)">
+                  {order.locationLabel ?? 'No registrada'}
+                </p>
+                <p className="mt-1 text-xs text-(--theme-text) opacity-55">
+                  {order.locationType ?? 'Tipo no registrado'}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-(--theme-border) bg-(--theme-secondary-bg)/60 px-4 py-3">
+                <p className="text-[11px] font-800 uppercase tracking-[0.22em] text-(--theme-text) opacity-45">
+                  Fecha
+                </p>
+                <p className="mt-1 text-sm font-700 text-(--theme-text)">
+                  {formatDate(order.createdAt)}
+                </p>
+                <p className="mt-1 text-xs text-(--theme-text) opacity-55">
+                  Actualizado {formatDate(order.updatedAt)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-(--theme-border) bg-(--theme-secondary-bg)/40 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-800 uppercase tracking-[0.22em] text-(--theme-text) opacity-45">
+                  Productos
+                </p>
+                <p className="mt-1 text-sm font-700 text-(--theme-text)">
+                  {items.length} producto{items.length === 1 ? '' : 's'}
+                </p>
+              </div>
+
+              <span className="rounded-full border border-(--theme-border) bg-(--theme-card-bg) px-3 py-1 text-[11px] font-800 uppercase tracking-[0.18em] text-(--theme-text) opacity-70">
+                Devuelto
+              </span>
+            </div>
+
+            <div className="mt-4 space-y-3">
+              {visibleItems.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-(--theme-border) px-4 py-4 text-sm text-(--theme-text) opacity-60">
+                  No se encontraron productos para este pedido.
+                </div>
+              ) : (
+                visibleItems.map((item) => (
+                  <div
+                    key={item.itemId}
+                    className="rounded-2xl border border-(--theme-border) bg-(--theme-card-bg) px-4 py-4 shadow-sm"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-800 text-(--theme-text)">
+                          {item.productName}
+                        </p>
+                        <p className="mt-1 text-xs text-(--theme-text) opacity-55">
+                          {item.quantity} x {formatCurrency(item.unitPrice)}
+                        </p>
+                      </div>
+
+                      <p className="whitespace-nowrap text-sm font-800 text-primary">
+                        {formatCurrency(item.subtotal)}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              )}
+
+              {hiddenItems > 0 && (
+                <div className="rounded-2xl border border-dashed border-(--theme-border) px-4 py-3 text-sm font-700 text-(--theme-text) opacity-65">
+                  +{hiddenItems} producto{hiddenItems === 1 ? '' : 's'} mas
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            onClick={() => onViewDetails(order)}
+            className="inline-flex items-center justify-center rounded-full border border-(--theme-border) px-5 py-2.5 text-sm font-700 text-(--theme-text) transition hover:border-primary hover:bg-(--theme-secondary-bg) hover:text-primary"
+          >
+            Ver detalles
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onRegister(order)}
+            disabled={isSubmitting}
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-800 text-white transition hover:opacity-90 disabled:opacity-50"
+          >
+            {isSubmitting && <Loader2 size={16} className="animate-spin" />}
+            {isSubmitting ? 'Guardando...' : 'Registrar motivo'}
+          </button>
+        </div>
+      </div>
+    </article>
   );
 }
 
-// ---------------------------------------------------------------------------
-// Sección: motivos de devolución registrados
-// ---------------------------------------------------------------------------
-
-function RegisteredSection({
-  reasons,
-  loading,
-}: {
-  reasons: ReturnReasonDoc[];
-  loading: boolean;
-}) {
+function RegisteredReasonCard({ reason }: { reason: DeliveryFailureReasonRecord }) {
   return (
-    <section>
-      <h2 className="text-lg font-bold text-(--theme-text) mb-4">
-        Motivos registrados ({reasons.length})
-      </h2>
+    <article className="rounded-3xl border border-(--theme-border) bg-(--theme-card-bg) p-5 shadow-sm">
+      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3
+              className="text-lg font-900 tracking-tight text-(--theme-text)"
+              style={{ fontFamily: 'Outfit, sans-serif' }}
+            >
+              {parseOrderId(reason.orderId).friendlyName}
+            </h3>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-(--theme-success-border) bg-(--theme-success-bg) px-2.5 py-0.5 text-xs font-700 text-(--theme-success)">
+              <CheckCircle2 size={13} />
+              Registrado
+            </span>
+          </div>
 
-      {loading ? (
-        <div className="flex items-center justify-center py-8">
-          <Loader2 className="animate-spin text-primary" size={32} />
+          <p className="mt-2 text-sm font-700 text-(--theme-text) opacity-80">
+            {reason.buyerName ?? reason.buyerId ?? 'Comprador desconocido'}
+          </p>
+          <p className="mt-3 text-sm font-800 text-(--theme-text)">
+            {reason.reason}
+          </p>
+          {reason.description && (
+            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-(--theme-text) opacity-65">
+              {reason.description}
+            </p>
+          )}
         </div>
-      ) : reasons.length === 0 ? (
-        <div className="rounded-2xl border border-(--theme-border) bg-(--theme-card-bg) p-8 text-center">
-          <p className="text-(--theme-text) opacity-60">
-            Todavía no registraste ningún motivo de devolución.
+
+        <div className="shrink-0 rounded-2xl border border-(--theme-border) bg-(--theme-secondary-bg)/60 px-4 py-3 md:text-right">
+          <p className="text-[11px] font-800 uppercase tracking-[0.22em] text-(--theme-text) opacity-45">
+            Registro
+          </p>
+          <p className="mt-1 text-sm font-700 text-(--theme-text)">
+            {reason.registeredByName}
+          </p>
+          <p className="mt-1 text-xs text-(--theme-text) opacity-55">
+            {reason.registeredAt
+              ? reason.registeredAt.toDate().toLocaleString('es-BO', {
+                  day: '2-digit',
+                  month: 'short',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })
+              : 'Pendiente'}
           </p>
         </div>
-      ) : (
-        <ul className="space-y-3">
-          {reasons.map((r) => (
-            <li
-              key={r.id}
-              className="rounded-2xl border border-(--theme-border) bg-(--theme-card-bg) p-4 hover:border-primary/20 transition-colors"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <p className="font-bold text-(--theme-text)">
-                      Pedido #{r.orderId.slice(0, 8)}
-                    </p>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-(--theme-success-bg) border border-(--theme-success-border) text-(--theme-success) px-3 py-1 text-xs font-bold">
-                      <CheckCircle2 size={14} />
-                      Registrado
-                    </span>
-                  </div>
-                  <p className="text-sm text-(--theme-text) mt-2 font-medium">
-                    Motivo: {r.reason}
-                  </p>
-                  {r.description && (
-                    <p className="text-sm text-(--theme-text) opacity-70 mt-1">
-                      {r.description}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <p className="text-xs text-(--theme-text) opacity-60 mt-3">
-                Registrado por: {r.registeredByName}
-                {r.registeredAt &&
-                  ` · ${r.registeredAt.toDate().toLocaleString("es-BO", {
-                    dateStyle: "medium",
-                    timeStyle: "short",
-                  })}`}
-              </p>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
+      </div>
+    </article>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Modal: formulario de registro
-// ---------------------------------------------------------------------------
 
 function ReasonModal({
   order,
-  sellerId,
-  sellerName,
+  isSubmitting,
+  submitError,
+  onSubmit,
   onClose,
 }: {
-  order: OrderDoc;
-  sellerId: string;
-  sellerName: string;
+  order: Order;
+  isSubmitting: boolean;
+  submitError: string | null;
+  onSubmit: (payload: {
+    order: Order;
+    reason: DeliveryFailureReason;
+    description?: string;
+  }) => Promise<boolean>;
   onClose: () => void;
 }) {
-  const [reason, setReason] = useState<ReturnReason | "">("");
-  const [description, setDescription] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
+  const [reason, setReason] = useState<DeliveryFailureReason | ''>('');
+  const [description, setDescription] = useState('');
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const needsDescription = reason === 'Otro';
 
-  const needsDescription = reason === "Otro";
-
-  async function handleSubmit() {
-    if (!reason) {
-      setError("Selecciona un motivo antes de guardar.");
-      return;
-    }
-    if (needsDescription && description.trim().length === 0) {
-      setError("Escribe una descripción para el motivo 'Otro'.");
-      return;
-    }
-
-    setSubmitting(true);
-    setError("");
-
-    try {
-      await addDoc(collection(db, "deliveryFailures"), {
-        orderId: order.id,
-        sellerId,
-        buyerId: order.buyerId ?? null,
-        reason,
-        description: needsDescription ? description.trim() : null,
-        orderStatus: order.status,
-        registeredBy: sellerId,
-        registeredByName: sellerName,
-        registeredAt: serverTimestamp(),
-      });
-      onClose();
-    } catch (err) {
-      console.error("Error al guardar el motivo:", err);
-      setError("No se pudo guardar el motivo. Intenta de nuevo.");
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  // Cerrar con Escape
   useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !isSubmitting) onClose();
     };
-    document.addEventListener("keydown", handleEsc);
-    return () => document.removeEventListener("keydown", handleEsc);
-  }, [onClose]);
+
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, [isSubmitting, onClose]);
+
+  const handleSubmit = async () => {
+    if (!reason) {
+      setValidationError('Selecciona un motivo antes de guardar.');
+      return;
+    }
+
+    if (needsDescription && !description.trim()) {
+      setValidationError("Describe el motivo cuando seleccionas 'Otro'.");
+      return;
+    }
+
+    setValidationError(null);
+
+    const saved = await onSubmit({
+      order,
+      reason,
+      description: description.trim(),
+    });
+
+    if (saved) onClose();
+  };
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="failure-reason-title"
+      onClick={(event) => {
+        if (event.target === event.currentTarget && !isSubmitting) onClose();
       }}
     >
-      <div className="w-full max-w-2xl rounded-2xl bg-(--theme-card-bg) border border-(--theme-border) p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h3 className="text-lg font-bold text-(--theme-text)">
-              Registrar motivo de devolución
-            </h3>
-            <p className="text-sm text-(--theme-text) opacity-60">
-              Pedido #{order.id.slice(0, 8)}
-              {order.buyerName && ` - ${order.buyerName}`}
+      <section className="w-full max-w-2xl overflow-hidden rounded-3xl border border-(--theme-border) bg-(--theme-card-bg) shadow-2xl">
+        <div className="flex items-start justify-between gap-4 border-b border-(--theme-border) p-5 sm:p-6">
+          <div className="min-w-0">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <FileText size={24} />
+            </div>
+            <h2
+              id="failure-reason-title"
+              className="text-xl font-900 tracking-tight text-(--theme-text)"
+              style={{ fontFamily: 'Outfit, sans-serif' }}
+            >
+              Registrar motivo de devolucion
+            </h2>
+            <p className="mt-1 text-sm text-(--theme-text) opacity-60">
+              {parseOrderId(order.orderId).friendlyName} - {order.buyerName ?? 'Comprador desconocido'}
             </p>
           </div>
+
           <button
+            type="button"
             onClick={onClose}
+            disabled={isSubmitting}
             aria-label="Cerrar"
-            className="shrink-0 text-(--theme-text) opacity-60 hover:opacity-100 transition p-2 rounded-full hover:bg-(--theme-secondary-bg)"
+            className="shrink-0 rounded-full p-2 text-(--theme-text) opacity-60 transition hover:bg-(--theme-secondary-bg) hover:opacity-100 disabled:opacity-30"
           >
             <X size={20} />
           </button>
         </div>
 
-        <div className="mt-6">
-          <label className="text-sm font-bold text-(--theme-text) mb-3 block">
-            Selecciona el motivo de la devolución
-          </label>
-          <fieldset className="space-y-3">
-            {RETURN_REASONS.map((option) => (
-              <label
-                key={option}
-                className={`flex items-center gap-3 rounded-xl border px-4 py-3 cursor-pointer transition-colors ${
-                  reason === option
-                    ? "border-primary bg-primary/5"
-                    : "border-(--theme-border) hover:border-primary/30"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="reason"
-                  value={option}
-                  checked={reason === option}
-                  onChange={() => setReason(option)}
-                  className="accent-primary w-4 h-4"
-                />
-                <span className="text-(--theme-text)">{option}</span>
-              </label>
-            ))}
-          </fieldset>
-        </div>
+        <div className="max-h-[72vh] overflow-y-auto p-5 sm:p-6">
+          <div className="rounded-2xl border border-(--theme-border) bg-(--theme-secondary-bg)/50 px-4 py-3">
+            <p className="text-[11px] font-800 uppercase tracking-[0.22em] text-(--theme-text) opacity-45">
+              Pedido devuelto
+            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-3">
+              <StatusPill status={order.status} />
+              <span className="text-sm font-800 text-primary">
+                {formatCurrency(order.total)}
+              </span>
+              <span className="text-sm text-(--theme-text) opacity-60">
+                {formatDate(order.updatedAt)}
+              </span>
+            </div>
+          </div>
 
-        {needsDescription && (
-          <div className="mt-4">
-            <label className="text-sm font-bold text-(--theme-text) mb-2 block">
-              Descripción <span className="text-(--theme-error)">*</span>
+          <fieldset className="mt-6">
+            <legend className="mb-3 text-sm font-800 text-(--theme-text)">
+              Motivo del fallo de entrega
+            </legend>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              {DELIVERY_FAILURE_REASON_OPTIONS.map((option) => (
+                <label
+                  key={option}
+                  className={`flex min-h-14 cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-700 transition ${
+                    reason === option
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-(--theme-border) text-(--theme-text) hover:border-primary/40 hover:bg-(--theme-secondary-bg)'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="delivery-failure-reason"
+                    value={option}
+                    checked={reason === option}
+                    onChange={() => {
+                      setReason(option);
+                      setValidationError(null);
+                    }}
+                    className="h-4 w-4 accent-primary"
+                  />
+                  <span>{option}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <div className="mt-5">
+            <label
+              htmlFor="delivery-failure-description"
+              className="mb-2 block text-sm font-800 text-(--theme-text)"
+            >
+              Descripcion {needsDescription ? '(obligatoria)' : '(opcional)'}
             </label>
             <textarea
+              id="delivery-failure-description"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-              placeholder="Describe brevemente qué pasó con este pedido..."
-              className="w-full rounded-xl border border-(--theme-border) bg-(--theme-secondary-bg) text-(--theme-text) p-3 outline-none focus:border-primary transition resize-none"
+              onChange={(event) => setDescription(event.target.value)}
+              rows={4}
+              maxLength={350}
+              placeholder="Agrega detalles utiles para el analisis del fallo."
+              className="w-full resize-none rounded-2xl border border-(--theme-border) bg-(--theme-secondary-bg) p-4 text-sm text-(--theme-text) outline-none transition placeholder:text-(--theme-text)/40 focus:border-primary"
             />
+            <p className="mt-2 text-right text-xs text-(--theme-text) opacity-45">
+              {description.length}/350
+            </p>
           </div>
-        )}
 
-        {error && (
-          <div className="mt-4 flex items-center gap-2 rounded-xl bg-(--theme-error-bg) border border-(--theme-error-border) text-(--theme-error) px-4 py-3 text-sm">
-            <AlertCircle size={16} className="shrink-0" />
-            <span>{error}</span>
-          </div>
-        )}
+          {(validationError || submitError) && (
+            <div className="mt-4 flex items-start gap-2 rounded-2xl border border-(--theme-error-border) bg-(--theme-error-bg) px-4 py-3 text-sm font-700 text-(--theme-error)">
+              <AlertCircle size={17} className="mt-0.5 shrink-0" />
+              <span>{validationError || submitError}</span>
+            </div>
+          )}
+        </div>
 
-        <div className="mt-6 flex flex-col sm:flex-row items-center justify-end gap-3">
+        <div className="flex flex-col gap-3 border-t border-(--theme-border) p-5 sm:flex-row sm:justify-end sm:p-6">
           <button
+            type="button"
             onClick={onClose}
-            disabled={submitting}
-            className="w-full sm:w-auto rounded-full px-4 py-2 text-sm font-bold text-(--theme-text) opacity-70 hover:opacity-100 transition disabled:opacity-40"
+            disabled={isSubmitting}
+            className="rounded-full border border-(--theme-border) px-5 py-2.5 text-sm font-700 text-(--theme-text) transition hover:bg-(--theme-secondary-bg) disabled:opacity-40"
           >
             Cancelar
           </button>
+
           <button
+            type="button"
             onClick={handleSubmit}
-            disabled={submitting}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-primary text-white px-5 py-2 text-sm font-bold hover:opacity-90 transition hover:scale-105 active:scale-95 disabled:opacity-60 disabled:hover:scale-100"
+            disabled={isSubmitting}
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-800 text-white transition hover:opacity-90 disabled:opacity-50"
           >
-            {submitting && <Loader2 size={16} className="animate-spin" />}
+            {isSubmitting && <Loader2 size={16} className="animate-spin" />}
             Guardar motivo
           </button>
         </div>
+      </section>
+    </div>
+  );
+}
+
+export default function RegisterFailureReasons({
+  embedded = false,
+}: {
+  embedded?: boolean;
+}) {
+  const {
+    user,
+    ordersAwaitingReason,
+    registeredReasons,
+    loading,
+    loadingOrders,
+    loadingReasons,
+    error,
+    submitError,
+    submittingOrderId,
+    registerReason,
+    clearSubmitError,
+  } = useDeliveryFailureReasons();
+
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [activeOrder, setActiveOrder] = useState<Order | null>(null);
+
+  const openRegisterModal = (order: Order) => {
+    clearSubmitError();
+    setActiveOrder(order);
+  };
+
+  return (
+    <div
+      className={
+        embedded
+          ? 'w-full min-w-0'
+          : 'min-h-screen bg-(--theme-bg) px-4 pb-10 pt-10 md:px-8 xl:px-10'
+      }
+    >
+      <Header
+        title="Motivos de fallos de entrega"
+        description="Registra el motivo de pedidos devueltos para que el equipo pueda analizar las causas de fallo."
+      />
+
+      {!user && !loading && (
+        <ErrorMessage message="Debes iniciar sesion como vendedor para registrar motivos." />
+      )}
+
+      {error && <ErrorMessage message={error} />}
+
+      {selectedOrder && (
+        <OrderDetailsModal
+          order={selectedOrder}
+          onClose={() => setSelectedOrder(null)}
+        />
+      )}
+
+      {activeOrder && (
+        <ReasonModal
+          order={activeOrder}
+          isSubmitting={submittingOrderId === activeOrder.orderId}
+          submitError={submitError}
+          onSubmit={registerReason}
+          onClose={() => setActiveOrder(null)}
+        />
+      )}
+
+      <div className="grid w-full gap-8">
+        <section className="w-full rounded-3xl p-5">
+          <SectionHeader title="Devueltos pendientes" count={ordersAwaitingReason.length} />
+
+          {loadingOrders ? (
+            <SkeletonRows count={3} />
+          ) : ordersAwaitingReason.length === 0 ? (
+            <EmptyOrders description="No hay pedidos devueltos pendientes de motivo." />
+          ) : (
+            <div className="grid gap-4">
+              {ordersAwaitingReason.map((order) => (
+                <ReturnedOrderCard
+                  key={order.orderId}
+                  order={order}
+                  isSubmitting={submittingOrderId === order.orderId}
+                  onViewDetails={setSelectedOrder}
+                  onRegister={openRegisterModal}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="w-full rounded-3xl p-5">
+          <div className="mb-6 rounded-3xl border border-(--theme-border) bg-linear-to-r from-(--theme-card-bg) via-(--theme-card-bg) to-(--theme-secondary-bg)/55 p-4 shadow-sm">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-center gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-white">
+                  <ClipboardList size={22} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] font-800 uppercase tracking-[0.26em] text-(--theme-text) opacity-45">
+                    Historial
+                  </p>
+                  <h2
+                    className="mt-1 text-base font-900 tracking-tight text-(--theme-text) md:text-lg"
+                    style={{ fontFamily: 'Outfit, sans-serif' }}
+                  >
+                    Motivos registrados
+                  </h2>
+                </div>
+              </div>
+
+              <span className="inline-flex items-center justify-center rounded-full border border-(--theme-border) bg-(--theme-secondary-bg) px-4 py-1.5 text-xs font-800 text-(--theme-text)">
+                {registeredReasons.length} registros
+              </span>
+            </div>
+          </div>
+
+          {loadingReasons ? (
+            <SkeletonRows count={2} />
+          ) : registeredReasons.length === 0 ? (
+            <div className="rounded-3xl border border-dashed border-(--theme-border) bg-(--theme-card-bg) p-8 text-center">
+              <PackageX className="mx-auto mb-3 text-(--theme-text) opacity-35" size={34} />
+              <p className="text-sm font-700 text-(--theme-text) opacity-65">
+                Todavia no se registro ningun motivo.
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {registeredReasons.map((reason) => (
+                <RegisteredReasonCard key={reason.id} reason={reason} />
+              ))}
+            </div>
+          )}
+        </section>
       </div>
+
+      {!loading && ordersAwaitingReason.length > 0 && (
+        <div className="fixed bottom-4 left-4 right-4 z-30 rounded-2xl border border-(--theme-border) bg-(--theme-card-bg) p-3 shadow-2xl md:hidden">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <PackageCheck size={20} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-800 text-(--theme-text)">
+                {ordersAwaitingReason.length} pendiente{ordersAwaitingReason.length === 1 ? '' : 's'}
+              </p>
+              <p className="truncate text-xs text-(--theme-text) opacity-55">
+                Selecciona un pedido devuelto para registrar el motivo.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
