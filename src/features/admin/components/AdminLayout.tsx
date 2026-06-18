@@ -11,6 +11,7 @@ import {
   LogOut,
   Menu,
   Package,
+  Scale,
   Settings,
   ShoppingBag,
   Tag,
@@ -28,6 +29,7 @@ import SellerActivityPanel from '../monitoring/components/SellerActivityPanel.ts
 import OrderReceptionPanel from '../orders/components/OrderReceptionPanel.tsx';
 import OrderHistory from '../pedidos/components/OrderHistory.tsx';
 import PaymentAuditPanel from '../pedidos/payment-audit/components/PaymentAuditPanel.tsx';
+import PaymentReconciliationPanel from '../reconciliation/components/PaymentReconciliationPanel.tsx';
 import CancelledOrdersReport from '../reports/components/CancelledOrdersReport.tsx';
 import SalesReport from '../analytics/components/SalesReport.tsx';
 import ConfigPanel from '../settings/components/ConfigPanel.tsx';
@@ -40,6 +42,7 @@ type Section =
   | 'pedidos'
   | 'historial'
   | 'auditoria-cobros'
+  | 'conciliacion-pagos'
   | 'usuarios'
   | 'categorias'
   | 'ventas-diarias'
@@ -143,6 +146,10 @@ export default function AdminLayout() {
       title: 'Auditoría de cobros',
       subtitle: 'Registro detallado de cobros confirmados por pedido',
     },
+    'conciliacion-pagos': {
+      title: 'Conciliacion de pagos',
+      subtitle: 'Diferencias entre pedidos entregados y pagos registrados',
+    },
     usuarios: { title: 'Gestión de usuarios', subtitle: 'Registra y administra usuarios' },
     categorias: { title: 'Categorías', subtitle: 'Gestiona las categorías de productos' },
     'ventas-diarias': { title: 'Ventas diarias', subtitle: 'Monitorea el rendimiento diario de ventas' },
@@ -220,6 +227,10 @@ export default function AdminLayout() {
                           <button onClick={() => { setActiveSection('auditoria-cobros'); setSidebarOpen(false); }}
                             className={sidebarSubItemClass(activeSection === 'auditoria-cobros')}>
                             Auditoría de cobros
+                          </button>
+                          <button onClick={() => { setActiveSection('conciliacion-pagos'); setSidebarOpen(false); }}
+                            className={`${sidebarSubItemClass(activeSection === 'conciliacion-pagos')} flex items-center gap-1.5`}>
+                            <Scale size={11} /> Conciliacion
                           </button>
                         </div>
                       )}
@@ -422,6 +433,7 @@ export default function AdminLayout() {
           {activeSection === 'historial' && <OrderHistory />}
           {activeSection === 'demanda-horarios' && <DemandPanel />}
           {activeSection === 'auditoria-cobros' && <PaymentAuditPanel />}
+          {activeSection === 'conciliacion-pagos' && <PaymentReconciliationPanel />}
         </main>
       </div>
     </div>
