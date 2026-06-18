@@ -1,9 +1,9 @@
 export interface CourierOrderItem {
-    productId: string;
-    name: string;
-    unitPrice: number;
-    quantity: number;
-    subtotal: number;
+	productId: string;
+	name: string;
+	unitPrice: number;
+	quantity: number;
+	subtotal: number;
 }
 
 export interface CourierOrder {
