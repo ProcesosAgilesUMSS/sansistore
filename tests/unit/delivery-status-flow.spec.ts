@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, describe } from 'vitest';
 import {
   assertCanTransitionDeliveryStatus,
   canTransitionDeliveryStatus,
@@ -7,7 +7,7 @@ import {
   getOrderDeliveryStatusForDeliveryStatus,
   getOrderStatusForDeliveryStatus,
   type MessengerDeliveryStatus,
-} from '../../src/features/mensajero/utils/deliveryStatusFlow';
+} from '@features/mensajero/utils/deliveryStatusFlow';
 
 const expectedMappings: Array<{
   status: MessengerDeliveryStatus;
@@ -59,7 +59,7 @@ const expectedMappings: Array<{
   },
 ];
 
-test.describe('delivery status flow', () => {
+describe('delivery status flow', () => {
   test('maps messenger delivery statuses to visible labels and order statuses', () => {
     for (const mapping of expectedMappings) {
       expect(getDeliveryStatusLabel(mapping.status)).toBe(mapping.label);
@@ -118,11 +118,13 @@ test.describe('delivery status flow', () => {
       ).toBe(true);
     }
 
-    expect(canTransitionDeliveryStatus('assigned', 'pending_reassignment')).toBe(
+    expect(
+      canTransitionDeliveryStatus('assigned', 'pending_reassignment')
+    ).toBe(true);
+    expect(canTransitionDeliveryStatus('accepted', 'not_delivered')).toBe(true);
+    expect(canTransitionDeliveryStatus('in_transit', 'not_delivered')).toBe(
       true
     );
-    expect(canTransitionDeliveryStatus('accepted', 'not_delivered')).toBe(true);
-    expect(canTransitionDeliveryStatus('in_transit', 'not_delivered')).toBe(true);
     expect(canTransitionDeliveryStatus('in_transit', 'cancelled')).toBe(true);
   });
 

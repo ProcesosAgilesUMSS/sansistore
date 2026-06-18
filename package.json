@@ -11,6 +11,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "test:e2e": "playwright test",
+    "test:unit": "vitest run",
+    "test": "bun run test:unit && bun run test:e2e",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -63,7 +65,8 @@
     "globals": "^17.5.0",
     "prettier": "^3.8.3",
     "prettier-plugin-astro": "^0.14.1",
-    "typescript-eslint": "^8.46.2"
+    "typescript-eslint": "^8.46.2",
+    "vitest": "^4.1.9"
   },
   "overrides": {
     "@typescript-eslint/scope-manager": "8.46.2",

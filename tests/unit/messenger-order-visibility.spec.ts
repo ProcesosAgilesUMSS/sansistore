@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test';
-import { getVisibleMessengerOrders } from '../../src/features/mensajero/utils/orderVisibility';
-import type { MessengerOrder } from '../../src/features/mensajero/types';
+import { expect, test, describe } from 'vitest';
+import { getVisibleMessengerOrders } from '@features/mensajero/utils/orderVisibility';
+import type { MessengerOrder } from '@features/mensajero/types';
 
 const baseOrder: MessengerOrder = {
   id: 'order-001',
@@ -25,7 +25,7 @@ const baseOrder: MessengerOrder = {
   updatedAt: new Date('2026-04-25T10:00:00.000Z'),
 };
 
-test.describe('messenger order visibility', () => {
+describe('messenger order visibility', () => {
   test('keeps an order in only its most advanced delivery state', () => {
     const assignedOrder: MessengerOrder = {
       ...baseOrder,
