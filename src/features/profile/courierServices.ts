@@ -217,9 +217,11 @@ export async function userHasRole(userId: string, role: string): Promise<boolean
     return roles.includes(role);
 }
 
-export async function getPrimaryUserRole(userId: string): Promise<string | null> {
-    const roles = await getUserRoles(userId);
-    return roles.length > 0 ? roles[0] : null;
+export async function getPrimaryUserRole(
+	userId: string,
+): Promise<string | null> {
+	const roles = await getUserRoles(userId);
+	return roles.length > 0 ? roles[0] : null;
 }
 
 // ============================================
