@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../../lib/firebase';
-import { getDeliveryStatsByCourier } from './courierServices.ts'; // ← NUEVO
+import { getDeliveryStatsByCourier } from './courierServices.ts';
 import { Pencil, Check, X, AlertCircle, CheckCircle, MapPin, Package, Star } from 'lucide-react';
 
 interface ProfileData {
@@ -16,7 +16,6 @@ interface ProfileData {
     deliveryRating?: number;
 }
 
-// ── NUEVO ──────────────────────────────────────────────────────────
 interface DeliveryStatsData {
     totalDelivered: number;
     totalNotDelivered: number;
@@ -24,7 +23,6 @@ interface DeliveryStatsData {
     deliveryRate: number;
     isLoading: boolean;
 }
-// ──────────────────────────────────────────────────────────────────
 
 export default function ProfileView() {
     const [loading, setLoading] = useState(true);
@@ -41,7 +39,6 @@ export default function ProfileView() {
     });
     const [roles, setRoles] = useState<string[]>([]);
 
-    // ── NUEVO ──────────────────────────────────────────────────────
     const [deliveryStats, setDeliveryStats] = useState<DeliveryStatsData>({
         totalDelivered: 0,
         totalNotDelivered: 0,
@@ -49,7 +46,6 @@ export default function ProfileView() {
         deliveryRate: 0,
         isLoading: true,
     });
-    // ──────────────────────────────────────────────────────────────
 
     const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
@@ -104,7 +100,6 @@ export default function ProfileView() {
 
                 setAuthenticated(true);
 
-                // ── NUEVO: cargar stats si el usuario es mensajero ──────────
                 const isMensajero = userRoles.includes('mensajero') || userRoles.includes('admin');
 
                 if (isMensajero) {
@@ -124,11 +119,10 @@ export default function ProfileView() {
                 } else {
                     setDeliveryStats((prev) => ({ ...prev, isLoading: false }));
                 }
-                // ────────────────────────────────────────────────────────────
 
             } catch (error) {
                 console.error('Error cargando perfil:', error);
-                setDeliveryStats((prev) => ({ ...prev, isLoading: false })); // ← NUEVO
+                setDeliveryStats((prev) => ({ ...prev, isLoading: false }));
             } finally {
                 setLoading(false);
             }
@@ -268,10 +262,11 @@ export default function ProfileView() {
         );
     }
 
-    const showMisDirecciones = profile.roles.length === 0 || profile.roles.includes('comprador');
-    const showMisPedidos = profile.roles.length > 0 && profile.roles.some(r => ['comprador', 'admin'].includes(r));
-    const showCalificacionMensajero = profile.roles.length > 0 && profile.roles.some(r => ['mensajero', 'admin'].includes(r));
-    const isMensajero = profile.roles.includes('mensajero') || profile.roles.includes('admin'); // ← NUEVO
+    // --- LÓGICA CORREGIDA DE ROLES ---
+    const showMisDirecciones = true; // Todo usuario autenticado puede tener direcciones
+    const showMisPedidos = profile.roles.length === 0 || profile.roles.some(r => ['comprador', 'admin'].includes(r));
+    const showCalificacionMensajero = profile.roles.includes('mensajero') || profile.roles.includes('admin');
+    const isMensajero = profile.roles.includes('mensajero') || profile.roles.includes('admin');
 
     return (
         <>
@@ -323,7 +318,6 @@ export default function ProfileView() {
                 </header>
 
                 <div className="flex flex-col gap-5 pb-2">
-
                     {/* Campo: CI */}
                     <div className="flex flex-col">
                         <label className="text-[11px] font-bold uppercase tracking-wider text-text-light/50 mb-1.5">
@@ -453,7 +447,7 @@ export default function ProfileView() {
                     </div>
                 </div>
 
-                {/* ── NUEVO: Estadísticas de Delivery ─────────────────────────── */}
+                {/* Estadísticas de Delivery */}
                 {isMensajero && (
                     <div className="rounded-2xl border border-border-light bg-bg-light p-4">
                         <h3 className="mb-3 text-xs font-bold uppercase tracking-widest text-text-light opacity-50">
@@ -487,17 +481,35 @@ export default function ProfileView() {
                         </div>
                     </div>
                 )}
-                {/* ─────────────────────────────────────────────────────────────── */}
 
-                {/* Gestión de Compras */}
-                {(() => {
-                    const isComprador = roles.length === 0 || roles.includes('comprador') || roles.includes('admin');
-                    if (!isComprador) return null;
-                    return (
-                        <div className="mb-2 rounded-2xl border border-border-light bg-bg-light p-4">
-                            <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-text-light opacity-50">
-                                Gestión de Compras
-                            </h3>
+                {/* CONSOLIDADO: Gestión de Cuenta */}
+                {(showMisPedidos || showMisDirecciones) && (
+                    <div className="mb-2 rounded-2xl border border-border-light bg-bg-light p-4 flex flex-col gap-3">
+                        <h3 className="text-xs font-bold uppercase tracking-widest text-text-light opacity-50 mb-1">
+                            Gestión de Cuenta
+                        </h3>
+                        
+                        {showMisDirecciones && (
+                            <a
+                                href="/location"
+                                className="group flex items-center justify-between rounded-xl border border-border-light bg-card-bg-light p-3 transition-all hover:border-primary hover:shadow-sm"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+                                        <MapPin size={18} />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <h4 className="font-bold text-text-light text-sm">Mis direcciones</h4>
+                                        <span className="text-[11px] text-text-light/50 font-medium">Gestionar mis lugares de entrega</span>
+                                    </div>
+                                </div>
+                                <span className="text-primary font-bold opacity-50 transition-transform group-hover:translate-x-1 group-hover:opacity-100 pr-2">
+                                    →
+                                </span>
+                            </a>
+                        )}
+
+                        {showMisPedidos && (
                             <a
                                 href="/mis-pedidos"
                                 className="group flex items-center justify-between rounded-xl border border-border-light bg-card-bg-light p-3 transition-all hover:border-primary hover:shadow-sm"
@@ -506,62 +518,19 @@ export default function ProfileView() {
                                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
                                         <Package size={18} />
                                     </div>
-                                    <div>
+                                    <div className="flex flex-col">
                                         <h4 className="font-bold text-text-light text-sm">Mis pedidos y devoluciones</h4>
+                                        <span className="text-[11px] text-text-light/50 font-medium">Ver el historial de mis compras</span>
                                     </div>
                                 </div>
                                 <span className="text-primary font-bold opacity-50 transition-transform group-hover:translate-x-1 group-hover:opacity-100 pr-2">
                                     →
                                 </span>
                             </a>
-                        </div>
-                    );
-                })()}
-
-                <div className="flex justify-end mt-2">
-                    <a
-                        href="/edit-profile"
-                        className="inline-flex items-center justify-center rounded-full bg-primary text-white px-6 py-3 text-xs uppercase font-bold tracking-wider hover:opacity-90 transition-all"
-                    >
-                        Editar perfil
-                    </a>
-                </div >
-
-                <footer className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-border-light">
-                    {showMisDirecciones && (
-                        <a
-                            href="/location"
-                            className="flex items-center gap-3 px-4 py-3 text-[13px] font-bold text-text-light/80 rounded-xl border border-border-light bg-border-light/10 hover:bg-border-light/30 hover:text-primary hover:border-primary/30 transition-all group"
-                        >
-                            <div className="p-2 rounded-lg bg-bg-light border border-border-light text-text-light/50 group-hover:text-primary group-hover:border-primary/20 transition-colors">
-                                <MapPin size={16} />
-                            </div>
-                            <div className="flex flex-col text-left">
-                                <span>Mis direcciones</span>
-                                <span className="text-[11px] font-medium text-text-light/40 group-hover:text-primary/60 transition-colors">Gestionar entrega</span>
-                            </div>
-                        </a>
-                    )
-                    }
-
-                    {
-                        showMisPedidos && (
-                            <a
-                                href="/mis-pedidos"
-                                className="flex items-center gap-3 px-4 py-3 text-[13px] font-bold text-text-light/80 rounded-xl border border-border-light bg-border-light/10 hover:bg-border-light/30 hover:text-primary hover:border-primary/30 transition-all group"
-                            >
-                                <div className="p-2 rounded-lg bg-bg-light border border-border-light text-text-light/50 group-hover:text-primary group-hover:border-primary/20 transition-colors">
-                                    <Package size={16} />
-                                </div>
-                                <div className="flex flex-col text-left">
-                                    <span>Mis pedidos</span>
-                                    <span className="text-[11px] font-medium text-text-light/40 group-hover:text-primary/60 transition-colors">Ver mis compras</span>
-                                </div>
-                            </a >
-                        )
-                    }
-                </footer >
-            </section >
+                        )}
+                    </div>
+                )}
+            </section>
         </>
     );
 }
