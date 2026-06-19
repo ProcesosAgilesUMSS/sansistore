@@ -509,9 +509,10 @@
 - **Blockers:** n/a.
 
 ## Merino Vidal Mateo Alejandro
-- **Yesterday:**
-- **Today:**
-- **Blockers:** n/a.
+* **Yesterday:** Realicé una revisión general de la aplicación, validando los diferentes flujos del sistema e identificando y reportando bugs encontrados durante las pruebas.
+* **Today:** Continuaré con la revisión funcional de la aplicación y el seguimiento de los bugs reportados para verificar su estado y posibles correcciones.
+* **Blockers:** n/a.
+
 
 ## Velasquez Vela Marcos
 - **Yesterday:**
