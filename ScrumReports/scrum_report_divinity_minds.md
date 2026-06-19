@@ -515,6 +515,7 @@
 * **Blockers:** n/a.
 
 ## Velasquez Vela Marcos
-- **Yesterday:**
-- **Today:**
+- **Yesterday:** Unifiqué y rediseñé el sistema de UI del proyecto (centralización de la fuente Inter y agregado de tokens de color claro/oscuro en `global.css`), mejoré el header (`Navbar.tsx`) y footer (`Footer.tsx`) con diseño responsivo, y abrí y planifiqué las issues de tareas de alinear todas las pantallas del sistema (#616 a #623) con el nuevo estándar de `UI.md`.
+- **Today:** Apoyé a los demás equipos de desarrollo en la migración de colores hardcodeados a los tokens y verifiqué la consistencia visual y responsiva de las nuevas secciones en `/me`.
 - **Blockers:** n/a.
+
