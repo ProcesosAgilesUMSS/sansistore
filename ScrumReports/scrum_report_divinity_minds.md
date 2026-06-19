@@ -494,9 +494,10 @@
 # 06/18/2026
 
 ## Castro Tejada Steven Lisandro
-- **Yesterday:**
-- **Today:**
+- **Yesterday:** Realicé el seguimiento y validación de las Pull Requests fusionadas (#670, #674) en la rama main.
+- **Today:** Audité el código de la vista unificada `/me` en producción (v1.3.0), identifiqué discrepancias en el Navbar y en la visibilidad de roles para "Mis direcciones", abrí la issue de bug #686 para el Sprint 5 y creé la rama local `fix/locations-navbar-role-visibility`.
 - **Blockers:** n/a.
+
 
 ## Gutierrez Hinojosa Jhon Deymar
 - **Yesterday:** Se integro la refactorizacion de los tests y reporte algunos bugs.
