@@ -256,6 +256,15 @@ export default function Navbar() {
             <div className="flex items-center gap-3 shrink-0">
               {/* CART */}
               {showCompradorFeatures && <CartButton />}
+              {authReady && user && showCompradorFeatures && (
+                <a
+                  href="/location"
+                  className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-primary/40 px-3 py-1.5 text-[12px] font-semibold text-primary transition-all hover:bg-primary hover:text-white hover:border-primary"
+                >
+                  <MapPin size={13} />
+                  Mis direcciones
+                </a>
+              )}
 
               {/* THEME */}
               <button
@@ -325,6 +334,15 @@ export default function Navbar() {
                             Mensajero
                           </a>
                         )}
+
+                        <a
+                          role="menuitem"
+                          href="/edit-profile"
+                          className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light opacity-70 transition-colors hover:bg-border-light/40 hover:text-primary hover:opacity-100"
+                        >
+                          <Settings size={14} />
+                          Editar Datos Personales
+                        </a>
 
                         <button
                           type="button"
@@ -404,6 +422,16 @@ export default function Navbar() {
                     Mi Perfil
                   </a>
 
+                  {/* Restringimos "Mis direcciones" solo a compradores */}
+                  {showCompradorFeatures && (
+                    <a
+                      href="/location"
+                      className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
+                    >
+                      Mis direcciones
+                    </a>
+                  )}
+
                   {canAccessCourier && (
                     <a
                       href="/courier"
@@ -414,6 +442,13 @@ export default function Navbar() {
                   )}
 
                   <hr className="border-border-light my-0.5" />
+
+                  <a
+                    href="/edit-profile"
+                    className="text-[13px] font-semibold text-text-light opacity-[0.55] transition-all hover:text-primary hover:opacity-100"
+                  >
+                    Editar Datos Personales
+                  </a>
 
                   <button
                     type="button"
