@@ -507,3 +507,12 @@
 - **Yesterday:** Implementé mi HU correspondiente al Sprint 4.
 - **Today:** Verificar que todo funcione correctamente antes de la demo de mañana.
 - **Blockers:** None.
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday (17/06):** 
+  - Corrección del bug en la HU #568: se ajustó el guardado del motivo de rechazo desde la vista de detalle del pedido (`/delivery/order/ID_DEL_PEDIDO`).
+  - Se actualizó el PR #646 con los cambios solicitados por Daniel.
+- **Today (18/06):** 
+  - La HU #568 fue completada y el PR #646 ha sido aprobado. Se espera el merge a `main` para el cierre del Sprint 4.
+  - Preparación de la demo del Sprint 4.
+- **Blockers:** None.
