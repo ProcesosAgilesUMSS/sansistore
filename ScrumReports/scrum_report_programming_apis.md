@@ -490,3 +490,34 @@
 - **Yesterday:** Empece el desarrollo de la HU 570 liberar disponibilidad
 - **Today:** Continuar con la implementación de la HU para este sprint.
 - **Blockers:** None.
+
+## 18-06-2026
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Implementé la HU correspondiente al Sprint, trabajé parcialmente como QA para validar que las funcionalidades de mis compañeros trabajen de la manera más correcta posible.
+- **Today:** Terminé con la implementación y revisión de las funcionalidades para este Sprint 4. Toca preparar toda la información y datos necesarios para la demo de mañana viernes.
+- **Blockers:** Necesitaríamos que más equipos también validen nuestros avances, tal como pasó en el grupo de Whatsapp.
+
+### Efrain Peralta Felipe 
+- **Yesterday:** ver qué debería considerar para la implementación de mi hu.
+- **Today:** Terminé con la implementación de mi hu para este sprint.
+- **Blockers:** None.
+
+### Adrián Said Andrade Medina
+- **Yesterday:** Implementé mi HU correspondiente al Sprint 4.
+- **Today:** Verificar que todo funcione correctamente antes de la demo de mañana.
+- **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+- **Yesterday:** Termine de implementar mi HU 570 para el sprint 4
+- **Today:** Preparar la presentacion de mi HU para la demo
+- **Blockers:** None.
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday (17/06):** 
+  - Corrección del bug en la HU #568: se ajustó el guardado del motivo de rechazo desde la vista de detalle del pedido (`/delivery/order/ID_DEL_PEDIDO`).
+  - Se actualizó el PR #646 con los cambios solicitados por Daniel.
+- **Today (18/06):** 
+  - La HU #568 fue completada y el PR #646 ha sido aprobado. Se espera el merge a `main` para el cierre del Sprint 4.
+  - Preparación de la demo del Sprint 4.
+- **Blockers:** None.
