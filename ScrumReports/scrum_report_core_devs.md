@@ -392,9 +392,9 @@
 # Daily Report #
 # 06/16/2026   #
   ## Gonza Rojas Willian D.
-  - **Yesterday:**    Se corrigio el bug del orden de PEDIDOS DEVUELTOS, primero la ENTRADA y luego la SALIDA.
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Se revisó el bug del orden de PEDIDOS DEVUELTOS, primero la ENTRADA y luego la SALIDA.
+  - **Today:**        Se hizo pruebas para estado DEVUELTO, se empezo a implementar la US #56 Lote nuevo.
+  - **Blockers:**     Ninguno
 
   ## Llanos Villarroel Vania F.
   - **Yesterday:**  
@@ -417,3 +417,30 @@
   - **Blockers:**     
 
 
+# ##############
+# Daily Report #
+# 06/19/2026   #
+  ## Gonza Rojas Willian D.
+  - **Yesterday:**    Se termino la US #56 Lote nuevo, 
+  - **Today:**        se reviso el flujo de pedidos devueltos y los demas estados.
+  - **Blockers:**     Ninguno
+
+  ## Llanos Villarroel Vania F.
+  - **Yesterday:**  
+  - **Today:**      
+  - **Blockers:**   
+
+  ## Rios Quiruchi Edney Jhojan
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Sejas Arze Eddy
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Soliz Moya Alejandra
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
