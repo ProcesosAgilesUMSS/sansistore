@@ -122,7 +122,7 @@ const canSubmit = secret.trim().length > 0 && !saving;
                                     disabled={saving}
                                 />
                                 {error && (
-                                    <p className="text-xs font-bold text-red-500">{error}</p>
+                                    <p className="text-xs font-bold text-(--theme-error)">{error}</p>
                                 )}
                             </div>
 

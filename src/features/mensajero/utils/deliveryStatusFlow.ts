@@ -30,7 +30,7 @@ const orderStatusByDeliveryStatus: Record<MessengerDeliveryStatus, string> = {
   in_transit: 'EN CAMINO',
   delivered: 'ENTREGADO',
   not_delivered: 'NO ENTREGADO',
-  pending_reassignment: 'PENDIENTE REASIGNACION',
+  pending_reassignment: 'PENDIENTE-ASIGNACION',
   cancelled: 'CANCELADO',
   reprogrammed: 'REPROGRAMADO',
 };

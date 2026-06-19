@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { LoginPage } from '../pages/login.page';
 
 const FIRESTORE_DOCUMENTS_URL =
   'http://127.0.0.1:8180/v1/projects/sansistore/databases/(default)/documents';
@@ -84,49 +85,13 @@ async function findFirestoreOrderIdByCustomer(customerName: string) {
  */
 
 async function login(page: Page, email: string) {
-  await page.goto('/login', { waitUntil: 'domcontentloaded' });
-
-  const loginButton = page
-    .locator('form')
-    .getByRole('button', { name: /Iniciar/ });
-  const emailField = page.getByLabel('Correo electrónico');
-  const passwordField = page.locator('#password');
-
-  await expect(loginButton).toBeEnabled({ timeout: 15_000 });
-  await expect(emailField).toBeEditable();
-  await expect(passwordField).toBeEditable();
-  await expect
-    .poll(
-      async () => {
-        try {
-          return await page.evaluate(() => {
-            const button = document
-              .querySelector('form')
-              ?.querySelector('button[type="button"]');
-            return Boolean(
-              button &&
-                Object.keys(button).some((key) =>
-                  key.startsWith('__reactProps')
-                )
-            );
-          });
-        } catch {
-          return false;
-        }
-      },
-      { timeout: 15_000 }
-    )
-    .toBe(true);
-
-  // Hasta que React no hidrata, el primer fill puede perderse y el click
-  // del boton no dispara el submit. Reintentamos rellenar + enviar (acciones
-  // idempotentes) hasta que la pagina deje de estar en /login.
+  const loginPage = new LoginPage(page);
+  await loginPage.goto();
+  await loginPage.waitForReady();
+  // ponytail: toPass retries fill+click+URL hasta salir de /login.
   await expect(async () => {
-    await emailField.fill(email);
-    await passwordField.fill('12345678');
-    await expect(emailField).toHaveValue(email);
-    await expect(passwordField).toHaveValue('12345678');
-    await loginButton.click({ noWaitAfter: true });
+    await loginPage.fillCredentials(email);
+    await loginPage.loginButton.click({ noWaitAfter: true });
     await expect(page).not.toHaveURL(/\/login/, { timeout: 8_000 });
   }).toPass({ timeout: 40_000 });
 }

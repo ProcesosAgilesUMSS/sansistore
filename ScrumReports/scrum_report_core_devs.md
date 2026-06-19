@@ -195,9 +195,9 @@
   - **Blockers:**   
 
   ## Rios Quiruchi Edney Jhojan
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Colaboré en la planificación de las historias de usuario para el Sprint 3.
+  - **Today:**        Revisar los requerimientos de la US #72 (Solicitud de productos al inventario) y analizar su integración con el flujo actual.
+  - **Blockers:**     ninguno.
 
   ## Sejas Arze Eddy
   - **Yesterday:**    
@@ -225,9 +225,9 @@
   - **Blockers:**   
 
   ## Rios Quiruchi Edney Jhojan
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Analicé el flujo de solicitud de productos entre ventas e inventario.
+  - **Today:**        Ayudar con el dise;o de la US 72
+  - **Blockers:**     Dudas sobre el flujo actual
 
   ## Sejas Arze Eddy
   - **Yesterday:**    
@@ -255,9 +255,9 @@
   - **Blockers:**   
 
   ## Rios Quiruchi Edney Jhojan
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Ayudar en la implementacion de la US 72
+  - **Today:**        revisar la US 68 sobre correcciones de inventario
+  - **Blockers:**     ninguno.
 
   ## Sejas Arze Eddy
   - **Yesterday:**    
@@ -285,9 +285,9 @@
   - **Blockers:**   
 
   ## Rios Quiruchi Edney Jhojan
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Ayudar en la logica para correcciones de inventario y validacion de movimientos
+  - **Today:**        mejoras en el dise;o
+  - **Blockers:**     ninguno.
 
   ## Sejas Arze Eddy
   - **Yesterday:**    
@@ -298,3 +298,122 @@
   - **Yesterday:**    Revisé la presentación de información en las vistas del módulo de inventarios.
   - **Today:**        Analizar los problemas de legibilidad reportados en los bugs #451 y #453.
   - **Blockers:**     Ninguno.
+
+
+# ##############
+# Daily Report #
+# 06/04/2026   #
+  ## Gonza Rojas Willian D.
+  - **Yesterday:**    Se redefinio el flujo de pedidos devueltos
+  - **Today:**        Se desarrollo la Entrada a tienda fisica de productos devueltos
+  - **Blockers:**     Bug, No se ve la adicion de a tienda de productos devueltos
+
+  ## Llanos Villarroel Vania F.
+  - **Yesterday:**  
+  - **Today:**      
+  - **Blockers:**   
+
+  ## Rios Quiruchi Edney Jhojan
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Sejas Arze Eddy
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Soliz Moya Alejandra
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+
+# ##############
+# Daily Report #
+# 06/09/2026   #
+  ## Gonza Rojas Willian D.
+  - **Yesterday:**    Se terminó de desarrollar la Entrada de productos devueltos, se corrigio el bug
+  - **Today:**        Se observo la entrada de productos en mal estado, se redefinio la US #68
+  - **Blockers:**     Ninguno
+
+  ## Llanos Villarroel Vania F.
+  - **Yesterday:**  
+  - **Today:**      
+  - **Blockers:**   
+
+  ## Rios Quiruchi Edney Jhojan
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Sejas Arze Eddy
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Soliz Moya Alejandra
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+
+# ##############
+# Daily Report #
+# 06/11/2026   #
+  ## Gonza Rojas Willian D.
+  - **Yesterday:**    Se terminó de desarrollar la US #68, ahora se muestra Entrada de todo el pedido y Salida de solo los productos en mal estado si hubiera.
+  - **Today:**        Se encontró un bug, en historial de movimientos se ve primero la SALIDA y luego la ENTRADA, se empezó a trabajar en US #56 Lote Nuevo.
+  - **Blockers:**     Ninguno
+
+  ## Llanos Villarroel Vania F.
+  - **Yesterday:**  
+  - **Today:**      
+  - **Blockers:**   
+
+  ## Rios Quiruchi Edney Jhojan
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Sejas Arze Eddy
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Soliz Moya Alejandra
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+
+
+# ##############
+# Daily Report #
+# 06/16/2026   #
+  ## Gonza Rojas Willian D.
+  - **Yesterday:**    Se corrigio el bug del orden de PEDIDOS DEVUELTOS, primero la ENTRADA y luego la SALIDA.
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Llanos Villarroel Vania F.
+  - **Yesterday:**  
+  - **Today:**      
+  - **Blockers:**   
+
+  ## Rios Quiruchi Edney Jhojan
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Sejas Arze Eddy
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Soliz Moya Alejandra
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+

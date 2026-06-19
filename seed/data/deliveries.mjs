@@ -1,17 +1,22 @@
 import { Users } from './users.mjs';
 
 export const Deliveries = {
+  // Entrega ya completada: Luis conserva una sola entrega activa (DELIVERY_006,
+  // in_transit). Un mensajero no puede tener mas de una entrega activa a la vez.
   DELIVERY_001: {
     code: 'delivery-001',
     orderCode: 'order-001',
     courier: Users.LUIS,
-    status: 'accepted',
+    status: 'delivered',
     attemptNumber: 1,
-    customerConfirmed: false,
+    customerConfirmed: true,
+    customerConfirmedAt: '2026-04-25T11:05:00.000Z',
     assignedAt: '2026-04-25T09:10:00.000Z',
     pickedUpAt: '2026-04-25T10:20:00.000Z',
+    inTransitAt: '2026-04-25T10:30:00.000Z',
+    deliveredAt: '2026-04-25T11:05:00.000Z',
     createdAt: '2026-04-25T09:05:00.000Z',
-    updatedAt: '2026-04-25T09:10:00.000Z',
+    updatedAt: '2026-04-25T11:05:00.000Z',
   },
   DELIVERY_002: {
     code: 'delivery-002',
@@ -86,29 +91,37 @@ export const Deliveries = {
     createdAt: '2026-04-25T08:02:00.000Z',
     updatedAt: '2026-04-25T08:45:00.000Z',
   },
+  // Entrega ya completada: Nadia queda sin entregas activas, por lo que puede
+  // aceptar un pedido asignado (lo valida el smoke test de courier).
   DELIVERY_008: {
     code: 'delivery-008',
     orderCode: 'order-008',
     courier: Users.NADIA,
-    status: 'accepted',
+    status: 'delivered',
     attemptNumber: 1,
-    customerConfirmed: false,
+    customerConfirmed: true,
+    customerConfirmedAt: '2026-04-25T12:45:00.000Z',
     assignedAt: '2026-04-25T12:05:00.000Z',
     pickedUpAt: '2026-04-25T12:15:00.000Z',
+    inTransitAt: '2026-04-25T12:20:00.000Z',
+    deliveredAt: '2026-04-25T12:45:00.000Z',
     createdAt: '2026-04-25T12:02:00.000Z',
-    updatedAt: '2026-04-25T12:15:00.000Z',
+    updatedAt: '2026-04-25T12:45:00.000Z',
   },
+  // Entrega ya completada: Nadia no conserva entregas activas.
   DELIVERY_009: {
     code: 'delivery-009',
     orderCode: 'order-009',
     courier: Users.NADIA,
-    status: 'in_transit',
+    status: 'delivered',
     attemptNumber: 1,
-    customerConfirmed: false,
+    customerConfirmed: true,
+    customerConfirmedAt: '2026-04-25T13:05:00.000Z',
     assignedAt: '2026-04-25T12:35:00.000Z',
     inTransitAt: '2026-04-25T12:45:00.000Z',
+    deliveredAt: '2026-04-25T13:05:00.000Z',
     createdAt: '2026-04-25T12:32:00.000Z',
-    updatedAt: '2026-04-25T12:45:00.000Z',
+    updatedAt: '2026-04-25T13:05:00.000Z',
   },
   DELIVERY_010: {
     code: 'delivery-010',

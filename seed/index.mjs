@@ -9,7 +9,9 @@ import { deliveryList } from './data/deliveries.mjs';
 import { run as seedCartItems } from './data/cart.mjs';
 import { inventoryMovements } from './data/inventoryMovements.mjs';
 import { activityLogList } from './data/activityLogs.mjs';
+import { paymentActivityLogList } from './data/paymentActivityLogs.mjs';
 import { readFileSync, existsSync } from 'node:fs';
+import { courierSessionList } from './data/messengerShiftClosures.mjs';
 
 const envPath = new URL('../.env', import.meta.url);
 if (existsSync(envPath)) {
@@ -195,6 +197,8 @@ async function seedFirestoreUsers() {
       displayName: user.displayName,
       photoURL: user.photoURL,
       phoneNumber: user.phoneNumber ?? null,
+      ci: user.ci ?? null,
+      internalPhone: user.internalPhone ?? null,
       roles: user.roles,
       institutionalId: user.institutionalId,
       isActive: user.isActive,
@@ -403,6 +407,43 @@ async function seedDeliveries() {
   console.log('deliveries seeded');
 }
 
+const COURIER_SESSIONS_COLLECTION = 'messenger_shift_closures';
+
+async function seedCourierSessions() {
+  for (const session of courierSessionList) {
+    await setDoc(COURIER_SESSIONS_COLLECTION, session.id, {
+      courierId:   session.courierId,
+      courierName: session.courierName,   // desnormalizado, igual que hace serializeClosure
+      dateKey:     session.dateKey,
+      status:      session.status,
+
+      startedAt: toTimestamp(session.startedAt, null),
+      closedAt:  toTimestamp(session.closedAt,  null),
+      createdAt: toTimestamp(session.createdAt, null),
+
+      summary: {
+        completedCount:    session.summary.completedCount,
+        pendingCount:      session.summary.pendingCount,
+        notDeliveredCount: session.summary.notDeliveredCount,
+        cancelledCount:    session.summary.cancelledCount,
+        totalCollected:    session.summary.totalCollected,
+      },
+
+      completedOrders: session.completedOrders.map(serializeSnapshotForSeed),
+      pendingOrders:   session.pendingOrders.map(serializeSnapshotForSeed),
+      incidentOrders:  session.incidentOrders.map(serializeSnapshotForSeed),
+
+      validatedBy:     session.validatedBy     ?? null,
+      validatedByName: session.validatedByName ?? null,
+      validatedAt:     session.validatedAt
+                         ? toTimestamp(session.validatedAt, null)
+                         : null,
+      rejectionReason: session.rejectionReason ?? null,
+    });
+  }
+  console.log('courier sessions seeded');
+}
+
 async function seedMovements() {
   for (const movement of inventoryMovements) {
     await db.collection('inventoryMovements').add({
@@ -423,6 +464,17 @@ async function seedActivityLogs() {
   console.log('activity logs seeded');
 }
 
+async function seedPaymentActivityLogs() {
+  for (const log of paymentActivityLogList) {
+    const { id, ...data } = log;
+    await setDoc('paymentActivityLogs', id, {
+      ...data,
+      timestamp: toTimestamp(data.timestamp),
+    });
+  }
+  console.log('payment activity logs seeded');
+}
+
 async function clearAllData() {
   console.log('\n Clearing existing data...');
 
@@ -434,6 +486,21 @@ async function clearAllData() {
     console.log(`  Clearing ${col.id}...`);
     await db.recursiveDelete(col);
   }
+}
+
+function serializeSnapshotForSeed(order) {
+  return {
+    ...order,
+    paymentCollectedAt: order.paymentCollectedAt
+      ? toTimestamp(order.paymentCollectedAt, null)
+      : null,
+    assignedAt: order.assignedAt
+      ? toTimestamp(order.assignedAt, null)
+      : null,
+    updatedAt: order.updatedAt
+      ? toTimestamp(order.updatedAt, null)
+      : null,
+  };
 }
 
 async function main() {
@@ -452,6 +519,8 @@ async function main() {
   await seedDeliveries();
   await seedMovements();
   await seedActivityLogs();
+  await seedPaymentActivityLogs();
+  await seedCourierSessions();
 
   if (isProduction) {
     console.log('\n Production seed complete!\n');

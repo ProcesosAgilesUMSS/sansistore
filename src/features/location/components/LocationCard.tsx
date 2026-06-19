@@ -100,24 +100,24 @@ export default function LocationCard({
                     group flex items-center gap-3 rounded-[1.25rem] border px-4 py-3 
                     transition-all duration-300 cursor-pointer
                     ${isSelected
-                        ? 'border-[#88B04B] bg-[#88B04B]/10 shadow-[0_0_0_2px_rgba(136,176,75,0.15)]'
-                        : 'border-(--theme-border) bg-(--theme-card-bg) hover:border-[#88B04B]'
+                      ? 'border-2 border-primary bg-primary/5'
+                      : 'border-(--theme-border) bg-(--theme-card-bg) hover:border-primary'
                     }
                     ${isDeleting ? 'opacity-50 pointer-events-none' : ''}
                 `}
             >
-                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#88B04B]/10 text-[#88B04B] transition-colors duration-300">
+                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-(--theme-secondary-bg) text-(--theme-text) transition-colors duration-300">
                     {TYPE_ICONS[type]}
                 </div>
 
                 <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                        <span className="font-outfit text-sm font-extrabold leading-none text-(--theme-text) transition-colors duration-300  truncate block w-full">
+                        <span className="text-sm font-extrabold leading-none text-(--theme-text) transition-colors duration-300  truncate block w-full">
                             {label}
                         </span>
                     </div>
 
-                    <p className="mt-1 font-inter text-[10px] font-bold uppercase tracking-widest text-[#88B04B] truncate block w-full">
+                    <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-primary truncate block w-full">
                         {type}
                     </p>
                 </div>
@@ -129,12 +129,12 @@ export default function LocationCard({
                         className={`
                             flex h-8 w-8 items-center justify-center rounded-full transition-all
                             ${isDefault
-                                ? 'text-[#88B04B] opacity-100'
-                                : 'text-[#88B04B] opacity-40 hover:opacity-100'
+                                ? 'text-primary opacity-100'
+                                : 'text-(--theme-text) opacity-40 hover:opacity-100 hover:text-primary'
                             }
                         `}
                     >
-                        <Star size={16} fill={isDefault ? '#88B04B' : 'none'} />
+                        <Star size={16} fill={isDefault ? 'currentColor' : 'none'} />
                     </button>
 
                     <button
@@ -142,8 +142,8 @@ export default function LocationCard({
                         aria-label={`Editar ${label}`}
                         className="
                             flex h-8 w-8 items-center justify-center rounded-full
-                            text-blue-500 opacity-40 transition-all
-                            hover:opacity-100
+                            text-(--theme-text) opacity-40 transition-all
+                            hover:opacity-100 hover:text-primary
                         "
                     >
                         <Pencil size={16} />
@@ -155,8 +155,8 @@ export default function LocationCard({
                         aria-label={`Eliminar ${label}`}
                         className="
                             flex h-8 w-8 items-center justify-center rounded-full
-                            text-red-500 opacity-40 transition-all
-                            hover:opacity-100
+                            text-(--theme-danger) opacity-40 transition-all
+                            hover:opacity-100 hover:bg-(--theme-danger-bg)
                             disabled:opacity-20 disabled:cursor-not-allowed
                         "
                     >

@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import admin from 'firebase-admin';
+import { LoginPage } from '../pages/login.page';
 
 const CART_KEY = 'sansistore_cart';
 const PROJECT_ID = 'sansistore';
@@ -23,14 +24,14 @@ function toFirestoreRestFields(data: Record<string, unknown>) {
       if (typeof value === 'boolean') return [key, { booleanValue: value }];
       if (typeof value === 'number') return [key, { doubleValue: value }];
       return [key, { stringValue: String(value) }];
-    }),
+    })
   );
 }
 
 async function mirrorDocumentToDefaultEmulator(
   collectionName: string,
   documentId: string,
-  data: Record<string, unknown>,
+  data: Record<string, unknown>
 ) {
   const updateMask = Object.keys(data)
     .map((field) => `updateMask.fieldPaths=${encodeURIComponent(field)}`)
@@ -46,11 +47,10 @@ async function mirrorDocumentToDefaultEmulator(
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify({ fields: toFirestoreRestFields(data) }),
             signal: AbortSignal.timeout(1000),
-          },
+          }
         );
-      } catch {
-      }
-    }),
+      } catch {}
+    })
   );
 }
 
@@ -97,15 +97,21 @@ async function createTestProduct({
     enabled: inventoryEnabled,
   };
 
-  await db.collection('products').doc(productId).set({
-    ...productData,
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
-  });
+  await db
+    .collection('products')
+    .doc(productId)
+    .set({
+      ...productData,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
 
-  await db.collection('inventory').doc(productId).set({
-    ...inventoryData,
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-  });
+  await db
+    .collection('inventory')
+    .doc(productId)
+    .set({
+      ...inventoryData,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
 
   await mirrorDocumentToDefaultEmulator('products', productId, {
     ...productData,
@@ -117,20 +123,66 @@ async function createTestProduct({
   });
 }
 
-async function updateTestProduct(productId: string, data: Record<string, unknown>) {
+async function updateTestProduct(
+  productId: string,
+  data: Record<string, unknown>
+) {
   await getTestDb().collection('products').doc(productId).update(data);
   await mirrorDocumentToDefaultEmulator('products', productId, data);
 }
 
-async function updateTestInventory(productId: string, data: Record<string, unknown>) {
+async function updateTestInventory(
+  productId: string,
+  data: Record<string, unknown>
+) {
   await getTestDb().collection('inventory').doc(productId).update(data);
   await mirrorDocumentToDefaultEmulator('inventory', productId, data);
+}
+
+async function createTestAuthUser({
+  uid,
+  email,
+  displayName,
+}: {
+  uid: string;
+  email: string;
+  displayName: string;
+}) {
+  if (admin.apps.length === 0) {
+    admin.initializeApp({ projectId: PROJECT_ID });
+  }
+
+  process.env.FIREBASE_AUTH_EMULATOR_HOST =
+    process.env.FIREBASE_AUTH_EMULATOR_HOST || '127.0.0.1:9199';
+
+  try {
+    await admin.auth().createUser({
+      uid,
+      email,
+      password: '12345678',
+      displayName,
+    });
+  } catch {
+    // Ignore if already created
+  }
+
+  const db = admin.firestore();
+  await db
+    .collection('users')
+    .doc(uid)
+    .set({
+      uid,
+      email,
+      displayName,
+      roles: ['comprador'],
+      isActive: true,
+    });
 }
 
 async function seedLocalCart(
   page: Page,
   productId: string,
-  priceAtAdd: number,
+  priceAtAdd: number
 ) {
   await page.addInitScript(
     ({ cartKey, item }) => {
@@ -144,7 +196,7 @@ async function seedLocalCart(
         updatedAt: Date.now(),
         priceAtAdd,
       },
-    },
+    }
   );
 }
 
@@ -165,60 +217,13 @@ test.describe('Cart - Carrito', () => {
   test.setTimeout(90_000);
 
   async function loginWithEmail(page: Page, email: string) {
-    await page.goto('/login');
-    const loginButton = page.locator('form').getByRole('button', {
-      name: 'Iniciar sesión',
-      exact: true,
-    });
-
-    await expect(loginButton).toBeEnabled({ timeout: 15_000 });
-    await expect(page.getByLabel('Correo electrónico')).toBeEditable();
-    await expect(page.locator('#password')).toBeEditable();
-    await expect
-      .poll(
-        async () => {
-          try {
-            return await page.evaluate(() => {
-              const button = document
-                .querySelector('form')
-                ?.querySelector('button[type="button"]');
-              return Boolean(
-                button &&
-                  Object.keys(button).some((key) => key.startsWith('__reactProps'))
-              );
-            });
-          } catch (e) {
-            return false;
-          }
-        },
-        { timeout: 15_000 }
-      )
-      .toBe(true);
-
-    const emailField = page.getByLabel('Correo electrónico');
-    const passwordField = page.locator('#password');
-
-    // Fill right before clicking to minimize autofill interference window
-    await emailField.fill(email);
-    await passwordField.fill('12345678');
-
-    // Retry if autofill overwrites the values
-    for (let attempt = 0; attempt < 3; attempt++) {
-      const currentEmail = await emailField.inputValue();
-      const currentPass = await passwordField.inputValue();
-      if (currentEmail === email && currentPass === '12345678') break;
-      await emailField.fill(email);
-      await passwordField.fill('12345678');
-      await page.waitForTimeout(150);
-    }
-
-    await page
-      .locator('form')
-      .getByRole('button', { name: 'Iniciar sesión', exact: true })
-      .click();
-    await expect(page).toHaveURL('/', { timeout: 30_000 });
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.waitForReady();
+    await loginPage.fillCredentials(email);
+    await loginPage.loginButton.click();
+    await expect(page).toHaveURL(/\/(?:productos)?$/, { timeout: 30_000 });
   }
-
 
   async function expectCartPage(page: Page) {
     await expect(page).toHaveTitle(/Mi Carrito \| SansiStore/);
@@ -243,10 +248,14 @@ test.describe('Cart - Carrito', () => {
     await page.goto('/carrito');
     await expectFilledCartPage(page);
 
-    await expect(page.locator('section').getByText('Leche PIL Natural 900 ml')).toBeVisible();
+    await expect(
+      page.locator('section').getByText('Leche PIL Natural 900 ml')
+    ).toBeVisible();
     await expect(page.getByText('Bs 9.70 / u')).toBeVisible();
 
-    await expect(page.locator('section').getByText('Pan Integral Bimbo (precio rebajado)')).toBeVisible();
+    await expect(
+      page.locator('section').getByText('Pan Integral Bimbo (precio rebajado)')
+    ).toBeVisible();
     await expect(page.getByText('Bs 15.00 Bs 10.00 / u')).toBeVisible();
   });
 
@@ -258,18 +267,25 @@ test.describe('Cart - Carrito', () => {
     await page.goto('/carrito');
     await expectCartPage(page);
     await expect(page.getByText('Tu carrito está vacío')).toBeVisible();
-    await expect(page.getByRole('link', { name: /Comprar ahora/ })).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: /Comprar ahora/ })
+    ).toBeVisible();
   });
 
   test('should clear cart when user logs out', async ({ page }) => {
     await page.goto('/productos/leche-pil-natural-900-ml');
     await page.getByRole('button', { name: 'Agregar al carrito' }).click();
-    await expect(page.getByLabel(/Carrito, [^0]/)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByLabel(/Carrito, [^0]/)).toBeVisible({
+      timeout: 10_000,
+    });
 
     await page.goto('/carrito');
     await expectFilledCartPage(page);
     await expect(
-      page.locator('a[href="/productos/leche-pil-natural-900-ml"]').filter({ hasText: 'Leche PIL Natural 900 ml' }).first()
+      page
+        .locator('a[href="/productos/leche-pil-natural-900-ml"]')
+        .filter({ hasText: 'Leche PIL Natural 900 ml' })
+        .first()
     ).toBeVisible({ timeout: 15_000 });
 
     await page.goto('/logout');
@@ -319,8 +335,12 @@ test.describe('Cart - Carrito', () => {
 
     await page.goto('/carrito');
     await expectFilledCartPage(page);
-    await expect(page.locator('a').filter({ hasText: 'Leche PIL Natural 900 ml' })).toBeVisible();
-    await expect(page.getByRole('link', { name: /Carrito, 1 unidades/ })).toBeVisible();
+    await expect(
+      page.locator('a').filter({ hasText: 'Leche PIL Natural 900 ml' })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: /Carrito, 1 unidades/ })
+    ).toBeVisible();
   });
 
   test('should show updated price in real time before confirming', async ({
@@ -338,7 +358,12 @@ test.describe('Cart - Carrito', () => {
 
     await page.goto('/carrito');
 
-    await expect(page.locator(`a[href="/productos/${productId}"]`).filter({ hasText: productName }).first()).toBeVisible({ timeout: 15_000 });
+    await expect(
+      page
+        .locator(`a[href="/productos/${productId}"]`)
+        .filter({ hasText: productName })
+        .first()
+    ).toBeVisible({ timeout: 15_000 });
     await expect(page.getByText('Bs 10.00 / u').first()).toBeVisible();
 
     await updateTestProduct(productId, {
@@ -346,10 +371,12 @@ test.describe('Cart - Carrito', () => {
     });
 
     await expect(
-      page.getByText('El precio subió de Bs 10.00 a Bs 12.50.'),
+      page.getByText('El precio subió de Bs 10.00 a Bs 12.50.')
     ).toBeVisible();
     await expect(
-      page.getByText('1 producto cambió de precio. Revisa el total antes de confirmar.'),
+      page.getByText(
+        '1 producto cambió de precio. Revisa el total antes de confirmar.'
+      )
     ).toBeVisible();
   });
 
@@ -369,8 +396,15 @@ test.describe('Cart - Carrito', () => {
 
     await page.goto('/carrito');
 
-    await expect(page.locator(`a[href="/productos/${productId}"]`).filter({ hasText: productName }).first()).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByRole('button', { name: 'Confirmar pedido' })).toBeEnabled();
+    await expect(
+      page
+        .locator(`a[href="/productos/${productId}"]`)
+        .filter({ hasText: productName })
+        .first()
+    ).toBeVisible({ timeout: 15_000 });
+    await expect(
+      page.getByRole('button', { name: 'Confirmar pedido' })
+    ).toBeEnabled();
 
     await updateTestInventory(productId, {
       stockAvailable: 0,
@@ -378,9 +412,11 @@ test.describe('Cart - Carrito', () => {
 
     await expect(page.getByText('Sin stock disponible.')).toBeVisible();
     await expect(
-      page.getByText('Hay 1 producto no disponible. Quítalos para continuar.'),
+      page.getByText('Hay 1 producto no disponible. Quítalos para continuar.')
     ).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Confirmar pedido' })).toBeDisabled();
+    await expect(
+      page.getByRole('button', { name: 'Confirmar pedido' })
+    ).toBeDisabled();
   });
 
   test('should show image fallback in real time when product image breaks', async ({
@@ -399,13 +435,141 @@ test.describe('Cart - Carrito', () => {
 
     await page.goto('/carrito');
 
-    await expect(page.locator(`a[href="/productos/${productId}"]`).filter({ hasText: productName }).first()).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByTestId(`cart-item-image-${productId}`)).toBeVisible();
+    await expect(
+      page
+        .locator(`a[href="/productos/${productId}"]`)
+        .filter({ hasText: productName })
+        .first()
+    ).toBeVisible({ timeout: 15_000 });
+    await expect(
+      page.getByTestId(`cart-item-image-${productId}`)
+    ).toBeVisible();
 
     await updateTestProduct(productId, {
       imageUrl: '',
     });
 
-    await expect(page.getByTestId(`cart-item-image-fallback-${productId}`)).toBeVisible();
+    await expect(
+      page.getByTestId(`cart-item-image-fallback-${productId}`)
+    ).toBeVisible();
+  });
+
+  test('should clear local storage cart for guest/anonymous user', async ({
+    page,
+  }) => {
+    await page.goto('/productos/leche-pil-natural-900-ml');
+    const addToCartBtn = page.getByRole('button', {
+      name: 'Agregar al carrito',
+    });
+    await expect(addToCartBtn).toBeVisible();
+    await addToCartBtn.click();
+    await expect(page.getByLabel(/Carrito, [^0]/)).toBeVisible({
+      timeout: 10_000,
+    });
+
+    await page.goto('/carrito');
+    await expectFilledCartPage(page);
+
+    await expect(
+      page.locator('a').filter({ hasText: 'Leche PIL Natural 900 ml' }).first()
+    ).toBeVisible();
+    const clearCartBtn = page.getByRole('button', { name: 'Vaciar carrito' });
+    await expect(clearCartBtn).toBeVisible();
+
+    await clearCartBtn.click();
+    const modal = page.locator('[role="dialog"]');
+    await expect(modal).toBeVisible();
+    await expect(
+      modal.getByRole('heading', { name: 'Vaciar carrito' })
+    ).toBeVisible();
+
+    await modal.getByRole('button', { name: 'Cancelar' }).click();
+    await expect(modal).not.toBeVisible();
+    await expect(
+      page.locator('a').filter({ hasText: 'Leche PIL Natural 900 ml' }).first()
+    ).toBeVisible();
+
+    await clearCartBtn.click();
+    await expect(modal).toBeVisible();
+    await modal.getByRole('button', { name: 'Vaciar' }).click();
+
+    await expect(modal).not.toBeVisible();
+    await expect(page.getByText('Tu carrito está vacío')).toBeVisible();
+
+    const localStorageCart = await page.evaluate(
+      (key) => window.localStorage.getItem(key),
+      CART_KEY
+    );
+    expect(
+      localStorageCart === null || JSON.parse(localStorageCart).length === 0
+    ).toBe(true);
+  });
+
+  test('should clear Firestore cart for authenticated user', async ({
+    page,
+  }, testInfo) => {
+    const workerId = testInfo.workerIndex;
+    const uid = `user-clear-cart-${workerId}`;
+    const email = `clear.cart.${workerId}@est.umss.edu`;
+    const displayName = `Test Clear Cart ${workerId}`;
+    const productId = `test-clear-prod-${workerId}`;
+    const productName = `Product Clear Cart ${workerId}`;
+
+    await createTestAuthUser({ uid, email, displayName });
+
+    await createTestProduct({
+      productId,
+      name: productName,
+      price: 15,
+    });
+
+    const db = getTestDb();
+    await db
+      .collection('users')
+      .doc(uid)
+      .collection('cartItems')
+      .doc(productId)
+      .set({
+        cartItemId: `cart-${uid}-1`,
+        userId: uid,
+        productId,
+        quantity: 3,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+    await loginWithEmail(page, email);
+
+    await page.goto('/carrito');
+    await expectFilledCartPage(page);
+    await expect(
+      page.locator('a').filter({ hasText: productName }).first()
+    ).toBeVisible();
+
+    const clearCartBtn = page.getByRole('button', { name: 'Vaciar carrito' });
+    await expect(clearCartBtn).toBeVisible();
+
+    await clearCartBtn.click();
+    const modal = page.locator('[role="dialog"]');
+    await expect(modal).toBeVisible();
+    await modal.getByRole('button', { name: 'Vaciar' }).click();
+
+    await expect(modal).not.toBeVisible();
+    await expect(page.getByText('Tu carrito está vacío')).toBeVisible();
+
+    await expect
+      .poll(
+        async () => {
+          const snap = await db
+            .collection('users')
+            .doc(uid)
+            .collection('cartItems')
+            .get();
+          return snap.empty;
+        },
+        {
+          timeout: 15_000,
+        }
+      )
+      .toBe(true);
   });
 });

@@ -1,4 +1,3 @@
-
 //Área 7: Administración & Analítica — Nova 2.0
 //
 //Este service escribe y lee la colección accessLogs en Firestore.
@@ -9,6 +8,7 @@ import {
   getDocs,
   query,
   where,
+  limit,
   serverTimestamp,
   Timestamp,
 } from 'firebase/firestore';
@@ -45,8 +45,8 @@ export const registrarAcceso = async (
 export const getAccessLogs = async (
   filter?: AccessLogFilter
 ): Promise<AccessLog[]> => {
-  // Construir la query base sin orderBy para evitar requerir índices compuestos
-  let q = query(collection(db, COLLECTION));
+  // Construir la query base con limit para evitar traer demasiados documentos
+  let q = query(collection(db, COLLECTION), limit(500));
 
   // Solo aplicar filtro de fecha inicio en Firestore.
   // (dos where sobre el mismo campo requiere índice compuesto en producción)
@@ -54,7 +54,7 @@ export const getAccessLogs = async (
     const start = new Date(filter.startDate);
     start.setHours(0, 0, 0, 0);
     const startTimestamp = Timestamp.fromDate(start);
-    q = query(q, where('timestamp', '>=', startTimestamp));
+    q = query(collection(db, COLLECTION), where('timestamp', '>=', startTimestamp), limit(500));
   }
 
   const snapshot = await getDocs(q);

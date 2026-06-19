@@ -47,3 +47,11 @@ export async function deleteCartItem(uid: string, productId: string): Promise<vo
   const ref = doc(db, 'users', uid, 'cartItems', productId);
   await deleteDoc(ref);
 }
+
+export async function clearCartFirestore(uid: string): Promise<void> {
+  const batch = writeBatch(db);
+  const colRef = cartCol(uid);
+  const snap = await getDocs(colRef);
+  snap.docs.forEach((d) => batch.delete(d.ref));
+  await batch.commit();
+}

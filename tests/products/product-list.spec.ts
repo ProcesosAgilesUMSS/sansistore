@@ -1,4 +1,5 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
+import { ProductListPage } from '../pages/product-list.page';
 
 test.afterEach(async ({ page }, testInfo) => {
   if (testInfo.status !== testInfo.expectedStatus) {
@@ -14,25 +15,18 @@ test.afterEach(async ({ page }, testInfo) => {
 });
 
 test.describe('Avaiable product list', () => {
-  async function expectProductsPageVisible(page: Page) {
-    await expect(
-      page.getByRole('heading', { name: 'Productos disponibles' })
-    ).toBeVisible({ timeout: 15_000 });
-  }
+  let products: ProductListPage;
 
-  async function expectSearchReady(page: Page) {
-    await expectProductsPageVisible(page);
-    await expect(
-      page.getByRole('textbox', { name: '¿Qué estás buscando hoy?' })
-    ).not.toHaveAttribute('disabled', { timeout: 15_000 });
-  }
+  test.beforeEach(({ page }) => {
+    products = new ProductListPage(page);
+  });
 
   test('load products page', async ({ page }) => {
-    await page.goto('/productos');
+    await products.goto();
 
     await expect(page).toHaveTitle(/Productos \| Sansistore/);
 
-    await expectProductsPageVisible(page);
+    await products.expectVisible();
 
     await expect(
       page.getByRole('button', { name: 'Todas las categorías' })
@@ -41,8 +35,8 @@ test.describe('Avaiable product list', () => {
   });
 
   test('Ofertas', async ({ page }) => {
-    await page.goto('/productos');
-    await expectProductsPageVisible(page);
+    await products.goto();
+    await products.expectVisible();
 
     await page.getByRole('button', { name: /Activar filtro Solo ofertas/ }).click();
     await expect(
@@ -51,21 +45,17 @@ test.describe('Avaiable product list', () => {
   });
 
   test('Categorias', async ({ page }) => {
-    await page.goto('/productos?category=lacteos');
+    await products.goto('?category=lacteos');
     const url = new URL(page.url());
     expect(url.searchParams.get('category')).toBe('lacteos');
-    await expect(
-      page.getByRole('heading', { name: 'Productos disponibles' })
-    ).toBeVisible();
+    await products.expectVisible();
   });
 
   test('Buscar', async ({ page }) => {
-    await page.goto('/productos');
-    await expectSearchReady(page);
+    await products.goto();
+    await products.expectSearchReady();
 
-    await page
-      .getByRole('textbox', { name: '¿Qué estás buscando hoy?' })
-      .fill('Leche');
+    await products.searchInput.fill('Leche');
     await page.getByRole('link', { name: /Ver detalle de Leche PIL Natural 900 ml/ }).click();
     await expect(
       page.getByRole('heading', { name: /Leche PIL Natural 900 ml/ })
@@ -74,30 +64,25 @@ test.describe('Avaiable product list', () => {
   });
 
   test('Search with URL params', async ({ page }) => {
-    await page.goto('/productos?q=Leche');
-    await expectSearchReady(page);
+    await products.goto('?q=Leche');
+    await products.expectSearchReady();
 
-    const searchInput = page.getByRole('textbox', {
-      name: '¿Qué estás buscando hoy?',
-    });
-    await expect(searchInput).toHaveValue('Leche');
+    await expect(products.searchInput).toHaveValue('Leche');
     const url = new URL(page.url());
     expect(url.searchParams.get('q')).toBe('Leche');
   });
 
   test('Category filter with URL params', async ({ page }) => {
-    await page.goto('/productos?category=lacteos');
+    await products.goto('?category=lacteos');
 
     const url = new URL(page.url());
     expect(url.searchParams.get('category')).toBe('lacteos');
-    await expect(
-      page.getByRole('heading', { name: 'Productos disponibles' })
-    ).toBeVisible();
+    await products.expectVisible();
   });
 
   test('Offers filter with URL params', async ({ page }) => {
-    await page.goto('/productos?offers=true');
-    await expectProductsPageVisible(page);
+    await products.goto('?offers=true');
+    await products.expectVisible();
 
     const offersButton = page.getByRole('button', { name: /Quitar filtro Solo ofertas/ });
     await expect(offersButton).toHaveAttribute('aria-pressed', 'true');
@@ -107,23 +92,18 @@ test.describe('Avaiable product list', () => {
   });
 
   test('Sort by name A-Z', async ({ page }) => {
-    await page.goto('/productos?sort=name-asc');
+    await products.goto('?sort=name-asc');
 
     const url = new URL(page.url());
     expect(url.searchParams.get('sort')).toBe('name-asc');
-    await expect(
-      page.getByRole('heading', { name: 'Productos disponibles' })
-    ).toBeVisible();
+    await products.expectVisible();
   });
 
   test('Combined filters with URL params', async ({ page }) => {
-    await page.goto('/productos?q=Leche&category=lacteos&sort=name-asc&page=1');
-    await expectSearchReady(page);
+    await products.goto('?q=Leche&category=lacteos&sort=name-asc&page=1');
+    await products.expectSearchReady();
 
-    const searchInput = page.getByRole('textbox', {
-      name: '¿Qué estás buscando hoy?',
-    });
-    await expect(searchInput).toHaveValue('Leche');
+    await expect(products.searchInput).toHaveValue('Leche');
 
     const url = new URL(page.url());
     expect(url.searchParams.get('q')).toBe('Leche');

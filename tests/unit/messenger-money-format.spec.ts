@@ -1,10 +1,7 @@
-import { expect, test } from '@playwright/test';
-import {
-  formatBolivianos,
-  roundMoney,
-} from '../src/features/mensajero/utils/money';
+import { expect, test, describe } from 'vitest';
+import { formatBolivianos, roundMoney } from '@features/mensajero/utils/money';
 
-test.describe('messenger money formatting', () => {
+describe('messenger money formatting', () => {
   test('rounds floating point precision noise before rendering bolivianos', () => {
     const floatingPointTotal = 302.59999999999997;
 

@@ -1,11 +1,11 @@
-import { expect, test } from '@playwright/test';
-import type { MessengerOrder } from '../src/features/mensajero/types';
+import { expect, test, describe } from 'vitest';
+import type { MessengerOrder } from '@features/mensajero/types';
 import {
   getCollectedOrdersForDay,
   getCollectedTotal,
   getCollectedTotalForDay,
   isMessengerOrderCollected,
-} from '../src/features/mensajero/utils/collectionSummary';
+} from '@features/mensajero/utils/collectionSummary';
 
 const baseOrder: MessengerOrder = {
   id: 'order-base',
@@ -43,7 +43,7 @@ function buildOrder(
   };
 }
 
-test.describe('messenger collection summary', () => {
+describe('messenger collection summary', () => {
   test('counts only delivered orders with collected payment status', () => {
     const collected = buildOrder('collected', {
       cashToCollect: 100,
@@ -105,9 +105,11 @@ test.describe('messenger collection summary', () => {
       updatedAt: new Date('2026-06-04T11:00:00.000Z'),
     });
 
-    expect(getCollectedOrdersForDay([today, yesterday, noCollectedDate], workday))
-      .toHaveLength(1);
-    expect(getCollectedTotalForDay([today, yesterday, noCollectedDate], workday))
-      .toBe(120);
+    expect(
+      getCollectedOrdersForDay([today, yesterday, noCollectedDate], workday)
+    ).toHaveLength(1);
+    expect(
+      getCollectedTotalForDay([today, yesterday, noCollectedDate], workday)
+    ).toBe(120);
   });
 });

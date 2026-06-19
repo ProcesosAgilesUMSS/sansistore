@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { ProductDetailPage } from '../pages/product-detail.page';
 
 test.afterEach(async ({ page }, testInfo) => {
   if (testInfo.status !== testInfo.expectedStatus) {
@@ -16,16 +17,18 @@ test.afterEach(async ({ page }, testInfo) => {
 test.describe('Product Detail Page', () => {
   test.setTimeout(60_000);
 
+  let product: ProductDetailPage;
+
+  test.beforeEach(({ page }) => {
+    product = new ProductDetailPage(page);
+  });
+
   test('loads product with inventory in stock', async ({ page }) => {
-    await page.goto('/productos/leche-pil-natural-900-ml', {
-      waitUntil: 'domcontentloaded',
-    });
+    await product.goto('leche-pil-natural-900-ml');
 
     await expect(page).toHaveTitle(/Sansistore/);
 
-    await expect(
-      page.getByRole('heading', { name: /Leche PIL Natural 900 ml/ })
-    ).toBeVisible({ timeout: 30_000 });
+    await product.waitForHeading(/Leche PIL Natural 900 ml/);
 
     await expect(page.getByText(/Bs\s(9\.70|12\.50)/)).toBeVisible();
 
@@ -37,17 +40,13 @@ test.describe('Product Detail Page', () => {
     await expect(page.getByText(/Stock:.*disponibles/)).toBeVisible();
   });
 
-  test('loads product out of stock', async ({ page }) => {
-    await page.goto('/productos/yogurt-test-sin-resenas', {
-      waitUntil: 'domcontentloaded',
-    });
+  test('loads product out of stock', async () => {
+    await product.goto('yogurt-test-sin-resenas');
+
+    await product.waitForHeading(/Yogurt Test Sin Resenas/);
 
     await expect(
-      page.getByRole('heading', { name: /Yogurt Test Sin Resenas/ })
-    ).toBeVisible({ timeout: 30_000 });
-
-    await expect(
-      page
+      product.page
         .locator('p.leading-7')
         .filter({
           hasText: 'Producto de prueba sin inventario ni comentarios.',
@@ -55,23 +54,20 @@ test.describe('Product Detail Page', () => {
         .first()
     ).toBeVisible();
 
-    await expect(page.getByText(/Bs\s21\.50/)).toBeVisible();
+    await expect(product.page.getByText(/Bs\s21\.50/)).toBeVisible();
     await expect(
-      page.getByText('Producto agotado', { exact: true }).or(page.getByText('No disponible', { exact: true }))
+      product.page.getByText('Producto agotado', { exact: true }).first().or(product.page.getByText('No disponible', { exact: true }).first())
     ).toBeVisible({ timeout: 15000 });
   });
 
   test('displays offer price when available', async ({ page }) => {
-    await page.goto(
-      '/productos/detergente-liquido-ola-futuro-limpieza-completa-5-l',
-      { waitUntil: 'domcontentloaded' }
+    await product.goto(
+      'detergente-liquido-ola-futuro-limpieza-completa-5-l',
     );
 
-    await expect(
-      page.getByRole('heading', {
-        name: /Detergente Liquido Ola Futuro Limpieza Completa 5 L/,
-      })
-    ).toBeVisible({ timeout: 30_000 });
+    await product.waitForHeading(
+      /Detergente Liquido Ola Futuro Limpieza Completa 5 L/,
+    );
 
     await expect(page.getByText(/Bs\s123\.00/)).toBeVisible();
 
@@ -81,13 +77,9 @@ test.describe('Product Detail Page', () => {
   });
 
   test('displays product reviews', async ({ page }) => {
-    await page.goto('/productos/leche-pil-natural-900-ml', {
-      waitUntil: 'domcontentloaded',
-    });
+    await product.goto('leche-pil-natural-900-ml');
 
-    await expect(
-      page.getByRole('heading', { name: /Leche PIL Natural 900 ml/ })
-    ).toBeVisible({ timeout: 30_000 });
+    await product.waitForHeading(/Leche PIL Natural 900 ml/);
 
     await expect(
       page.getByRole('heading', { name: /Comentarios del producto/ })
@@ -139,13 +131,9 @@ test.describe('Product Detail Page', () => {
   test('displays no reviews message when product has no reviews', async ({
     page,
   }) => {
-    await page.goto('/productos/yogurt-test-sin-resenas', {
-      waitUntil: 'domcontentloaded',
-    });
+    await product.goto('yogurt-test-sin-resenas');
 
-    await expect(
-      page.getByRole('heading', { name: /Yogurt Test Sin Resenas/ })
-    ).toBeVisible({ timeout: 30_000 });
+    await product.waitForHeading(/Yogurt Test Sin Resenas/);
     await expect(page.getByText('Sin calificaciones')).toBeVisible({
       timeout: 15_000,
     });
@@ -154,14 +142,10 @@ test.describe('Product Detail Page', () => {
     ).toBeVisible({ timeout: 15_000 });
   });
 
-  test('product image loads', async ({ page }) => {
-    await page.goto('/productos/leche-pil-natural-900-ml', {
-      waitUntil: 'domcontentloaded',
-    });
-    await expect(
-      page.getByRole('heading', { name: /Leche PIL Natural 900 ml/ })
-    ).toBeVisible({ timeout: 30_000 });
-    const productImage = page.getByRole('img', {
+  test('product image loads', async () => {
+    await product.goto('leche-pil-natural-900-ml');
+    await product.waitForHeading(/Leche PIL Natural 900 ml/);
+    const productImage = product.page.getByRole('img', {
       name: /Leche PIL Natural 900 ml/,
     });
 
@@ -174,6 +158,7 @@ test.describe('Product Detail Page', () => {
     });
   });
 
+  // ponytail: 404 test needs response object; keep page.goto
   test('returns 404 for non-existent product', async ({ page }) => {
     const response = await page.goto('/productos/this-product-does-not-exist');
 
@@ -184,7 +169,7 @@ test.describe('Product Detail Page', () => {
   });
 
   test('displays breadcrumb navigation', async ({ page }) => {
-    await page.goto('/productos/leche-pil-natural-900-ml');
+    await product.goto('leche-pil-natural-900-ml');
 
     const breadcrumb = page.getByLabel('Ruta de navegación');
     await expect(
@@ -194,8 +179,9 @@ test.describe('Product Detail Page', () => {
   });
 
   test('add to cart button is functional', async ({ page }) => {
-    await page.goto('/productos/leche-pil-natural-900-ml');
+    await product.goto('leche-pil-natural-900-ml');
 
+    // ponytail: locator used 2x, not worth POM property
     const addToCartButton = page.getByRole('button', {
       name: /add to cart|agregar al carrito|comprar/i,
     });
@@ -207,8 +193,9 @@ test.describe('Product Detail Page', () => {
   });
 
   test('add to cart button is disabled when out of stock', async ({ page }) => {
-    await page.goto('/productos/yogurt-test-sin-resenas');
+    await product.goto('yogurt-test-sin-resenas');
 
+    // ponytail: same locator, 2nd use — not worth extracting
     const addToCartButton = page.getByRole('button', {
       name: /add to cart|agregar al carrito|comprar/i,
     });

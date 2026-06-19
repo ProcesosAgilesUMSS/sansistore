@@ -7,29 +7,37 @@ export const StatusPill = ({ status }: Props) => {
     RESERVADO:
       'border border-(--theme-border) bg-(--theme-secondary-bg) text-(--theme-text)',
     LISTO:
-      'border border-(--theme-border) bg-primary text-white',
+      'border border-(--theme-border) bg-primary text-primary-action',
     ASIGNADO:
       'border border-(--theme-border) bg-(--theme-secondary-bg) text-(--theme-text)',
     'NO ENTREGADO':
-      'border border-amber-200 bg-amber-50 text-amber-800',
+      'border border-(--theme-warning-border) bg-(--theme-warning-bg) text-(--theme-warning)',
+    DEVUELTO:
+      'border border-(--theme-warning-border) bg-(--theme-warning-bg) text-(--theme-warning)',
+    RECHAZADO:
+      'border border-(--theme-error-border) bg-(--theme-error-bg) text-(--theme-error)',
     CANCELADO:
-      'border border-red-200 bg-red-50 text-red-700',
+      'border border-(--theme-error-border) bg-(--theme-error-bg) text-(--theme-error)',
   };
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-700 tracking-wide ${styles[status] ?? 'bg-gray-100 text-gray-600'}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-700 tracking-wide ${styles[status] ?? 'bg-(--theme-secondary-bg) text-(--theme-text) opacity-60'}`}
     >
       <span
         className={`h-1.5 w-1.5 rounded-full ${
           status === 'RESERVADO'
             ? 'bg-primary'
             : status === 'LISTO'
-              ? 'bg-white'
+              ? 'bg-(--theme-bg)'
               : status === 'NO ENTREGADO'
-                ? 'bg-amber-500'
-                : status === 'CANCELADO'
-                  ? 'bg-red-500'
-                  : 'bg-primary'
+                ? 'bg-(--theme-warning)'
+                : status === 'DEVUELTO'
+                  ? 'bg-(--theme-warning)'
+                  : status === 'RECHAZADO'
+                    ? 'bg-(--theme-error)'
+                    : status === 'CANCELADO'
+                      ? 'bg-(--theme-error)'
+                      : 'bg-primary'
         }`}
       />
       {status}

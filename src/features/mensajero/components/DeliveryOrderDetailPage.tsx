@@ -4,7 +4,6 @@ import {
   AlertTriangle,
   ArrowLeft,
   CheckCircle2,
-  DollarSign,
   LoaderCircle,
   MapPin,
   Package,
@@ -16,15 +15,14 @@ import {
 import PaymentSuccessModal from '../modals/PaymentSuccessModal';
 import ConfirmPaymentModal from '../modals/Confirmpaymentmodal';
 import UndeliveredModal from '../modals/UndeliveredModal';
-import CancelNoPaymentModal from '../modals/CancelNoPaymentModal';
 import ConfirmAssignedOrderActionModal, {
   type AssignedOrderAction,
 } from '../modals/ConfirmAssignedOrderActionModal';
 import { auth } from '../../../lib/firebase';
 import { parseOrderId } from '../../cart/services/orderService';
 import {
+  acceptMessengerOrder,
   getMessengerOrderById,
-  markMessengerOrderAsCancelledByNoPayment,
   markMessengerOrderAsNotDelivered,
   registerMessengerCashPayment,
   setMessengerOrderStatus,
@@ -32,6 +30,8 @@ import {
 import type { MessengerOrder } from '../types';
 import { getDeliveryStatusLabel } from '../utils/deliveryStatusFlow';
 import { formatBolivianos } from '../utils/money';
+import { ACCEPT_BLOCKED_BY_ACTIVE_DELIVERY_MESSAGE } from '../utils/acceptEligibility';
+import AcceptBlockedModal from '../modals/AcceptBlockedModal';
 import './MessengerDashboard.css';
 
 const DEV_COURIER_ID = 'user-nadia';
@@ -85,19 +85,6 @@ const getStatusUpdateMessage = (status: MessengerOrder['deliveryStatus']) => {
   return `Estado actualizado a ${getDeliveryStatusLabel(status)}.`;
 };
 
-const canCancelByNoPayment = (order: MessengerOrder) => {
-  const paymentText = `${order.paymentStatus} ${order.paymentStatusLabel}`
-    .toLowerCase()
-    .trim();
-
-  return (
-    (order.deliveryStatus === 'accepted' || order.deliveryStatus === 'in_transit') &&
-    !paymentText.includes('cobrado') &&
-    !paymentText.includes('pagado') &&
-    !paymentText.includes('cancelado')
-  );
-};
-
 function CopyableOrderId({ order }: { order: MessengerOrder }) {
   const { uuid, friendlyName } = parseOrderId(order.id);
   const displayId = order.displayId ?? friendlyName;
@@ -121,22 +108,20 @@ function CopyableOrderId({ order }: { order: MessengerOrder }) {
 function DetailActions({
   order,
   onAssignedAction,
-  onCancelNoPayment,
   onDelivered,
   onInTransit,
   onNotDelivered,
 }: {
   order: MessengerOrder;
   onAssignedAction: (action: AssignedOrderAction) => void;
-  onCancelNoPayment: () => void;
   onDelivered: () => void;
   onInTransit: () => void;
   onNotDelivered: () => void;
 }) {
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
       <a
-        className="messenger-map-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+        className="messenger-map-button inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 px-4 text-sm font-bold transition"
         href={buildBuyerMapUrl(order)}
         onClick={() => storeBuyerMapOrder(order)}
       >
@@ -147,7 +132,7 @@ function DetailActions({
       {order.deliveryStatus === 'assigned' && (
         <>
           <button
-            className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
+            className="messenger-deliver-button inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-4 text-sm font-bold transition"
             onClick={() => onAssignedAction('accept')}
             type="button"
           >
@@ -155,7 +140,7 @@ function DetailActions({
             Aceptar pedido
           </button>
           <button
-            className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+            className="messenger-reject-button inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 px-4 text-sm font-bold transition"
             onClick={() => onAssignedAction('reject')}
             type="button"
           >
@@ -167,7 +152,7 @@ function DetailActions({
 
       {order.deliveryStatus === 'accepted' && (
         <button
-          className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 text-sm font-bold text-white shadow-lg transition hover:bg-blue-700"
+          className="messenger-transit-button inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-4 text-sm font-bold shadow-lg transition"
           onClick={onInTransit}
           type="button"
         >
@@ -178,7 +163,7 @@ function DetailActions({
 
       {order.deliveryStatus === 'in_transit' && (
         <button
-          className="messenger-deliver-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl px-6 text-sm font-bold transition"
+          className="messenger-deliver-button inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-4 text-sm font-bold transition"
           onClick={onDelivered}
           type="button"
         >
@@ -189,7 +174,7 @@ function DetailActions({
 
       {(order.deliveryStatus === 'accepted' || order.deliveryStatus === 'in_transit') && (
         <button
-          className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
+          className="messenger-reject-button inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 px-4 text-sm font-bold transition"
           onClick={onNotDelivered}
           type="button"
         >
@@ -198,16 +183,6 @@ function DetailActions({
         </button>
       )}
 
-      {canCancelByNoPayment(order) && (
-        <button
-          className="messenger-reject-button inline-flex h-12 items-center justify-center gap-2 rounded-2xl border-2 px-6 text-sm font-bold transition"
-          onClick={onCancelNoPayment}
-          type="button"
-        >
-          <DollarSign size={17} />
-          Cancelar por falta de pago
-        </button>
-      )}
     </div>
   );
 }
@@ -225,13 +200,11 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
   const [savingAssignedAction, setSavingAssignedAction] = useState(false);
   const [undeliveredOrder, setUndeliveredOrder] = useState<MessengerOrder | null>(null);
   const [savingUndelivered, setSavingUndelivered] = useState(false);
-  const [cancelNoPaymentOrder, setCancelNoPaymentOrder] =
-    useState<MessengerOrder | null>(null);
-  const [savingCancelNoPayment, setSavingCancelNoPayment] = useState(false);
   const [confirmPaymentOrder, setConfirmPaymentOrder] = useState<MessengerOrder | null>(
     null
   );
   const [paymentSuccessOpen, setPaymentSuccessOpen] = useState(false);
+  const [acceptBlockedOpen, setAcceptBlockedOpen] = useState(false);
 
   useEffect(() => {
     return onAuthStateChanged(auth, (user) => {
@@ -278,34 +251,78 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
     return { subtotal, deliveryCost };
   }, [order]);
 
-  const updateStatus = async (status: MessengerOrder['deliveryStatus']) => {
+  const updateStatus = async (
+    status: MessengerOrder['deliveryStatus'],
+    rejectionReason?: string
+  ) => {
     if (!order) return;
 
     const previousOrder = order;
-    setOrder({ ...order, deliveryStatus: status });
+    const updatedOrder = { ...order, deliveryStatus: status };
+    
+    // Si es rechazo y hay motivo, incluirlo
+    if (status === 'pending_reassignment' && rejectionReason) {
+      updatedOrder.rejectionReason = rejectionReason;
+    }
+
+    setOrder(updatedOrder);
     setMessage('');
     setError('');
 
     try {
-      await setMessengerOrderStatus(previousOrder, status);
+      if (status === 'accepted') {
+        // Mismo punto único que el dashboard: revalida contra Firestore que no
+        // haya otra entrega activa antes de aceptar, sin importar desde qué
+        // pantalla se dispare la acción.
+        if (!courierId) {
+          throw new Error('No se pudo identificar al mensajero.');
+        }
+        await acceptMessengerOrder(previousOrder, courierId);
+      } else {
+        await setMessengerOrderStatus(
+          previousOrder,
+          status,
+          status === 'pending_reassignment' ? rejectionReason : undefined
+        );
+      }
       setMessage(getStatusUpdateMessage(status));
       await loadOrder({ showLoading: false });
     } catch (statusError) {
       console.error(statusError);
       setOrder(previousOrder);
-      setError('No se pudo actualizar el estado del pedido.');
+      if (
+        statusError instanceof Error &&
+        statusError.message === ACCEPT_BLOCKED_BY_ACTIVE_DELIVERY_MESSAGE
+      ) {
+        // Misma UX que el dashboard: si el servicio bloquea por tener otra
+        // entrega activa, mostramos la modal en lugar de un error suelto.
+        setAcceptBlockedOpen(true);
+      } else {
+        setError(
+          statusError instanceof Error
+            ? statusError.message
+            : 'No se pudo actualizar el estado del pedido.'
+        );
+      }
     }
   };
 
-  const confirmAssignedOrderAction = async () => {
+  const confirmAssignedOrderAction = async (reason?: string) => {
     if (!pendingAssignedAction || savingAssignedAction) return;
 
-    const nextStatus =
-      pendingAssignedAction.action === 'accept' ? 'accepted' : 'pending_reassignment';
+    const { action } = pendingAssignedAction;
+
+    // Validar motivo solo para rechazo
+    if (action === 'reject' && !reason?.trim()) {
+      setError('Debes seleccionar un motivo para rechazar el pedido.');
+      return;
+    }
+
+    const nextStatus = action === 'accept' ? 'accepted' : 'pending_reassignment';
 
     setSavingAssignedAction(true);
     try {
-      await updateStatus(nextStatus);
+      await updateStatus(nextStatus, action === 'reject' ? reason : undefined);
       setPendingAssignedAction(null);
     } finally {
       setSavingAssignedAction(false);
@@ -338,36 +355,6 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
     }
   };
 
-  const registerCancelNoPayment = async (notes: string) => {
-    if (!cancelNoPaymentOrder) return;
-
-    const previousOrder = cancelNoPaymentOrder;
-    setSavingCancelNoPayment(true);
-    setOrder({
-      ...previousOrder,
-      deliveryStatus: 'cancelled',
-      paymentStatus: 'CANCELADO',
-      paymentStatusLabel: 'Cancelado por falta de pago',
-    });
-
-    try {
-      await markMessengerOrderAsCancelledByNoPayment({
-        order: previousOrder,
-        notes,
-        courierId,
-      });
-      setMessage(getStatusUpdateMessage('cancelled'));
-      setCancelNoPaymentOrder(null);
-      await loadOrder({ showLoading: false });
-    } catch (cancelError) {
-      console.error(cancelError);
-      setOrder(previousOrder);
-      setError('No se pudo cancelar el pedido por falta de pago.');
-    } finally {
-      setSavingCancelNoPayment(false);
-    }
-  };
-
   const confirmPayment = async (targetOrder: MessengerOrder, secret: string) => {
     if (!courierId) throw new Error('No se pudo identificar al mensajero.');
     if (secret !== targetOrder.secret) throw new Error('Codigo incorrecto.');
@@ -397,7 +384,7 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
 
   if (loading) {
     return (
-      <section className="mx-auto flex min-h-[55vh] max-w-5xl items-center justify-center px-4">
+      <section className="mx-auto flex min-h-[55vh] max-w-6xl items-center justify-center px-4">
         <div className="messenger-order-card flex items-center gap-3 rounded-[28px] border p-8 text-sm font-bold">
           <LoaderCircle className="animate-spin" size={20} />
           Cargando detalle del pedido...
@@ -408,7 +395,7 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
 
   if (!order) {
     return (
-      <section className="mx-auto max-w-5xl px-4 py-10">
+      <section className="mx-auto max-w-6xl px-4 py-10">
         <a
           className="messenger-map-button mb-6 inline-flex h-11 items-center justify-center gap-2 rounded-2xl border-2 px-5 text-sm font-bold transition"
           href="/courier"
@@ -463,7 +450,7 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
           <div
             className={`mt-6 rounded-2xl border px-4 py-3 text-sm font-bold ${
               error
-                ? 'border-red-500/40 bg-red-500/10 text-red-500'
+                ? 'border-(--theme-error-border) bg-(--theme-error-bg) text-(--theme-error)'
                 : 'border-primary/30 bg-primary/10 text-primary'
             }`}
           >
@@ -503,7 +490,6 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
             <DetailActions
               order={order}
               onAssignedAction={(action) => setPendingAssignedAction({ order, action })}
-              onCancelNoPayment={() => setCancelNoPaymentOrder(order)}
               onDelivered={() => setConfirmPaymentOrder(order)}
               onInTransit={() => void updateStatus('in_transit')}
               onNotDelivered={() => setUndeliveredOrder(order)}
@@ -569,15 +555,6 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
         />
       )}
 
-      {cancelNoPaymentOrder && (
-        <CancelNoPaymentModal
-          isSaving={savingCancelNoPayment}
-          order={cancelNoPaymentOrder}
-          onClose={() => setCancelNoPaymentOrder(null)}
-          onConfirm={registerCancelNoPayment}
-        />
-      )}
-
       {confirmPaymentOrder && (
         <ConfirmPaymentModal
           order={confirmPaymentOrder}
@@ -588,6 +565,10 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
 
       {paymentSuccessOpen && (
         <PaymentSuccessModal onClose={() => setPaymentSuccessOpen(false)} />
+      )}
+
+      {acceptBlockedOpen && (
+        <AcceptBlockedModal onClose={() => setAcceptBlockedOpen(false)} />
       )}
     </section>
   );

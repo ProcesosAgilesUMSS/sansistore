@@ -401,3 +401,92 @@
 - **Yesterday:** Trabaje en mis HU asignadas y mi issue asignado
 - **Today:** Preveo terminar mi HU y bug asignado
 - **Blockers:** None.
+
+***
+
+# Sprint 4
+
+## 09-06-2026
+
+### José Daniel Virreira Rufino
+
+- **Yesterday:** Participé en la demo, presentación y finalización de todo el Sprint 3
+- **Today:** Trabajaré en el sprint retrospective, en el sprint planning para esta cuarta iteración y empezaré con la implementación de las siguientes historias de usuario.
+- **Blockers:** Encontrar posibles dependencias para este sprint sobre nuestras historias de usuario.
+
+### Efrain Peralta Felipe
+
+- **Yesterday:** Encontre una hus posiblemente duplicada en las hus que nos faltan.
+- **Today:** Trabajare en la hu del sprint 4.
+- **Blockers:** None
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday:** Cierre del Sprint 3, verificación de que todos los PRs estén mergeados en `main` y preparación para la retrospectiva.
+- **Today:** Participar en el sprint retrospective y en el sprint planning para esta cuarta iteración.
+- **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+- **Yesterday:** Verifique las funcionalidades añadidas por nuestro team para el sprint 3
+- **Today:** Realizar el trello para el sprint retrospective
+- **Blockers:** None.
+
+### Adrian
+
+- **Yesterday:** Estuve trabajando en la hu asignada
+- **Today:** Termine de corregir un bug que salia.
+- **Blockers:** None.
+
+## 11-06-2026
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday:** Cierre del Sprint 3 y preparación para el Sprint 4.
+- **Today:** Inicio del desarrollo de las historias de usuario asignadas para el Sprint 4.
+- **Blockers:** None.
+
+### Efrain Peralta Felipe
+- **Yesterday:** Preparación del sprint 4.
+- **Today:** Comenzar con el desarrollo de la hu del sprint 4.
+- **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+- **Yesterday:** Empece la preparacion de las HU para el sprint 4.
+- **Today:** Comenzare con el desarrollo de HU para el sprint 4 y correccion de bugs
+- **Blockers:** None.
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Documenté las historias de usuario para este sprint 4
+- **Today:** Refinaremos el sprint planning para poder empezar a desarrollar el sprint 4
+- **Blockers:** Las funcionalidades que estaban en el git son deprecadas, duplicadas, o en estado "not to release", por lo tanto, tuvimos que planear nuevas HU's en base a indicaciones del ingeniero.
+
+### Adrian
+
+- **Yesterday:** Estuve planificando que hu hare.
+- **Today:** Hablare con mi grupo para ver que hacer.
+- **Blockers:** None.
+
+## 16-06-2026
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Participé en el Sprint Planning 4 para continuar con el desarrollo de integración continua.
+- **Today:** Continuar con la implementación de la historia de usuario asignada y también verificar que errores se presentan durante el desarrollo.
+- **Blockers:** Cambiar la estética a la definida puede traer bugs de cualquier tipo, se debe tener cuidado.
+
+### Efrain Peralta Felipe
+- **Yesterday:** Analice mi hu designada para esta este sprint
+- **Today:** Continuar con la implementación de mi hu para este sprint.
+- **Blockers:** None.
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday:** Asignación y análisis de la HU #568 (Rechazar pedido asignado con motivo). La HU se encuentra en estado "In Progress".
+- **Today:** Continuar con el desarrollo de la HU #568.
+- **Blockers:** None.
+
+### Adrián
+- **Yesterday:** Desarrollo de la HU asignada, la cual restringe al mensajero de aceptar un nuevo pedido si ya tiene una entrega activa.
+- **Today:** Continuar con la implementación de la HU para este sprint.
+- **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+- **Yesterday:** Empece el desarrollo de la HU 570 liberar disponibilidad
+- **Today:** Continuar con la implementación de la HU para este sprint.
+- **Blockers:** None.

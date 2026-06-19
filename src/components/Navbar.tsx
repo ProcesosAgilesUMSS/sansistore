@@ -84,8 +84,24 @@ export default function Navbar() {
   const [theme, setTheme] = useState<ThemeMode>('light');
   const [themeReady, setThemeReady] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-  const [loginMenuOpen, setLoginMenuOpen] = useState(false);
   const [roles, setRoles] = useState<string[]>([]);
+  const [currentPath, setCurrentPath] = useState('');
+
+  useEffect(() => {
+    const syncPath = () => setCurrentPath(window.location.pathname);
+    syncPath();
+    document.addEventListener('astro:page-load', syncPath);
+    document.addEventListener('astro:after-swap', syncPath);
+    return () => {
+      document.removeEventListener('astro:page-load', syncPath);
+      document.removeEventListener('astro:after-swap', syncPath);
+    };
+  }, []);
+
+  const isActive = (href: string) =>
+    href === '/'
+      ? currentPath === '/'
+      : currentPath === href || currentPath.startsWith(href + '/');
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
@@ -180,23 +196,28 @@ export default function Navbar() {
   const showOperadorInvFeatures = user && roles.length > 0 && roles.some(r => ['operador_inv', 'admin'].includes(r));
   const showMensajeroFeatures = user && roles.length > 0 && roles.some(r => ['mensajero', 'admin'].includes(r));
   const showAdminFeatures = user && roles.length > 0 && roles.some(r => ['admin'].includes(r));
-  const showMisPedidos = user && roles.length > 0 && roles.some(r => ['comprador', 'admin'].includes(r));
 
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-bg-light/85 border-b border-border-light font-sans">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-14">
+        <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16">
+          <div className="flex items-center justify-between gap-4 h-14">
             {/* LOGO */}
             <a
               href="/"
-              className="font-black tracking-tight text-[16px] text-text-light"
+              aria-label="SansiStore — inicio"
+              className="group flex items-center gap-2 shrink-0"
             >
-              sansi<span className="text-primary">store</span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-white shadow-sm shadow-primary/30 transition-transform group-hover:scale-105 group-active:scale-95">
+                <ShoppingBag size={17} strokeWidth={2.4} />
+              </span>
+              <span className="font-display font-black tracking-tight text-[18px] leading-none text-text-light">
+                Sansi<span className="text-primary">Store</span>
+              </span>
             </a>
 
             {/* LINKS */}
-            <div className="hidden md:flex items-center gap-8">
+            <div className="hidden md:flex items-center gap-8 whitespace-nowrap">
               {[
                 { label: 'Productos', href: '/productos', reqComprador: true },
                 { label: 'Ordenes', href: '/seller/created-orders', reqVendedor: true },
@@ -212,19 +233,27 @@ export default function Navbar() {
                   if (item.reqAdmin && !showAdminFeatures) return false;
                   return true;
                 })
-                .map((item) => (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    className="text-[13px] text-text-light opacity-[0.60] font-semibold tracking-[0.02em] transition-all hover:text-primary hover:opacity-100"
-                  >
-                    {item.label}
-                  </a>
-                ))}
+                .map((item) => {
+                  const active = isActive(item.href);
+                  return (
+                    <a
+                      key={item.label}
+                      href={item.href}
+                      aria-current={active ? 'page' : undefined}
+                      className={`relative text-[13px] font-semibold tracking-[0.02em] transition-all hover:text-primary ${
+                        active
+                          ? 'text-primary opacity-100 after:absolute after:-bottom-4.5 after:left-0 after:right-0 after:h-0.5 after:bg-primary after:rounded-full'
+                          : 'text-text-light opacity-[0.60] hover:opacity-100'
+                      }`}
+                    >
+                      {item.label}
+                    </a>
+                  );
+                })}
             </div>
 
             {/* ACTIONS */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 shrink-0">
               {/* CART */}
               {showCompradorFeatures && <CartButton />}
               {authReady && user && showCompradorFeatures && (
@@ -272,7 +301,7 @@ export default function Navbar() {
                           className="w-7 h-7 rounded-full object-cover"
                         />
                       )}
-                      <span className="hidden sm:inline text-[13px] text-text-light opacity-70">
+                      <span className="hidden sm:inline max-w-35 truncate text-[13px] text-text-light opacity-70">
                         {user.displayName}
                       </span>
                       <ChevronDown
@@ -295,17 +324,6 @@ export default function Navbar() {
                           <UserIcon size={14} />
                           Mi Perfil
                         </a>
-
-                        {showMisPedidos && (
-                          <a
-                            role="menuitem"
-                            href="/mis-pedidos"
-                            className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light opacity-70 transition-colors hover:bg-border-light/40 hover:text-primary hover:opacity-100"
-                          >
-                            <Package size={14} />
-                            Mis pedidos
-                          </a>
-                        )}
 
                         {canAccessCourier && (
                           <a
@@ -339,36 +357,13 @@ export default function Navbar() {
                     )}
                   </div>
                 ) : (
-                  <div className="relative">
-                    <button
-                      type="button"
-                      aria-expanded={loginMenuOpen}
-                      aria-haspopup="menu"
-                      onClick={() => setLoginMenuOpen((open) => !open)}
-                      className="flex items-center gap-2 rounded-full px-2 py-1 transition-all hover:bg-border-light/40"
-                    >
-                      <UserIcon size={18} className="text-text-light opacity-60" />
-                      <ChevronDown
-                        size={14}
-                        className={`text-text-light opacity-50 transition-transform ${loginMenuOpen ? 'rotate-180' : ''}`}
-                      />
-                    </button>
-
-                    {loginMenuOpen && (
-                      <div
-                        role="menu"
-                        className="absolute right-0 top-11 w-48 overflow-hidden rounded-lg border border-border-light bg-bg-light shadow-lg"
-                      >
-                        <a
-                          role="menuitem"
-                          href="/login"
-                          className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light transition-colors hover:bg-border-light/40 hover:text-primary"
-                        >
-                          Iniciar sesión
-                        </a>
-                      </div>
-                    )}
-                  </div>
+                  <a
+                    href="/login"
+                    className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-1.5 text-[13px] font-semibold text-white transition-all hover:brightness-110 active:scale-95"
+                  >
+                    <UserIcon size={15} />
+                    Iniciar sesión
+                  </a>
                 ))}
 
               {/* MOBILE */}
@@ -399,15 +394,23 @@ export default function Navbar() {
                   if (item.reqAdmin && !showAdminFeatures) return false;
                   return true;
                 })
-                .map((item) => (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    className="text-[13px] text-text-light opacity-[0.55] font-semibold tracking-[0.02em] transition-all hover:text-primary hover:opacity-100"
-                  >
-                    {item.label}
-                  </a>
-                ))}
+                .map((item) => {
+                  const active = isActive(item.href);
+                  return (
+                    <a
+                      key={item.label}
+                      href={item.href}
+                      aria-current={active ? 'page' : undefined}
+                      className={`text-[13px] font-semibold tracking-[0.02em] transition-all hover:text-primary ${
+                        active
+                          ? 'text-primary opacity-100'
+                          : 'text-text-light opacity-[0.55] hover:opacity-100'
+                      }`}
+                    >
+                      {item.label}
+                    </a>
+                  );
+                })}
 
               {/* CORRECCIÓN: Quitamos showCompradorFeatures de aquí */}
               {user && (
@@ -426,15 +429,6 @@ export default function Navbar() {
                       className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
                     >
                       Mis direcciones
-                    </a>
-                  )}
-
-                  {showMisPedidos && (
-                    <a
-                      href="/mis-pedidos"
-                      className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
-                    >
-                      Mis pedidos
                     </a>
                   )}
 

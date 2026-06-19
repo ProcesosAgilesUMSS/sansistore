@@ -13,6 +13,10 @@ import {
   type Unsubscribe,
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
+import {
+  normalizePaymentMethod,
+  registrarActividadCobroActual,
+} from '../../admin/pedidos/payment-audit/services/paymentAuditService';
 import { getCurrentZone } from '../../location/utils/zoneLimits';
 import type { MessengerOrder, MessengerOrderItem, MessengerShiftClosure, MessengerShiftOrderSnapshot,} from '../types';
 import { getVisibleMessengerOrders } from '../utils/orderVisibility';
@@ -22,6 +26,10 @@ import {
   getOrderDeliveryStatusForDeliveryStatus,
   getOrderStatusForDeliveryStatus,
 } from '../utils/deliveryStatusFlow';
+import {
+  ACCEPT_BLOCKED_BY_ACTIVE_DELIVERY_MESSAGE,
+  isActiveDelivery,
+} from '../utils/acceptEligibility';
 
 type DeliveryStatus = MessengerOrder['deliveryStatus'];
 type OrderData = Record<string, unknown>;
@@ -146,7 +154,7 @@ const formatCourierZoneName = (zoneName: string | null): string | undefined => {
 
 const readOrderDisplayId = (orderId: string): string | undefined => {
   const [, friendlyName] = orderId.split('_');
-  return asString(friendlyName) ?? asString(orderId);
+  return asString(friendlyName) ?? asString(orderId) ?? undefined;
 };
 
 const readPayment = async (paymentId: string | null): Promise<PaymentData> => {
@@ -307,7 +315,7 @@ const getStatusForORder = (status: DeliveryStatus) => {
     case 'accepted':
       return 'ACEPTADO';
     case 'pending_reassignment':
-      return 'PENDIENTE REASIGNACION';
+      return 'PENDIENTE-ASIGNACION';
     case 'in_transit':
       return 'EN CAMINO';
     case 'delivered':
@@ -325,7 +333,8 @@ const getStatusForORder = (status: DeliveryStatus) => {
 
 export async function setMessengerOrderStatus(
   order: MessengerOrder,
-  status: DeliveryStatus
+  status: DeliveryStatus,
+  rejectionReason?: string
 ) {
   assertCanTransitionDeliveryStatus(order.deliveryStatus, status);
 
@@ -334,6 +343,12 @@ export async function setMessengerOrderStatus(
     status,
     updatedAt: serverTimestamp(),
   };
+
+  // Si es rechazo y hay motivo, guardarlo
+  if (status === 'pending_reassignment' && rejectionReason) {
+    dataToUpdate.rejectionReason = rejectionReason;
+    dataToUpdate.rejectedAt = serverTimestamp();
+  }
 
   if (status === 'in_transit') {
     dataToUpdate.inTransitAt = serverTimestamp();
@@ -348,12 +363,64 @@ export async function setMessengerOrderStatus(
   await updateDoc(deliveryRef, dataToUpdate);
 
   if (order.id) {
-    await updateDoc(doc(db, 'orders', order.id), {
+    const orderUpdateData: Record<string, unknown> = {
       status: getOrderStatusForDeliveryStatus(status),
       deliveryStatus: getOrderDeliveryStatusForDeliveryStatus(status),
       updatedAt: serverTimestamp(),
-    });
+    };
+
+    if (status === 'pending_reassignment' && rejectionReason) {
+      orderUpdateData.rejectionReason = rejectionReason;
+      orderUpdateData.rejectedAt = serverTimestamp();
+    }
+
+    await updateDoc(doc(db, 'orders', order.id), orderUpdateData);
   }
+}
+
+/**
+ * Lanza un error si el mensajero ya tiene una entrega activa
+ * (estado `accepted` o `in_transit`) distinta a la que intenta aceptar.
+ * Consulta Firestore en el momento (no confía en el estado local de la UI),
+ * por lo que la regla se cumple sin importar desde qué pantalla se dispare.
+ * Se filtra en memoria para no requerir un índice compuesto en Firestore.
+ */
+export async function assertCanAcceptMessengerOrder(
+  courierId: string,
+  deliveryId: string
+): Promise<void> {
+  const deliveriesQuery = query(
+    collection(db, 'deliveries'),
+    where('courierId', '==', courierId)
+  );
+  const snapshot = await getDocs(deliveriesQuery);
+
+  const hasActiveDelivery = snapshot.docs.some(
+    (deliveryDoc) =>
+      deliveryDoc.id !== deliveryId &&
+      isActiveDelivery({
+        deliveryStatus: normalizeDeliveryStatus(deliveryDoc.data().status),
+      })
+  );
+
+  if (hasActiveDelivery) {
+    throw new Error(ACCEPT_BLOCKED_BY_ACTIVE_DELIVERY_MESSAGE);
+  }
+}
+
+/**
+ * Punto único para aceptar un pedido asignado. Valida contra Firestore que el
+ * mensajero no tenga otra entrega activa y, solo si pasa, marca el pedido como
+ * `accepted`. Tanto el dashboard como la vista de detalle deben usar esta
+ * función para que la regla de negocio viva en un solo lugar y no se pueda
+ * colar una doble aceptación desde pantallas que no se sincronizan en vivo.
+ */
+export async function acceptMessengerOrder(
+  order: MessengerOrder,
+  courierId: string
+): Promise<void> {
+  await assertCanAcceptMessengerOrder(courierId, order.deliveryId);
+  await setMessengerOrderStatus(order, 'accepted');
 }
 
 export async function registerMessengerCashPayment(
@@ -407,6 +474,14 @@ export async function registerMessengerCashPayment(
   );
 
   await batch.commit();
+
+  registrarActividadCobroActual({
+    orderId: order.id,
+    amount: order.cashToCollect,
+    paymentMethod: normalizePaymentMethod(order.paymentMethod),
+    status: 'VERIFICADO',
+    fallbackRole: 'MENSAJERO',
+  }).catch((err) => console.error('Error al registrar auditoria de cobro:', err));
 }
 
 export async function markMessengerOrderAsNotDelivered({

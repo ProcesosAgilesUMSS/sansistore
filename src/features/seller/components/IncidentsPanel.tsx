@@ -29,7 +29,7 @@ function StatItem({
         <p className="text-xs font-800 uppercase tracking-[0.16em] text-(--theme-text) opacity-45">
           {label}
         </p>
-        <p className="truncate text-lg font-900 text-(--theme-text)" style={{ fontFamily: 'Outfit, sans-serif' }}>
+        <p className="truncate font-display text-lg font-900 text-(--theme-text)">
           {value}
         </p>
       </div>
@@ -48,7 +48,7 @@ function IncidentRow({
     <div className="flex items-center gap-4 rounded-2xl border border-(--theme-border) bg-(--theme-card-bg) px-6 py-5 transition hover:shadow-sm">
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <p className="text-lg font-800 text-(--theme-text)" style={{ fontFamily: 'Outfit, sans-serif' }}>
+          <p className="font-display text-lg font-800 text-(--theme-text)">
             {parseOrderId(order.orderId).friendlyName}
           </p>
           <p className="text-sm text-(--theme-text) opacity-55">
@@ -58,7 +58,7 @@ function IncidentRow({
 
         <div className="mt-2 flex flex-wrap items-center gap-2">
           {order.incidentReason ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-sm font-800 text-amber-800">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-(--theme-warning-border) bg-(--theme-warning-bg) px-3 py-1 text-sm font-800 text-(--theme-warning)">
               <AlertTriangle size={12} />
               {order.incidentReason}
             </span>
@@ -107,7 +107,7 @@ export default function IncidentsPanel({ embedded = false }: { embedded?: boolea
     <div
       className={
         embedded
-          ? 'mx-auto w-full max-w-4xl px-4 py-10'
+          ? 'mx-auto w-full max-w-6xl px-4 py-10'
           : 'min-h-screen bg-(--theme-bg) px-4 pb-10 pt-10 md:px-8 xl:px-10'
       }
     >
@@ -142,10 +142,10 @@ export default function IncidentsPanel({ embedded = false }: { embedded?: boolea
                 {sortedReasons.map(([reason, count]) => (
                   <span
                     key={reason}
-                    className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-1.5 text-sm font-700 text-amber-800"
+                    className="inline-flex items-center gap-2 rounded-full border border-(--theme-warning-border) bg-(--theme-warning-bg) px-4 py-1.5 text-sm font-700 text-(--theme-warning)"
                   >
                     {reason}
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-200 text-xs font-900 text-amber-900">
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-(--theme-warning-border) text-xs font-900 text-(--theme-warning)">
                       {count}
                     </span>
                   </span>
@@ -156,10 +156,10 @@ export default function IncidentsPanel({ embedded = false }: { embedded?: boolea
 
           <div className="rounded-2xl border border-(--theme-border) bg-(--theme-card-bg) p-6">
             <div className="mb-4 flex items-center gap-2.5">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-900 text-white">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-900 text-primary-action">
                 {orders.length}
               </span>
-              <p className="text-lg font-800 text-(--theme-text)" style={{ fontFamily: 'Outfit, sans-serif' }}>
+              <p className="font-display text-lg font-800 text-(--theme-text)">
                 Pedidos no entregados
               </p>
             </div>
@@ -180,8 +180,8 @@ export default function IncidentsPanel({ embedded = false }: { embedded?: boolea
           </div>
 
           {orders.length > 0 && (
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
-              <p className="text-xs font-700 text-amber-800">
+            <div className="rounded-2xl border border-(--theme-warning-border) bg-(--theme-warning-bg) px-4 py-3">
+              <p className="text-xs font-700 text-(--theme-warning)">
                 Gestiona estos pedidos desde{' '}
                 <a href="/seller/undelivered-orders" className="underline underline-offset-2 hover:opacity-80">
                   Pedidos no entregados

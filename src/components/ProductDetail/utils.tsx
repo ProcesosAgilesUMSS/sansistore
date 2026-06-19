@@ -213,9 +213,10 @@ export function areSetsEqual<T>(left: Set<T>, right: Set<T>) {
 export function getProductDerivedData(product: Product | null) {
   const showOffer = hasValidOffer(product);
   const currentPrice = showOffer ? (product?.offerPrice ?? 0) : (product?.price ?? 0);
-  const stockAvailable = product?.stockAvailable ?? 0;
-  const stockReserved = product?.stockReserved ?? 0;
-  const effectiveStock = Math.max(0, stockAvailable - stockReserved);
+  const effectiveStock = Math.max(
+    0,
+    (product?.stockAvailable ?? 0) - (product?.stockReserved ?? 0)
+  );
   const isAvailable =
     effectiveStock > 0 &&
     product?.enabled !== false &&

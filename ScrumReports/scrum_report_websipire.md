@@ -380,3 +380,129 @@ por las dudas que se tienen.
 * **Yesterday:** Completé el desarrollo de las historias de usuario asignadas y revisé las observaciones realizadas sobre la HU-125.
 * **Today:** Realicé pruebas funcionales del flujo de la HU-125 para validar las observaciones recibidas, verificando el comportamiento de la funcionalidad e identificando algunos ajustes pendientes para asegurar el cumplimiento de los requerimientos.
 * **Blockers:** None.
+
+# Daily Reports - Team 3 Webspire 09/06/26
+
+
+## Dayana Saleth Ortuño Guzmán
+
+* **Yesterday:** Estuve presente en la demo realizada el día de ayer.
+
+* **Today:** Coordinar la planificación de las historias de usuario pendientes, analizando su ubicación dentro del flujo de la aplicación para garantizar una mejor experiencia para el usuario.
+
+* **Blockers:** None.
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Realicé la demo de las funcionalidades desarrolladas por mi grupo, presentando los avances alcanzados durante el sprint y participando en la revisión general del sistema.
+* **Today:** Coordinar la planificación de las historias de usuario pendientes, analizando su ubicación dentro del flujo de la aplicación para garantizar una mejor experiencia para el usuario.
+* **Blockers:** None.
+* 
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Estuve presente en la demo realizada el día de ayer, participando en la revisión de los avances y funcionalidades desarrolladas por el equipo.
+* **Today:** Revisar las historias de usuario pendientes y apoyar en su planificación, considerando su impacto dentro de la experiencia de usuario y el flujo de la aplicación.
+* **Blockers:** None.
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Estuve presente en la demo realizada el día de ayer, observando el funcionamiento de las funcionalidades implementadas y los avances del equipo.
+* **Today:** Colaborar en la organización de las historias de usuario pendientes y analizar los ajustes necesarios para mantener la coherencia dentro del flujo de la aplicación.
+* **Blockers:** None.
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Estuve presente en la demo realizada el día de ayer, revisando junto al equipo los avances alcanzados durante el sprint.
+* **Today:** Apoyar en la planificación de las historias de usuario pendientes, revisando posibles dependencias y su integración dentro del flujo de la aplicación.
+* **Blockers:** None.
+
+# Daily Reports - Team 3 Webspire 11/06/26
+
+## Dayana Saleth Ortuño Guzmán
+
+* **Yesterday:** Revise el tablero de github y puse los criterios de aceptacion a la HU designada.
+* **Today:** Comence con el desarrollo para el Sprint4.
+* **Blockers:** None.
+
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Revisé el tablero de GitHub y agregué los criterios de aceptación.
+* **Today:** Empecé con el desarrollo correspondiente al Sprint 4.
+* **Blockers:** None.
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Revisé los requerimientos de las HUs asignadas y validé los criterios de aceptación para iniciar su desarrollo.
+* **Today:** Comencé con la implementación de las funcionalidades correspondientes.
+* **Blockers:** None
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Estuve presente en la asignacion de hus para ver el funcionamiento que tendra que tener.
+* **Today:** Contribui con la asignacion de criterios de aceptacion de mis his asignadas
+* **Blockers:** none
+  
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Revisé los requerimientos de las HUs asignadas y confirmé los criterios de aceptación necesarios para comenzar con el desarrollo.
+* **Today:** Inicié la implementación de las funcionalidades correspondientes a mi HU asignada.
+* **Blockers:** None
+  
+# Daily Reports - Team 3 Webspire 16/06/26
+
+## Dayana Saleth Ortuño Guzmán
+
+* **Yesterday:** Comence con la tarea que se nos asigno, de mejorar el diseño de una una vista, especificamente la que esta en: src/features/cobro/components/CheckoutSummaryPanel.tsx
+* **Today:** Comenzare con el desarrollo de mi HU Asiganada.
+* **Blockers:** None.
+
+## Maria Victoria Grageda Vallejos
+
+* **Yesterday:** Estuve trabajando en mi HU asignada, revisando los avances necesarios para continuar con su desarrollo.
+* **Today:** Continuaré trabajando en mi HU asignada.
+* **Blockers:** None.
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Estuve trabajando en mi HU asignada, avanzando con la implementación de las funcionalidades.
+* **Today:** Continuaré con el desarrollo de mi HU, realizando pruebas y ajustes para asegurar su correcto funcionamiento.
+* **Blockers:** None
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Trabaje en el avance del mockup de la Hu que me toco para este sprint. 
+* **Today:**  Avance con el desarrollo de mi hu asignada.
+* **Blockers:** none
+
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Estuve avanzando en mi HU asignada, desarrollando parte de las funcionalidades planificadas.
+* **Today:** Continuaré con la implementación de mi HU, realizando pruebas y ajustes para asegurar su correcto funcionamiento.
+* **Blockers:** None
+# Daily Reports - Team 3 Webspire 18/06/26
+
+## Dayana Saleth Ortuño Guzmán
+
+* **Yesterday:** Implemente una parte de mu HU asignada.
+* **Today:** Revise lo que mi compañera implemento para finalizar la HU "Registrar el motivo de fallos de entrega para análisis"
+* **Blockers:** Al principio tuve la duda si tenia que registra el pedido fallido del mensajero o del comprador, pero una vez preguntando y entendiendo ya puede comprender.
+
+## Maria Victoria Grageda Vallejos
+* **Yesterday:** Trabajé en mi HU asignada: registrar el motivo de fallos de entrega para análisis. Revisé la vista, el servicio y la lógica para guardar el motivo del pedido en base de datos.
+* **Today:** Finalicé y ajusté mi HU para trabajar con el estado `RECHAZADO`, según la aclaración recibida. También validé que el flujo no duplique el registro del motivo cuando el cliente ya lo registró.
+* **Blockers:** Ninguno actualmente. La duda sobre el estado a usar (`DEVUELTO`, `NO ENTREGADO` o `RECHAZADO`) ya fue aclarada y se definió trabajar con `RECHAZADO`.
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Trabajé en la implementación y validación de la HU "Detectar diferencias entre pedidos entregados y pagos registrados", revisando la lógica de conciliación y los criterios de aceptación definidos.
+* **Today:** Realicé pruebas finales y validé junto al equipo que los distintos escenarios de inconsistencias se detecten correctamente.
+* **Blockers:** None
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Trabajé en la implementación de la HU "Detectar diferencias entre pedidos entregados y pagos registrados", colaborando en la integración y pruebas de los diferentes casos de inconsistencia. 
+* **Today:**  Realicé pruebas de validación y revisión final de la HU para asegurar el cumplimiento de los criterios de aceptación
+* **Blockers:** none
+
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Avancé en el desarrollo de la HU "Detectar diferencias entre pedidos entregados y pagos registrados", apoyando en la implementación de las validaciones y reglas de conciliación.
+* **Today:** Revisé y validé el funcionamiento de los filtros y la visualización de inconsistencias en el panel de conciliación.
+* **Blockers:** None

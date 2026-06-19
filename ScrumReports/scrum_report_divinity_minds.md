@@ -392,6 +392,128 @@
 
 ## Velasquez Vela Marcos
 
+- **Yesterday:** Revisé las HUs de dmind del Sprint 3 (reseña de delivery, identificar pedidos con fallos, categorías inactivas) contrastando código contra criterios de aceptación; confirmé que cumplen, incluida la reposición de stock atómica que evita duplicados.
+- **Today:** Revisé las HUs de mis compañeros validando que cumplieran sus criterios y las moví a "Aceptado por el PO". Además corrí las pruebas Playwright de las HUs en Docker (pedidos fallidos, flujo de delivery y reseñas) y dejé observaciones de readiness para el review.
+- **Blockers:** n/a.
+
+# 06/09/2026
+
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Revisó historias de usuario pendientes y ayudó a ordenar los puntos principales para llevarlos al tablero de Trello de la Sprint Retrospective.
+- **Today:** Participar en la retrospectiva y proponer acciones concretas para mejorar la coordinación del equipo.
+- **Blockers:** n/a.
+
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Configuraciones del github workflow para validacion de codigo limpio con biome.
+- **Today:** Corregir secciones de codigo con buenas practicas.
+- **Blockers:** n/a.
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:**  Validé y reporté los bugs encontrados, actualizando sus estados de "Ready for QA" a "Done", y revisé los flujos completos que deberian pasar para asegurar el comportamiento correcto del sistema
+- **Today:** Me enfocaré en revisar las HUs del siguiente sprint para analizar los nuevos requerimientos.
+- **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Revisó historias de usuario y creó el tablero de Trello usado por el equipo para registrar ideas, acuerdos y puntos de mejora de la Sprint Retrospective.
+- **Today:** Facilitar el uso del tablero durante la retrospectiva y dejar organizados los acuerdos finales.
+- **Blockers:** n/a.
+
+## Velasquez Vela Marcos
+
+- **Yesterday:** Preparó el reporte del equipo, creó la rama de trabajo y ordenó algunas HUs para que quedaran más claras dentro del sprint.
+- **Today:** Participar en la retrospectiva y registrar los compromisos que salgan para darles seguimiento.
+- **Blockers:** n/a.
+
+# 06/11/2026
+
+## Castro Tejada Steven Lisandro
+
+- **Yesterday:** Realicé la revisión de las HUs del Sprint 4 y documenté los criterios de aceptación pendientes en el tablero.
+- **Today:** Dar soporte en la validación de los PRs abiertos y coordinar la asignación de tareas del sprint.
+- **Blockers:** n/a.
+
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Refactoricé los tests automatizados para mejorar la escalabilidad, separando responsabilidades y reduciendo duplicación en los casos de prueba.
+- **Today:** Continuar con la migración de los tests restantes al nuevo esquema y actualizar el workflow de CI.
+- **Blockers:** n/a.
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Refactoricé la estructura de los tests de integración para que sean más modulares y reutilizables entre HUs.
+- **Today:** Escribir nuevos casos de prueba para las funcionalidades del Sprint 4 usando la nueva estructura.
+- **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Revisé el flujo de autenticación y reporté inconsistencias en los mensajes de error.
+- **Today:** Corregir los mensajes de error en el login y validar el flujo completo con roles.
+- **Blockers:** n/a.
+
+## Velasquez Vela Marcos
+
+- **Yesterday:** Creé el archivo de estándar de diseño para definir lineamientos visuales y buenas prácticas del proyecto.
+- **Today:** Validar los seeders en conjunto con las pruebas y apoyar en la revisión de PRs.
+- **Blockers:** n/a.
+
+# 06/16/2026
+
+## Castro Tejada Steven Lisandro
+- **Yesterday:** Completé y mergeé dos Pull Requests críticas para la aplicación: la PR #562 (*Add clear cart feature and tests*) que cierra las HUs #554 y #555 (vaciado de carrito y sus pruebas e2e con Playwright); y la PR #561 (*Mejoras de estilos, favoritos y dropdown*) que resuelve las issues de diseño/funcionalidad #557, #558, #559 y #560 (favoritos en detalle de producto, etiquetas de stock agotado/no disponible y contrastes de botones).
+- **Today:** Diseñé, creé y configuré en GitHub la nueva issue de Flow #564 (*Calificación promedio de entregas para Mensajero en /me*). La asigné en el tablero de proyectos (Sprint 4, Team: `flow`, Area: `usuarios`, Status: `ToDO`, Priority: `P2`, Severity: `Minor`) y la vinculé como sub-issue/tarea hija de la HU contenedora Padre #490 actualizando su descripción y checklist en GitHub.
+- **Blockers:** n/a.
+
+## Gutierrez Hinojosa Jhon Deymar
+
+- **Yesterday:** Organice los pr con su issue para tener un mejor tracking de los trabajos de los demas equipos.
+- **Today:** Revisare los bugs corregidos y pr nuevos.
+- **Blockers:** Los demas equipos no detallan su pr para revisar y tampoco linkean el issue que resolvieron.
+
+## Merudia Calderon Dayeza
+
+- **Yesterday:** Revisé las HUs de operador y comprador, detectando un bug de visualización en la interfaz del comprador que ya fue reportado
+- **Today:** Continuaré con la revisión de más HUs para analizar la lógica completa de los bugs.
+- **Blockers:** La falta de detalle en algunas HUs complica su revisión.
+
+## Merino Vidal Mateo Alejandro
+
+- **Yesterday:** Validé el flujo completo de autenticación con roles, asegurando coherencia en los mensajes para cada tipo de usuario.
+- **Today:** Revisé el flujo general de la aplicación y ayudé a detectar inconsistencias visuales (contrastes, alineaciones, espaciados).
+- **Blockers:** n/a.
+
+## Velasquez Vela Marcos
+
+- **Yesterday:** Unifiqué el sistema de UI para corregir la inconsistencia visual del sitio: documenté el estándar en un único archivo `UI.md`, agregué los tokens de color faltantes (warning, info, danger) en `global.css`, dejé una sola fuente (Inter) cargada de forma centralizada y rediseñé el logo de marca y el footer (con íconos reales de redes) usando los tokens del tema para que respeten el dark mode.
+- **Today:** Apoyar a los equipos en la migración de los colores hardcodeados a los tokens y validar que las pantallas cumplan el estándar de header/footer y ancho.
+- **Blockers:** n/a.
+
+# 06/18/2026
+
+## Castro Tejada Steven Lisandro
 - **Yesterday:**
 - **Today:**
-- **Blockers:**
+- **Blockers:** n/a.
+
+## Gutierrez Hinojosa Jhon Deymar
+- **Yesterday:** Se integro la refactorizacion de los tests y reporte algunos bugs.
+- **Today:** Revisar nuestro flujo de la tienda para asegurar que todo funcione.
+- **Blockers:** Algunos bugs salieron y no dejaron probar el flujo general.
+
+## Merudia Calderon Dayeza
+- **Yesterday:** Ayude a crear los pom de los test para su refactorizacion.
+- **Today:** Revisare escenarios para ver el estado de los diferentes roles.
+- **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+* **Yesterday:** Realicé una revisión general de la aplicación, validando los diferentes flujos del sistema e identificando y reportando bugs encontrados durante las pruebas.
+* **Today:** Continuaré con la revisión funcional de la aplicación y el seguimiento de los bugs reportados para verificar su estado y posibles correcciones.
+* **Blockers:** n/a.
+
+## Velasquez Vela Marcos
+- **Yesterday:**
+- **Today:**
+- **Blockers:** n/a.
