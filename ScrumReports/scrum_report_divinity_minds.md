@@ -504,8 +504,8 @@
 - **Blockers:** Algunos bugs salieron y no dejaron probar el flujo general.
 
 ## Merudia Calderon Dayeza
-- **Yesterday:**
-- **Today:**
+- **Yesterday:** Ayude a crear los pom de los test para su refactorizacion.
+- **Today:** Revise escenarios para ver el estado de los diferentes roles.
 - **Blockers:** n/a.
 
 ## Merino Vidal Mateo Alejandro
