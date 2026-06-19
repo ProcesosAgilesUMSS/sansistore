@@ -1,5 +1,6 @@
 import { AlertTriangle, CheckCircle2, RefreshCw, Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { parseOrderId } from "../../../cart/services/orderService";
 import { listenPaymentReconciliation } from "../services/paymentReconciliationService";
 import type {
 	PaymentReconciliationItem,
@@ -72,6 +73,26 @@ function SummaryCard({
 				{value}
 			</p>
 		</div>
+	);
+}
+
+function OrderIdSummary({ orderId }: { orderId: string }) {
+	const { uuid, friendlyName } = parseOrderId(orderId);
+
+	return (
+		<>
+			<p
+				className="max-w-[180px] truncate font-mono text-[12px] font-black uppercase text-(--theme-text)"
+				title={orderId}
+			>
+				#{friendlyName}
+			</p>
+			{uuid !== friendlyName && (
+				<p className="mt-1 max-w-[180px] truncate font-mono text-[10px] text-(--theme-text) opacity-45">
+					{uuid}
+				</p>
+			)}
+		</>
 	);
 }
 
@@ -302,9 +323,7 @@ export default function PaymentReconciliationPanel() {
 											}
 										>
 											<td className="px-4 py-3 align-top">
-												<p className="max-w-[220px] truncate font-mono text-[11px] font-bold text-(--theme-text)">
-													{item.orderId}
-												</p>
+												<OrderIdSummary orderId={item.orderId} />
 												<p className="mt-1 text-[10px] text-(--theme-text) opacity-45">
 													{formatDateTime(item.deliveredAt ?? item.updatedAt)}
 												</p>
