@@ -436,9 +436,9 @@
   - **Blockers:**     
 
   ## Sejas Arze Eddy
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Reportar como repetida la US #52
+  - **Today:**        Apoyar en el desarrollo de la US #56
+  - **Blockers:**     Ninguno
 
   ## Soliz Moya Alejandra
   - **Yesterday:**    
