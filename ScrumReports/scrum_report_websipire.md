@@ -476,3 +476,33 @@ por las dudas que se tienen.
 * **Yesterday:** Estuve avanzando en mi HU asignada, desarrollando parte de las funcionalidades planificadas.
 * **Today:** Continuaré con la implementación de mi HU, realizando pruebas y ajustes para asegurar su correcto funcionamiento.
 * **Blockers:** None
+# Daily Reports - Team 3 Webspire 18/06/26
+
+## Dayana Saleth Ortuño Guzmán
+
+* **Yesterday:** Implemente una parte de mu HU asignada.
+* **Today:** Revise lo que mi compañera implemento para finalizar la HU "Registrar el motivo de fallos de entrega para análisis"
+* **Blockers:** Al principio tuve la duda si tenia que registra el pedido fallido del mensajero o del comprador, pero una vez preguntando y entendiendo ya puede comprender.
+
+## Maria Victoria Grageda Vallejos
+* **Yesterday:** Trabajé en mi HU asignada: registrar el motivo de fallos de entrega para análisis. Revisé la vista, el servicio y la lógica para guardar el motivo del pedido en base de datos.
+* **Today:** Finalicé y ajusté mi HU para trabajar con el estado `RECHAZADO`, según la aclaración recibida. También validé que el flujo no duplique el registro del motivo cuando el cliente ya lo registró.
+* **Blockers:** Ninguno actualmente. La duda sobre el estado a usar (`DEVUELTO`, `NO ENTREGADO` o `RECHAZADO`) ya fue aclarada y se definió trabajar con `RECHAZADO`.
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Trabajé en la implementación y validación de la HU "Detectar diferencias entre pedidos entregados y pagos registrados", revisando la lógica de conciliación y los criterios de aceptación definidos.
+* **Today:** Realicé pruebas finales y validé junto al equipo que los distintos escenarios de inconsistencias se detecten correctamente.
+* **Blockers:** None
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Trabajé en la implementación de la HU "Detectar diferencias entre pedidos entregados y pagos registrados", colaborando en la integración y pruebas de los diferentes casos de inconsistencia. 
+* **Today:**  Realicé pruebas de validación y revisión final de la HU para asegurar el cumplimiento de los criterios de aceptación
+* **Blockers:** none
+
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Avancé en el desarrollo de la HU "Detectar diferencias entre pedidos entregados y pagos registrados", apoyando en la implementación de las validaciones y reglas de conciliación.
+* **Today:** Revisé y validé el funcionamiento de los filtros y la visualización de inconsistencias en el panel de conciliación.
+* **Blockers:** None
