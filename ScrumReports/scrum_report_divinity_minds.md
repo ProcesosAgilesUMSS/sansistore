@@ -490,3 +490,30 @@
 - **Yesterday:** Unifiqué el sistema de UI para corregir la inconsistencia visual del sitio: documenté el estándar en un único archivo `UI.md`, agregué los tokens de color faltantes (warning, info, danger) en `global.css`, dejé una sola fuente (Inter) cargada de forma centralizada y rediseñé el logo de marca y el footer (con íconos reales de redes) usando los tokens del tema para que respeten el dark mode.
 - **Today:** Apoyar a los equipos en la migración de los colores hardcodeados a los tokens y validar que las pantallas cumplan el estándar de header/footer y ancho.
 - **Blockers:** n/a.
+
+# 06/18/2026
+
+## Castro Tejada Steven Lisandro
+- **Yesterday:**
+- **Today:**
+- **Blockers:** n/a.
+
+## Gutierrez Hinojosa Jhon Deymar
+- **Yesterday:** Se integro la refactorizacion de los tests y reporte algunos bugs.
+- **Today:** Revisar nuestro flujo de la tienda para asegurar que todo funcione.
+- **Blockers:** Algunos bugs salieron y no dejaron probar el flujo general.
+
+## Merudia Calderon Dayeza
+- **Yesterday:**
+- **Today:**
+- **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+- **Yesterday:**
+- **Today:**
+- **Blockers:** n/a.
+
+## Velasquez Vela Marcos
+- **Yesterday:**
+- **Today:**
+- **Blockers:** n/a.
