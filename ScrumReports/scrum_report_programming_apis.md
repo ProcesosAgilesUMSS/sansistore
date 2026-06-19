@@ -508,6 +508,11 @@
 - **Today:** Verificar que todo funcione correctamente antes de la demo de mañana.
 - **Blockers:** None.
 
+### Bruno Salcedo Cadiz
+- **Yesterday:** Termine de implementar mi HU 570 para el sprint 4
+- **Today:** Preparar la presentacion de mi HU para la demo
+- **Blockers:** None.
+
 ### Jhoel Gustavo Aiza Arce
 - **Yesterday (17/06):** 
   - Corrección del bug en la HU #568: se ajustó el guardado del motivo de rechazo desde la vista de detalle del pedido (`/delivery/order/ID_DEL_PEDIDO`).
