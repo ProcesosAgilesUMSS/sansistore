@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { auth, db } from "../../../lib/firebase";
+import { registrarAcceso } from "../audit/services/accessLogService";
 import SalesReport from "../analytics/components/SalesReport.tsx";
 import AccessLogPanel from "../audit/components/AccessLogPanel.tsx";
 import CategoryList from "../categories/components/CategoryList.tsx";
@@ -104,28 +105,40 @@ export default function AdminLayout() {
 		return unsub;
 	}, []);
 
+	// ── HU #159: registrar LOGOUT en bitácora al cerrar sesión desde el admin ──
 	const handleLogout = () => {
-		signOut(auth)
-			.then(() => {
-				window.location.href = "/login";
-			})
-			.catch(console.error);
+		const currentUser = auth.currentUser;
+		if (currentUser) {
+			getDoc(doc(db, "users", currentUser.uid))
+				.then((snap) => {
+					const userData = snap.exists() ? snap.data() : null;
+					return registrarAcceso({
+						uid: currentUser.uid,
+						displayName: userData?.displayName ?? currentUser.displayName ?? "Administrador",
+						email: currentUser.email ?? "",
+						roles: userData?.roles ?? [],
+						action: "LOGOUT",
+					});
+				})
+				.catch(() => console.warn("[AccessLog] No se pudo registrar el logout del admin."))
+				.finally(() => {
+					signOut(auth)
+						.then(() => { window.location.href = "/login"; })
+						.catch(console.error);
+				});
+		} else {
+			signOut(auth)
+				.then(() => { window.location.href = "/login"; })
+				.catch(console.error);
+		}
 	};
 
 	const navSections: NavSection[] = [
 		{
 			title: "Principal",
 			items: [
-				{
-					label: "Dashboard",
-					icon: <LayoutDashboard size={15} />,
-					section: "dashboard",
-				},
-				{
-					label: "Pedidos",
-					icon: <ShoppingBag size={15} />,
-					section: "pedidos",
-				},
+				{ label: "Dashboard", icon: <LayoutDashboard size={15} />, section: "dashboard" },
+				{ label: "Pedidos", icon: <ShoppingBag size={15} />, section: "pedidos" },
 			],
 		},
 		{
@@ -133,124 +146,45 @@ export default function AdminLayout() {
 			items: [
 				{ label: "Usuarios", icon: <Users size={15} />, section: "usuarios" },
 				{ label: "Categorías", icon: <Tag size={15} />, section: "categorias" },
-				{
-					label: "Parámetros",
-					icon: <Settings size={15} />,
-					section: "parametros",
-				},
-				{
-					label: "Bitácora",
-					icon: <ClipboardList size={15} />,
-					section: "bitacora",
-				},
-				{
-					label: "Monitoreo",
-					icon: <Activity size={15} />,
-					section: "monitoreo",
-				},
+				{ label: "Parámetros", icon: <Settings size={15} />, section: "parametros" },
+				{ label: "Bitácora", icon: <ClipboardList size={15} />, section: "bitacora" },
+				{ label: "Monitoreo", icon: <Activity size={15} />, section: "monitoreo" },
 			],
 		},
 		{
 			title: "Analítica",
 			items: [
-				{
-					label: "Ventas",
-					icon: <BarChart2 size={15} />,
-					section: "ventas-diarias",
-				},
-				{
-					label: "Inventario",
-					icon: <Package size={15} />,
-					section: null,
-					disabled: true,
-				},
-				{
-					label: "Mensajeros",
-					icon: <Bike size={15} />,
-					section: null,
-					disabled: true,
-				},
-				{
-					label: "Reportes",
-					icon: <FileText size={15} />,
-					section: "reportes",
-				},
+				{ label: "Ventas", icon: <BarChart2 size={15} />, section: "ventas-diarias" },
+				{ label: "Inventario", icon: <Package size={15} />, section: null, disabled: true },
+				{ label: "Mensajeros", icon: <Bike size={15} />, section: null, disabled: true },
+				{ label: "Reportes", icon: <FileText size={15} />, section: "reportes" },
 			],
 		},
 	];
 
 	const pageTitles: Record<string, { title: string; subtitle: string }> = {
 		dashboard: { title: "Dashboard", subtitle: "Panel de administración" },
-		pedidos: {
-			title: "Pedidos",
-			subtitle: "Validación de recepción por comprador",
-		},
-		historial: {
-			title: "Historial de pedido",
-			subtitle: "Auditoría completa del pedido",
-		},
-		"auditoria-cobros": {
-			title: "Auditoría de cobros",
-			subtitle: "Registro detallado de cobros confirmados por pedido",
-		},
-		"conciliacion-pagos": {
-			title: "Conciliacion de pagos",
-			subtitle: "Diferencias entre pedidos entregados y pagos registrados",
-		},
-		usuarios: {
-			title: "Gestión de usuarios",
-			subtitle: "Registra y administra usuarios",
-		},
-		categorias: {
-			title: "Categorías",
-			subtitle: "Gestiona las categorías de productos",
-		},
-		"ventas-diarias": {
-			title: "Ventas diarias",
-			subtitle: "Monitorea el rendimiento diario de ventas",
-		},
-		"mensajeros-desempeno": {
-			title: "Desempeño de mensajeros",
-			subtitle: "Métricas de eficiencia por mensajero",
-		},
-		"mensajeros-cierres": {
-			title: "Validar cierres de jornada",
-			subtitle: "Audita el dinero recaudado por cada mensajero",
-		},
-		"mas-vendidos": {
-			title: "Más vendidos",
-			subtitle: "Productos con más unidades vendidas",
-		},
-		parametros: {
-			title: "Parámetros del sistema",
-			subtitle: "Configura los parámetros globales del sistema",
-		},
-		reportes: {
-			title: "Reportes de ventas",
-			subtitle: "Genera reportes de ventas por rango de fechas",
-		},
-		bitacora: {
-			title: "Bitácora",
-			subtitle: "Registra actividad de inicio y cierre de sesión",
-		},
-		"reportes-cancelados": {
-			title: "Pedidos cancelados",
-			subtitle: "Reporte de órdenes canceladas por período",
-		},
-		monitoreo: {
-			title: "Monitoreo de vendedores",
-			subtitle: "Bitácora de actividad y cambios de estado en pedidos",
-		},
-		"demanda-horarios": {
-			title: "Demanda por horarios",
-			subtitle: "Análisis de pedidos agrupados por franja horaria",
-		},
+		pedidos: { title: "Pedidos", subtitle: "Validación de recepción por comprador" },
+		historial: { title: "Historial de pedido", subtitle: "Auditoría completa del pedido" },
+		"auditoria-cobros": { title: "Auditoría de cobros", subtitle: "Registro detallado de cobros confirmados por pedido" },
+		"conciliacion-pagos": { title: "Conciliacion de pagos", subtitle: "Diferencias entre pedidos entregados y pagos registrados" },
+		usuarios: { title: "Gestión de usuarios", subtitle: "Registra y administra usuarios" },
+		categorias: { title: "Categorías", subtitle: "Gestiona las categorías de productos" },
+		"ventas-diarias": { title: "Ventas diarias", subtitle: "Monitorea el rendimiento diario de ventas" },
+		"mensajeros-desempeno": { title: "Desempeño de mensajeros", subtitle: "Métricas de eficiencia por mensajero" },
+		"mensajeros-cierres": { title: "Validar cierres de jornada", subtitle: "Audita el dinero recaudado por cada mensajero" },
+		"mas-vendidos": { title: "Más vendidos", subtitle: "Productos con más unidades vendidas" },
+		parametros: { title: "Parámetros del sistema", subtitle: "Configura los parámetros globales del sistema" },
+		reportes: { title: "Reportes de ventas", subtitle: "Genera reportes de ventas por rango de fechas" },
+		bitacora: { title: "Bitácora", subtitle: "Registra actividad de inicio y cierre de sesión" },
+		"reportes-cancelados": { title: "Pedidos cancelados", subtitle: "Reporte de órdenes canceladas por período" },
+		monitoreo: { title: "Monitoreo de vendedores", subtitle: "Bitácora de actividad y cambios de estado en pedidos" },
+		"demanda-horarios": { title: "Demanda por horarios", subtitle: "Análisis de pedidos agrupados por franja horaria" },
 	};
 
 	const currentPage = pageTitles[activeSection ?? "dashboard"];
 	const sidebarItemActive = "bg-primary/15 text-primary";
-	const sidebarItemInactive =
-		"text-(--theme-text)/40 hover:text-(--theme-text)/80 hover:bg-(--theme-text)/5";
+	const sidebarItemInactive = "text-(--theme-text)/40 hover:text-(--theme-text)/80 hover:bg-(--theme-text)/5";
 	const sidebarSubItemClass = (active: boolean) =>
 		`w-full text-left px-3 py-2 rounded-lg text-[12px] transition-colors ${active ? sidebarItemActive : sidebarItemInactive}`;
 
@@ -278,12 +212,8 @@ export default function AdminLayout() {
 						S
 					</div>
 					<div className="flex flex-col leading-tight">
-						<span className="text-[13px] font-semibold text-(--theme-text)">
-							SansiStore
-						</span>
-						<span className="text-[10px] text-primary/70 tracking-wide uppercase">
-							Admin · Área 7
-						</span>
+						<span className="text-[13px] font-semibold text-(--theme-text)">SansiStore</span>
+						<span className="text-[10px] text-primary/70 tracking-wide uppercase">Admin · Área 7</span>
 					</div>
 				</div>
 
@@ -304,55 +234,24 @@ export default function AdminLayout() {
 											>
 												<span>{item.icon}</span>
 												<span className="flex-1 text-left">Pedidos</span>
-												<ChevronRight
-													size={12}
-													className={`transition-transform ${pedidosOpen ? "rotate-90" : ""}`}
-												/>
+												<ChevronRight size={12} className={`transition-transform ${pedidosOpen ? "rotate-90" : ""}`} />
 											</button>
 											{pedidosOpen && (
 												<div className="ml-7 mt-1 space-y-1">
-													<button
-														type="button"
-														onClick={() => {
-															setActiveSection("pedidos");
-															setSidebarOpen(false);
-														}}
-														className={sidebarSubItemClass(
-															activeSection === "pedidos",
-														)}
-													>
+													<button type="button" onClick={() => { setActiveSection("pedidos"); setSidebarOpen(false); }}
+														className={sidebarSubItemClass(activeSection === "pedidos")}>
 														Recepción
 													</button>
-													<button
-														type="button"
-														onClick={() => {
-															setActiveSection("historial");
-															setSidebarOpen(false);
-														}}
-														className={`${sidebarSubItemClass(activeSection === "historial")} flex items-center gap-1.5`}
-													>
+													<button type="button" onClick={() => { setActiveSection("historial"); setSidebarOpen(false); }}
+														className={`${sidebarSubItemClass(activeSection === "historial")} flex items-center gap-1.5`}>
 														<ClipboardList size={11} /> Historial
 													</button>
-													<button
-														type="button"
-														onClick={() => {
-															setActiveSection("auditoria-cobros");
-															setSidebarOpen(false);
-														}}
-														className={sidebarSubItemClass(
-															activeSection === "auditoria-cobros",
-														)}
-													>
+													<button type="button" onClick={() => { setActiveSection("auditoria-cobros"); setSidebarOpen(false); }}
+														className={sidebarSubItemClass(activeSection === "auditoria-cobros")}>
 														Auditoría de cobros
 													</button>
-													<button
-														type="button"
-														onClick={() => {
-															setActiveSection("conciliacion-pagos");
-															setSidebarOpen(false);
-														}}
-														className={`${sidebarSubItemClass(activeSection === "conciliacion-pagos")} flex items-center gap-1.5`}
-													>
+													<button type="button" onClick={() => { setActiveSection("conciliacion-pagos"); setSidebarOpen(false); }}
+														className={`${sidebarSubItemClass(activeSection === "conciliacion-pagos")} flex items-center gap-1.5`}>
 														<Scale size={11} /> Conciliacion
 													</button>
 												</div>
@@ -364,42 +263,20 @@ export default function AdminLayout() {
 								if (item.label === "Ventas") {
 									return (
 										<div key={item.label} className="mb-1">
-											<button
-												type="button"
-												onClick={() => setVentasOpen(!ventasOpen)}
-												className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-colors ${sidebarItemInactive}`}
-											>
+											<button type="button" onClick={() => setVentasOpen(!ventasOpen)}
+												className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-colors ${sidebarItemInactive}`}>
 												<span>{item.icon}</span>
 												<span className="flex-1 text-left">Ventas</span>
-												<ChevronRight
-													size={12}
-													className={`transition-transform ${ventasOpen ? "rotate-90" : ""}`}
-												/>
+												<ChevronRight size={12} className={`transition-transform ${ventasOpen ? "rotate-90" : ""}`} />
 											</button>
 											{ventasOpen && (
 												<div className="ml-7 mt-1 space-y-1">
-													<button
-														type="button"
-														onClick={() => {
-															setActiveSection("ventas-diarias");
-															setSidebarOpen(false);
-														}}
-														className={sidebarSubItemClass(
-															activeSection === "ventas-diarias",
-														)}
-													>
+													<button type="button" onClick={() => { setActiveSection("ventas-diarias"); setSidebarOpen(false); }}
+														className={sidebarSubItemClass(activeSection === "ventas-diarias")}>
 														Ventas diarias
 													</button>
-													<button
-														type="button"
-														onClick={() => {
-															setActiveSection("mas-vendidos");
-															setSidebarOpen(false);
-														}}
-														className={sidebarSubItemClass(
-															activeSection === "mas-vendidos",
-														)}
-													>
+													<button type="button" onClick={() => { setActiveSection("mas-vendidos"); setSidebarOpen(false); }}
+														className={sidebarSubItemClass(activeSection === "mas-vendidos")}>
 														Más vendidos
 													</button>
 												</div>
@@ -411,54 +288,24 @@ export default function AdminLayout() {
 								if (item.label === "Reportes") {
 									return (
 										<div key={item.label} className="mb-1">
-											<button
-												type="button"
-												onClick={() => setReportesOpen(!reportesOpen)}
-												className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-colors ${sidebarItemInactive}`}
-											>
+											<button type="button" onClick={() => setReportesOpen(!reportesOpen)}
+												className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-colors ${sidebarItemInactive}`}>
 												<span>{item.icon}</span>
 												<span className="flex-1 text-left">Reportes</span>
-												<ChevronRight
-													size={12}
-													className={`transition-transform ${reportesOpen ? "rotate-90" : ""}`}
-												/>
+												<ChevronRight size={12} className={`transition-transform ${reportesOpen ? "rotate-90" : ""}`} />
 											</button>
 											{reportesOpen && (
 												<div className="ml-7 mt-1 space-y-1">
-													<button
-														type="button"
-														onClick={() => {
-															setActiveSection("reportes");
-															setSidebarOpen(false);
-														}}
-														className={sidebarSubItemClass(
-															activeSection === "reportes",
-														)}
-													>
+													<button type="button" onClick={() => { setActiveSection("reportes"); setSidebarOpen(false); }}
+														className={sidebarSubItemClass(activeSection === "reportes")}>
 														Ventas por fecha
 													</button>
-													<button
-														type="button"
-														onClick={() => {
-															setActiveSection("reportes-cancelados");
-															setSidebarOpen(false);
-														}}
-														className={sidebarSubItemClass(
-															activeSection === "reportes-cancelados",
-														)}
-													>
+													<button type="button" onClick={() => { setActiveSection("reportes-cancelados"); setSidebarOpen(false); }}
+														className={sidebarSubItemClass(activeSection === "reportes-cancelados")}>
 														Pedidos cancelados
 													</button>
-													<button
-														type="button"
-														onClick={() => {
-															setActiveSection("demanda-horarios");
-															setSidebarOpen(false);
-														}}
-														className={sidebarSubItemClass(
-															activeSection === "demanda-horarios",
-														)}
-													>
+													<button type="button" onClick={() => { setActiveSection("demanda-horarios"); setSidebarOpen(false); }}
+														className={sidebarSubItemClass(activeSection === "demanda-horarios")}>
 														Demanda por horarios
 													</button>
 												</div>
@@ -470,37 +317,20 @@ export default function AdminLayout() {
 								if (item.label === "Mensajeros") {
 									return (
 										<div key={item.label} className="mb-1">
-											<button
-												type="button"
-												onClick={() => setMensajerosOpen(!mensajerosOpen)}
-												className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-colors ${sidebarItemInactive}`}
-											>
+											<button type="button" onClick={() => setMensajerosOpen(!mensajerosOpen)}
+												className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-colors ${sidebarItemInactive}`}>
 												<span>{item.icon}</span>
 												<span className="flex-1 text-left">Mensajeros</span>
-												<ChevronRight
-													size={12}
-													className={`transition-transform ${mensajerosOpen ? "rotate-90" : ""}`}
-												/>
+												<ChevronRight size={12} className={`transition-transform ${mensajerosOpen ? "rotate-90" : ""}`} />
 											</button>
 											{mensajerosOpen && (
 												<div className="ml-7 mt-1 space-y-1">
-													<button
-														type="button"
-														onClick={() => {
-															setActiveSection("mensajeros-desempeno");
-															setSidebarOpen(false);
-														}}
-														className={sidebarSubItemClass(
-															activeSection === "mensajeros-desempeno",
-														)}
-													>
+													<button type="button" onClick={() => { setActiveSection("mensajeros-desempeno"); setSidebarOpen(false); }}
+														className={sidebarSubItemClass(activeSection === "mensajeros-desempeno")}>
 														Desempeño
 													</button>
-													<button
-														type="button"
-														onClick={() => { setActiveSection("mensajeros-cierres"); setSidebarOpen(false); }}
-														className={sidebarSubItemClass(activeSection === "mensajeros-cierres")}
-													>
+													<button type="button" onClick={() => { setActiveSection("mensajeros-cierres"); setSidebarOpen(false); }}
+														className={sidebarSubItemClass(activeSection === "mensajeros-cierres")}>
 														Validar cierres
 													</button>
 												</div>
@@ -523,12 +353,11 @@ export default function AdminLayout() {
 										className={`
                       w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] mb-0.5
                       transition-colors duration-150 text-left
-                      ${
-												isActive
-													? sidebarItemActive
-													: item.disabled
-														? "text-(--theme-text)/20 cursor-not-allowed"
-														: `${sidebarItemInactive} cursor-pointer`
+                      ${isActive
+												? sidebarItemActive
+												: item.disabled
+													? "text-(--theme-text)/20 cursor-not-allowed"
+													: `${sidebarItemInactive} cursor-pointer`
 											}
                     `}
 									>
@@ -539,9 +368,7 @@ export default function AdminLayout() {
 												{item.badge}
 											</span>
 										)}
-										{isActive && (
-											<ChevronRight size={12} className="opacity-50" />
-										)}
+										{isActive && <ChevronRight size={12} className="opacity-50" />}
 									</button>
 								);
 							})}
@@ -555,12 +382,8 @@ export default function AdminLayout() {
 							{userInitials}
 						</div>
 						<div className="flex-1 min-w-0">
-							<p className="text-[12px] text-(--theme-text) font-medium truncate">
-								{userName}
-							</p>
-							<p className="text-[10px] text-(--theme-text)/30 truncate">
-								Administrador
-							</p>
+							<p className="text-[12px] text-(--theme-text) font-medium truncate">{userName}</p>
+							<p className="text-[10px] text-(--theme-text)/30 truncate">Administrador</p>
 						</div>
 						<button
 							type="button"
@@ -625,9 +448,7 @@ export default function AdminLayout() {
 					{activeSection === "categorias" && <CategoryList />}
 					{activeSection === "ventas-diarias" && <DailySales />}
 					{activeSection === "mas-vendidos" && <TopSellingProducts />}
-					{activeSection === "mensajeros-desempeno" && (
-						<MessengerPerformancePage />
-					)}
+					{activeSection === "mensajeros-desempeno" && <MessengerPerformancePage />}
 					{activeSection === "mensajeros-cierres" && <CourierSessionsValidation />}
 					{activeSection === "parametros" && <ConfigPanel />}
 					{activeSection === "reportes" && <SalesReport />}
@@ -637,9 +458,7 @@ export default function AdminLayout() {
 					{activeSection === "historial" && <OrderHistory />}
 					{activeSection === "demanda-horarios" && <DemandPanel />}
 					{activeSection === "auditoria-cobros" && <PaymentAuditPanel />}
-					{activeSection === "conciliacion-pagos" && (
-						<PaymentReconciliationPanel />
-					)}
+					{activeSection === "conciliacion-pagos" && <PaymentReconciliationPanel />}
 				</main>
 			</div>
 		</div>
