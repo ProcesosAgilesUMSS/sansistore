@@ -402,3 +402,61 @@
 * **Yesterday:** Me reuní con mi equipo paradefinirs responsables de hu
 * **Today:** Revise y empecé con los criterios de aceptación de mi HU
 * **Blockers:** none.
+
+# 16/06/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+* **Yesterday:** estaba viendo el avance que tubo mi equipo en respuesta de sus hus asignadas
+* **Today:** empece a testear el fronted de la hu #149 
+* **Blockers:** none.
+
+## Fabricio Javier Cordova Caceres 
+* **Yesterday:** estaba completando el backend de mi hu
+* **Today:** continuando con el desarrollo del backend 
+* **Blockers:** none.
+
+## Dylan Coca Beltran
+- **Yesterday:** comence a trabajar en el frontend de mi hu 142 y ver los requisitos para el backend
+- **Today:** comence con el backend, y tambien complete parte del fronted, ademas de algunas correcciones
+- **Blockers:** se usaron datos de prueba hardcodeados para las pruebas locales
+
+## Jherlan Marcelo Calero Sardan 
+* **Yesterday:** luego de hacer los criterios de aceptacion empecé con el fronted de nuestra hu correspondiente #149
+* **Today:** termine el fronted y empece con el backend de la hu #149 
+* **Blockers:** none.
+
+## Camila Wara Fernandez Sandoval 
+* **Yesterday:** Refine los criterios de aceptación de mi hu #145 
+* **Today:** Una ves terminado los criterios de aceptación empecé con el front de la Hu #145 
+* **Blockers:** none.
+
+# 18/06/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+* **Yesterday:** estaba revisando a detalle el backend de la hu #149
+* **Today:** empece a testear ela integracion del bakcend y fronted de la hu #149 
+* **Blockers:** none.
+
+## Fabricio Javier Cordova Caceres 
+* **Yesterday:** terminado el backend 
+* **Today:** test del backend y buscando errores para corregir 
+* **Blockers:** none.
+
+## Dylan Coca Beltran
+- **Yesterday:** trabaje en el frontend de mi hu 142. ademas hice parte del backend
+- **Today:** complete el frontend y el backend, tambien corregi bugs respecto a los enpoints
+- **Blockers:** algunas discrepancias en la coleccion para fin de jornada de mensajero
+
+## Jherlan Marcelo Calero Sardan 
+* **Yesterday:** termine con el backend de la hu #149 
+* **Today:** verifique que en la integración este todo bien respecto a nuestra hu
+* **Blockers:** none.
+
+## Camila Wara Fernandez Sandoval 
+* **Yesterday:** Realice las últimas pruebas de mi hu #145
+* **Today:** termine la Hu #145, y realice las pruebas con mi compañero del front y el back para realizar el PR
+* **Blockers:** none.
