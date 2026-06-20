@@ -324,9 +324,9 @@
   - **Blockers:**     
 
   ## Soliz Moya Alejandra
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Colaboré con ajustes de interfaz en las vistas de inventario.
+  - **Today:**        Revisar los requerimientos de la US 52
+  - **Blockers:**     ninguno
 
 
 # ##############
@@ -353,9 +353,9 @@
   - **Blockers:**     
 
   ## Soliz Moya Alejandra
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Revisar los requerimientos de la US 68
+  - **Today:**        Avanzar con el disenio de la US 56 para su posterior desarrollo
+  - **Blockers:**     ninguno
 
 
 # ##############
@@ -382,9 +382,9 @@
   - **Blockers:**     
 
   ## Soliz Moya Alejandra
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Revisar la US 56 y definir que deberia de realizarse
+  - **Today:**        Mejorar el disenio del toast de alerta de stock minimo
+  - **Blockers:**     ninguno
 
 
 
@@ -412,8 +412,8 @@
   - **Blockers:**     
 
   ## Soliz Moya Alejandra
-  - **Yesterday:**    
-  - **Today:**        
+  - **Yesterday:**    Revisar el flujo completo de la parte del operador en busca de bugs de la US 56.
+  - **Today:**        No se encontro ningun bug en la US 56.
   - **Blockers:**     
 
 
