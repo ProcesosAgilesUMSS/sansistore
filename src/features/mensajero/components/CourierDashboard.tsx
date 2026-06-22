@@ -41,7 +41,7 @@ const INVALID_AMOUNT_MESSAGE =
 const getPageClass = (embedded = false) =>
   embedded
     ? 'bg-transparent py-2 text-text-light'
-    : 'min-h-screen bg-bg-light pt-24 pb-12 text-text-light';
+    : 'min-h-[100dvh] bg-bg-light pt-24 pb-12 text-text-light';
 const cardBaseClass =
   'rounded-[28px] border border-border-light bg-card-bg-light px-7 py-8 shadow-[0_14px_30px_rgba(38,33,22,0.10)]';
 const sectionCardClass =

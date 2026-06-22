@@ -600,15 +600,15 @@ function OrderDetailModal({
 
     return (
         <div
-            className="fixed inset-0 z-[998] flex items-center justify-center bg-black/65 p-4 backdrop-blur-sm"
+            className="fixed inset-0 z-[998] flex items-start justify-center overflow-y-auto bg-black/65 p-2 backdrop-blur-sm sm:p-4"
             onClick={(event) => {
                 if (event.target === event.currentTarget) onClose();
             }}
         >
-            <section className="max-h-[92vh] w-full max-w-6xl overflow-y-auto rounded-[28px] border border-border-light bg-card-bg-light text-text-light shadow-2xl">
-                <header className="flex items-start justify-between gap-4 border-b border-border-light px-6 py-5">
+            <section className="my-2 flex max-h-[calc(100dvh-1rem)] w-full max-w-6xl flex-col overflow-hidden rounded-[24px] border border-border-light bg-card-bg-light text-text-light shadow-2xl sm:my-0 sm:max-h-[calc(100dvh-2rem)] sm:rounded-[28px]">
+                <header className="flex shrink-0 items-start justify-between gap-3 border-b border-border-light px-4 py-4 sm:gap-4 sm:px-6 sm:py-5">
                     <div>
-                        <h2 className="text-2xl font-black tracking-normal">
+                        <h2 className="text-xl font-black leading-tight tracking-normal sm:text-2xl">
                             Detalle de cobro del pedido
                         </h2>
                         <p className="text-sm font-semibold opacity-70">
@@ -625,7 +625,7 @@ function OrderDetailModal({
                     </button>
                 </header>
 
-                <div className="grid gap-5 p-6 lg:grid-cols-[1fr_280px]">
+                <div className="grid min-h-0 flex-1 gap-5 overflow-y-auto p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_280px]">
                     <div className="space-y-5">
                         <article className="rounded-[24px] border border-border-light bg-secondary-bg-light/40 p-5">
                             <div className="flex flex-wrap items-center gap-3">
@@ -826,12 +826,12 @@ function CloseShiftModal({
 }) {
     return (
         <div
-            className="fixed inset-0 z-[999] flex items-center justify-center bg-black/65 p-4 backdrop-blur-sm"
+            className="fixed inset-0 z-[999] flex items-start justify-center overflow-y-auto bg-black/65 p-2 backdrop-blur-sm sm:p-4"
             onClick={(event) => {
                 if (event.target === event.currentTarget && !isSaving) onClose();
             }}
         >
-            <section className="w-full max-w-xl rounded-[28px] border border-border-light bg-card-bg-light p-6 text-text-light shadow-2xl">
+            <section className="my-2 max-h-[calc(100dvh-1rem)] w-full max-w-xl overflow-y-auto rounded-[24px] border border-border-light bg-card-bg-light p-4 text-text-light shadow-2xl sm:my-0 sm:max-h-[calc(100dvh-2rem)] sm:rounded-[28px] sm:p-6">
                 <header className="flex items-start justify-between gap-4">
                     <div>
                         <span className="messenger-icon mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full">
@@ -925,18 +925,18 @@ function ShiftReportDetailModal({
 
     return (
         <div
-            className="fixed inset-0 z-[999] flex items-center justify-center bg-black/65 p-4 backdrop-blur-sm"
+            className="fixed inset-0 z-[999] flex items-start justify-center overflow-y-auto bg-black/65 p-2 backdrop-blur-sm sm:p-4"
             onClick={(event) => {
                 if (event.target === event.currentTarget) onClose();
             }}
         >
-            <section className="max-h-[92vh] w-full max-w-6xl overflow-y-auto rounded-[28px] border border-border-light bg-card-bg-light text-text-light shadow-2xl">
-                <header className="flex items-start justify-between gap-4 border-b border-border-light px-6 py-5">
+            <section className="my-2 flex max-h-[calc(100dvh-1rem)] w-full max-w-6xl flex-col overflow-hidden rounded-[24px] border border-border-light bg-card-bg-light text-text-light shadow-2xl sm:my-0 sm:max-h-[calc(100dvh-2rem)] sm:rounded-[28px]">
+                <header className="flex shrink-0 items-start justify-between gap-3 border-b border-border-light px-4 py-4 sm:gap-4 sm:px-6 sm:py-5">
                     <div>
                         <p className="text-sm font-bold uppercase tracking-[0.24em] text-primary">
                             Reporte de jornada
                         </p>
-                        <h2 className="mt-2 text-2xl font-black tracking-[-0.04em]">
+                        <h2 className="mt-2 text-xl font-black leading-tight tracking-[-0.04em] sm:text-2xl">
                             Detalle de jornada - {formatDateKey(report.dateKey)}
                         </h2>
                         <p className="messenger-copy mt-1 text-sm font-semibold">
@@ -954,7 +954,7 @@ function ShiftReportDetailModal({
                     </button>
                 </header>
 
-                <div className="grid gap-5 p-6 lg:grid-cols-[280px_1fr]">
+                <div className="grid min-h-0 flex-1 gap-5 overflow-y-auto p-4 sm:p-6 lg:grid-cols-[280px_minmax(0,1fr)]">
                     <aside className="h-fit rounded-[24px] border border-border-light bg-secondary-bg-light/40 p-5">
                         <h3 className="text-lg font-black">Resumen</h3>
 
@@ -1655,7 +1655,7 @@ export default function MessengerDashboard({
 
     return (
         <main
-            className={`messenger-dashboard ${embedded ? 'messenger-dashboard--embedded' : 'min-h-screen'}`}
+            className={`messenger-dashboard ${embedded ? 'messenger-dashboard--embedded' : 'min-h-[100dvh]'}`}
         >
             {newOrderCount > 0 && clientSection === 'assigned' && (
                 <NewOrderToast
@@ -1911,7 +1911,7 @@ export default function MessengerDashboard({
                                                 </p>
                                             </div>
 
-                                            <div className="grid gap-3 text-sm font-bold sm:grid-cols-4 lg:min-w-[520px]">
+                                            <div className="grid min-w-0 gap-3 text-sm font-bold sm:grid-cols-4 lg:w-[520px] lg:max-w-full">
                                                 <p>
                                                     <span className="messenger-muted block text-xs">Completadas</span>
                                                     {report.summary.completedCount}
