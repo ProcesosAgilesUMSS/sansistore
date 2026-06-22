@@ -484,7 +484,7 @@ export default function ProfileView() {
 
                 {/* CONSOLIDADO: Gestión de Cuenta */}
                 {(showMisPedidos || showMisDirecciones) && (
-                    <div className="mb-2 rounded-2xl border border-border-light bg-bg-light p-4 flex flex-col gap-3">
+                    <footer className="mb-2 rounded-2xl border border-border-light bg-bg-light p-4 flex flex-col gap-3">
                         <h3 className="text-xs font-bold uppercase tracking-widest text-text-light opacity-50 mb-1">
                             Gestión de Cuenta
                         </h3>
@@ -520,7 +520,7 @@ export default function ProfileView() {
                                     </div>
                                     <div className="flex flex-col">
                                         <h4 className="font-bold text-text-light text-sm">Mis pedidos y devoluciones</h4>
-                                        <span className="text-[11px] text-text-light/50 font-medium">Ver el historial de mis compras</span>
+                                        <span className="text-[11px] text-text-light/50 font-medium">Ver mis compras</span>
                                     </div>
                                 </div>
                                 <span className="text-primary font-bold opacity-50 transition-transform group-hover:translate-x-1 group-hover:opacity-100 pr-2">
@@ -528,7 +528,7 @@ export default function ProfileView() {
                                 </span>
                             </a>
                         )}
-                    </div>
+                    </footer>
                 )}
             </section>
         </>
