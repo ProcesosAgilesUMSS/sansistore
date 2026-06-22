@@ -49,11 +49,11 @@ const actionConfig = {
 >;
 
 const rejectionReasons = [
-  'Pedido muy lejos de mi zona',
-  'No tengo disponibilidad horaria',
-  'El pedido es demasiado grande para mi vehículo',
-  'Problemas con mi vehículo',
-  'No conozco la zona de entrega',
+  'No estoy en el campus indicado',
+  'No puedo atender en este horario',
+  'No tengo acceso al edificio o area',
+  'Ubicacion del pedido incompleta',
+  'Entrega fuera de mi recorrido actual',
   'Otro motivo',
 ];
 
@@ -105,7 +105,7 @@ export default function ConfirmAssignedOrderActionModal({
   return (
     <>
       <div
-        className="fixed inset-0 z-[999] flex items-center justify-center overflow-y-auto bg-black/65 p-4 backdrop-blur-sm"
+        className="fixed inset-0 z-[999] flex items-start justify-center overflow-y-auto bg-black/65 p-2 backdrop-blur-sm sm:p-4"
         onClick={(event) => {
           if (event.target === event.currentTarget) onClose();
         }}
@@ -113,23 +113,23 @@ export default function ConfirmAssignedOrderActionModal({
         aria-modal="true"
         aria-labelledby="assigned-order-action-title"
       >
-        <section className="flex max-h-[calc(100vh-2rem)] w-full max-w-lg flex-col overflow-hidden rounded-[28px] border border-border-light bg-card-bg-light text-text-light shadow-2xl">
-          <header className="shrink-0 flex items-start justify-between gap-4 border-b border-border-light px-6 py-5">
-            <div className="flex items-center gap-4">
+        <section className="my-2 flex max-h-[calc(100dvh-1rem)] w-full max-w-lg flex-col overflow-hidden rounded-[24px] border border-border-light bg-card-bg-light text-text-light shadow-2xl sm:my-0 sm:max-h-[calc(100dvh-2rem)] sm:rounded-[28px]">
+          <header className="flex shrink-0 items-start justify-between gap-3 border-b border-border-light px-4 py-4 sm:gap-4 sm:px-6 sm:py-5">
+            <div className="flex min-w-0 items-center gap-3 sm:gap-4">
               <span
-                className={`flex h-12 w-12 items-center justify-center rounded-2xl ${config.iconClassName}`}
+                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl sm:h-12 sm:w-12 ${config.iconClassName}`}
               >
                 <Icon size={24} />
               </span>
 
-              <div>
+              <div className="min-w-0">
                 <h2
-                  className="text-xl font-black tracking-normal"
+                  className="text-lg font-black leading-tight tracking-normal sm:text-xl"
                   id="assigned-order-action-title"
                 >
                   {config.title}
                 </h2>
-                <p className="text-sm font-medium opacity-70">
+                <p className="text-sm font-medium leading-snug opacity-70">
                   {config.description}
                 </p>
               </div>
@@ -146,7 +146,7 @@ export default function ConfirmAssignedOrderActionModal({
             </button>
           </header>
 
-          <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-6 py-6">
+          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4 sm:space-y-6 sm:px-6 sm:py-6">
             <div className="grid gap-3 rounded-2xl border border-border-light bg-secondary-bg-light/60 p-4 sm:grid-cols-2">
               <div>
                 <p className="text-xs font-bold uppercase opacity-50">Pedido</p>
@@ -211,7 +211,7 @@ export default function ConfirmAssignedOrderActionModal({
             )}
           </div>
 
-          <footer className="shrink-0 flex flex-col gap-3 border-t border-border-light bg-secondary-bg-light/50 px-6 py-5 sm:flex-row">
+          <footer className="flex shrink-0 flex-col gap-3 border-t border-border-light bg-secondary-bg-light/50 px-4 py-3 sm:flex-row sm:px-6 sm:py-4">
             <button
               className="inline-flex h-12 flex-1 items-center justify-center rounded-full border border-border-light bg-card-bg-light text-sm font-black uppercase disabled:cursor-not-allowed disabled:opacity-50"
               disabled={isSaving}
@@ -241,10 +241,10 @@ export default function ConfirmAssignedOrderActionModal({
       {/* Modal de error */}
       {errorModal && (
         <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/65 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-[9999] flex items-start justify-center overflow-y-auto bg-black/65 p-2 backdrop-blur-sm sm:p-4"
           onClick={() => setErrorModal(null)}
         >
-          <div className="w-full max-w-md rounded-[28px] border border-(--theme-error-border) bg-card-bg-light p-6 shadow-2xl">
+          <div className="my-2 w-full max-w-md rounded-[24px] border border-(--theme-error-border) bg-card-bg-light p-4 shadow-2xl sm:my-auto sm:rounded-[28px] sm:p-6">
             <div className="flex items-center gap-4">
               <span className="flex h-12 w-12 items-center justify-center rounded-full bg-(--theme-error-bg) text-(--theme-error)">
                 <AlertTriangle size={24} />

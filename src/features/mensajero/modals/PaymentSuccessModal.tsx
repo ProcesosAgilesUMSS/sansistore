@@ -7,7 +7,7 @@ interface Props {
 export default function PaymentSuccessModal({ onClose }: Props) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-2 sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="success-title"
@@ -17,7 +17,7 @@ export default function PaymentSuccessModal({ onClose }: Props) {
         onClick={onClose}
       />
 
-      <div className="relative z-10 w-full max-w-sm rounded-2xl border border-border-light bg-card-bg-light p-6 shadow-2xl">
+      <div className="relative z-10 my-2 w-full max-w-sm rounded-2xl border border-border-light bg-card-bg-light p-5 shadow-2xl sm:my-auto sm:p-6">
         <div className="flex flex-col items-center gap-3 text-center">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
             <svg

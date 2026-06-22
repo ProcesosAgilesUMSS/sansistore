@@ -39,15 +39,15 @@ const canSubmit = secret.trim().length > 0 && !saving;
 
     return (
         <div
-            className="fixed inset-0 z-[999] flex items-center justify-center bg-black/65 p-4 backdrop-blur-sm"
+            className="fixed inset-0 z-[999] flex items-start justify-center overflow-y-auto bg-black/65 p-2 backdrop-blur-sm sm:p-4"
             onClick={(e) => {
                 if (e.target === e.currentTarget && !saving) onClose();
             }}
         >
-            <section className="w-full max-w-md rounded-[28px] border border-border-light bg-card-bg-light text-text-light shadow-2xl">
+            <section className="my-2 flex max-h-[calc(100dvh-1rem)] w-full max-w-md flex-col overflow-hidden rounded-[24px] border border-border-light bg-card-bg-light text-text-light shadow-2xl sm:my-0 sm:max-h-[calc(100dvh-2rem)] sm:rounded-[28px]">
 
                 {/* Header */}
-                <header className="flex items-start justify-between gap-4 border-b border-border-light px-6 py-5">
+                <header className="flex shrink-0 items-start justify-between gap-3 border-b border-border-light px-4 py-4 sm:gap-4 sm:px-6 sm:py-5">
                     <div>
                         <h2 className="text-xl font-black tracking-tight">
                             Registrar pago
@@ -67,7 +67,7 @@ const canSubmit = secret.trim().length > 0 && !saving;
                     </button>
                 </header>
 
-                <div className="space-y-5 p-6">
+                <div className="min-h-0 flex-1 space-y-5 overflow-y-auto p-4 sm:p-6">
 
                     {/* Resumen del pedido */}
                     <article className="messenger-cash-box rounded-[20px] border-2 p-5 space-y-3">

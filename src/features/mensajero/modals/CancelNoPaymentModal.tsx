@@ -34,20 +34,20 @@ export default function CancelNoPaymentModal({
 
   return (
     <div
-      className="fixed inset-0 z-[999] flex items-center justify-center bg-black/65 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[999] flex items-start justify-center overflow-y-auto bg-black/65 p-2 backdrop-blur-sm sm:p-4"
       onClick={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
     >
-      <section className="w-full max-w-lg overflow-hidden rounded-[28px] border border-border-light bg-card-bg-light text-text-light shadow-2xl">
-        <header className="flex items-start justify-between gap-4 border-b border-border-light px-6 py-5">
+      <section className="my-2 flex max-h-[calc(100dvh-1rem)] w-full max-w-lg flex-col overflow-hidden rounded-[24px] border border-border-light bg-card-bg-light text-text-light shadow-2xl sm:my-auto sm:max-h-[calc(100dvh-2rem)] sm:rounded-[28px]">
+        <header className="flex shrink-0 items-start justify-between gap-3 border-b border-border-light px-4 py-4 sm:gap-4 sm:px-6 sm:py-5">
           <div className="flex items-center gap-4">
-            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-(--theme-error-bg) text-(--theme-error)">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-(--theme-error-bg) text-(--theme-error) sm:h-12 sm:w-12">
               <DollarSign size={24} />
             </span>
 
             <div>
-              <h2 className="text-xl font-black tracking-normal">
+              <h2 className="text-lg font-black leading-tight tracking-normal sm:text-xl">
                 Cancelar pedido
               </h2>
               <p className="text-sm font-medium opacity-70">
@@ -66,7 +66,7 @@ export default function CancelNoPaymentModal({
           </button>
         </header>
 
-        <div className="space-y-6 px-6 py-6">
+        <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6">
           <div className="grid gap-3 rounded-2xl border border-border-light bg-secondary-bg-light/60 p-4 sm:grid-cols-3">
             <div>
               <p className="text-xs font-bold uppercase opacity-50">Cliente</p>
@@ -100,7 +100,7 @@ export default function CancelNoPaymentModal({
           </label>
         </div>
 
-        <footer className="flex flex-col gap-3 border-t border-border-light bg-secondary-bg-light/50 px-6 py-5 sm:flex-row">
+        <footer className="flex shrink-0 flex-col gap-3 border-t border-border-light bg-secondary-bg-light/50 px-4 py-3 sm:flex-row sm:px-6 sm:py-4">
           <button
             className="inline-flex h-12 flex-1 items-center justify-center rounded-full border border-border-light bg-card-bg-light text-sm font-black uppercase"
             onClick={onClose}
