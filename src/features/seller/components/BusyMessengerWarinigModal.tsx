@@ -13,7 +13,7 @@ export const BusyMessengerWarinigModal = ({ messenger, isLoading, onConfirm, onC
   return createPortal(
     (
       <div
-        className="fixed inset-0 z-999 flex items-center justify-center bg-black/75 p-4 backdrop-blur-md"
+        className="fixed inset-0 z-999 flex items-start justify-center overflow-y-auto bg-black/75 p-2 backdrop-blur-md sm:p-4"
         role="dialog"
         aria-modal="true"
         aria-labelledby="busy-warning-title"
@@ -21,7 +21,7 @@ export const BusyMessengerWarinigModal = ({ messenger, isLoading, onConfirm, onC
           if (event.target === event.currentTarget) onCancel();
         }}
       >
-        <section className="w-full max-w-sm rounded-[28px] border border-(--theme-border) bg-(--theme-card-bg) p-6 shadow-2xl">
+        <section className="my-2 max-h-[calc(100dvh-1rem)] w-full max-w-sm overflow-y-auto rounded-[24px] border border-(--theme-border) bg-(--theme-card-bg) p-4 shadow-2xl sm:my-auto sm:max-h-[calc(100dvh-2rem)] sm:rounded-[28px] sm:p-6">
           <div className="flex items-start justify-between gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
               <AlertTriangle className="text-amber-600 dark:text-amber-400" size={22} />

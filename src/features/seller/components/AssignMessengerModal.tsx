@@ -29,7 +29,7 @@ export function AssignMessengerModal({
   return createPortal(
     (
       <div
-        className="fixed inset-0 z-999 flex items-center justify-center bg-black/75 p-4 backdrop-blur-md"
+        className="fixed inset-0 z-999 flex items-start justify-center overflow-y-auto bg-black/75 p-2 backdrop-blur-md sm:p-4"
         role="dialog"
         aria-modal="true"
         aria-labelledby="assign-messenger-title"
@@ -37,17 +37,17 @@ export function AssignMessengerModal({
           if (event.target === event.currentTarget) onClose();
         }}
       >
-        <section className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-[28px] border border-(--theme-border) bg-(--theme-card-bg) shadow-2xl">
-          <header className="flex items-start justify-between gap-4 border-b border-(--theme-border) px-6 py-5">
-            <div>
+        <section className="my-auto flex max-h-[calc(100dvh-1rem)] w-full max-w-3xl flex-col overflow-hidden rounded-[24px] border border-(--theme-border) bg-(--theme-card-bg) shadow-2xl sm:max-h-[calc(100dvh-2rem)] sm:rounded-[28px]">
+          <header className="flex shrink-0 items-start justify-between gap-3 border-b border-(--theme-border) px-4 py-4 sm:gap-4 sm:px-6 sm:py-5">
+            <div className="min-w-0">
               <h2
                 id="order-details-title"
-                className="mt-2 text-2xl font-bold tracking-tight text-(--theme-text)"
+                className="text-xl font-bold leading-tight tracking-tight text-(--theme-text) sm:mt-2 sm:text-2xl"
                 style={{ fontFamily: "Outfit, sans-serif" }}
               >
                 {parseOrderId(order.orderId).friendlyName}
               </h2>
-              <p className="mt-1 text-sm text-(--theme-text) opacity-70">
+              <p className="mt-1 text-sm leading-snug text-(--theme-text) opacity-70">
                 Selecciona un mensajero disponible y confirma la asignación.
               </p>
             </div>
@@ -62,7 +62,7 @@ export function AssignMessengerModal({
             </button>
           </header>
 
-          <div className="p-6">
+          <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
             <div className="rounded-3xl border border-(--theme-border) bg-(--theme-secondary-bg)/50 p-4">
               <p className="text-[11px] font-800 uppercase tracking-[0.24em] text-(--theme-text) opacity-45">
                 Pedido listo
@@ -143,7 +143,7 @@ export function AssignMessengerModal({
               )}
             </div>
 
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+            <div className="sticky bottom-0 -mx-4 mt-6 flex flex-col gap-3 border-t border-(--theme-border) bg-(--theme-card-bg) px-4 py-4 sm:-mx-6 sm:flex-row sm:justify-end sm:px-6">
               <button
                 type="button"
                 onClick={onClose}
