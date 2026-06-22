@@ -1,4 +1,4 @@
-import { ArrowLeft, Banknote, MapPin, Package, Phone } from 'lucide-react';
+import { ArrowLeft, Banknote, Info, MapPin, Moon, Package, Phone, Sun, X } from 'lucide-react';
 import L from 'leaflet';
 import { useEffect, useMemo, useState } from 'react';
 import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
@@ -34,6 +34,20 @@ type BuyerMapOrder = {
 };
 
 const FALLBACK_POSITION: [number, number] = [-17.394, -66.1473];
+const THEME_STORAGE_KEY = 'sansistore-theme';
+
+type ThemeMode = 'light' | 'dark';
+
+const applyTheme = (theme: ThemeMode) => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+
+    try {
+        window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch {
+        // Keep visual theme even if local storage is unavailable.
+    }
+};
 
 function readOrderFromStorage(): BuyerMapOrder | null {
     if (typeof window === 'undefined') return null;
@@ -102,6 +116,8 @@ async function readOrderFromFirestore(orderId: string): Promise<BuyerMapOrder | 
 
 export default function CourierBuyerMap() {
     const [order, setOrder] = useState<BuyerMapOrder | null>(() => readInitialOrder());
+    const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+    const [theme, setTheme] = useState<ThemeMode>('light');
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
@@ -125,6 +141,16 @@ export default function CourierBuyerMap() {
         };
     }, []);
 
+    useEffect(() => {
+        const savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode | null;
+        const currentTheme =
+            savedTheme ||
+            (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
+
+        applyTheme(currentTheme);
+        setTheme(currentTheme);
+    }, []);
+
     const position = useMemo<[number, number]>(() => {
         const params = new URLSearchParams(window.location.search);
         const lat = Number(params.get('lat'));
@@ -139,8 +165,75 @@ export default function CourierBuyerMap() {
         return new URLSearchParams(window.location.search).get('mode') === 'seller';
     }, []);
 
+    const toggleTheme = () => {
+        const nextTheme = theme === 'dark' ? 'light' : 'dark';
+        applyTheme(nextTheme);
+        setTheme(nextTheme);
+    };
+
+    const detailsContent = (
+        <>
+            <p className="mb-1 text-xs font-bold uppercase text-primary">
+                {isSeller ? 'Ubicacion del vendedor' : 'Pedido del comprador'}
+            </p>
+            <h1 className="text-xl font-black leading-tight tracking-normal sm:text-2xl">
+                {order?.customerName ?? 'Cliente no registrado'}
+            </h1>
+
+            <div className="mt-4 space-y-3 text-sm sm:mt-5 sm:space-y-4">
+                <p className="flex items-start gap-3">
+                    <MapPin className="mt-0.5 shrink-0 text-primary" size={18} />
+                    <span>
+                        <span className="block font-bold">
+                            {order?.address ?? 'Direccion no registrada'}
+                        </span>
+                        {order?.reference && (
+                            <span className="mt-1 block text-xs opacity-70">
+                                {order.reference}
+                            </span>
+                        )}
+                    </span>
+                </p>
+
+                <p className="flex items-center gap-3">
+                    <Phone className="shrink-0 text-primary" size={18} />
+                    <span className="font-bold">{order?.phone ?? 'Sin telefono'}</span>
+                </p>
+
+                {!isSeller && (
+                    <>
+                        <div className="flex items-start gap-3">
+                            <Package className="mt-0.5 shrink-0 text-primary" size={18} />
+                            <div className="min-w-0 space-y-2">
+                                {(order?.items?.length ?? 0) > 0 ? (
+                                    order?.items.map((item) => (
+                                        <p key={`${item.name}-${item.quantity}`}>
+                                            {item.quantity}x {item.name}
+                                        </p>
+                                    ))
+                                ) : (
+                                    <p>Productos no registrados</p>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="rounded-2xl border border-primary/50 bg-primary/10 p-4">
+                            <p className="flex items-center gap-2 text-xs font-bold uppercase text-primary">
+                                <Banknote size={16} />
+                                Cobro
+                            </p>
+                            <p className="mt-2 text-3xl font-black">
+                                {formatBolivianos(order?.cashToCollect ?? 0)}
+                            </p>
+                        </div>
+                    </>
+                )}
+            </div>
+        </>
+    );
+
     return (
-        <main className="relative h-screen overflow-hidden bg-bg-light text-text-light">
+        <main className="relative h-dvh overflow-hidden bg-bg-light text-text-light">
             <MapContainer
                 center={position}
                 zoom={17}
@@ -174,15 +267,56 @@ export default function CourierBuyerMap() {
                 <ArrowLeft size={20} />
             </a>
 
-            <aside className="absolute inset-x-4 bottom-4 z-[500] rounded-[28px] border border-border-light bg-card-bg-light/95 p-5 text-text-light shadow-2xl backdrop-blur md:bottom-auto md:left-auto md:right-6 md:top-1/2 md:w-[360px] md:-translate-y-1/2">
+            <button
+                aria-label="Cambiar tema"
+                className="absolute right-4 top-16 z-[500] inline-flex h-11 w-11 items-center justify-center rounded-full border border-primary/40 bg-card-bg-light text-primary shadow-lg transition hover:border-primary md:top-4"
+                onClick={toggleTheme}
+                type="button"
+            >
+                {theme === 'dark' ? <Moon size={18} /> : <Sun size={18} />}
+            </button>
+
+            <button
+                className="absolute right-4 top-4 z-[500] inline-flex h-11 items-center justify-center gap-2 rounded-full border border-border-light bg-card-bg-light px-4 text-sm font-bold text-text-light shadow-lg transition hover:border-primary hover:text-primary md:hidden"
+                onClick={() => setIsDetailsOpen(true)}
+                type="button"
+            >
+                <Info size={18} />
+                Detalles
+            </button>
+
+            {isDetailsOpen && (
+                <div
+                    className="absolute inset-0 z-[650] bg-black/20 backdrop-blur-[1px] md:hidden"
+                    onClick={() => setIsDetailsOpen(false)}
+                >
+                    <aside
+                        className="absolute inset-x-3 top-16 max-h-[calc(100dvh-5rem)] overflow-y-auto rounded-[24px] border border-border-light bg-card-bg-light/95 p-4 text-text-light shadow-2xl backdrop-blur"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <button
+                            aria-label="Cerrar detalles"
+                            className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full border border-border-light bg-secondary-bg-light transition hover:text-primary"
+                            onClick={() => setIsDetailsOpen(false)}
+                            type="button"
+                        >
+                            <X size={16} />
+                        </button>
+
+                        <div className="pr-8">{detailsContent}</div>
+                    </aside>
+                </div>
+            )}
+
+            <aside className="absolute bottom-auto left-auto right-6 top-1/2 z-[500] hidden max-h-[calc(100dvh-2rem)] w-[360px] max-w-[calc(100vw-3rem)] -translate-y-1/2 overflow-y-auto rounded-[24px] border border-border-light bg-card-bg-light/95 p-5 text-text-light shadow-2xl backdrop-blur md:block">
                 <p className="mb-1 text-xs font-bold uppercase text-primary">
                     {isSeller ? 'Ubicación del vendedor' : 'Pedido del comprador'}
                 </p>
-                <h1 className="text-2xl font-black tracking-normal">
+                <h1 className="text-xl font-black leading-tight tracking-normal sm:text-2xl">
                     {order?.customerName ?? 'Cliente no registrado'}
                 </h1>
 
-                <div className="mt-5 space-y-4 text-sm">
+                <div className="mt-4 space-y-3 text-sm sm:mt-5 sm:space-y-4">
                     <p className="flex items-start gap-3">
                         <MapPin className="mt-0.5 shrink-0 text-primary" size={18} />
                         <span>
