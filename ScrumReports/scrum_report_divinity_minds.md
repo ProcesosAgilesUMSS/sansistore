@@ -528,9 +528,9 @@
 - **Blockers:** n/a.
 
 ## Gutierrez Hinojosa Jhon Deymar
-- **Yesterday:**
-- **Today:**
-- **Blockers:** n/a.
+- **Yesterday:** Llene con ideas al tablero de trello para el retrospective del sprint4 y actualice el status de las historias del sprint 3.
+- **Today:** Revisar historias del sprint 4 para confirmar que no tienen bugs.
+- **Blockers:** Algunas historias no tienen un pr linkeado.
 
 ## Merudia Calderon Dayeza
 - **Yesterday:**
