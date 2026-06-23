@@ -532,3 +532,10 @@
 - **Yesterday:** Trabajé en corregir problemas de responsive en diferentes pantallas del mensajero.
 - **Today:** Participaré en el Sprint Retrospective y atenderé a la reunión para saber cuáles son las siguientes actividades.
 - **Blockers:** No estamos seguros de qué vamos a hacer este siguiente sprint.
+
+### Efrain Peralta Felipe
+- **Yesterday:** Revise si habia algun bug.
+- **Today:** Participaré en el Sprint Retrospective.
+- **Blockers:** None.
+
+
