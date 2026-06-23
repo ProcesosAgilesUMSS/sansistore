@@ -190,8 +190,8 @@
   - **Blockers:**     Se tardó mucho en preguntar y entender el flujo de estados para #73
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
+  - **Yesterday:** Diseño de la vista de stock 
+  - **Today:**  Ajustes de diseño para las US #64    
   - **Blockers:**   
 
   ## Rios Quiruchi Edney Jhojan
@@ -220,8 +220,8 @@
   - **Blockers:**     Modificaciones de ultimo momento, en el flujo con el inventario
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
+  - **Yesterday:**  Revisión del diseño de salida de productos.
+  - **Today:** Diseño de interfaces para el Sprint     
   - **Blockers:**   
 
   ## Rios Quiruchi Edney Jhojan
@@ -250,8 +250,8 @@
   - **Blockers:**     Se reportaron cambios de ultimo momento, se tardó mas de lo debido.
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
+  - **Yesterday:** Apoyo en el diseño de las US del Sprint 3. 
+  - **Today:**  Rediseño de la sección de empaques    
   - **Blockers:**   
 
   ## Rios Quiruchi Edney Jhojan
@@ -280,8 +280,8 @@
   - **Blockers:**     Se tardó mas de lo debido, todavia no se definió el flujo de pedidos cancelados o devueltos.
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
+  - **Yesterday:**  Mejoras de legibilidad en las vistas
+  - **Today:**   Ajustes de diseño   
   - **Blockers:**   
 
   ## Rios Quiruchi Edney Jhojan
@@ -309,9 +309,9 @@
   - **Blockers:**     Bug, No se ve la adicion de a tienda de productos devueltos
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
-  - **Blockers:**   
+  - **Yesterday:**  Adaptación del diseño al flujo
+  - **Today:**  Diseño de la vista de entrada de productos devueltos.    
+  - **Blockers:** Bug de visualización.  
 
   ## Rios Quiruchi Edney Jhojan
   - **Yesterday:**    
@@ -338,9 +338,9 @@
   - **Blockers:**     Ninguno
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
-  - **Blockers:**   
+  - **Yesterday:**  Revisión del diseño tras la corrección del bug.
+  - **Today:**   Ajustes de la interfaz de la US #68   
+  - **Blockers:** Ninguno.  
 
   ## Rios Quiruchi Edney Jhojan
   - **Yesterday:**    
@@ -367,9 +367,9 @@
   - **Blockers:**     Ninguno
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
-  - **Blockers:**   
+  - **Yesterday:** Ajustes al historial de movimientos. 
+  - **Today:**  Diseño de la US #56    
+  - **Blockers:**  Ninguno. 
 
   ## Rios Quiruchi Edney Jhojan
   - **Yesterday:**    
@@ -397,9 +397,9 @@
   - **Blockers:**     Ninguno
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
-  - **Blockers:**   
+  - **Yesterday:** Revisión del flujo de devoluciones. 
+  - **Today:** Continuación del diseño de la US     
+  - **Blockers:** Ninguno.  
 
   ## Rios Quiruchi Edney Jhojan
   - **Yesterday:**    
@@ -426,9 +426,9 @@
   - **Blockers:**     Ninguno
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
-  - **Blockers:**   
+  - **Yesterday:** Finalización del diseño de la US
+  - **Today:** Revisión visual de los flujos del sistema.    
+  - **Blockers:**  Ninguno. 
 
   ## Rios Quiruchi Edney Jhojan
   - **Yesterday:**    
