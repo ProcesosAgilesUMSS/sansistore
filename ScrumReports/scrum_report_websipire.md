@@ -506,3 +506,11 @@ por las dudas que se tienen.
 * **Yesterday:** Avancé en el desarrollo de la HU "Detectar diferencias entre pedidos entregados y pagos registrados", apoyando en la implementación de las validaciones y reglas de conciliación.
 * **Today:** Revisé y validé el funcionamiento de los filtros y la visualización de inconsistencias en el panel de conciliación.
 * **Blockers:** None
+
+# Daily Reports - Team 3 Webspire 23/06/26
+
+## Dayana Saleth Ortuño Guzmán
+
+* **Yesterday:** Revise partes de nuestra implementacion si es que hay algun bug por arrglar.
+* **Today:** Revise el tablero de GitHub en caso de que los QAs encontraran algun Bug de parte de neustra implementacion.
+* **Blockers:** none
