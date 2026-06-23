@@ -491,13 +491,13 @@
 - **Today:** Apoyar a los equipos en la migración de los colores hardcodeados a los tokens y validar que las pantallas cumplan el estándar de header/footer y ancho.
 - **Blockers:** n/a.
 
+
 # 06/18/2026
 
 ## Castro Tejada Steven Lisandro
 - **Yesterday:** Realicé el seguimiento y validación de las Pull Requests fusionadas (#670, #674) en la rama main.
 - **Today:** Audité el código de la vista unificada `/me` en producción (v1.3.0), identifiqué discrepancias en el Navbar y en la visibilidad de roles para "Mis direcciones", abrí la issue de bug #686 para el Sprint 5 y creé la rama local `fix/locations-navbar-role-visibility`.
 - **Blockers:** n/a.
-
 
 ## Gutierrez Hinojosa Jhon Deymar
 - **Yesterday:** Se integro la refactorizacion de los tests y reporte algunos bugs.
@@ -518,6 +518,7 @@
 - **Yesterday:** Unifiqué y rediseñé el sistema de UI del proyecto (centralización de la fuente Inter y agregado de tokens de color claro/oscuro en `global.css`), mejoré el header (`Navbar.tsx`) y footer (`Footer.tsx`) con diseño responsivo, y abrí y planifiqué las issues de tareas de alinear todas las pantallas del sistema (#616 a #623) con el nuevo estándar de `UI.md`.
 - **Today:** Apoyé a los demás equipos de desarrollo en la migración de colores hardcodeados a los tokens y verifiqué la consistencia visual y responsiva de las nuevas secciones en `/me`.
 - **Blockers:** n/a.
+
 
 # 06/22/2026
 
@@ -545,4 +546,3 @@
 - **Yesterday:** Avancé en el rediseño de la interfaz de inicio de sesión sin tarjetas, el diseño con barra lateral de la sección de perfil y la consolidación de la pantalla de ubicaciones para unificarla en un solo componente master-detail.
 - **Today:** Completé el rediseño de inicio de sesión (`LoginPage.tsx`, `/iniciar-sesion`) con restricción estricta de Google Auth a cuentas `@umss.edu`; implementé el nuevo layout responsivo de perfil con barra lateral y cargadores skeleton (`ProfileView.tsx`, `/mi-perfil`); unifiqué la vista de ubicaciones (`LocationSection.tsx`, `/ubicaciones`) eliminando los modales encadenados; añadí animaciones al carrito y un banner interactivo y cerrable para el emulador de Firebase.
 - **Blockers:** n/a.
-
