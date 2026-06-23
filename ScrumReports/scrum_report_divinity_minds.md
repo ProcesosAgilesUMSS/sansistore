@@ -533,8 +533,8 @@
 - **Blockers:** Algunas historias no tienen un pr linkeado.
 
 ## Merudia Calderon Dayeza
-- **Yesterday:**
-- **Today:**
+- **Yesterday:*Participé en la reunión de Retrospectiva del equipo para el Sprint 4 en Trello*
+- **Today:*Revisaré las HUs que quedaron pendientes en el entorno de QA para este mismo sprint.*
 - **Blockers:** n/a.
 
 ## Merino Vidal Mateo Alejandro
