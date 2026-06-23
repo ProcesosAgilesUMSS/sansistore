@@ -521,3 +521,14 @@
   - La HU #568 fue completada y el PR #646 ha sido aprobado. Se espera el merge a `main` para el cierre del Sprint 4.
   - Preparación de la demo del Sprint 4.
 - **Blockers:** None.
+
+***
+
+# Sprint 5
+
+## 23-06-2026
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Trabajé en corregir problemas de responsive en diferentes pantallas del mensajero.
+- **Today:** Participaré en el Sprint Retrospective y atenderé a la reunión para saber cuáles son las siguientes actividades.
+- **Blockers:** No estamos seguros de qué vamos a hacer este siguiente sprint.
