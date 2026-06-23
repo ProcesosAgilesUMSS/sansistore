@@ -506,3 +506,34 @@ por las dudas que se tienen.
 * **Yesterday:** Avancé en el desarrollo de la HU "Detectar diferencias entre pedidos entregados y pagos registrados", apoyando en la implementación de las validaciones y reglas de conciliación.
 * **Today:** Revisé y validé el funcionamiento de los filtros y la visualización de inconsistencias en el panel de conciliación.
 * **Blockers:** None
+
+# Daily Reports - Team 3 Webspire 23/06/26
+
+## Dayana Saleth Ortuño Guzmán
+
+* **Yesterday:** Revise partes de nuestra implementacion si es que hay algun bug por arrglar.
+* **Today:** Revise el tablero de GitHub en caso de que los QAs encontraran algun Bug de parte de neustra implementacion.
+* **Blockers:** none
+## María Victoria Grageda Vallejos
+
+* **Yesterday:** Verifiqué algunas partes de nuestra implementación para identificar posibles errores que deban corregirse.
+* **Today:** Revisé el tablero de GitHub para comprobar si los QAs reportaron algún bug relacionado con nuestra implementación.
+* **Blockers:** None.
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Revisé los cambios integrados en el sistema y validé que las funcionalidades implementadas en el sprint funcionen correctamente después del merge. 
+* **Today:**  Participaré en el Sprint Retrospective para analizar los resultados obtenidos y planificar las siguientes actividades del equipo.
+* **Blockers:** None.
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:**  Verifiqué el estado final de las funcionalidades completadas durante el sprint
+* **Today:** Asistiré a la Sprint Retrospective y colaboraré en la evaluación de los objetivos alcanzados durante el sprint.
+* **Blockers:** None
+
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Revisé las tareas concluidas durante el sprint para asegurar que cumplan con los criterios establecidos y no presenten observaciones pendientes.
+* **Today:** Participaré en la Sprint Retrospective y en la discusión de las actividades
+* **Blockers:** None
