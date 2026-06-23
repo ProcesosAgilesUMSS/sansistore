@@ -514,3 +514,8 @@ por las dudas que se tienen.
 * **Yesterday:** Revise partes de nuestra implementacion si es que hay algun bug por arrglar.
 * **Today:** Revise el tablero de GitHub en caso de que los QAs encontraran algun Bug de parte de neustra implementacion.
 * **Blockers:** none
+## María Victoria Grageda Vallejos
+
+* **Yesterday:** Verifiqué algunas partes de nuestra implementación para identificar posibles errores que deban corregirse.
+* **Today:** Revisé el tablero de GitHub para comprobar si los QAs reportaron algún bug relacionado con nuestra implementación.
+* **Blockers:** None.
