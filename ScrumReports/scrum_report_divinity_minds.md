@@ -491,13 +491,13 @@
 - **Today:** Apoyar a los equipos en la migración de los colores hardcodeados a los tokens y validar que las pantallas cumplan el estándar de header/footer y ancho.
 - **Blockers:** n/a.
 
+
 # 06/18/2026
 
 ## Castro Tejada Steven Lisandro
 - **Yesterday:** Realicé el seguimiento y validación de las Pull Requests fusionadas (#670, #674) en la rama main.
 - **Today:** Audité el código de la vista unificada `/me` en producción (v1.3.0), identifiqué discrepancias en el Navbar y en la visibilidad de roles para "Mis direcciones", abrí la issue de bug #686 para el Sprint 5 y creé la rama local `fix/locations-navbar-role-visibility`.
 - **Blockers:** n/a.
-
 
 ## Gutierrez Hinojosa Jhon Deymar
 - **Yesterday:** Se integro la refactorizacion de los tests y reporte algunos bugs.
@@ -519,3 +519,30 @@
 - **Today:** Apoyé a los demás equipos de desarrollo en la migración de colores hardcodeados a los tokens y verifiqué la consistencia visual y responsiva de las nuevas secciones en `/me`.
 - **Blockers:** n/a.
 
+
+# 06/23/2026
+
+## Castro Tejada Steven Lisandro
+- **Yesterday:** Aporté ideas y tarjetas al tablero de retrospectiva de Sprint 4 del equipo Divinity Minds (en la herramienta Trello), documentando lecciones aprendidas sobre pruebas de integración con Playwright e hidratación de componentes.
+- **Today:** Realicé la limpieza y depuración de 19 ramas remotas de seguimiento en GitHub ya fusionadas en main (pertenecientes a otros equipos y al nuestro), asociadas a los Pull Requests #561, #562, #639, #668, #670, #672, #674, #676, #679, #680, #681 y #688.
+- **Blockers:** n/a.
+
+## Gutierrez Hinojosa Jhon Deymar
+- **Yesterday:** Llene con ideas al tablero de trello para el retrospective del sprint4 y actualice el status de las historias del sprint 3.
+- **Today:** Revisar historias del sprint 4 para confirmar que no tienen bugs.
+- **Blockers:** Algunas historias no tienen un pr linkeado.
+
+## Merudia Calderon Dayeza
+- **Yesterday:*Participé en la reunión de Retrospectiva del equipo para el Sprint 4 en Trello*
+- **Today:*Revisaré las HUs que quedaron pendientes en el entorno de QA para este mismo sprint.*
+- **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+- **Yesterday:** Aporté ideas y acuerdos al tablero de retrospective del Sprint 4 en Trello y realicé una revisión funcional de la aplicación, validando los flujos principales e identificando posibles mejoras.
+- **Today:** Revisaré las historias de usuario del Sprint 4 y daré seguimiento a los bugs reportados para validar su estado y las correcciones aplicadas.
+- **Blockers:** n/a.
+
+## Velasquez Vela Marcos
+- **Yesterday:** Avancé en el rediseño de la interfaz de inicio de sesión sin tarjetas, el diseño con barra lateral de la sección de perfil y la consolidación de la pantalla de ubicaciones para unificarla en un solo componente master-detail.
+- **Today:** Completé el rediseño de inicio de sesión (`LoginPage.tsx`, `/iniciar-sesion`) con restricción estricta de Google Auth a cuentas `@umss.edu`; implementé el nuevo layout responsivo de perfil con barra lateral y cargadores skeleton (`ProfileView.tsx`, `/mi-perfil`); unifiqué la vista de ubicaciones (`LocationSection.tsx`, `/ubicaciones`) eliminando los modales encadenados; añadí animaciones al carrito y un banner interactivo y cerrable para el emulador de Firebase.
+- **Blockers:** n/a.
