@@ -542,7 +542,7 @@
 - **Blockers:** n/a.
 
 ## Velasquez Vela Marcos
-- **Yesterday:**
-- **Today:**
+- **Yesterday:** Avancé en el rediseño de la interfaz de inicio de sesión sin tarjetas, el diseño con barra lateral de la sección de perfil y la consolidación de la pantalla de ubicaciones para unificarla en un solo componente master-detail.
+- **Today:** Completé el rediseño de inicio de sesión (`LoginPage.tsx`, `/iniciar-sesion`) con restricción estricta de Google Auth a cuentas `@umss.edu`; implementé el nuevo layout responsivo de perfil con barra lateral y cargadores skeleton (`ProfileView.tsx`, `/mi-perfil`); unifiqué la vista de ubicaciones (`LocationSection.tsx`, `/ubicaciones`) eliminando los modales encadenados; añadí animaciones al carrito y un banner interactivo y cerrable para el emulador de Firebase.
 - **Blockers:** n/a.
 
