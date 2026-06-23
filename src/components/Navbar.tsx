@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import {
   ChevronDown,
   ShoppingBag,
+  ShoppingCart,
   Menu,
   X,
   LogOut,
@@ -59,18 +60,20 @@ function CartButton() {
       aria-label={`Carrito, ${mounted ? totalUnits : 0} unidades`}
       className="relative transition-all text-text-light opacity-[0.60] hover:text-primary hover:opacity-100"
     >
-      <ShoppingBag
+      <ShoppingCart
         size={18}
         className={`transition-all duration-300 ease-out ${isAnimating ? 'text-primary opacity-100 scale-105' : ''
           }`}
       />
-      <span
-        key={totalUnits}
-        className={`absolute -top-1 -right-1 text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold border border-primary bg-primary text-bg-dark transition-transform duration-300 ease-out ${isAnimating ? 'scale-110' : 'scale-100'
-          }`}
-      >
-        {mounted ? (totalUnits > 99 ? '99+' : totalUnits) : 0}
-      </span>
+      {mounted && totalUnits > 0 && (
+        <span
+          key={totalUnits}
+          className={`absolute -top-1 -right-1 text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold border border-primary bg-primary text-bg-dark transition-transform duration-300 ease-out ${isAnimating ? 'scale-110' : 'scale-100'
+            }`}
+        >
+          {totalUnits > 99 ? '99+' : totalUnits}
+        </span>
+      )}
     </a>
   );
 }
@@ -172,7 +175,7 @@ export default function Navbar() {
           clearLocalCart();
           clearLocalFavorites();
           signOut(auth)
-            .then(() => { window.location.href = '/login'; })
+            .then(() => { window.location.href = '/iniciar-sesion'; })
             .catch(console.error);
         });
     } else {
@@ -180,7 +183,7 @@ export default function Navbar() {
       clearLocalCart();
       clearLocalFavorites();
       signOut(auth)
-        .then(() => { window.location.href = '/login'; })
+        .then(() => { window.location.href = '/iniciar-sesion'; })
         .catch(console.error);
     }
   };
@@ -309,7 +312,7 @@ export default function Navbar() {
                       >
                         <a
                           role="menuitem"
-                          href="/me"
+                          href="/mi-perfil"
                           className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light opacity-70 transition-colors hover:bg-border-light/40 hover:text-primary hover:opacity-100"
                         >
                           <UserIcon size={14} />
@@ -340,7 +343,7 @@ export default function Navbar() {
                   </div>
                 ) : (
                   <a
-                    href="/login"
+                    href="/iniciar-sesion"
                     className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-1.5 text-[13px] font-semibold text-white transition-all hover:brightness-110 active:scale-95"
                   >
                     <UserIcon size={15} />
@@ -398,7 +401,7 @@ export default function Navbar() {
               {user && (
                 <>
                   <a
-                    href="/me"
+                    href="/mi-perfil"
                     className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
                   >
                     Mi Perfil

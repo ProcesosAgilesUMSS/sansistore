@@ -123,12 +123,12 @@ export default function AdminLayout() {
 				.catch(() => console.warn("[AccessLog] No se pudo registrar el logout del admin."))
 				.finally(() => {
 					signOut(auth)
-						.then(() => { window.location.href = "/login"; })
+						.then(() => { window.location.href = "/iniciar-sesion"; })
 						.catch(console.error);
 				});
 		} else {
 			signOut(auth)
-				.then(() => { window.location.href = "/login"; })
+				.then(() => { window.location.href = "/iniciar-sesion"; })
 				.catch(console.error);
 		}
 	};

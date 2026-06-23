@@ -1,0 +1,16 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import LocationSection from '../features/location/components/LocationSection.tsx';
+---
+
+<Layout title="Mis ubicaciones | SansiStore">
+  <Navbar client:load />
+
+  <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16">
+    <LocationSection client:only="react" />
+  </main>
+
+  <Footer client:load />
+</Layout>

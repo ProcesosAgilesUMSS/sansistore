@@ -10,11 +10,11 @@
 
   signOut(auth)
     .then(() => {
-      window.location.href = '/login';
+      window.location.href = '/iniciar-sesion';
     })
     .catch((error) => {
       console.error('Logout error:', error);
-      window.location.href = '/login';
+      window.location.href = '/iniciar-sesion';
     });
 </script>
 

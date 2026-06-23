@@ -1,0 +1,22 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import ProfileView from '../features/profile/ProfileView';
+---
+
+<Layout title="Mi Perfil | Sansistore">
+  <Navbar client:load />
+
+  <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16">
+    <header class="mb-8">
+      <h1 class="text-[clamp(1.6rem,3vw,2.2rem)] font-black tracking-[-0.03em] leading-none text-(--theme-text)">
+        Mi Perfil
+      </h1>
+    </header>
+
+    <ProfileView client:load />
+  </main>
+
+  <Footer client:load />
+</Layout>

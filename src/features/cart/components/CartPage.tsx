@@ -340,7 +340,7 @@ export default function CartPage() {
     return (
       <div className="error-message">
         <p>No autenticado</p>
-        <a href="/login">Iniciar sesión</a>
+        <a href="/iniciar-sesion">Iniciar sesión</a>
       </div>
     );
   }

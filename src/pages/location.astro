@@ -1,10 +1,5 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import LocationSection from '../features/location/components/LocationSection.tsx';
-import Navbar from '../components/Navbar';
+// Ruta heredada: /location ahora vive en /ubicaciones (UI en español).
+// Mantenemos el redirect para no romper enlaces externos o guardados.
+return Astro.redirect('/ubicaciones', 301);
 ---
-
-<Layout title="Ubicación">
-    <Navbar client:load />
-    <LocationSection client:only="react" />
-</Layout>

@@ -1,22 +1,5 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import ProfileView from '../features/profile/ProfileView';
+// Ruta heredada: /me ahora vive en /mi-perfil (UI en español).
+// Mantenemos el redirect para no romper enlaces externos o guardados.
+return Astro.redirect('/mi-perfil', 301);
 ---
-
-<Layout title="Mi Cuenta | Sansistore">
-  <Navbar client:load />
-
-  <main class="flex-1 w-full max-w-xl mx-auto px-4 pt-32 pb-16">
-    <header class="flex flex-col items-center gap-4 mb-8 text-center">
-      <h1 class="text-[clamp(1.75rem,4vw,3rem)] font-black tracking-[-0.04em] leading-none text-text-light">
-        Mi Perfil
-      </h1>
-    </header>
-
-    <ProfileView client:load />
-  </main>
-
-  <Footer client:load />
-</Layout>

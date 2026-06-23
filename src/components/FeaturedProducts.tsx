@@ -169,6 +169,8 @@ function FeaturedProductsInner({
     'best-sellers' | 'recent' | 'name-asc' | 'name-desc'
   >(isSortOption(initialSort) ? initialSort : 'best-sellers');
   const [showSortDropdown, setShowSortDropdown] = useState(false);
+  const [bumpingProductId, setBumpingProductId] = useState<string | null>(null);
+  const bumpTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const ITEMS_PER_PAGE = 12;
   const searchRef = useRef<HTMLDivElement>(null);
   const sortRef = useRef<HTMLDivElement>(null);
@@ -553,6 +555,23 @@ function FeaturedProductsInner({
     }
     window.history.pushState({}, '', url);
   };
+
+  const handleAddToCart = (
+    productId: string,
+    stock: number,
+    price: number
+  ) => {
+    addToCart(productId, stock, price);
+    if (bumpTimeoutRef.current) clearTimeout(bumpTimeoutRef.current);
+    setBumpingProductId(productId);
+    bumpTimeoutRef.current = setTimeout(() => setBumpingProductId(null), 700);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (bumpTimeoutRef.current) clearTimeout(bumpTimeoutRef.current);
+    };
+  }, []);
 
   return (
     <section id="productos" className="bg-bg-light py-20">
@@ -974,22 +993,33 @@ function FeaturedProductsInner({
                               </span>
                             )}
                           </div>
-                          <button
-                            type="button"
-                            title={isProductAvailable ? 'Agregar al carrito' : 'Sin stock disponible'}
-                            disabled={!isProductAvailable}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              addToCart(product.id, effectiveStock, currentPrice);
-                            }}
-                            className={`flex items-center justify-center rounded-full p-2.5 sm:p-3 transition-all active:scale-95 shrink-0 relative z-20 ${
-                              isProductAvailable
-                                ? 'text-primary hover:scale-110 hover:drop-shadow-lg'
-                                : 'text-text-light opacity-30 cursor-not-allowed'
-                            }`}
-                          >
-                            <FaCartPlus className="text-lg sm:text-xl" />
-                          </button>
+                          <span className="relative shrink-0">
+                            {bumpingProductId === product.id && (
+                              <span
+                                key={Date.now()}
+                                aria-hidden="true"
+                                className="cart-bump pointer-events-none absolute -top-2 left-1/2 z-30 rounded-full bg-primary px-1.5 py-0.5 text-[11px] font-extrabold leading-none text-white shadow-md shadow-primary/40"
+                              >
+                                +1
+                              </span>
+                            )}
+                            <button
+                              type="button"
+                              title={isProductAvailable ? 'Agregar al carrito' : 'Sin stock disponible'}
+                              disabled={!isProductAvailable}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                handleAddToCart(product.id, effectiveStock, currentPrice);
+                              }}
+                              className={`flex items-center justify-center rounded-full p-2.5 sm:p-3 transition-all active:scale-95 shrink-0 relative z-20 ${
+                                isProductAvailable
+                                  ? 'text-primary hover:scale-110 hover:drop-shadow-lg'
+                                  : 'text-text-light opacity-30 cursor-not-allowed'
+                              } ${bumpingProductId === product.id ? 'cart-icon-pop' : ''}`}
+                            >
+                              <FaCartPlus className="text-lg sm:text-xl" />
+                            </button>
+                          </span>
                         </div>
                       </div>
                     </article>

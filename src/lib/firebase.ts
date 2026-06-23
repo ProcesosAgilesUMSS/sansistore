@@ -35,6 +35,12 @@ const db =
     : getFirestore(app);
 const storage = getStorage(app);
 const googleProvider = new GoogleAuthProvider();
+// Restringe el selector de cuentas de Google al dominio institucional y
+// fuerza a elegir cuenta (evita auto-login con una cuenta no institucional).
+googleProvider.setCustomParameters({
+  hd: 'umss.edu',
+  prompt: 'select_account',
+});
 
 setPersistence(auth, browserLocalPersistence).catch(() => {});
 
@@ -60,7 +66,9 @@ if (import.meta.env.PUBLIC_APP_ENV !== 'production') {
     connectFirestoreEmulator(db, firestoreEmulatorHost, firestoreEmulatorPort);
     // Connect auth emulator as well
     try {
-      connectAuthEmulator(auth, authEmulatorUrl);
+      // disableWarnings oculta el banner rojo que Firebase inyecta solo;
+      // mostramos nuestro propio aviso cerrable (EmulatorBanner).
+      connectAuthEmulator(auth, authEmulatorUrl, { disableWarnings: true });
       console.log(`Firebase Auth: connected to emulator at ${authEmulatorUrl}`);
     } catch (e) {
       console.warn('Firebase Auth: could not connect to emulator', e);

@@ -67,7 +67,7 @@ export function LocationSelectorModal({ user, onClose, onConfirm }: Props) {
               <MapPin size={32} className="text-primary/40" />
               <p className="text-sm font-bold">No hay ubicaciones guardadas</p>
               <a
-                href="/location"
+                href="/ubicaciones"
                 className="text-xs font-semibold text-primary hover:underline"
               >
                 Agregar ubicación

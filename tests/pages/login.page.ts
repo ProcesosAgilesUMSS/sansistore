@@ -18,7 +18,7 @@ export class LoginPage {
   }
 
   async goto() {
-    await this.page.goto('/login');
+    await this.page.goto('/iniciar-sesion');
   }
 
   async waitForReady() {
@@ -32,7 +32,7 @@ export class LoginPage {
             return await this.page.evaluate(() => {
               const button = document
                 .querySelector('form')
-                ?.querySelector('button[type="button"]');
+                ?.querySelector('button[type="submit"]');
               return Boolean(
                 button &&
                 Object.keys(button).some((key) => key.startsWith('__reactProps'))

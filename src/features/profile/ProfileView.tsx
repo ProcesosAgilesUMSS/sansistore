@@ -4,9 +4,13 @@ import {
 	AlertCircle,
 	Check,
 	CheckCircle,
+	ChevronRight,
+	CreditCard,
+	Mail,
 	MapPin,
 	Package,
 	Pencil,
+	Phone,
 	Star,
 	X,
 } from "lucide-react";
@@ -32,6 +36,17 @@ interface DeliveryStatsData {
 	deliveryRate: number;
 	isLoading: boolean;
 }
+
+const ROLE_LABELS: Record<string, string> = {
+	comprador: "Comprador",
+	mensajero: "Mensajero",
+	admin: "Administrador",
+	vendedor: "Vendedor",
+	almacen: "Almacén",
+};
+
+const formatRole = (role: string) =>
+	ROLE_LABELS[role] ?? role.charAt(0).toUpperCase() + role.slice(1);
 
 export default function ProfileView() {
 	const [loading, setLoading] = useState(true);
@@ -83,6 +98,17 @@ export default function ProfileView() {
 
 			setUid(user.uid);
 
+			// La autenticación depende de que exista `user`, NO de que Firestore
+			// responda. Marcamos autenticado y sembramos lo básico desde auth de
+			// inmediato; si la lectura de Firestore falla, igual mostramos el perfil.
+			setAuthenticated(true);
+			setProfile((prev) => ({
+				...prev,
+				displayName: user.displayName || "Sin nombre",
+				email: user.email || "No disponible",
+				photoURL: user.photoURL || "",
+			}));
+
 			try {
 				const userDoc = await getDoc(doc(db, "users", user.uid));
 				let phone = "No registrado";
@@ -110,8 +136,6 @@ export default function ProfileView() {
 					roles: userRoles,
 					deliveryRating,
 				});
-
-				setAuthenticated(true);
 
 				const isMensajero =
 					userRoles.includes("mensajero") || userRoles.includes("admin");
@@ -285,20 +309,16 @@ export default function ProfileView() {
 	};
 
 	if (loading) {
-		return (
-			<div className="text-center py-8 text-text-light/60 font-medium">
-				Cargando perfil...
-			</div>
-		);
+		return <ProfileSkeleton />;
 	}
 
 	if (!authenticated) {
 		return (
-			<div className="text-center flex flex-col items-center gap-6 py-6">
-				<p className="text-error font-semibold">No autenticado</p>
+			<div className="flex flex-col items-center gap-6 py-10 text-center">
+				<p className="font-semibold text-(--theme-error)">No autenticado</p>
 				<a
-					href="/login"
-					className="rounded-full bg-primary text-white px-6 py-3 text-xs uppercase font-bold tracking-wider hover:opacity-90 transition-all"
+					href="/iniciar-sesion"
+					className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-white transition-all hover:brightness-105"
 				>
 					Iniciar sesión
 				</a>
@@ -306,7 +326,7 @@ export default function ProfileView() {
 		);
 	}
 
-	// --- LÓGICA CORREGIDA DE ROLES ---
+	// --- LÓGICA DE ROLES ---
 	const showMisDirecciones = true; // Todo usuario autenticado puede tener direcciones
 	const showMisPedidos =
 		profile.roles.length === 0 ||
@@ -320,353 +340,426 @@ export default function ProfileView() {
 		<>
 			{toast && (
 				<div
-					className={`fixed bottom-6 left-1/2 z-[200] flex -translate-x-1/2 items-center gap-2 rounded-full px-5 py-2.5 shadow-lg transition-all animate-fade-in ${
-						toast.type === "success" ? "bg-[#88B04B]" : "bg-red-500"
+					className={`fixed bottom-6 left-1/2 z-[200] flex -translate-x-1/2 items-center gap-2 rounded-full px-5 py-2.5 text-white shadow-lg animate-fade-in ${
+						toast.type === "success" ? "bg-primary" : "bg-(--theme-error)"
 					}`}
 				>
 					{toast.type === "success" ? (
-						<CheckCircle size={15} className="text-white" />
+						<CheckCircle size={15} />
 					) : (
-						<AlertCircle size={15} className="text-white" />
+						<AlertCircle size={15} />
 					)}
-					<span className="font-outfit text-sm font-bold text-white">
-						{toast.message}
-					</span>
+					<span className="text-sm font-bold">{toast.message}</span>
 				</div>
 			)}
 
-			<section className="bg-card-bg-light border border-border-light rounded-[1.25rem] p-6 shadow-sm max-w-xl mx-auto flex flex-col gap-6">
-				<header className="flex flex-col items-center text-center pb-6 border-b border-border-light pt-4 relative">
-					{profile.photoURL ? (
-						<img
-							src={profile.photoURL}
-							alt={profile.displayName}
-							className="size-24 rounded-full object-cover shadow-sm ring-4 ring-primary/10 border border-border-light mb-4"
+			<div className="grid gap-5 lg:grid-cols-3 lg:items-start">
+				{/* Tarjeta de identidad */}
+				<section className="overflow-hidden rounded-2xl border border-(--theme-border) bg-(--theme-card-bg) shadow-sm lg:sticky lg:top-28">
+					<div className="h-20 bg-gradient-to-r from-primary to-primary/60" />
+					<div className="flex flex-col items-center px-6 pb-6 text-center">
+						{profile.photoURL ? (
+							<img
+								src={profile.photoURL}
+								alt={profile.displayName}
+								className="-mt-12 size-24 rounded-full border-4 border-(--theme-card-bg) object-cover shadow-md"
+							/>
+						) : (
+							<div className="-mt-12 flex size-24 items-center justify-center rounded-full border-4 border-(--theme-card-bg) bg-primary text-3xl font-black text-white shadow-md">
+								{profile.displayName.charAt(0).toUpperCase()}
+							</div>
+						)}
+
+						<h2 className="mt-3 text-xl font-black tracking-tight text-(--theme-text)">
+							{profile.displayName}
+						</h2>
+						<p className="mt-0.5 text-[13px] font-medium text-(--theme-text) opacity-60">
+							{profile.email}
+						</p>
+
+						{profile.roles.length > 0 && (
+							<div className="mt-3 flex flex-wrap justify-center gap-1.5">
+								{profile.roles.map((role) => (
+									<span
+										key={role}
+										className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-bold text-primary"
+									>
+										{formatRole(role)}
+									</span>
+								))}
+							</div>
+						)}
+
+						{showCalificacionMensajero &&
+							profile.deliveryRating !== undefined && (
+								<div className="mt-3 flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+									<Star size={13} fill="currentColor" />
+									<span>
+										Calificación: {profile.deliveryRating.toFixed(1)} / 5.0
+									</span>
+								</div>
+							)}
+					</div>
+				</section>
+
+				{/* Columna de detalles */}
+				<div className="flex flex-col gap-5 lg:col-span-2">
+				{/* Información personal */}
+				<section className="rounded-2xl border border-(--theme-border) bg-(--theme-card-bg) p-6 shadow-sm">
+					<h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-(--theme-text) opacity-50">
+						Información personal
+					</h3>
+					<div className="flex flex-col divide-y divide-(--theme-border)">
+						<EditableField
+							icon={<CreditCard size={17} />}
+							label="Carnet de identidad"
+							inputId="profile-ci-input"
+							value={profile.ci}
+							isEditing={isEditingCi}
+							tempValue={tempCi}
+							onTempChange={setTempCi}
+							onStart={handleStartEditCi}
+							onSave={handleSaveCi}
+							onCancel={() => setIsEditingCi(false)}
+							error={errors.ci}
+							placeholder="Ej. 12345678"
 						/>
-					) : (
-						<div className="size-24 rounded-full bg-border-light/40 flex items-center justify-center text-text-light/40 font-bold text-2xl shadow-sm mb-4">
-							{profile.displayName.charAt(0).toUpperCase()}
-						</div>
-					)}
-
-					<h1 className="text-xl font-black tracking-tight text-text-light mb-1">
-						{profile.displayName}
-					</h1>
-
-					<dd className="text-[13px] font-medium text-text-light opacity-60 mb-2">
-						{profile.email}
-					</dd>
-
-					{showCalificacionMensajero &&
-						profile.deliveryRating !== undefined && (
-							<div className="flex items-center gap-1 bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full text-xs font-bold mt-1">
-								<Star size={13} fill="currentColor" />
-								<span>
-									Calificación: {profile.deliveryRating.toFixed(1)} / 5.0
-								</span>
-							</div>
-						)}
-				</header>
-
-				<div className="flex flex-col gap-5 pb-2">
-					{/* Campo: CI */}
-					<div className="flex flex-col">
-						<label
-							htmlFor="profile-ci-input"
-							className="text-[11px] font-bold uppercase tracking-wider text-text-light/50 mb-1.5"
-						>
-							Carnet de identidad
-						</label>
-						{isEditingCi ? (
-							<div className="flex flex-col gap-1">
-								<div className="flex items-center gap-2">
-									<input
-										id="profile-ci-input"
-										type="text"
-										value={tempCi}
-										onChange={(e) => setTempCi(e.target.value)}
-										onKeyDown={(e) => {
-											if (e.key === "Enter") handleSaveCi();
-											if (e.key === "Escape") setIsEditingCi(false);
-										}}
-										className={`flex-1 px-3 py-1.5 text-sm font-semibold rounded-md border bg-transparent text-text-light focus:outline-none focus:ring-2 focus:ring-primary/20 ${errors.ci ? "border-error focus:border-error" : "border-border-light focus:border-primary"}`}
-										placeholder="Ej. 12345678"
-									/>
-									<button
-										type="button"
-										onClick={handleSaveCi}
-										aria-label="Confirmar CI"
-										className="p-1.5 rounded-md text-text-light/60 hover:text-primary hover:bg-border-light/40 transition-all"
-									>
-										<Check size={16} />
-									</button>
-									<button
-										type="button"
-										onClick={() => setIsEditingCi(false)}
-										aria-label="Cancelar edición de CI"
-										className="p-1.5 rounded-md text-text-light/40 hover:text-error hover:bg-border-light/40 transition-all"
-									>
-										<X size={16} />
-									</button>
-								</div>
-								{errors.ci && (
-									<span className="text-[11px] font-medium text-error mt-0.5">
-										{errors.ci}
-									</span>
-								)}
-							</div>
-						) : (
-							<div className="flex items-center justify-between group pb-3 border-b border-dotted border-border-light">
-								<span className="text-sm font-bold text-text-light">
-									{profile.ci}
-								</span>
-								<button
-									type="button"
-									onClick={handleStartEditCi}
-									aria-label="Editar CI"
-									className="p-1.5 text-text-light/40 hover:text-primary rounded-md hover:bg-border-light/20 transition-all"
-								>
-									<Pencil size={13} />
-								</button>
-							</div>
-						)}
+						<EditableField
+							icon={<Phone size={17} />}
+							label="Teléfono celular"
+							inputId="profile-phone-input"
+							value={profile.phone}
+							isEditing={isEditingPhone}
+							tempValue={tempPhone}
+							onTempChange={setTempPhone}
+							onStart={handleStartEditPhone}
+							onSave={handleSavePhone}
+							onCancel={() => setIsEditingPhone(false)}
+							error={errors.phone}
+							placeholder="Ej. 71234567"
+						/>
+						<EditableField
+							icon={<Mail size={17} />}
+							label="Correo de respaldo"
+							inputId="profile-secondary-mail-input"
+							type="email"
+							value={profile.secondaryMail}
+							isEditing={isEditingMail}
+							tempValue={tempMail}
+							onTempChange={setTempMail}
+							onStart={handleStartEditMail}
+							onSave={handleSaveMail}
+							onCancel={() => setIsEditingMail(false)}
+							error={errors.secondaryMail}
+							placeholder="ejemplo@correo.com"
+						/>
 					</div>
-
-					{/* Campo: Teléfono Celular */}
-					<div className="flex flex-col">
-						<label
-							htmlFor="profile-phone-input"
-							className="text-[11px] font-bold uppercase tracking-wider text-text-light/50 mb-1.5"
-						>
-							Teléfono celular
-						</label>
-						{isEditingPhone ? (
-							<div className="flex flex-col gap-1">
-								<div className="flex items-center gap-2">
-									<input
-										id="profile-phone-input"
-										type="text"
-										value={tempPhone}
-										onChange={(e) => setTempPhone(e.target.value)}
-										onKeyDown={(e) => {
-											if (e.key === "Enter") handleSavePhone();
-											if (e.key === "Escape") setIsEditingPhone(false);
-										}}
-										className={`flex-1 px-3 py-1.5 text-sm font-semibold rounded-md border bg-transparent text-text-light focus:outline-none focus:ring-2 focus:ring-primary/20 ${errors.phone ? "border-error focus:border-error" : "border-border-light focus:border-primary"}`}
-										placeholder="Ej. 71234567"
-									/>
-									<button
-										type="button"
-										onClick={handleSavePhone}
-										aria-label="Confirmar teléfono"
-										className="p-1.5 rounded-md text-text-light/60 hover:text-primary hover:bg-border-light/40 transition-all"
-									>
-										<Check size={16} />
-									</button>
-									<button
-										type="button"
-										onClick={() => setIsEditingPhone(false)}
-										aria-label="Cancelar edición de teléfono"
-										className="p-1.5 rounded-md text-text-light/40 hover:text-error hover:bg-border-light/40 transition-all"
-									>
-										<X size={16} />
-									</button>
-								</div>
-								{errors.phone && (
-									<span className="text-[11px] font-medium text-error mt-0.5">
-										{errors.phone}
-									</span>
-								)}
-							</div>
-						) : (
-							<div className="flex items-center justify-between group pb-3 border-b border-dotted border-border-light">
-								<span className="text-sm font-bold text-text-light">
-									{profile.phone}
-								</span>
-								<button
-									type="button"
-									onClick={handleStartEditPhone}
-									aria-label="Editar teléfono"
-									className="p-1.5 text-text-light/40 hover:text-primary rounded-md hover:bg-border-light/20 transition-all"
-								>
-									<Pencil size={13} />
-								</button>
-							</div>
-						)}
-					</div>
-
-					{/* Campo: Correo Electrónico de Respaldo */}
-					<div className="flex flex-col">
-						<label
-							htmlFor="profile-secondary-mail-input"
-							className="text-[11px] font-bold uppercase tracking-wider text-text-light/50 mb-1.5"
-						>
-							Correo de respaldo
-						</label>
-						{isEditingMail ? (
-							<div className="flex flex-col gap-1">
-								<div className="flex items-center gap-2">
-									<input
-										id="profile-secondary-mail-input"
-										type="email"
-										value={tempMail}
-										onChange={(e) => setTempMail(e.target.value)}
-										onKeyDown={(e) => {
-											if (e.key === "Enter") handleSaveMail();
-											if (e.key === "Escape") setIsEditingMail(false);
-										}}
-										className={`flex-1 px-3 py-1.5 text-sm font-semibold rounded-md border bg-transparent text-text-light focus:outline-none focus:ring-2 focus:ring-primary/20 ${errors.secondaryMail ? "border-error focus:border-error" : "border-border-light focus:border-primary"}`}
-										placeholder="ejemplo@correo.com"
-									/>
-									<button
-										type="button"
-										onClick={handleSaveMail}
-										aria-label="Confirmar correo"
-										className="p-1.5 rounded-md text-text-light/60 hover:text-primary hover:bg-border-light/40 transition-all"
-									>
-										<Check size={16} />
-									</button>
-									<button
-										type="button"
-										onClick={() => setIsEditingMail(false)}
-										aria-label="Cancelar edición de correo"
-										className="p-1.5 rounded-md text-text-light/40 hover:text-error hover:bg-border-light/40 transition-all"
-									>
-										<X size={16} />
-									</button>
-								</div>
-								{errors.secondaryMail && (
-									<span className="text-[11px] font-medium text-error mt-0.5">
-										{errors.secondaryMail}
-									</span>
-								)}
-							</div>
-						) : (
-							<div className="flex items-center justify-between group pb-3 border-b border-dotted border-border-light">
-								<span className="text-sm font-bold text-text-light">
-									{profile.secondaryMail}
-								</span>
-								<button
-									type="button"
-									onClick={handleStartEditMail}
-									aria-label="Editar correo de respaldo"
-									className="p-1.5 text-text-light/40 hover:text-primary rounded-md hover:bg-border-light/20 transition-all"
-								>
-									<Pencil size={13} />
-								</button>
-							</div>
-						)}
-					</div>
-				</div>
+				</section>
 
 				{/* Estadísticas de Delivery */}
 				{isMensajero && (
-					<div className="rounded-2xl border border-border-light bg-bg-light p-4">
-						<h3 className="mb-3 text-xs font-bold uppercase tracking-widest text-text-light opacity-50">
+					<section className="rounded-2xl border border-(--theme-border) bg-(--theme-card-bg) p-6 shadow-sm">
+						<h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-(--theme-text) opacity-50">
 							Estadísticas de delivery
 						</h3>
-						<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-							{deliveryStats.isLoading ? (
-								<div className="col-span-4 text-center text-text-light/60 text-sm py-2">
-									Cargando estadísticas...
-								</div>
-							) : (
-								<>
-									<div className="bg-white/50 rounded-xl p-3 text-center border border-border-light/50">
-										<p className="text-xs text-text-light/60 font-medium uppercase tracking-wider">
-											Total
-										</p>
-										<p className="text-xl font-bold text-text-light mt-1">
-											{deliveryStats.total}
-										</p>
-									</div>
-									<div className="bg-green-50 rounded-xl p-3 text-center border border-green-200/50">
-										<p className="text-xs text-green-700/60 font-medium uppercase tracking-wider">
-											Entregados
-										</p>
-										<p className="text-xl font-bold text-green-700 mt-1">
-											{deliveryStats.totalDelivered}
-										</p>
-									</div>
-									<div className="bg-red-50 rounded-xl p-3 text-center border border-red-200/50">
-										<p className="text-xs text-red-700/60 font-medium uppercase tracking-wider">
-											No entregados
-										</p>
-										<p className="text-xl font-bold text-red-700 mt-1">
-											{deliveryStats.totalNotDelivered}
-										</p>
-									</div>
-									<div className="bg-blue-50 rounded-xl p-3 text-center border border-blue-200/50">
-										<p className="text-xs text-blue-700/60 font-medium uppercase tracking-wider">
-											Tasa de éxito
-										</p>
-										<p className="text-xl font-bold text-blue-700 mt-1">
-											{deliveryStats.deliveryRate}%
-										</p>
-									</div>
-								</>
+						{deliveryStats.isLoading ? (
+							<div className="grid animate-pulse grid-cols-2 gap-3 md:grid-cols-4">
+								{[0, 1, 2, 3].map((i) => (
+									<div
+										key={i}
+										className="h-[68px] rounded-xl border border-(--theme-border) bg-(--theme-secondary-bg)"
+									/>
+								))}
+							</div>
+						) : (
+							<div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+								<StatCard
+									label="Total"
+									value={deliveryStats.total}
+									tone="neutral"
+								/>
+								<StatCard
+									label="Entregados"
+									value={deliveryStats.totalDelivered}
+									tone="success"
+								/>
+								<StatCard
+									label="No entregados"
+									value={deliveryStats.totalNotDelivered}
+									tone="error"
+								/>
+								<StatCard
+									label="Tasa de éxito"
+									value={`${deliveryStats.deliveryRate}%`}
+									tone="info"
+								/>
+							</div>
+						)}
+					</section>
+				)}
+
+				{/* Gestión de Cuenta */}
+				{(showMisPedidos || showMisDirecciones) && (
+					<section className="rounded-2xl border border-(--theme-border) bg-(--theme-card-bg) p-6 shadow-sm">
+						<h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-(--theme-text) opacity-50">
+							Gestión de cuenta
+						</h3>
+						<div className="grid gap-3 sm:grid-cols-2">
+							{showMisDirecciones && (
+								<AccountLink
+									href="/ubicaciones"
+									icon={<MapPin size={18} />}
+									title="Mis direcciones"
+									subtitle="Gestionar mis lugares de entrega"
+								/>
+							)}
+							{showMisPedidos && (
+								<AccountLink
+									href="/mis-pedidos"
+									icon={<Package size={18} />}
+									title="Mis pedidos y devoluciones"
+									subtitle="Ver mis compras"
+								/>
 							)}
 						</div>
-					</div>
+					</section>
 				)}
-
-				{/* CONSOLIDADO: Gestión de Cuenta */}
-				{(showMisPedidos || showMisDirecciones) && (
-					<footer className="mb-2 rounded-2xl border border-border-light bg-bg-light p-4 flex flex-col gap-3">
-						<h3 className="text-xs font-bold uppercase tracking-widest text-text-light opacity-50 mb-1">
-							Gestión de Cuenta
-						</h3>
-
-						{showMisDirecciones && (
-							<a
-								href="/location"
-								className="group flex items-center justify-between rounded-xl border border-border-light bg-card-bg-light p-3 transition-all hover:border-primary hover:shadow-sm"
-							>
-								<div className="flex items-center gap-3">
-									<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
-										<MapPin size={18} />
-									</div>
-									<div className="flex flex-col">
-										<h4 className="font-bold text-text-light text-sm">
-											Mis direcciones
-										</h4>
-										<span className="text-[11px] text-text-light/50 font-medium">
-											Gestionar mis lugares de entrega
-										</span>
-									</div>
-								</div>
-								<span className="text-primary font-bold opacity-50 transition-transform group-hover:translate-x-1 group-hover:opacity-100 pr-2">
-									→
-								</span>
-							</a>
-						)}
-
-						{showMisPedidos && (
-							<a
-								href="/mis-pedidos"
-								className="group flex items-center justify-between rounded-xl border border-border-light bg-card-bg-light p-3 transition-all hover:border-primary hover:shadow-sm"
-							>
-								<div className="flex items-center gap-3">
-									<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
-										<Package size={18} />
-									</div>
-									<div className="flex flex-col">
-										<h4 className="font-bold text-text-light text-sm">
-											Mis pedidos y devoluciones
-										</h4>
-										<span className="text-[11px] text-text-light/50 font-medium">
-											Ver mis compras
-										</span>
-									</div>
-								</div>
-								<span className="text-primary font-bold opacity-50 transition-transform group-hover:translate-x-1 group-hover:opacity-100 pr-2">
-									→
-								</span>
-							</a>
-						)}
-					</footer>
-				)}
-			</section>
+				</div>
+			</div>
 		</>
+	);
+}
+
+function ProfileSkeleton() {
+	return (
+		<div className="grid animate-pulse gap-5 lg:grid-cols-3 lg:items-start">
+			{/* Tarjeta de identidad */}
+			<section className="overflow-hidden rounded-2xl border border-(--theme-border) bg-(--theme-card-bg) shadow-sm">
+				<div className="h-20 bg-(--theme-secondary-bg)" />
+				<div className="flex flex-col items-center px-6 pb-6">
+					<div className="-mt-12 size-24 rounded-full border-4 border-(--theme-card-bg) bg-(--theme-secondary-bg)" />
+					<div className="mt-3 h-5 w-40 rounded bg-(--theme-secondary-bg)" />
+					<div className="mt-2 h-3 w-52 rounded bg-(--theme-secondary-bg)" />
+					<div className="mt-3 flex gap-1.5">
+						<div className="h-5 w-20 rounded-full bg-(--theme-secondary-bg)" />
+						<div className="h-5 w-16 rounded-full bg-(--theme-secondary-bg)" />
+					</div>
+				</div>
+			</section>
+
+			{/* Columna de detalles */}
+			<div className="flex flex-col gap-5 lg:col-span-2">
+			{/* Información personal */}
+			<section className="rounded-2xl border border-(--theme-border) bg-(--theme-card-bg) p-6 shadow-sm">
+				<div className="mb-4 h-3 w-32 rounded bg-(--theme-secondary-bg)" />
+				<div className="flex flex-col divide-y divide-(--theme-border)">
+					{[0, 1, 2].map((i) => (
+						<div
+							key={i}
+							className="flex items-center gap-3 py-3.5 first:pt-0 last:pb-0"
+						>
+							<div className="size-9 shrink-0 rounded-full bg-(--theme-secondary-bg)" />
+							<div className="flex-1 space-y-1.5">
+								<div className="h-2.5 w-24 rounded bg-(--theme-secondary-bg)" />
+								<div className="h-3.5 w-36 rounded bg-(--theme-secondary-bg)" />
+							</div>
+							<div className="size-7 shrink-0 rounded-lg bg-(--theme-secondary-bg)" />
+						</div>
+					))}
+				</div>
+			</section>
+
+			{/* Gestión de cuenta */}
+			<section className="rounded-2xl border border-(--theme-border) bg-(--theme-card-bg) p-6 shadow-sm">
+				<div className="mb-4 h-3 w-32 rounded bg-(--theme-secondary-bg)" />
+				<div className="grid gap-3 sm:grid-cols-2">
+					{[0, 1].map((i) => (
+						<div
+							key={i}
+							className="flex items-center gap-3 rounded-xl border border-(--theme-border) bg-(--theme-secondary-bg) p-3"
+						>
+							<div className="size-10 shrink-0 rounded-full bg-(--theme-card-bg)" />
+							<div className="flex-1 space-y-1.5">
+								<div className="h-3.5 w-40 rounded bg-(--theme-card-bg)" />
+								<div className="h-2.5 w-28 rounded bg-(--theme-card-bg)" />
+							</div>
+						</div>
+					))}
+				</div>
+			</section>
+			</div>
+		</div>
+	);
+}
+
+interface EditableFieldProps {
+	icon: React.ReactNode;
+	label: string;
+	inputId: string;
+	value: string;
+	isEditing: boolean;
+	tempValue: string;
+	onTempChange: (value: string) => void;
+	onStart: () => void;
+	onSave: () => void;
+	onCancel: () => void;
+	error?: string;
+	placeholder?: string;
+	type?: string;
+}
+
+function EditableField({
+	icon,
+	label,
+	inputId,
+	value,
+	isEditing,
+	tempValue,
+	onTempChange,
+	onStart,
+	onSave,
+	onCancel,
+	error,
+	placeholder,
+	type = "text",
+}: EditableFieldProps) {
+	const isEmpty = value === "No registrado";
+
+	return (
+		<div className="py-3.5 first:pt-0 last:pb-0">
+			<div className="flex items-center gap-3">
+				<div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+					{icon}
+				</div>
+				<div className="min-w-0 flex-1">
+					<p className="text-[11px] font-bold uppercase tracking-wider text-(--theme-text) opacity-50">
+						{label}
+					</p>
+					{isEditing ? (
+						<div className="mt-1 flex items-center gap-2">
+							<input
+								id={inputId}
+								type={type}
+								value={tempValue}
+								onChange={(e) => onTempChange(e.target.value)}
+								onKeyDown={(e) => {
+									if (e.key === "Enter") onSave();
+									if (e.key === "Escape") onCancel();
+								}}
+								placeholder={placeholder}
+								className={`min-w-0 flex-1 rounded-lg border bg-(--theme-secondary-bg) px-3 py-1.5 text-sm font-semibold text-(--theme-text) focus:outline-none focus:ring-2 focus:ring-primary/20 ${
+									error
+										? "border-(--theme-error) focus:border-(--theme-error)"
+										: "border-(--theme-border) focus:border-primary"
+								}`}
+							/>
+							<button
+								type="button"
+								onClick={onSave}
+								aria-label={`Confirmar ${label}`}
+								className="rounded-lg p-1.5 text-(--theme-text) opacity-60 transition-all hover:bg-primary/10 hover:text-primary hover:opacity-100"
+							>
+								<Check size={16} />
+							</button>
+							<button
+								type="button"
+								onClick={onCancel}
+								aria-label={`Cancelar edición de ${label}`}
+								className="rounded-lg p-1.5 text-(--theme-text) opacity-40 transition-all hover:bg-(--theme-error-bg) hover:text-(--theme-error) hover:opacity-100"
+							>
+								<X size={16} />
+							</button>
+						</div>
+					) : (
+						<p
+							className={`truncate text-sm font-bold ${
+								isEmpty
+									? "text-(--theme-text) opacity-40"
+									: "text-(--theme-text)"
+							}`}
+						>
+							{value}
+						</p>
+					)}
+				</div>
+				{!isEditing && (
+					<button
+						type="button"
+						onClick={onStart}
+						aria-label={`Editar ${label}`}
+						className="shrink-0 rounded-lg p-2 text-(--theme-text) opacity-40 transition-all hover:bg-primary/10 hover:text-primary hover:opacity-100"
+					>
+						<Pencil size={14} />
+					</button>
+				)}
+			</div>
+			{isEditing && error && (
+				<p className="mt-1.5 pl-12 text-[11px] font-medium text-(--theme-error)">
+					{error}
+				</p>
+			)}
+		</div>
+	);
+}
+
+const STAT_TONES = {
+	neutral: "bg-(--theme-secondary-bg) border-(--theme-border) text-(--theme-text)",
+	success:
+		"bg-(--theme-success-bg) border-(--theme-success-border) text-(--theme-success)",
+	error: "bg-(--theme-error-bg) border-(--theme-error-border) text-(--theme-error)",
+	info: "bg-(--theme-info-bg) border-(--theme-info-border) text-(--theme-info)",
+} as const;
+
+function StatCard({
+	label,
+	value,
+	tone,
+}: {
+	label: string;
+	value: string | number;
+	tone: keyof typeof STAT_TONES;
+}) {
+	return (
+		<div className={`rounded-xl border p-3 text-center ${STAT_TONES[tone]}`}>
+			<p className="text-[10px] font-bold uppercase tracking-wider opacity-70">
+				{label}
+			</p>
+			<p className="mt-1 text-xl font-black">{value}</p>
+		</div>
+	);
+}
+
+function AccountLink({
+	href,
+	icon,
+	title,
+	subtitle,
+}: {
+	href: string;
+	icon: React.ReactNode;
+	title: string;
+	subtitle: string;
+}) {
+	return (
+		<a
+			href={href}
+			className="group flex items-center justify-between rounded-xl border border-(--theme-border) bg-(--theme-secondary-bg) p-3 transition-all hover:border-primary hover:shadow-sm"
+		>
+			<div className="flex items-center gap-3">
+				<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+					{icon}
+				</div>
+				<div className="flex flex-col">
+					<h4 className="text-sm font-bold text-(--theme-text)">{title}</h4>
+					<span className="text-[11px] font-medium text-(--theme-text) opacity-50">
+						{subtitle}
+					</span>
+				</div>
+			</div>
+			<ChevronRight
+				size={18}
+				className="mr-1 shrink-0 text-primary opacity-50 transition-transform group-hover:translate-x-1 group-hover:opacity-100"
+			/>
+		</a>
 	);
 }

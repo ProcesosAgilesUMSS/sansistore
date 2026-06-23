@@ -1,8 +1,5 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import LoginPage from '../components/LoginPage';
+// Ruta heredada: /login ahora vive en /iniciar-sesion (UI en español).
+// Mantenemos el redirect para no romper enlaces externos o guardados.
+return Astro.redirect('/iniciar-sesion', 301);
 ---
-
-<Layout title="Iniciar sesión | SansiStore">
-  <LoginPage client:load />
-</Layout>

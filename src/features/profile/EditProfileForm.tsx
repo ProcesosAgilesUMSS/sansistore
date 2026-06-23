@@ -94,7 +94,7 @@ export default function PerfilForm() {
 
       setSuccess(true);
         setTimeout(() => {
-          window.location.href = "/me";
+          window.location.href = "/mi-perfil";
         }, 1500);
     } catch (err) {
       console.error("Error al guardar:", err);

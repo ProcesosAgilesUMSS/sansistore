@@ -71,7 +71,7 @@ export default function StockAlertButton({ productId }: Props) {
   if (status === 'unauthenticated') {
     return (
       <p className="mt-4 text-sm text-text-light opacity-60">
-        <a href="/login" className="text-primary underline hover:opacity-80">
+        <a href="/iniciar-sesion" className="text-primary underline hover:opacity-80">
           Inicia sesión
         </a>{' '}
         para recibir una alerta cuando este producto esté disponible.
