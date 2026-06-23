@@ -538,4 +538,8 @@
 - **Today:** Participaré en el Sprint Retrospective.
 - **Blockers:** None.
 
+### Bruno Salcedo Cadiz
+- **Yesterday:** Probe el correcto funcionamiento de mi HU en el flujo de trabajo
+- **Today:** Participaré en el Sprint Retrospective.
+- **Blockers:** None.
 
