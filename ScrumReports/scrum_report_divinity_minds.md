@@ -538,8 +538,8 @@
 - **Blockers:** n/a.
 
 ## Merino Vidal Mateo Alejandro
-- **Yesterday:**
-- **Today:**
+- **Yesterday:** Aporté ideas y acuerdos al tablero de retrospective del Sprint 4 en Trello y realicé una revisión funcional de la aplicación, validando los flujos principales e identificando posibles mejoras.
+- **Today:** Revisaré las historias de usuario del Sprint 4 y daré seguimiento a los bugs reportados para validar su estado y las correcciones aplicadas.
 - **Blockers:** n/a.
 
 ## Velasquez Vela Marcos
