@@ -519,3 +519,21 @@ por las dudas que se tienen.
 * **Yesterday:** Verifiqué algunas partes de nuestra implementación para identificar posibles errores que deban corregirse.
 * **Today:** Revisé el tablero de GitHub para comprobar si los QAs reportaron algún bug relacionado con nuestra implementación.
 * **Blockers:** None.
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Revisé los cambios integrados en el sistema y validé que las funcionalidades implementadas en el sprint funcionen correctamente después del merge. 
+* **Today:**  Participaré en el Sprint Retrospective para analizar los resultados obtenidos y planificar las siguientes actividades del equipo.
+* **Blockers:** None.
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:**  Verifiqué el estado final de las funcionalidades completadas durante el sprint
+* **Today:** Asistiré a la Sprint Retrospective y colaboraré en la evaluación de los objetivos alcanzados durante el sprint.
+* **Blockers:** None
+
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Revisé las tareas concluidas durante el sprint para asegurar que cumplan con los criterios establecidos y no presenten observaciones pendientes.
+* **Today:** Participaré en la Sprint Retrospective y en la discusión de las actividades
+* **Blockers:** None
