@@ -519,3 +519,30 @@
 - **Today:** Apoyé a los demás equipos de desarrollo en la migración de colores hardcodeados a los tokens y verifiqué la consistencia visual y responsiva de las nuevas secciones en `/me`.
 - **Blockers:** n/a.
 
+# 06/22/2026
+
+## Castro Tejada Steven Lisandro
+- **Yesterday:** Aporté ideas y tarjetas al tablero de retrospectiva de Sprint 4 del equipo Divinity Minds (en la herramienta Trello), documentando lecciones aprendidas sobre pruebas de integración con Playwright e hidratación de componentes.
+- **Today:** Realicé la limpieza y depuración de 19 ramas remotas de seguimiento en GitHub ya fusionadas en main (pertenecientes a otros equipos y al nuestro), asociadas a los Pull Requests #561, #562, #639, #668, #670, #672, #674, #676, #679, #680, #681 y #688.
+- **Blockers:** n/a.
+
+## Gutierrez Hinojosa Jhon Deymar
+- **Yesterday:**
+- **Today:**
+- **Blockers:** n/a.
+
+## Merudia Calderon Dayeza
+- **Yesterday:**
+- **Today:**
+- **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+- **Yesterday:**
+- **Today:**
+- **Blockers:** n/a.
+
+## Velasquez Vela Marcos
+- **Yesterday:**
+- **Today:**
+- **Blockers:** n/a.
+
