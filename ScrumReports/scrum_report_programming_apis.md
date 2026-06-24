@@ -542,4 +542,7 @@
 - **Yesterday:** Probe el correcto funcionamiento de mi HU en el flujo de trabajo
 - **Today:** Participaré en el Sprint Retrospective.
 - **Blockers:** None.
-
+### Adrián Said Andrade Medina
+- **Yesterday:** Revisé el estado de mis HUs asignadas y verifiqué que no quedaran bugs pendientes en mi flujo de trabajo.
+- **Today:** Participaré en el Sprint Retrospective
+- **Blockers:** None.
