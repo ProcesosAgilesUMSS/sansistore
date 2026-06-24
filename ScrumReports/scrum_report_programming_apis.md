@@ -521,3 +521,33 @@
   - La HU #568 fue completada y el PR #646 ha sido aprobado. Se espera el merge a `main` para el cierre del Sprint 4.
   - Preparación de la demo del Sprint 4.
 - **Blockers:** None.
+
+***
+
+# Sprint 5
+
+## 23-06-2026
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Trabajé en corregir problemas de responsive en diferentes pantallas del mensajero.
+- **Today:** Participaré en el Sprint Retrospective y atenderé a la reunión para saber cuáles son las siguientes actividades.
+- **Blockers:** No estamos seguros de qué vamos a hacer este siguiente sprint.
+
+### Efrain Peralta Felipe
+- **Yesterday:** Revise si habia algun bug.
+- **Today:** Participaré en el Sprint Retrospective.
+- **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+- **Yesterday:** Probe el correcto funcionamiento de mi HU en el flujo de trabajo
+- **Today:** Participaré en el Sprint Retrospective.
+- **Blockers:** None.
+### Adrián Said Andrade Medina
+- **Yesterday:** Revisé el estado de mis HUs asignadas y verifiqué que no quedaran bugs pendientes en mi flujo de trabajo.
+- **Today:** Participaré en el Sprint Retrospective
+- **Blockers:** None.
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday:** Revisión final del PR #646 y verificación de que la HU #568 esté completamente integrada en `main`.
+- **Today:** Participación en el Sprint Retrospective para analizar los resultados del Sprint 4 y definir mejoras para el próximo sprint.
+- **Blockers:** None.
