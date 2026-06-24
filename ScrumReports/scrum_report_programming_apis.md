@@ -546,3 +546,8 @@
 - **Yesterday:** Revisé el estado de mis HUs asignadas y verifiqué que no quedaran bugs pendientes en mi flujo de trabajo.
 - **Today:** Participaré en el Sprint Retrospective
 - **Blockers:** None.
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday:** Revisión final del PR #646 y verificación de que la HU #568 esté completamente integrada en `main`.
+- **Today:** Participación en el Sprint Retrospective para analizar los resultados del Sprint 4 y definir mejoras para el próximo sprint.
+- **Blockers:** None.
