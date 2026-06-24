@@ -338,7 +338,7 @@ function RejectedOrderSection({
 				disabled={isSubmitting}
 				className="rounded-full bg-(--theme-danger) px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50 cursor-pointer"
 			>
-				{isSubmitting ? "Procesando..." : "Denegar"}
+				{isSubmitting ? "Procesando..." : "Rechazar devolución"}
 			</button>
 		</div>
 	);
