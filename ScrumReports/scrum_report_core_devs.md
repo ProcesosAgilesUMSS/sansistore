@@ -314,9 +314,9 @@
   - **Blockers:**   
 
   ## Rios Quiruchi Edney Jhojan
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Revisar el flujo que se tiene hasta ahora y el funcionamiento en general para encontrar bugs.
+  - **Today:**        Analizar la HU #69 sobre diferencias entre stock físico y stock registrado en el sistema.
+  - **Blockers:**     Ninguno
 
   ## Sejas Arze Eddy
   - **Yesterday:**    
@@ -343,9 +343,9 @@
   - **Blockers:**   
 
   ## Rios Quiruchi Edney Jhojan
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Avanzar con el análisis de la US #69 sobre diferencias entre stock físico y stock registrado.
+  - **Today:**        Ayudar en la implementación de la HU #50 de alertas de stock mínimo.
+  - **Blockers:**     Ninguno
 
   ## Sejas Arze Eddy
   - **Yesterday:**    
@@ -372,9 +372,9 @@
   - **Blockers:**   
 
   ## Rios Quiruchi Edney Jhojan
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Ayudar en la implementación de la HU #50 de alertas de stock mínimo.
+  - **Today:**        Se termino de realizar las alertas de stock minimo
+  - **Blockers:**     No tenia una idea clara sobre como se deberian de mostrar las alertas
 
   ## Sejas Arze Eddy
   - **Yesterday:**    
@@ -402,7 +402,7 @@
   - **Blockers:**   
 
   ## Rios Quiruchi Edney Jhojan
-  - **Yesterday:**    
+  - **Yesterday:**    Aprobar Pull Requests del avance realizado
   - **Today:**        
   - **Blockers:**     
 
