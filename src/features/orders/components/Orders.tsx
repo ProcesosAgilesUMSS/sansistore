@@ -124,7 +124,11 @@ export default function Orders() {
 											<button
 												type="button"
 												key={status}
-												onClick={() => toggleStatus(status)}
+												//onClick={() => toggleStatus(status)}
+												onClick={() => {
+													toggleStatus(status);
+													setShowFilters(false);
+												}}
 												className={`flex text-xs gap-x-2 cursor-pointer p-1.5 rounded-lg transition-colors hover:bg-(--theme-secondary-bg) w-full ${selectedStatuses.includes(status as OrderStatus) ? "bg-(--theme-secondary-bg)" : ""}`}
 											>
 												<OrderStatusBadge status={status} />
