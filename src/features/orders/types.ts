@@ -81,6 +81,7 @@ export interface Order {
 	buyerName?: string;
 	buyerPhoneNumber?: string;
 	buyerInstitutionalId?: string;
+	buyerCi?: string;
 	sellerId?: string;
 	status: OrderStatus;
 	buyerReceptionConfirmed?: boolean;
