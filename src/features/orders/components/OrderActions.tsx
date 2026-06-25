@@ -1,6 +1,6 @@
-import { useAssignOrdersToDelivery } from "@features/seller/hooks/useAssignOrdersToDelivery";
-import { useGetMessengers } from "@features/seller/hooks/useGetMessengers";
-import { UserRound } from "lucide-react";
+/*import { useAssignOrdersToDelivery } from "@features/seller/hooks/useAssignOrdersToDelivery";*/
+/*import { useGetMessengers } from "@features/seller/hooks/useGetMessengers";*/
+/*import { UserRound } from "lucide-react";*/
 import { useState } from "react";
 import {
 	cancelOrder,
@@ -110,7 +110,7 @@ export default function OrderActions({
 			/>
 		);
 	}
-
+/*
 	if (order.status === "LISTO") {
 		return (
 			<ReadyOrderSection
@@ -120,7 +120,11 @@ export default function OrderActions({
 			/>
 		);
 	}
+*/
 
+if (order.status === "LISTO") {
+	return null;
+}
 	if (order.status === "RECHAZADO") {
 		return (
 			<RejectedOrderSection
@@ -344,6 +348,8 @@ function RejectedOrderSection({
 	);
 }
 
+/*desde aqui*/
+/*
 function ReadyOrderSection({
 	order,
 	onSuccess,
@@ -463,3 +469,4 @@ function ReadyOrderSection({
 		</div>
 	);
 }
+*/
