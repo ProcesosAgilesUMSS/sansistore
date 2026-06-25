@@ -551,3 +551,10 @@
 - **Yesterday:** Revisión final del PR #646 y verificación de que la HU #568 esté completamente integrada en `main`.
 - **Today:** Participación en el Sprint Retrospective para analizar los resultados del Sprint 4 y definir mejoras para el próximo sprint.
 - **Blockers:** None.
+
+## 25-06-2026
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Mantuve contacto con el lider del grupo de CoreDevs para ver cómo ayudar en el problema de stock dentro de la aplicación
+- **Today:** Participaré en la reunión planeatada y comunicaré las inquietudes que existen en el equipo.
+- **Blockers:** Aún no se está seguro de qué haremos en este Sprint ni que es lo que se debe presentar en la demo final.
