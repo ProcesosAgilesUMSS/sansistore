@@ -179,10 +179,10 @@ function ProductCarousel({
         </h2>
         <a
           href={href}
-          className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/30 px-4 py-1.5 text-xs font-bold text-primary transition-all hover:bg-primary hover:text-white sm:text-sm"
+          className="inline-flex shrink-0 items-center gap-1 rounded-full border border-border-light px-4 py-2 text-sm font-semibold text-text-light transition-all duration-200 hover:border-primary hover:text-primary"
         >
           Ver más
-          <ChevronRight size={14} />
+          <ChevronRight size={16} />
         </a>
       </div>
 
