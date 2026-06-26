@@ -8,6 +8,7 @@ import GoogleLoginButton from "../components/GoogleLoginButton";
 import Navbar from "../components/Navbar";
 // ── HU #159: registrar LOGIN en bitácora ──
 import { registrarAcceso } from "../features/admin/audit/services/accessLogService";
+import { getDefaultRouteForRoles } from "../features/auth/utils/defaultRoute";
 import { auth, db } from "../lib/firebase";
 
 export default function LoginPage() {
@@ -48,15 +49,18 @@ export default function LoginPage() {
 			);
 
 			// HU #159: registrar LOGIN. Si falla el log, no bloqueamos el login.
+			let roles: unknown = [];
+
 			try {
 				const userSnap = await getDoc(doc(db, "users", result.user.uid));
 				const userData = userSnap.exists() ? userSnap.data() : null;
+				roles = userData?.roles ?? [];
 				await registrarAcceso({
 					uid: result.user.uid,
 					displayName:
 						userData?.displayName ?? result.user.displayName ?? "Usuario",
 					email: result.user.email ?? emailValue,
-					roles: userData?.roles ?? [],
+					roles: Array.isArray(roles) ? roles : [],
 					action: "LOGIN",
 				});
 			} catch {
@@ -64,7 +68,7 @@ export default function LoginPage() {
 			}
 
 			setSuccess(true);
-			window.location.assign("/");
+			window.location.assign(getDefaultRouteForRoles(roles));
 		} catch (err: unknown) {
 			const firebaseError = err as FirebaseError;
 			setError(
@@ -81,9 +85,9 @@ export default function LoginPage() {
 		void performEmailLogin();
 	};
 
-	const handleGoogleSuccess = () => {
+	const handleGoogleSuccess = (redirectPath: string) => {
 		setSuccess(true);
-		window.location.href = "/mi-perfil";
+		window.location.href = redirectPath;
 	};
 
 	const handleGoogleError = (errorMsg: string) => {

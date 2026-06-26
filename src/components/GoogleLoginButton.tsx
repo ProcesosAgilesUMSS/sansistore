@@ -10,6 +10,7 @@ import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, googleProvider, db } from '../lib/firebase';
 //HU #159: registrar LOGIN con Google en bitácora
 import { registrarAcceso } from '../features/admin/audit/services/accessLogService';
+import { getDefaultRouteForRoles } from '../features/auth/utils/defaultRoute';
 
 const INSTITUTIONAL_DOMAIN = 'umss.edu';
 
@@ -17,7 +18,7 @@ const isInstitutionalEmail = (email: string | null): boolean =>
     !!email && email.toLowerCase().endsWith(`@${INSTITUTIONAL_DOMAIN}`);
 
 export interface GoogleLoginButtonProps {
-    onSuccess?: () => void;
+    onSuccess?: (redirectPath: string) => void;
     onError?: (error: string) => void;
     variant?: 'full' | 'icon';
     className?: string;
@@ -68,21 +69,23 @@ export default function GoogleLoginButton({
 
             //HU #159: registrar LOGIN con Google
             // Si falla el log, no bloqueamos el login
+            const finalSnap = await getDoc(userRef);
+            const userData = finalSnap.exists() ? finalSnap.data() : null;
+            const roles = userData?.roles ?? ['comprador'];
+
             try {
-                const finalSnap = await getDoc(userRef);
-                const userData = finalSnap.exists() ? finalSnap.data() : null;
                 await registrarAcceso({
                     uid: result.user.uid,
                     displayName: userData?.displayName ?? result.user.displayName ?? 'Usuario UMSS',
                     email: result.user.email ?? '',
-                    roles: userData?.roles ?? ['comprador'],
+                    roles: Array.isArray(roles) ? roles : ['comprador'],
                     action: 'LOGIN',
                 });
             } catch {
                 console.warn('[AccessLog] No se pudo registrar el acceso Google.');
             }
 
-            onSuccess?.();
+            onSuccess?.(getDefaultRouteForRoles(roles));
         } catch (e: unknown) {
             const ignored = [
                 'auth/popup-closed-by-user',
