@@ -568,3 +568,8 @@
   - Esperar definiciones del ingeniero sobre el alcance de la documentación interactiva.
   - Participación en la reunión general de revisión de equipos.
 - **Blockers:** Pendiente de confirmación del ingeniero sobre el formato y alcance de la documentación.
+
+### Efrain Peralta Felipe 
+- **Yesterday:** revise la parte del vendedor
+- **Today:** continuaré con la revisión de la parte del vendoe.
+- **Blockers:** None.
