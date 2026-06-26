@@ -140,6 +140,7 @@ function FeaturedProductsInner({
   const ITEMS_PER_PAGE = 12;
   const searchRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const pendingSearchFocusRef = useRef(false);
   const sortRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -198,13 +199,21 @@ function FeaturedProductsInner({
     const url = new URL(window.location.href);
     if (url.searchParams.get('focusSearch') !== 'true') return;
 
-    window.requestAnimationFrame(() => {
-      searchInputRef.current?.focus();
-
-      url.searchParams.delete('focusSearch');
-      window.history.replaceState({}, '', url.toString());
-    });
+    pendingSearchFocusRef.current = true;
+    url.searchParams.delete('focusSearch');
+    window.history.replaceState({}, '', url.toString());
   }, []);
+
+  useEffect(() => {
+    if (isLoading || !pendingSearchFocusRef.current) return;
+
+    const focusTimer = window.setTimeout(() => {
+      searchInputRef.current?.focus({ preventScroll: true });
+      pendingSearchFocusRef.current = false;
+    }, 0);
+
+    return () => window.clearTimeout(focusTimer);
+  }, [isLoading]);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && products.length > 0) {
