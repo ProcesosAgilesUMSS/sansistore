@@ -554,3 +554,8 @@
 - **Today:** Además dejé preparada la entrega técnica de esta rama para revisión, documentando el alcance en las issues del Sprint 5 y consolidando todo en el PR #715 hacia `main`.
 - **Today:** Revisar visualmente la home y consolidar cualquier ajuste final de UX o criterios de selección.
 - **Blockers:** n/a.
+
+## Gutierrez Hinojosa Jhon Deymar
+- **Yesterday:** Corregí y estabilicé los tests automatizados afectados por los cambios en home, catálogo, perfil, favoritos, courier y pedidos, hasta dejar verde la ejecución principal de Playwright. Este trabajo quedó asociado sobre todo a la task #714.
+- **Today:** Dar seguimiento a la estabilidad de las pruebas y apoyar en cualquier ajuste adicional de CI/CD.
+- **Blockers:** n/a.
