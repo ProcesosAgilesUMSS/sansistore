@@ -47,11 +47,11 @@ async function fetchLocationsData(
 async function fetchBuyersData(
   db: Firestore,
   buyerIds: string[],
-): Promise<Record<string, { displayName: string; email: string; institutionalId: string }>> {
+): Promise<Record<string, { displayName: string; email: string; institutionalId: string; ci: string }>> {
   if (buyerIds.length === 0) return {};
 
   try {
-    const map: Record<string, { displayName: string; email: string; institutionalId: string }> = {};
+    const map: Record<string, { displayName: string; email: string; institutionalId: string; ci: string }> = {};
 
     const userSnapshots = await Promise.all(
       buyerIds.map((uid) => getDoc(doc(db, 'users', uid)))
@@ -64,6 +64,7 @@ async function fetchBuyersData(
           displayName: data.displayName ?? data.email ?? 'Comprador desconocido',
           email: data.email ?? '',
           institutionalId: data.institutionalId ?? '',
+          ci: data.ci ?? '',
         };
       }
     });
@@ -135,6 +136,7 @@ async function enrichOrdersWithData(
     buyerName: buyerMap[order.buyerId]?.displayName,
     buyerEmail: buyerMap[order.buyerId]?.email,
     buyerInstitutionalId: buyerMap[order.buyerId]?.institutionalId,
+    buyerCi: buyerMap[order.buyerId]?.ci,
     locationLabel: locationMap[order.locationId]?.label,
     locationType: locationMap[order.locationId]?.type,
     items: itemsMap[order.orderId] ?? [],

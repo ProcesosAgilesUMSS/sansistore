@@ -67,10 +67,20 @@ export default function OrderModal({
 					{order.buyerInstitutionalId && (
 						<>
 							<div className="leading-[140%] col-start-1 col-end-4 text-(--theme-text) opacity-60">
-								Carnet:
+								Código SIS:
 							</div>
 							<div className="leading-[140%] col-start-7  min-[765px]:col-start-5 col-end-21">
 								{order.buyerInstitutionalId}
+							</div>
+						</>
+					)}
+					{order.buyerCi && (
+						<>
+							<div className="leading-[140%] col-start-1 col-end-4 text-(--theme-text) opacity-60">
+								Carnet:
+							</div>
+							<div className="leading-[140%] col-start-7  min-[765px]:col-start-5 col-end-21">
+								{order.buyerCi}
 							</div>
 						</>
 					)}
