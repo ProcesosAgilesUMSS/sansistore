@@ -76,7 +76,7 @@ test.describe('Favorite products', () => {
 
     expect(storedFavorites).toHaveLength(1);
 
-    await page.reload();
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await page.goto('/favoritos', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: 'Mis favoritos' })).toBeVisible({
       timeout: 15_000,

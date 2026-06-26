@@ -10,7 +10,7 @@ export class ProductListPage {
   }
 
   async goto(query = '') {
-    await this.page.goto(`/productos${query}`);
+    await this.page.goto(`/productos${query}`, { waitUntil: 'domcontentloaded' });
   }
 
   async expectVisible() {
