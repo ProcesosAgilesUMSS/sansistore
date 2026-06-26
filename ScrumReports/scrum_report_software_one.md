@@ -559,3 +559,37 @@ También realice pruebas funcionales en entorno local sobre el flujo completo de
 - **Today:** Ajustes finales y culminación de mis implementaciones para asegurar una buena presentación en la demo.
 - **Blockers:** NONE
 
+
+# 16/06/ 2026
+## Daily Reports - Team 6 SoftwareOne
+
+
+### Llanos Vega Juan Carlos
+- **Yesterday:** Llevamos a cabo la retrospectiva del sprint para analizar qué mejorar.
+- **Today:** Sesión de sprint planning, estimación de tickets y comienzo del nuevo ciclo de trabajo.
+- **Blockers:** Ninguno
+
+
+### Rodriguez Torrico Arnold Guery
+- **Yesterday:** Reflexión sobre el sprint finalizado en nuestra retrospectiva.
+- **Today:** Planeación del siguiente sprint, revisión de historias de usuario e inicio de las tareas.
+- **Blockers:** Ninguno.
+
+
+### Pereira Fiorilo Oliver Do Santos
+- **Yesterday:** Junta de retrospectiva para discutir puntos fuertes y áreas de mejora.
+- **Today:** Distribución de tareas en el planning y puesta en marcha del desarrollo de los requerimientos.
+- **Blockers:** Ninguno.
+
+
+### Paqui Rojas Aaron David
+- **Yesterday:** Análisis grupal en la retrospectiva sobre el desempeño del último sprint.
+- **Today:** Aceptación de nuevos issues durante el planning y comienzo de la codificación.
+- **Blockers:** Ninguno.
+
+
+### Gutiérrez Fuentes Alexander Raul
+- **Yesterday:** Participación en la reunión de retrospectiva evaluando el progreso.
+- **Today:** Organización general en el sprint planning, toma de requerimientos e inicio de implementaciones.
+- **Blockers:** NONE
+
