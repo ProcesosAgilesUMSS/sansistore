@@ -22,21 +22,8 @@ const SORT_OPTIONS: { value: CatalogSort; label: string }[] = [
 ];
 
 const PRODUCTS_PER_VIEW = 4;
+const MOBILE_PRODUCTS_PER_VIEW = 2;
 const AUTOPLAY_INTERVAL_MS = 2600;
-
-function buildProductWindows(products: CatalogProduct[]) {
-  if (products.length <= PRODUCTS_PER_VIEW) return [products];
-
-  const windows: CatalogProduct[][] = [];
-  for (
-    let startIndex = 0;
-    startIndex <= products.length - PRODUCTS_PER_VIEW;
-    startIndex += 1
-  ) {
-    windows.push(products.slice(startIndex, startIndex + PRODUCTS_PER_VIEW));
-  }
-  return windows;
-}
 
 function HomeCatalogControls() {
   const [showSortDropdown, setShowSortDropdown] = useState(false);
@@ -146,9 +133,30 @@ function ProductCarousel({
   href: string;
 }) {
   const carouselRef = useRef<HTMLElement>(null);
-  const slides = useMemo(() => buildProductWindows(products.slice(0, 12)), [products]);
-  const [activeSlide, setActiveSlide] = useState(0);
+  const carouselProducts = useMemo(() => products.slice(0, 12), [products]);
+  const [productsPerView, setProductsPerView] = useState(() => {
+    if (typeof window === 'undefined') return PRODUCTS_PER_VIEW;
+
+    return window.matchMedia('(min-width: 768px)').matches
+      ? PRODUCTS_PER_VIEW
+      : MOBILE_PRODUCTS_PER_VIEW;
+  });
+  const [activePosition, setActivePosition] = useState(0);
   const [hasStarted, setHasStarted] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 768px)');
+    const handleChange = (event: MediaQueryListEvent) => {
+      setProductsPerView(event.matches ? PRODUCTS_PER_VIEW : MOBILE_PRODUCTS_PER_VIEW);
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  const maxPosition = Math.max(0, carouselProducts.length - productsPerView);
+  const visiblePosition = Math.min(activePosition, maxPosition);
+  const positionCount = maxPosition + 1;
 
   useEffect(() => {
     const carousel = carouselRef.current;
@@ -169,20 +177,19 @@ function ProductCarousel({
   }, [hasStarted]);
 
   useEffect(() => {
-    if (!hasStarted || slides.length <= 1) return;
+    if (!hasStarted || maxPosition <= 0) return;
 
     const interval = window.setInterval(() => {
-      setActiveSlide((current) => (current + 1) % slides.length);
+      setActivePosition((current) => (current >= maxPosition ? 0 : current + 1));
     }, AUTOPLAY_INTERVAL_MS);
 
     return () => window.clearInterval(interval);
-  }, [hasStarted, slides.length]);
+  }, [hasStarted, maxPosition]);
 
-  if (slides.length === 0) return null;
+  if (carouselProducts.length === 0) return null;
 
-  const visibleSlide = activeSlide % slides.length;
-  const canGoBack = visibleSlide > 0;
-  const canGoForward = visibleSlide < slides.length - 1;
+  const canGoBack = visiblePosition > 0;
+  const canGoForward = visiblePosition < maxPosition;
 
   return (
     <section ref={carouselRef} className="py-8">
@@ -204,7 +211,7 @@ function ProductCarousel({
           <button
             type="button"
             aria-label={`Anterior en ${title}`}
-            onClick={() => setActiveSlide((current) => Math.max(0, current - 1))}
+            onClick={() => setActivePosition((current) => Math.max(0, current - 1))}
             className="absolute left-2 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-border-light bg-card-bg-light/90 text-text-light shadow-lg backdrop-blur transition-all hover:border-primary hover:text-primary"
           >
             <ChevronLeft size={20} />
@@ -215,7 +222,7 @@ function ProductCarousel({
             type="button"
             aria-label={`Siguiente en ${title}`}
             onClick={() =>
-              setActiveSlide((current) => Math.min(slides.length - 1, current + 1))
+              setActivePosition((current) => Math.min(maxPosition, current + 1))
             }
             className="absolute right-2 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-border-light bg-card-bg-light/90 text-text-light shadow-lg backdrop-blur transition-all hover:border-primary hover:text-primary"
           >
@@ -223,32 +230,32 @@ function ProductCarousel({
           </button>
         )}
         <div
-          className="flex transition-transform duration-700 ease-out"
-          style={{ transform: `translateX(-${visibleSlide * 100}%)` }}
+          className="-mx-1.5 flex transition-transform duration-700 ease-out sm:-mx-2"
+          style={{
+            transform: `translateX(-${visiblePosition * (100 / productsPerView)}%)`,
+          }}
         >
-          {slides.map((slide, slideIndex) => (
+          {carouselProducts.map((product) => (
             <div
-              key={`${title}-${slideIndex}`}
-              className="grid min-w-full grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4"
+              key={`${title}-${product.id}`}
+              className="min-w-[50%] px-1.5 sm:px-2 md:min-w-[25%]"
             >
-              {slide.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
+              <ProductCard product={product} />
             </div>
           ))}
         </div>
       </div>
 
-      {slides.length > 1 && (
+      {positionCount > 1 && (
         <div className="mt-4 flex justify-center gap-2" aria-label={`Paginación de ${title}`}>
-          {slides.map((_, index) => (
+          {Array.from({ length: positionCount }).map((_, index) => (
             <button
               key={index}
               type="button"
               aria-label={`Ver producto ${index + 1}`}
-              onClick={() => setActiveSlide(index)}
+              onClick={() => setActivePosition(index)}
               className={`h-2 rounded-full transition-all ${
-                visibleSlide === index ? 'w-6 bg-primary' : 'w-2 bg-border-light'
+                visiblePosition === index ? 'w-6 bg-primary' : 'w-2 bg-border-light'
               }`}
             />
           ))}
