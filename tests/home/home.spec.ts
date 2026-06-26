@@ -15,20 +15,26 @@ test.afterEach(async ({ page }, testInfo) => {
 
 test.describe('Home Page', () => {
   test('has correct title', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveTitle(/Sansistore/);
   });
 
-  test('redirects to products catalog', async ({ page }) => {
-    await page.goto('/');
-    await expect(page).toHaveURL('/productos');
+  test('shows the landing page', async ({ page }) => {
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(
-      page.getByRole('heading', { name: 'Productos disponibles' })
+      page.getByRole('heading', {
+        name: 'Descubre productos para tu día en la universidad',
+      })
     ).toBeVisible();
+    await expect(page.getByRole('link', { name: /Ir al catálogo completo/ })).toHaveAttribute(
+      'href',
+      '/productos'
+    );
   });
 
-  test('shows products page after entering home', async ({ page }) => {
-    await page.goto('/');
-    await expect(page).toHaveTitle(/Productos \| Sansistore/);
+  test('opens the products catalog from the home search', async ({ page }) => {
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.getByRole('button', { name: 'Buscar productos en el catálogo' }).click();
+    await expect(page).toHaveURL('/productos');
   });
 });
