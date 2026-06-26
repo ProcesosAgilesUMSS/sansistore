@@ -593,3 +593,36 @@ También realice pruebas funcionales en entorno local sobre el flujo completo de
 - **Today:** Organización general en el sprint planning, toma de requerimientos e inicio de implementaciones.
 - **Blockers:** NONE
 
+
+# 18/06/ 2026
+## Daily Reports - Team 6 SoftwareOne
+
+
+### Llanos Vega Juan Carlos
+- **Yesterday:** Avances significativos en el frontend y ajustes de integración.
+- **Today:** El día de hoy estuvo centrado en pulir mis implementaciones y cerrar los issues de cara a la demo del sprint.
+- **Blockers:** Ninguno
+
+
+### Rodriguez Torrico Arnold Guery
+- **Yesterday:** Desarrollo de los tickets actuales y resolución de bugs encontrados.
+- **Today:** Preparativos finales para la demo; logré concluir y perfeccionar mis tareas asignadas.
+- **Blockers:** Ninguno.
+
+
+### Pereira Fiorilo Oliver Do Santos
+- **Yesterday:** Implementación de componentes y pruebas de integración.
+- **Today:** Conclusión de los detalles técnicos y pulido general para dejar la presentación de mis issues lista.
+- **Blockers:** Ninguno.
+
+
+### Paqui Rojas Aaron David
+- **Yesterday:** Continuación del trabajo en el repositorio y commits de mis avances.
+- **Today:** Revisión final de mi código y término de mis requerimientos para la demostración de este sprint.
+- **Blockers:** Ninguno.
+
+
+### Gutiérrez Fuentes Alexander Raul
+- **Yesterday:** Escritura de código, resolución de problemas y avance grupal.
+- **Today:** Remate de implementaciones y ajustes visuales para la demo, asegurando que mis tareas estén finalizadas.
+- **Blockers:** NONE
