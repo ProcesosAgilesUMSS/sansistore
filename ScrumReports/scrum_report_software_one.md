@@ -626,3 +626,39 @@ También realice pruebas funcionales en entorno local sobre el flujo completo de
 - **Yesterday:** Escritura de código, resolución de problemas y avance grupal.
 - **Today:** Remate de implementaciones y ajustes visuales para la demo, asegurando que mis tareas estén finalizadas.
 - **Blockers:** NONE
+
+
+# 23/06/ 2026
+## Daily Reports - Team 6 SoftwareOne
+
+
+### Llanos Vega Juan Carlos
+- **Yesterday:** Balance del último sprint en nuestra retrospectiva y primeros pasos del planning.
+- **Today:** Definición de tareas para el nuevo sprint y comienzo de programación.
+- **Blockers:** Ninguno
+
+
+### Rodriguez Torrico Arnold Guery
+- **Yesterday:** Junta retrospectiva donde analizamos el rendimiento y empezamos a planificar.
+- **Today:** Análisis técnico de los nuevos requerimientos y comienzo de su desarrollo.
+- **Blockers:** Ninguno.
+
+
+### Pereira Fiorilo Oliver Do Santos
+- **Yesterday:** Evaluación del sprint cerrado en la retrospectiva y revisión del backlog.
+- **Today:** Asignación de mis nuevas historias de usuario e inicio de mis tareas.
+- **Blockers:** Ninguno.
+
+
+### Paqui Rojas Aaron David
+- **Yesterday:** Participación activa en la retrospectiva identificando mejoras.
+- **Today:** Planning completado, tickets seleccionados y comienzo de mis implementaciones.
+- **Blockers:** Ninguno.
+
+
+### Gutiérrez Fuentes Alexander Raul
+- **Yesterday:** Sesión de retrospectiva enfocada en la eficiencia del equipo.
+- **Today:** Repartición de trabajo en el planning y comienzo inmediato con el código.
+- **Blockers:** NONE
+
+
