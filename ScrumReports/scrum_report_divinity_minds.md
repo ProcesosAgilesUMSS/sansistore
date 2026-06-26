@@ -559,3 +559,8 @@
 - **Yesterday:** Corregí y estabilicé los tests automatizados afectados por los cambios en home, catálogo, perfil, favoritos, courier y pedidos, hasta dejar verde la ejecución principal de Playwright. Este trabajo quedó asociado sobre todo a la task #714.
 - **Today:** Dar seguimiento a la estabilidad de las pruebas y apoyar en cualquier ajuste adicional de CI/CD.
 - **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+- **Yesterday:** Participé como representante del equipo en la reunión del día, comuniqué los puntos tratados al grupo y ayudé a coordinar el seguimiento interno de las tareas relacionadas con la entrega.
+- **Today:** Continuar apoyando en la coordinación del equipo y en el seguimiento de acuerdos posteriores a la reunión.
+- **Blockers:** n/a.
