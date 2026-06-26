@@ -662,3 +662,35 @@ También realice pruebas funcionales en entorno local sobre el flujo completo de
 - **Blockers:** NONE
 
 
+# 25/06/ 2026
+## Daily Reports - Team 6 SoftwareOne
+
+
+### Llanos Vega Juan Carlos
+- **Yesterday:** Codificación intensiva y ajustes menores a los issues en curso.
+- **Today:** Preparación de todo el entorno para la demo, finalizando y puliendo las tareas que me correspondían.
+- **Blockers:** Ninguno
+
+
+### Rodriguez Torrico Arnold Guery
+- **Yesterday:** Adelantos en el desarrollo, pruebas funcionales en local.
+- **Today:** Últimos retoques a mis implementaciones, cerrando los tickets para que la demo fluya sin problemas.
+- **Blockers:** Ninguno.
+
+
+### Pereira Fiorilo Oliver Do Santos
+- **Yesterday:** Refactorización y avance continuo en las historias asignadas.
+- **Today:** Día dedicado a pulir detalles y culminar el código para la demostración de cierre de sprint.
+- **Blockers:** Ninguno.
+
+
+### Paqui Rojas Aaron David
+- **Yesterday:** Desarrollo principal y resolución de incidencias en mi módulo.
+- **Today:** Finalización técnica de mis tareas y preparación exhaustiva para la demo grupal.
+- **Blockers:** Ninguno.
+
+
+### Gutiérrez Fuentes Alexander Raul
+- **Yesterday:** Seguimiento del progreso, desarrollo y revisión de Pull Requests.
+- **Today:** Culminación y revisión de mis implementaciones, asegurando que estén pulidas para presentarlas en la demo.
+- **Blockers:** NONE
