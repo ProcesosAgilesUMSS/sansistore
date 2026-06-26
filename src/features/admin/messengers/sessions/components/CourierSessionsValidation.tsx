@@ -35,25 +35,28 @@ function differenceTone(totalCollected: number, expectedAmount: number) {
     diff: 0,
     label: 'Bs. 0.00',
     badge: 'text-[#4a6b1f] dark:text-[#b7dc78] bg-[#88b04b]/15 ring-1 ring-[#88b04b]/40',
-    row:   'bg-[var(--theme-card-bg)] border-[var(--theme-border)]',
+    cardBorder: 'border-[var(--theme-border)]',
+    cardBg: 'bg-[var(--theme-card-bg)]',
   };
   if (diff < 0) return {
     diff,
     label: `-${formatMoney(Math.abs(diff))}`,
     badge: 'text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-500/20 ring-1 ring-red-300 dark:ring-red-500/40',
-    row:   'bg-red-50 dark:bg-red-500/5 border-red-200 dark:border-red-500/30',
+    cardBorder: 'border-red-200 dark:border-red-500/30',
+    cardBg: 'bg-red-50 dark:bg-red-500/5',
   };
   return {
     diff,
     label: `+${formatMoney(diff)}`,
     badge: 'text-orange-700 dark:text-orange-300 bg-orange-100 dark:bg-orange-500/20 ring-1 ring-orange-300 dark:ring-orange-500/40',
-    row:   'bg-orange-50 dark:bg-orange-500/5 border-orange-200 dark:border-orange-500/30',
+    cardBorder: 'border-orange-200 dark:border-orange-500/30',
+    cardBg: 'bg-orange-50 dark:bg-orange-500/5',
   };
 }
 
-// ── Fila de cierre ────────────────────────────────────────────────────────────
+// ── Tarjeta de cierre ─────────────────────────────────────────────────────────
 
-function ClosureRow({
+function ClosureCard({
   closure,
   isValidating,
   onApprove,
@@ -64,24 +67,28 @@ function ClosureRow({
   onApprove: () => void;
   onReject: () => void;
 }) {
-  // expectedAmount = suma de todos los pedidos completados (cashToCollect)
   const expectedAmount = closure.completedOrders.reduce(
-    (sum, o) => sum + o.cashToCollect, 0
+    (sum, o) => sum + (o.cashToCollect ?? 0), 0
   );
   const tone = differenceTone(closure.summary.totalCollected, expectedAmount);
+  const incidents = closure.summary.notDeliveredCount + closure.summary.cancelledCount;
   const initials = closure.courierName
     .split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase();
 
   return (
-    <div className={`flex items-center gap-4 px-5 py-4 rounded-xl border transition-colors ${tone.row}`}>
+    <div className={`rounded-xl border transition-colors ${tone.cardBg} ${tone.cardBorder}`}>
 
-      {/* Avatar + mensajero */}
-      <div className="flex items-center gap-3 w-[220px] flex-shrink-0">
+      {/* Fila principal */}
+      <div className="flex items-center gap-3 px-4 py-3">
+
+        {/* Avatar */}
         <div className="w-9 h-9 rounded-full bg-[#88b04b]/15 flex items-center justify-center
           text-[#4a6b1f] dark:text-[#b7dc78] text-xs font-bold flex-shrink-0">
           {initials}
         </div>
-        <div className="min-w-0">
+
+        {/* Nombre + fecha */}
+        <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-[var(--theme-text)] truncate">
             {closure.courierName}
           </p>
@@ -89,63 +96,76 @@ function ClosureRow({
             {fmtDateKey(closure.dateKey)} · {fmtTime(closure.closedAt)}
           </p>
         </div>
-      </div>
 
-      {/* Entregas completadas */}
-      <div className="w-[80px] flex-shrink-0 text-sm text-[var(--theme-text)]">
-        {closure.summary.completedCount}
-      </div>
-
-      {/* Esperado */}
-      <div className="w-[110px] flex-shrink-0 text-sm text-[var(--theme-text)]">
-        {formatMoney(expectedAmount)}
-      </div>
-
-      {/* Registrado */}
-      <div className="w-[110px] flex-shrink-0 text-sm text-[var(--theme-text)]">
-        {formatMoney(closure.summary.totalCollected)}
-      </div>
-
-      {/* Diferencia */}
-      <div className="w-[120px] flex-shrink-0">
-        <span className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-full ${tone.badge}`}>
+        {/* Badge diferencia — siempre visible */}
+        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0 ${tone.badge}`}>
           {tone.label}
         </span>
+
+        {/* Acciones */}
+        <div className="flex items-center gap-1.5 flex-shrink-0 ml-1">
+          <button
+            onClick={onApprove}
+            disabled={isValidating}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
+              bg-[#88b04b]/15 text-[#4a6b1f] dark:text-[#b7dc78] hover:bg-[#88b04b]/25
+              disabled:opacity-50 transition-colors whitespace-nowrap"
+          >
+            {isValidating
+              ? <Loader2 size={13} className="animate-spin" />
+              : <CheckCircle2 size={13} />}
+            <span className="hidden sm:inline">Aprobar</span>
+          </button>
+          <button
+            onClick={onReject}
+            disabled={isValidating}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
+              border border-[var(--theme-border)] text-[var(--theme-text)]/60
+              hover:bg-red-500 hover:text-white hover:border-red-500
+              disabled:opacity-50 transition-colors whitespace-nowrap"
+          >
+            <XCircle size={13} />
+            <span className="hidden sm:inline">Rechazar</span>
+          </button>
+        </div>
       </div>
 
-      {/* Incidentes */}
-      <div className="w-[70px] flex-shrink-0 text-sm text-[var(--theme-text)]/60">
-        {closure.summary.notDeliveredCount + closure.summary.cancelledCount > 0
-          ? `${closure.summary.notDeliveredCount + closure.summary.cancelledCount} inc.`
-          : '—'}
+      {/* Fila de métricas */}
+      <div className="grid grid-cols-4 border-t border-[var(--theme-border)]">
+        <div className="px-4 py-2.5 border-r border-[var(--theme-border)]">
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--theme-text)]/40 mb-0.5">
+            Entregas
+          </p>
+          <p className="text-sm font-semibold text-[var(--theme-text)]">
+            {closure.summary.completedCount}
+          </p>
+        </div>
+        <div className="px-4 py-2.5 border-r border-[var(--theme-border)]">
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--theme-text)]/40 mb-0.5">
+            Esperado
+          </p>
+          <p className="text-sm font-semibold text-[var(--theme-text)]">
+            {formatMoney(expectedAmount)}
+          </p>
+        </div>
+        <div className="px-4 py-2.5 border-r border-[var(--theme-border)]">
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--theme-text)]/40 mb-0.5">
+            Registrado
+          </p>
+          <p className="text-sm font-semibold text-[var(--theme-text)]">
+            {formatMoney(closure.summary.totalCollected)}
+          </p>
+        </div>
+        <div className="px-4 py-2.5">
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--theme-text)]/40 mb-0.5">
+            Incidentes
+          </p>
+          <p className="text-sm font-semibold text-[var(--theme-text)]/60">
+            {incidents > 0 ? `${incidents} inc.` : '—'}
+          </p>
+        </div>
       </div>
 
-      {/* Acciones */}
-      <div className="flex items-center gap-2 ml-auto flex-shrink-0">
-        <button
-          onClick={onApprove}
-          disabled={isValidating}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
-            bg-[#88b04b]/15 text-[#4a6b1f] dark:text-[#b7dc78] hover:bg-[#88b04b]/25
-            disabled:opacity-50 transition-colors"
-        >
-          {isValidating
-            ? <Loader2 size={13} className="animate-spin" />
-            : <CheckCircle2 size={13} />}
-          Aprobar
-        </button>
-        <button
-          onClick={onReject}
-          disabled={isValidating}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
-            border border-[var(--theme-border)] text-[var(--theme-text)]/60
-            hover:bg-red-500 hover:text-white hover:border-red-500
-            disabled:opacity-50 transition-colors"
-        >
-          <XCircle size={13} />
-          Rechazar
-        </button>
-      </div>
     </div>
   );
 }
@@ -165,7 +185,7 @@ function RejectModal({
 }) {
   const [reason, setReason] = useState('');
   const expectedAmount = closure.completedOrders.reduce(
-    (sum, o) => sum + o.cashToCollect, 0
+    (sum, o) => sum + (o.cashToCollect ?? 0), 0
   );
   const tone = differenceTone(closure.summary.totalCollected, expectedAmount);
 
@@ -258,7 +278,7 @@ export default function CourierSessionsValidation() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-4">
+    <div className="max-w-4xl mx-auto space-y-4">
 
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -323,22 +343,8 @@ export default function CourierSessionsValidation() {
       {/* Lista */}
       {!loading && closures.length > 0 && (
         <div className="space-y-2">
-
-          {/* Cabecera */}
-          <div className="flex items-center gap-4 px-5 py-2.5 rounded-xl
-            bg-[var(--theme-secondary-bg)] text-[10px] font-semibold uppercase
-            tracking-wider text-[var(--theme-text)]/50">
-            <span className="w-[220px] flex-shrink-0">Mensajero</span>
-            <span className="w-[80px] flex-shrink-0">Entregas</span>
-            <span className="w-[110px] flex-shrink-0">Esperado</span>
-            <span className="w-[110px] flex-shrink-0">Registrado</span>
-            <span className="w-[120px] flex-shrink-0">Diferencia</span>
-            <span className="w-[70px] flex-shrink-0">Incidentes</span>
-            <span className="ml-auto">Acciones</span>
-          </div>
-
           {closures.map((closure) => (
-            <ClosureRow
+            <ClosureCard
               key={closure.id}
               closure={closure}
               isValidating={validating === closure.id}
