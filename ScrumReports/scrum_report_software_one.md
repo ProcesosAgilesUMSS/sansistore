@@ -491,3 +491,38 @@ También realice pruebas funcionales en entorno local sobre el flujo completo de
 - **Today:** Trabajo y resolución de los issues #425, #407 y #82. Realizamos code review grupal.
 - **Blockers:** NONE
 
+
+# 09/06/ 2026
+## Daily Reports - Team 6 SoftwareOne
+
+
+### Llanos Vega Juan Carlos
+- **Yesterday:** Participé en la retrospectiva del último sprint y se dio inicio al planning.
+- **Today:** Terminamos el sprint planning, me asignaron mis tareas y comencé con el desarrollo.
+- **Blockers:** Ninguno
+
+
+### Rodriguez Torrico Arnold Guery
+- **Yesterday:** Estuvimos en la reunión de retrospectiva para evaluar el sprint anterior y planificamos el siguiente.
+- **Today:** Finalización de la planificación, selección de requerimientos y primeras configuraciones de mi código.
+- **Blockers:** Ninguno.
+
+
+### Pereira Fiorilo Oliver Do Santos
+- **Yesterday:** Revisamos las mejoras en la retrospectiva y empezamos la planificación del nuevo ciclo.
+- **Today:** Tomé los issues correspondientes a este sprint y arranqué con el desarrollo de los mismos.
+- **Blockers:** Ninguno.
+
+
+### Paqui Rojas Aaron David
+- **Yesterday:** Análisis de lo logrado en el sprint pasado durante la retrospectiva y comienzo del planning.
+- **Today:** Asignación definitiva de tareas y comienzo formal del desarrollo de código.
+- **Blockers:** Ninguno.
+
+
+### Gutiérrez Fuentes Alexander Raul
+- **Yesterday:** Retrospectiva grupal enfocada en lecciones aprendidas y organización del planning inicial.
+- **Today:** Repartición final de issues en el planning e inicio inmediato del desarrollo técnico.
+- **Blockers:** NONE
+
+
