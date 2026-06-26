@@ -21,14 +21,21 @@ const SORT_OPTIONS: { value: CatalogSort; label: string }[] = [
   { value: 'name-desc', label: 'Z-A' },
 ];
 
-const PRODUCTS_PER_SLIDE = 4;
+const PRODUCTS_PER_VIEW = 4;
+const AUTOPLAY_INTERVAL_MS = 2600;
 
-function chunkProducts(products: CatalogProduct[]) {
-  const chunks: CatalogProduct[][] = [];
-  for (let index = 0; index < products.length; index += PRODUCTS_PER_SLIDE) {
-    chunks.push(products.slice(index, index + PRODUCTS_PER_SLIDE));
+function buildProductWindows(products: CatalogProduct[]) {
+  if (products.length <= PRODUCTS_PER_VIEW) return [products];
+
+  const windows: CatalogProduct[][] = [];
+  for (let startIndex = 0; startIndex < products.length; startIndex += 1) {
+    windows.push(
+      Array.from({ length: PRODUCTS_PER_VIEW }, (_, offset) => {
+        return products[(startIndex + offset) % products.length];
+      })
+    );
   }
-  return chunks;
+  return windows;
 }
 
 function HomeCatalogControls() {
@@ -127,25 +134,45 @@ function ProductCarousel({
   products: CatalogProduct[];
   href: string;
 }) {
-  const slides = useMemo(() => chunkProducts(products.slice(0, 12)), [products]);
+  const carouselRef = useRef<HTMLElement>(null);
+  const slides = useMemo(() => buildProductWindows(products.slice(0, 12)), [products]);
   const [activeSlide, setActiveSlide] = useState(0);
+  const [hasStarted, setHasStarted] = useState(false);
 
   useEffect(() => {
-    if (slides.length <= 1) return;
+    const carousel = carouselRef.current;
+    if (!carousel || hasStarted) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setHasStarted(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.35 }
+    );
+
+    observer.observe(carousel);
+    return () => observer.disconnect();
+  }, [hasStarted]);
+
+  useEffect(() => {
+    if (!hasStarted || slides.length <= 1) return;
 
     const interval = window.setInterval(() => {
       setActiveSlide((current) => (current + 1) % slides.length);
-    }, 4500);
+    }, AUTOPLAY_INTERVAL_MS);
 
     return () => window.clearInterval(interval);
-  }, [slides.length]);
+  }, [hasStarted, slides.length]);
 
   if (slides.length === 0) return null;
 
   const visibleSlide = activeSlide % slides.length;
 
   return (
-    <section className="py-7">
+    <section ref={carouselRef} className="py-7">
       <div className="mb-4 flex items-center justify-between gap-4">
         <h2 className="text-xl font-black tracking-tight text-text-light sm:text-2xl">
           {title}
@@ -183,7 +210,7 @@ function ProductCarousel({
             <button
               key={index}
               type="button"
-              aria-label={`Ver grupo ${index + 1}`}
+              aria-label={`Ver producto ${index + 1}`}
               onClick={() => setActiveSlide(index)}
               className={`h-2 rounded-full transition-all ${
                 visibleSlide === index ? 'w-6 bg-primary' : 'w-2 bg-border-light'
@@ -252,9 +279,12 @@ function HomePageInner() {
 
   return (
     <main className="min-h-screen bg-bg-light pt-14 text-text-light">
-      <section id="productos" className="bg-bg-light py-20">
+      <section id="productos" className="bg-bg-light pb-14 pt-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-10">
+          <div className="mb-6">
+            <p className="mb-2 text-xs font-black uppercase tracking-[0.22em] text-primary">
+              Descubre Sansistore
+            </p>
             <h1
               className="text-text-light"
               style={{
@@ -263,7 +293,7 @@ function HomePageInner() {
                 fontWeight: 900,
               }}
             >
-              Productos destacados
+              Lo mejor para hoy
             </h1>
           </div>
 

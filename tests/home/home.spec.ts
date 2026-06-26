@@ -23,7 +23,7 @@ test.describe('Home Page', () => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(
       page.getByRole('heading', {
-        name: 'Productos destacados',
+        name: 'Lo mejor para hoy',
       })
     ).toBeVisible();
     await expect(page.getByRole('link', { name: 'Buscar productos en el catálogo' })).toHaveAttribute(
