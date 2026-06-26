@@ -1,44 +1,21 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
 import {Package,Search,X,History,Trash2,ChevronLeft,ChevronRight,Heart,} from 'lucide-react';
-import { FaCartPlus, FaFilter } from 'react-icons/fa';
-import { collection, doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
+import { FaFilter } from 'react-icons/fa';
+import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { getOfferBadgeData, hasValidOffer } from '../lib/productOffers';
-import {getCreatedAtTimestamp,getSoldCount,isPopularProduct,} from '../lib/productPopularity';
 import CategoryFilter from './CategoryFilter';
-import { useCartContext, CartProvider } from '../features/cart';
+import { CartProvider } from '../features/cart';
 import { useFavorites } from '../features/favorites';
+import ProductCard from '../features/catalog/components/ProductCard';
+import { fetchCatalogProducts } from '../features/catalog/services/catalogService';
+import type { CatalogProduct, CatalogSort } from '../features/catalog/types';
+import {
+  filterCatalogProducts,
+  isSortOption,
+  removeAccents,
+  sortCatalogProducts,
+} from '../features/catalog/utils/catalogFilters';
 
-interface Product {
-  id: string;
-  slug: string;
-  name: string;
-  price: number;
-  imageUrl?: string;
-  active?: boolean;
-  hasOffer?: boolean;
-  offerPrice?: number;
-  description?: string;
-  badge?: string;
-  stockAvailable?: number;
-  stockReserved?: number;
-  stockTotal?: number;
-  enabled?: boolean;
-  categoryId?: string;
-  createdAt?: any;
-  soldCount?: number;
-}
-
-interface Inventory {
-  id: string;
-  productId?: string;
-  stockAvailable?: number;
-  stockReserved?: number;
-  stockTotal?: number;
-  enabled?: boolean;
-}
-
-const PRODUCT_PLACEHOLDER = '/product-placeholder.svg';
 const MAX_SEARCH_LENGTH = 100;
 const SEARCH_HISTORY_KEY = 'sansistore-search-history';
 const MAX_HISTORY_ITEMS = 5;
@@ -62,6 +39,7 @@ function saveSearchTerm(term: string) {
     const updated = [term, ...filtered].slice(0, MAX_HISTORY_ITEMS);
     localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(updated));
   } catch {
+    return;
   }
 }
 
@@ -73,33 +51,37 @@ function deleteSearchTerm(term: string) {
     );
     localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(updated));
   } catch {
+    return;
   }
 }
 
-function formatPrice(amount: number) {
-  return `Bs ${amount.toFixed(2)}`;
-}
-
-function getBadgeData(product: Product) {
-  const badgeData = getOfferBadgeData(product);
-
-  if (badgeData?.label.trim().toLowerCase() === 'popular') {
-    return null;
+function highlightText(text: string, term: string, enabled = true) {
+  if (!enabled || !term || !text) return text;
+  const normalizedText = removeAccents(text);
+  const normalizedTerm = removeAccents(term);
+  const escaped = normalizedTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(escaped, 'gi');
+  const result: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match;
+  while ((match = regex.exec(normalizedText)) !== null) {
+    if (match.index > lastIndex) {
+      result.push(text.slice(lastIndex, match.index));
+    }
+    result.push(
+      <mark
+        key={match.index}
+        className="rounded bg-primary/30 px-0.5 font-semibold text-primary"
+      >
+        {text.slice(match.index, match.index + match[0].length)}
+      </mark>
+    );
+    lastIndex = match.index + match[0].length;
   }
-
-  if (badgeData?.isDiscount) {
-    return {
-      label: badgeData.label,
-      className: 'bg-red-600 text-white',
-    };
+  if (lastIndex < text.length) {
+    result.push(text.slice(lastIndex));
   }
-
-  if (!badgeData) return null;
-
-  return {
-    label: badgeData.label,
-    className: 'bg-primary-action text-white',
-  };
+  return result.length > 0 ? result : text;
 }
 
 interface FeaturedProductsProps {
@@ -110,17 +92,6 @@ interface FeaturedProductsProps {
   initialPage?: number;
   favoritesOnly?: boolean;
   title?: string;
-}
-
-function isSortOption(
-  value: string | null | undefined
-): value is 'best-sellers' | 'recent' | 'name-asc' | 'name-desc' {
-  return (
-    value === 'best-sellers' ||
-    value === 'recent' ||
-    value === 'name-asc' ||
-    value === 'name-desc'
-  );
 }
 
 const SORT_OPTIONS = [
@@ -139,19 +110,16 @@ function FeaturedProductsInner({
   favoritesOnly = false,
   title = 'Productos disponibles',
 }: FeaturedProductsProps) {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [appliedSearch, setAppliedSearch] = useState(initialSearch);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const { addToCart } = useCartContext();
   const {
     favoriteIds,
     loading: favoritesLoading,
     error: favoritesError,
-    isFavorite,
-    toggleFavorite,
   } = useFavorites();
   const [searchHistory, setSearchHistory] = useState<string[]>(() =>
     getSearchHistory()
@@ -165,14 +133,14 @@ function FeaturedProductsInner({
     Number.isFinite(initialPage) && initialPage > 0 ? initialPage : 1
   );
   const [invalidPage, setInvalidPage] = useState(false);
-  const [sortBy, setSortBy] = useState<
-    'best-sellers' | 'recent' | 'name-asc' | 'name-desc'
-  >(isSortOption(initialSort) ? initialSort : 'best-sellers');
+  const [sortBy, setSortBy] = useState<CatalogSort>(
+    isSortOption(initialSort) ? initialSort : 'best-sellers'
+  );
   const [showSortDropdown, setShowSortDropdown] = useState(false);
-  const [bumpingProductId, setBumpingProductId] = useState<string | null>(null);
-  const bumpTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const ITEMS_PER_PAGE = 12;
   const searchRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const pendingSearchFocusRef = useRef(false);
   const sortRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -226,6 +194,37 @@ function FeaturedProductsInner({
   }, []);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const url = new URL(window.location.href);
+    if (url.searchParams.get('focusSearch') !== 'true') return;
+
+    pendingSearchFocusRef.current = true;
+    url.searchParams.delete('focusSearch');
+    window.history.replaceState({}, '', url.toString());
+  }, []);
+
+  useEffect(() => {
+    if (loading || favoritesLoading || !pendingSearchFocusRef.current) return;
+
+    let attempts = 0;
+    const focusTimer = window.setInterval(() => {
+      const input = searchInputRef.current;
+      if (!input) return;
+
+      input.focus({ preventScroll: true });
+      attempts += 1;
+
+      if (document.activeElement === input || attempts >= 40) {
+        pendingSearchFocusRef.current = false;
+        window.clearInterval(focusTimer);
+      }
+    }, 50);
+
+    return () => window.clearInterval(focusTimer);
+  }, [loading, favoritesLoading]);
+
+  useEffect(() => {
     if (typeof window !== 'undefined' && products.length > 0) {
       const url = new URL(window.location.href);
       const pageParamStr = url.searchParams.get('page');
@@ -233,10 +232,9 @@ function FeaturedProductsInner({
       const isValidPageNumber = !isNaN(pageNum) && pageNum > 0;
       const pageParam = isValidPageNumber ? Math.max(1, pageNum) : 1;
 
-      const filtered = products.filter((p) => {
-        if (showOffersOnly && !hasValidOffer(p)) return false;
-        if (selectedCategory && p.categoryId !== selectedCategory) return false;
-        return true;
+      const filtered = filterCatalogProducts(products, {
+        offersOnly: showOffersOnly,
+        categoryId: selectedCategory,
       });
 
       const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
@@ -282,44 +280,7 @@ function FeaturedProductsInner({
       setError(null);
 
       try {
-        const productsQuery = query(
-          collection(db, 'products'),
-          where('active', '==', true),
-          orderBy('createdAt', 'desc')
-        );
-        const [productsSnap, inventorySnap] = await Promise.all([
-          getDocs(productsQuery),
-          getDocs(collection(db, 'inventory')),
-        ]);
-
-        const inventoryByProductId = new Map(
-          inventorySnap.docs.map((inventoryDoc) => {
-            const inventory = {
-              id: inventoryDoc.id,
-              ...inventoryDoc.data(),
-            } as Inventory;
-            return [inventory.productId ?? inventoryDoc.id, inventory];
-          })
-        );
-
-        setProducts(
-          productsSnap.docs.map((productDoc) => {
-            const product = {
-              id: productDoc.id,
-              ...productDoc.data(),
-            } as Product;
-            const inventory = inventoryByProductId.get(productDoc.id);
-
-            return {
-              ...product,
-              soldCount: getSoldCount(product),
-              stockAvailable: inventory?.stockAvailable ?? 0,
-              stockReserved: inventory?.stockReserved ?? 0,
-              stockTotal: inventory?.stockTotal ?? 0,
-              enabled: inventory?.enabled ?? false,
-            };
-          })
-        );
+        setProducts(await fetchCatalogProducts());
       } catch (error) {
         console.error('Error loading products:', error);
         setError('No se pudo cargar el catálogo en este momento.');
@@ -331,69 +292,17 @@ function FeaturedProductsInner({
     fetchProducts();
   }, []);
 
-  const removeAccents = (text: string) => {
-    return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  };
-
   const filteredProducts = useMemo(() => {
-    let result = products;
-
-    if (favoritesOnly) {
-      result = result.filter((product) => favoriteIds.has(product.id));
-    }
-
-    if (showOffersOnly) {
-      result = result.filter((product) => hasValidOffer(product));
-    }
-
-    if (selectedCategory) {
-      result = result.filter((p) => p.categoryId === selectedCategory);
-    }
-
-    if (appliedSearch) {
-      const term = removeAccents(appliedSearch.toLowerCase());
-      const byName = result.filter((p) =>
-        removeAccents(p.name.toLowerCase()).includes(term)
-      );
-      const byDescription = result.filter(
-        (p) =>
-          !removeAccents(p.name.toLowerCase()).includes(term) &&
-          p.description &&
-          removeAccents(p.description.toLowerCase()).includes(term)
-      );
-      result = [...byName, ...byDescription];
-    }
-
-    const allSoldCountsAreZero = result.every(
-      (product) => getSoldCount(product) === 0
+    return sortCatalogProducts(
+      filterCatalogProducts(products, {
+        term: appliedSearch,
+        categoryId: selectedCategory,
+        offersOnly: showOffersOnly,
+        favoritesOnly,
+        favoriteIds,
+      }),
+      sortBy
     );
-    const effectiveSortBy =
-      sortBy === 'best-sellers' && allSoldCountsAreZero ? 'recent' : sortBy;
-
-    const sorted = [...result];
-    switch (effectiveSortBy) {
-      case 'best-sellers':
-        sorted.sort(
-          (a, b) =>
-            getSoldCount(b) - getSoldCount(a) ||
-            getCreatedAtTimestamp(b) - getCreatedAtTimestamp(a)
-        );
-        break;
-      case 'name-asc':
-        sorted.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case 'name-desc':
-        sorted.sort((a, b) => b.name.localeCompare(a.name));
-        break;
-      case 'recent':
-      default:
-        sorted.sort(
-          (a, b) => getCreatedAtTimestamp(b) - getCreatedAtTimestamp(a)
-        );
-        break;
-    }
-
-    return sorted;
   }, [
     products,
     appliedSearch,
@@ -443,51 +352,6 @@ function FeaturedProductsInner({
   ]);
 
   const isLoading = loading || favoritesLoading;
-
-  const highlightText = (
-    text: string,
-    term: string,
-    enabled: boolean = true
-  ) => {
-    if (!enabled || !term || !text) return text;
-    const normalizedText = removeAccents(text);
-    const normalizedTerm = removeAccents(term);
-    const escaped = normalizedTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(escaped, 'gi');
-    const result: React.ReactNode[] = [];
-    let lastIndex = 0;
-    let match;
-    while ((match = regex.exec(normalizedText)) !== null) {
-      if (match.index > lastIndex) {
-        result.push(text.slice(lastIndex, match.index));
-      }
-      result.push(
-        <mark
-          key={match.index}
-          className="bg-primary/30 text-primary font-semibold rounded px-0.5"
-        >
-          {text.slice(match.index, match.index + match[0].length)}
-        </mark>
-      );
-      lastIndex = match.index + match[0].length;
-    }
-    if (lastIndex < text.length) {
-      result.push(text.slice(lastIndex));
-    }
-    return result.length > 0 ? result : text;
-  };
-
-  const getMatchField = (product: Product, term: string) => {
-    if (!term) return null;
-    const t = removeAccents(term.toLowerCase());
-    if (removeAccents(product.name.toLowerCase()).includes(t)) return 'name';
-    if (
-      product.description &&
-      removeAccents(product.description.toLowerCase()).includes(t)
-    )
-      return 'description';
-    return null;
-  };
 
   const handleSearchClear = () => {
     setSearchTerm('');
@@ -555,23 +419,6 @@ function FeaturedProductsInner({
     }
     window.history.pushState({}, '', url);
   };
-
-  const handleAddToCart = (
-    productId: string,
-    stock: number,
-    price: number
-  ) => {
-    addToCart(productId, stock, price);
-    if (bumpTimeoutRef.current) clearTimeout(bumpTimeoutRef.current);
-    setBumpingProductId(productId);
-    bumpTimeoutRef.current = setTimeout(() => setBumpingProductId(null), 700);
-  };
-
-  useEffect(() => {
-    return () => {
-      if (bumpTimeoutRef.current) clearTimeout(bumpTimeoutRef.current);
-    };
-  }, []);
 
   return (
     <section id="productos" className="bg-bg-light py-20">
@@ -653,6 +500,7 @@ function FeaturedProductsInner({
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-text-light opacity-40"
               />
               <input
+                ref={searchInputRef}
                 type="text"
                 placeholder="¿Qué estás buscando hoy?"
                 value={searchTerm}
@@ -876,155 +724,13 @@ function FeaturedProductsInner({
             <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
               {filteredProducts
                 .slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
-                .map((product) => {
-                  const showOffer = hasValidOffer(product);
-                  const badgeData = getBadgeData(product);
-                  const showPopularBadge = isPopularProduct(product);
-                  const productIsFavorite = isFavorite(product.id);
-                  const currentPrice = showOffer ? product.offerPrice! : product.price;
-                  const effectiveStock = Math.max(
-                    0,
-                    (product.stockAvailable ?? 0) - (product.stockReserved ?? 0)
-                  );
-                  const isOutOfStock = effectiveStock <= 0;
-                  const isDisabled = product.enabled === false;
-                  const isProductAvailable = !isOutOfStock && !isDisabled;
-
-                  return (
-                    <article
-                      key={product.id}
-                      className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border-light bg-card-bg-light transition-all duration-300 hover:-translate-y-1 ${
-                        !isProductAvailable ? 'opacity-75' : ''
-                      }`}
-                    >
-                      <a
-                        href={`/productos/${product.slug}`}
-                        aria-label={`Ver detalle de ${product.name}`}
-                        className="absolute inset-0 z-10 rounded-2xl"
-                      />
-
-                      <div className="relative flex aspect-square items-center justify-center overflow-hidden bg-secondary-bg-light">
-                        <img
-                          src={product.imageUrl || PRODUCT_PLACEHOLDER}
-                          alt={product.name}
-                          className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 ${
-                            !isProductAvailable ? 'grayscale' : ''
-                          }`}
-                          onError={(event) => {
-                            event.currentTarget.onerror = null;
-                            event.currentTarget.src = PRODUCT_PLACEHOLDER;
-                          }}
-                        />
-
-                        <div className="absolute left-3 top-3 flex flex-wrap gap-2">
-                          {isOutOfStock && !isDisabled && (
-                            <span className="rounded-full bg-red-600 px-2 py-0.5 text-xs font-semibold text-white">
-                              Agotado
-                            </span>
-                          )}
-                          {isDisabled && (
-                            <span style={{ backgroundColor: '#4b5563' }} className="rounded-full px-2 py-0.5 text-xs font-semibold text-white">
-                              No disponible
-                            </span>
-                          )}
-                          {isProductAvailable && badgeData && (
-                            <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${badgeData.className}`}>
-                              {badgeData.label}
-                            </span>
-                          )}
-                          {isProductAvailable && showPopularBadge && (
-                            <span className="rounded-full bg-amber-400 px-2 py-0.5 text-xs font-semibold text-amber-950">
-                              Popular
-                            </span>
-                          )}
-                        </div>
-
-                        <button
-                          type="button"
-                          aria-label={
-                            productIsFavorite
-                              ? `Quitar ${product.name} de favoritos`
-                              : `Agregar ${product.name} a favoritos`
-                          }
-                          aria-pressed={productIsFavorite}
-                          title={productIsFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
-                          data-testid={`favorite-button-${product.slug}`}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            toggleFavorite(product.id);
-                          }}
-                          className={`absolute right-3 top-3 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-all active:scale-95 ${
-                            productIsFavorite
-                              ? 'border-primary bg-primary text-text-light shadow-md shadow-primary/25'
-                              : 'border-border-light bg-card-bg-light/90 text-text-light hover:border-primary hover:text-primary'
-                          }`}
-                        >
-                          <Heart size={18} fill={productIsFavorite ? 'currentColor' : 'none'} />
-                        </button>
-                      </div>
-
-                      <div className="relative z-20 flex flex-1 flex-col p-3 sm:p-4">
-                        <span
-                          className="block w-full text-sm sm:text-base font-semibold text-text-light transition-colors group-hover:text-primary"
-                          style={{
-                            display: '-webkit-box',
-                            WebkitBoxOrient: 'vertical',
-                            WebkitLineClamp: 2,
-                            overflow: 'hidden',
-                          }}
-                          title={product.name}
-                        >
-                          {highlightText(
-                            product.name,
-                            appliedSearch,
-                            getMatchField(product, appliedSearch) === 'name'
-                          )}
-                        </span>
-
-                        <div className="mt-auto flex items-center justify-between gap-2 pt-2 sm:pt-3">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-sm sm:text-base font-bold text-text-light">
-                              {formatPrice(currentPrice)}
-                            </span>
-                            {showOffer && (
-                              <span className="text-xs sm:text-sm text-text-light opacity-40 line-through">
-                                {formatPrice(product.price)}
-                              </span>
-                            )}
-                          </div>
-                          <span className="relative shrink-0">
-                            {bumpingProductId === product.id && (
-                              <span
-                                key={Date.now()}
-                                aria-hidden="true"
-                                className="cart-bump pointer-events-none absolute -top-2 left-1/2 z-30 rounded-full bg-primary px-1.5 py-0.5 text-[11px] font-extrabold leading-none text-white shadow-md shadow-primary/40"
-                              >
-                                +1
-                              </span>
-                            )}
-                            <button
-                              type="button"
-                              title={isProductAvailable ? 'Agregar al carrito' : 'Sin stock disponible'}
-                              disabled={!isProductAvailable}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                handleAddToCart(product.id, effectiveStock, currentPrice);
-                              }}
-                              className={`flex items-center justify-center rounded-full p-2.5 sm:p-3 transition-all active:scale-95 shrink-0 relative z-20 ${
-                                isProductAvailable
-                                  ? 'text-primary hover:scale-110 hover:drop-shadow-lg'
-                                  : 'text-text-light opacity-30 cursor-not-allowed'
-                              } ${bumpingProductId === product.id ? 'cart-icon-pop' : ''}`}
-                            >
-                              <FaCartPlus className="text-lg sm:text-xl" />
-                            </button>
-                          </span>
-                        </div>
-                      </div>
-                    </article>
-                  );
-                })}
+                .map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    appliedSearch={appliedSearch}
+                  />
+                ))}
             </div>
 
             {Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) > 1 && (

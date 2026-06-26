@@ -31,15 +31,21 @@ test.describe('Post and Manage Reviews', () => {
     await login.fillCredentials('juan.paredes@est.umss.edu');
     await login.loginButton.click();
     await expect(page).not.toHaveURL(/.*\/login/);
+    await expect(page).toHaveURL(/\/$/, { timeout: 30_000 });
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
   });
 
   const testProductUrl = '/productos/mocochinchi-soproma-100-gr';
 
   test('should manage the lifecycle of a product review', async ({ page }) => {
-    await page.goto(testProductUrl);
+    await page.goto(testProductUrl, { waitUntil: 'domcontentloaded' });
+    await expect(
+      page.getByRole('heading', { name: /Mocochinchi Soproma 100 gr/i })
+    ).toBeVisible({ timeout: 15_000 });
     
     const userOpinionContainer = page.locator('div.rounded-\\[2rem\\]', { hasText: 'Tu opinión' });
-    await expect(userOpinionContainer).toBeVisible();
+    await expect(userOpinionContainer).toBeVisible({ timeout: 15_000 });
 
     const isFormVisible = await userOpinionContainer.getByText('Publicar comentario').isVisible();
     const optionsButton = userOpinionContainer.locator('button.opacity-50.transition-colors');

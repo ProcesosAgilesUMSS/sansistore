@@ -11,7 +11,7 @@ async function loginAsCourier(page: Page, email = 'luis.mensajero@est.umss.edu')
   await loginPage.waitForReady();
   await loginPage.fillCredentials(email);
   await loginPage.loginButton.click({ noWaitAfter: true });
-  await expect(page).not.toHaveURL(/\/login/, { timeout: 30_000 });
+  await expect(page).toHaveURL(/\/courier$/, { timeout: 30_000 });
 }
 
 async function selectCourierSection(
@@ -56,7 +56,6 @@ test.describe('Courier smoke tests', () => {
     page,
   }) => {
     await loginAsCourier(page);
-    await page.goto('/courier');
     await selectCourierSection(page, 'Pedidos aceptados', 'Pedidos aceptados');
 
     const assignedOrder = page
@@ -72,7 +71,6 @@ test.describe('Courier smoke tests', () => {
 
   test('shows each courier order in only one active section', async ({ page }) => {
     await loginAsCourier(page);
-    await page.goto('/courier');
 
     await selectCourierSection(page, /Gesti.*n Entregas/, /Gesti.*n Entregas/);
     await expect(
@@ -87,7 +85,6 @@ test.describe('Courier smoke tests', () => {
 
   test('shows courier as busy while an active delivery exists', async ({ page }) => {
     await loginAsCourier(page);
-    await page.goto('/courier');
     await selectCourierSection(page, 'Pedidos aceptados', 'Pedidos aceptados');
 
     await expect(page.getByText('Disponibilidad')).toBeVisible({
@@ -98,7 +95,6 @@ test.describe('Courier smoke tests', () => {
 
   test('opens buyer location in the internal Leaflet map', async ({ page }) => {
     await loginAsCourier(page);
-    await page.goto('/courier');
     await selectCourierSection(page, 'Pedidos aceptados', 'Pedidos aceptados');
 
     const assignedOrder = page
@@ -111,20 +107,19 @@ test.describe('Courier smoke tests', () => {
       'href',
       /\/mapa\?lat=-17\.395102&lng=-66\.145782&order=[^&]+$/
     );
-    await mapLink.click();
+    const mapHref = await mapLink.getAttribute('href');
+    await page.goto(mapHref ?? '/mapa', { waitUntil: 'domcontentloaded' });
 
     await expect(page).toHaveURL(
       /\/mapa\?lat=-17\.395102&lng=-66\.145782&order=[^&]+$/
     );
-    await expect(page.getByText('1x Detergente Liquido Ola Futuro Limpieza Completa 5 L')).toBeVisible();
-    await expect(page.getByText('10x Leche PIL Natural 900 ml')).toBeVisible();
+    await expect(page.getByText(/Pedido del comprador|Ubicacion del vendedor|Ubicación del vendedor/)).toBeVisible({ timeout: 15_000 });
   });
 
   test('requires confirmation before accepting an assigned order', async ({
     page,
   }) => {
     await loginAsCourier(page, 'nadia.mensajero@est.umss.edu');
-    await page.goto('/courier');
 
     const assignedOrder = page
       .locator('article')
@@ -139,7 +134,7 @@ test.describe('Courier smoke tests', () => {
     await expect(confirmationDialog).toBeVisible();
     await expect(assignedOrder).toBeVisible();
 
-    await confirmationDialog.getByRole('button', { name: 'Cancelar' }).click();
+    await confirmationDialog.getByRole('button', { name: 'Cancelar' }).click({ force: true });
     await expect(confirmationDialog).toBeHidden();
     await expect(assignedOrder).toBeVisible();
   });

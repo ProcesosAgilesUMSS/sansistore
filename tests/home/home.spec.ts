@@ -15,20 +15,27 @@ test.afterEach(async ({ page }, testInfo) => {
 
 test.describe('Home Page', () => {
   test('has correct title', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveTitle(/Sansistore/);
   });
 
-  test('redirects to products catalog', async ({ page }) => {
-    await page.goto('/');
-    await expect(page).toHaveURL('/productos');
+  test('shows the landing page', async ({ page }) => {
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(
-      page.getByRole('heading', { name: 'Productos disponibles' })
+      page.getByRole('heading', {
+        name: 'Bienvenido a SansiStore',
+      })
     ).toBeVisible();
+    await expect(page.getByPlaceholder('¿Qué estás buscando hoy?')).toHaveAttribute(
+      'placeholder',
+      '¿Qué estás buscando hoy?'
+    );
   });
 
-  test('shows products page after entering home', async ({ page }) => {
-    await page.goto('/');
-    await expect(page).toHaveTitle(/Productos \| Sansistore/);
+  test('prepares the catalog search when requested from home flow', async ({ page }) => {
+    await page.goto('/productos?focusSearch=true', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByPlaceholder('¿Qué estás buscando hoy?')).not.toHaveAttribute('disabled', {
+      timeout: 15_000,
+    });
   });
 });
