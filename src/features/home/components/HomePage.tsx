@@ -341,12 +341,12 @@ function HomePageInner() {
     <main className="min-h-screen bg-bg-light text-text-light">
       <section id="productos" className="bg-bg-light py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-10 flex justify-center">
-            <div className="inline-flex max-w-full rounded-full border border-primary/25 bg-primary/10 px-5 py-2.5 shadow-sm shadow-primary/10">
+          <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
               <h1
-                className="text-nowrap bg-gradient-to-r from-primary via-text-light to-primary bg-clip-text text-transparent"
+                className="text-text-light"
                 style={{
-                  fontSize: 'clamp(1.35rem, 2.5vw, 2rem)',
+                  fontSize: 'clamp(1.6rem, 3vw, 2.2rem)',
                   letterSpacing: '-0.03em',
                   fontWeight: 900,
                 }}
