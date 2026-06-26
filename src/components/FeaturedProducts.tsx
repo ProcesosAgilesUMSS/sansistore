@@ -205,7 +205,7 @@ function FeaturedProductsInner({
   }, []);
 
   useEffect(() => {
-    if (isLoading || !pendingSearchFocusRef.current) return;
+    if (loading || favoritesLoading || !pendingSearchFocusRef.current) return;
 
     const focusTimer = window.setTimeout(() => {
       searchInputRef.current?.focus({ preventScroll: true });
@@ -213,7 +213,7 @@ function FeaturedProductsInner({
     }, 0);
 
     return () => window.clearTimeout(focusTimer);
-  }, [isLoading]);
+  }, [loading, favoritesLoading]);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && products.length > 0) {
