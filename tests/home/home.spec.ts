@@ -23,18 +23,19 @@ test.describe('Home Page', () => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(
       page.getByRole('heading', {
-        name: 'Lo mejor para hoy',
+        name: 'SansiStore para la comunidad UMSS',
       })
     ).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Buscar productos en el catálogo' })).toHaveAttribute(
-      'href',
-      '/productos'
+    await expect(page.getByPlaceholder('¿Qué estás buscando hoy?')).toHaveAttribute(
+      'placeholder',
+      '¿Qué estás buscando hoy?'
     );
   });
 
-  test('opens the products catalog from the home search', async ({ page }) => {
+  test('searches from home in the products catalog', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await page.getByRole('link', { name: 'Buscar productos en el catálogo' }).click();
-    await expect(page).toHaveURL('/productos');
+    await page.getByPlaceholder('¿Qué estás buscando hoy?').fill('leche');
+    await page.getByPlaceholder('¿Qué estás buscando hoy?').press('Enter');
+    await expect(page).toHaveURL('/productos?q=leche');
   });
 });

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { navigate } from 'astro:transitions/client';
-import { ChevronRight, Package, Search } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Package, Search } from 'lucide-react';
 import { FaFilter } from 'react-icons/fa';
 import CategoryFilter from '../../../components/CategoryFilter';
 import { CartProvider } from '../../cart';
@@ -28,18 +28,19 @@ function buildProductWindows(products: CatalogProduct[]) {
   if (products.length <= PRODUCTS_PER_VIEW) return [products];
 
   const windows: CatalogProduct[][] = [];
-  for (let startIndex = 0; startIndex < products.length; startIndex += 1) {
-    windows.push(
-      Array.from({ length: PRODUCTS_PER_VIEW }, (_, offset) => {
-        return products[(startIndex + offset) % products.length];
-      })
-    );
+  for (
+    let startIndex = 0;
+    startIndex <= products.length - PRODUCTS_PER_VIEW;
+    startIndex += 1
+  ) {
+    windows.push(products.slice(startIndex, startIndex + PRODUCTS_PER_VIEW));
   }
   return windows;
 }
 
 function HomeCatalogControls() {
   const [showSortDropdown, setShowSortDropdown] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const sortRef = useRef<HTMLDivElement>(null);
   const selectedSortLabel = 'Popular';
 
@@ -73,20 +74,30 @@ function HomeCatalogControls() {
           Ofertas
         </a>
       </div>
-      <div className="flex w-full flex-row items-center gap-3">
-        <a
-          href="/productos"
-          aria-label="Buscar productos en el catálogo"
+      <form
+        className="flex w-full flex-row items-center gap-3"
+        onSubmit={(event) => {
+          event.preventDefault();
+          void navigate(getCatalogUrl({ term: searchTerm }));
+        }}
+      >
+        <div
           className="relative flex-1"
+          aria-label="Buscar productos en el catálogo"
         >
           <Search
             size={18}
             className="absolute left-4 top-1/2 -translate-y-1/2 text-text-light opacity-40"
           />
-          <span className="block w-full rounded-full border border-border-light bg-card-bg-light py-3 pl-11 pr-11 text-[15px] sm:text-sm text-text-light/30 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all">
-            ¿Qué estás buscando hoy?
-          </span>
-        </a>
+          <input
+            type="text"
+            placeholder="¿Qué estás buscando hoy?"
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+            maxLength={100}
+            className="w-full rounded-full border border-border-light bg-card-bg-light py-3 pl-11 pr-11 text-[15px] sm:text-sm text-text-light placeholder:text-text-light/30 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all"
+          />
+        </div>
         <div ref={sortRef} className="relative shrink-0">
           <button
             type="button"
@@ -120,7 +131,7 @@ function HomeCatalogControls() {
             </div>
           )}
         </div>
-      </div>
+      </form>
     </div>
   );
 }
@@ -170,9 +181,11 @@ function ProductCarousel({
   if (slides.length === 0) return null;
 
   const visibleSlide = activeSlide % slides.length;
+  const canGoBack = visibleSlide > 0;
+  const canGoForward = visibleSlide < slides.length - 1;
 
   return (
-    <section ref={carouselRef} className="py-7">
+    <section ref={carouselRef} className="py-10">
       <div className="mb-4 flex items-center justify-between gap-4">
         <h2 className="text-xl font-black tracking-tight text-text-light sm:text-2xl">
           {title}
@@ -186,7 +199,29 @@ function ProductCarousel({
         </a>
       </div>
 
-      <div className="overflow-hidden">
+      <div className="relative overflow-hidden">
+        {canGoBack && (
+          <button
+            type="button"
+            aria-label={`Anterior en ${title}`}
+            onClick={() => setActiveSlide((current) => Math.max(0, current - 1))}
+            className="absolute left-2 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-border-light bg-card-bg-light/90 text-text-light shadow-lg backdrop-blur transition-all hover:border-primary hover:text-primary"
+          >
+            <ChevronLeft size={20} />
+          </button>
+        )}
+        {canGoForward && (
+          <button
+            type="button"
+            aria-label={`Siguiente en ${title}`}
+            onClick={() =>
+              setActiveSlide((current) => Math.min(slides.length - 1, current + 1))
+            }
+            className="absolute right-2 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-border-light bg-card-bg-light/90 text-text-light shadow-lg backdrop-blur transition-all hover:border-primary hover:text-primary"
+          >
+            <ChevronRight size={20} />
+          </button>
+        )}
         <div
           className="flex transition-transform duration-700 ease-out"
           style={{ transform: `translateX(-${visibleSlide * 100}%)` }}
@@ -279,12 +314,9 @@ function HomePageInner() {
 
   return (
     <main className="min-h-screen bg-bg-light pt-14 text-text-light">
-      <section id="productos" className="bg-bg-light pb-14 pt-8">
+      <section id="productos" className="bg-bg-light py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-6">
-            <p className="mb-2 text-xs font-black uppercase tracking-[0.22em] text-primary">
-              Descubre Sansistore
-            </p>
+          <div className="mb-10">
             <h1
               className="text-text-light"
               style={{
@@ -293,7 +325,7 @@ function HomePageInner() {
                 fontWeight: 900,
               }}
             >
-              Lo mejor para hoy
+              SansiStore para la comunidad UMSS
             </h1>
           </div>
 
@@ -332,7 +364,7 @@ function HomePageInner() {
           )}
 
           {!loading && !error && (
-            <div className="space-y-2">
+            <div className="space-y-8">
               <ProductCarousel
                 title="Ofertas"
                 products={offers}
