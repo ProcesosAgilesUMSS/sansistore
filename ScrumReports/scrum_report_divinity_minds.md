@@ -564,3 +564,8 @@
 - **Yesterday:** Participé como representante del equipo en la reunión del día, comuniqué los puntos tratados al grupo y ayudé a coordinar el seguimiento interno de las tareas relacionadas con la entrega.
 - **Today:** Continuar apoyando en la coordinación del equipo y en el seguimiento de acuerdos posteriores a la reunión.
 - **Blockers:** n/a.
+
+## Merudia Calderon Dayeza
+- **Yesterday:** Revisé las historias de usuario implementadas por el equipo, validando su planteamiento, separación funcional y coherencia con los criterios definidos para el sprint; la revisión se centró especialmente en las HUs #707, #708, #709 y #710.
+- **Today:** Continuar con la revisión de HUs pendientes y apoyar en la validación funcional de lo entregado.
+- **Blockers:** n/a.
