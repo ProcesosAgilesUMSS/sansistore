@@ -26,8 +26,10 @@ test.describe('Mis pedidos - comprador (Ana Mamani)', () => {
       .getByRole('link', { name: /Mis pedidos/ })
       .filter({ hasText: 'Ver mis compras' });
     await expect(link).toBeVisible({ timeout: 15_000 });
-    await link.click();
-    await expect(page).toHaveURL(/\/mis-pedidos$/);
+    await Promise.all([
+      page.waitForURL(/\/mis-pedidos$/, { timeout: 15_000 }),
+      link.click(),
+    ]);
   });
 
   test('muestra el encabezado y las tarjetas de pedidos de Ana', async ({

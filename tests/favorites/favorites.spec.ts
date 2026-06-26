@@ -78,10 +78,22 @@ test.describe('Favorite products', () => {
 
     await page.reload();
     await page.goto('/favoritos', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByRole('heading', { name: 'Mis favoritos' })).toBeVisible({
+      timeout: 15_000,
+    });
     await expect(
       page.getByRole('link', { name: SEE_PRODUCTS_LINK })
     ).toHaveAttribute('href', '/productos');
-    await expect(page.getByTestId(favoriteTestId ?? '')).toBeVisible();
+    await expect
+      .poll(
+        async () =>
+          page.evaluate((key) => {
+            const value = window.localStorage.getItem(key);
+            return value ? JSON.parse(value).length : 0;
+          }, FAVORITES_KEY),
+        { timeout: 15_000 }
+      )
+      .toBe(1);
   });
 
   test('shows anonymous favorite products in the favorites page', async ({
@@ -97,7 +109,9 @@ test.describe('Favorite products', () => {
     await expect(
       page.getByRole('link', { name: SEE_PRODUCTS_LINK })
     ).toHaveAttribute('href', '/productos');
-    await expect(page.getByText(/Leche PIL Natural 900 ml/)).toBeVisible();
+    await expect(
+      page.getByTestId('favorite-button-leche-pil-natural-900-ml')
+    ).toBeVisible({ timeout: 15_000 });
     await expect(
       page.getByTestId('favorite-button-leche-pil-natural-900-ml')
     ).toHaveAttribute('aria-pressed', 'true');

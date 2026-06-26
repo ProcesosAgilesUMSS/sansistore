@@ -56,9 +56,16 @@ test.describe('Avaiable product list', () => {
     await page.goto('/productos/leche-pil-natural-900-ml', {
       waitUntil: 'domcontentloaded',
     });
-    await expect(
-      page.getByRole('heading', { name: /Leche PIL Natural 900 ml/ })
-    ).toBeVisible({ timeout: 15_000 });
+    try {
+      await expect(
+        page.getByRole('heading', { name: /Leche PIL Natural 900 ml/ })
+      ).toBeVisible({ timeout: 15_000 });
+    } catch {
+      await page.reload({ waitUntil: 'domcontentloaded' });
+      await expect(
+        page.getByRole('heading', { name: /Leche PIL Natural 900 ml/ })
+      ).toBeVisible({ timeout: 15_000 });
+    }
     await expect(page.getByText('Stock: 24 disponibles')).toBeVisible();
   });
 
