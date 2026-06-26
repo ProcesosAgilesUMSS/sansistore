@@ -23,10 +23,10 @@ test.describe('Home Page', () => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(
       page.getByRole('heading', {
-        name: 'Descubre productos para tu día en la universidad',
+        name: 'Productos destacados',
       })
     ).toBeVisible();
-    await expect(page.getByRole('link', { name: /Ir al catálogo completo/ })).toHaveAttribute(
+    await expect(page.getByRole('link', { name: 'Buscar productos en el catálogo' })).toHaveAttribute(
       'href',
       '/productos'
     );
@@ -34,7 +34,7 @@ test.describe('Home Page', () => {
 
   test('opens the products catalog from the home search', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await page.getByRole('button', { name: 'Buscar productos en el catálogo' }).click();
+    await page.getByRole('link', { name: 'Buscar productos en el catálogo' }).click();
     await expect(page).toHaveURL('/productos');
   });
 });
