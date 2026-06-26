@@ -569,3 +569,8 @@
 - **Yesterday:** Revisé las historias de usuario implementadas por el equipo, validando su planteamiento, separación funcional y coherencia con los criterios definidos para el sprint; la revisión se centró especialmente en las HUs #707, #708, #709 y #710.
 - **Today:** Continuar con la revisión de HUs pendientes y apoyar en la validación funcional de lo entregado.
 - **Blockers:** n/a.
+
+## Velasquez Vela Marcos
+- **Yesterday:** Implementé nuevos tests automatizados para los flujos impactados por la nueva home, los carruseles destacados y la transición hacia el catálogo, fortaleciendo la cobertura e2e del módulo de tienda. Este trabajo se relaciona principalmente con la task #714.
+- **Today:** Revisar la cobertura restante y apoyar en la validación final de los flujos automatizados.
+- **Blockers:** n/a.
