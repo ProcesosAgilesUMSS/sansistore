@@ -7,6 +7,8 @@ import ProductCard from '../../catalog/components/ProductCard';
 import { fetchCatalogCategories, type CatalogCategory } from '../../catalog/services/categoryService';
 import { fetchCatalogProducts } from '../../catalog/services/catalogService';
 import type { CatalogProduct } from '../../catalog/types';
+import { getDiscountPercentage } from '../../../lib/productOffers';
+import { isPopularProduct } from '../../../lib/productPopularity';
 import {
   filterCatalogProducts,
   getCatalogUrl,
@@ -16,6 +18,16 @@ import {
 const PRODUCTS_PER_VIEW = 4;
 const MOBILE_PRODUCTS_PER_VIEW = 2;
 const AUTOPLAY_INTERVAL_MS = 2600;
+const MAX_CAROUSEL_PRODUCTS = 8;
+
+function uniqueProducts(products: CatalogProduct[]) {
+  const seen = new Set<string>();
+  return products.filter((product) => {
+    if (seen.has(product.id)) return false;
+    seen.add(product.id);
+    return true;
+  });
+}
 
 function HomeCatalogControls() {
   const navigatingToCatalogRef = useRef(false);
@@ -80,7 +92,10 @@ function ProductCarousel({
 }) {
   const carouselRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const carouselProducts = useMemo(() => products.slice(0, 12), [products]);
+  const carouselProducts = useMemo(
+    () => uniqueProducts(products).slice(0, MAX_CAROUSEL_PRODUCTS),
+    [products]
+  );
   const [productsPerView, setProductsPerView] = useState(() => {
     if (typeof window === 'undefined') return PRODUCTS_PER_VIEW;
 
@@ -261,27 +276,39 @@ function HomePageInner() {
   }, []);
 
   const offers = useMemo(
-    () =>
-      sortCatalogProducts(
-        filterCatalogProducts(products, { offersOnly: true }),
-        'best-sellers'
-      ),
+    () => {
+      const offerProducts = filterCatalogProducts(products, { offersOnly: true });
+      return uniqueProducts(offerProducts)
+        .sort((a, b) => {
+          const discountA = getDiscountPercentage(a) ?? 0;
+          const discountB = getDiscountPercentage(b) ?? 0;
+          return discountB - discountA || (b.soldCount ?? 0) - (a.soldCount ?? 0);
+        })
+        .slice(0, MAX_CAROUSEL_PRODUCTS);
+    },
     [products]
   );
   const popular = useMemo(
-    () => sortCatalogProducts(products, 'best-sellers'),
+    () =>
+      sortCatalogProducts(
+        uniqueProducts(products).filter((product) => isPopularProduct(product)),
+        'best-sellers'
+      ).slice(0, MAX_CAROUSEL_PRODUCTS),
     [products]
   );
-  const recent = useMemo(() => sortCatalogProducts(products, 'recent'), [products]);
+  const recent = useMemo(
+    () => sortCatalogProducts(uniqueProducts(products), 'recent').slice(0, MAX_CAROUSEL_PRODUCTS),
+    [products]
+  );
   const categoryCarousels = useMemo(
     () =>
       categories
         .map((category) => ({
           category,
           products: sortCatalogProducts(
-            filterCatalogProducts(products, { categoryId: category.id }),
+            uniqueProducts(filterCatalogProducts(products, { categoryId: category.id })),
             'best-sellers'
-          ),
+          ).slice(0, MAX_CAROUSEL_PRODUCTS),
         }))
         .filter((carousel) => carousel.products.length > 0),
     [categories, products]
