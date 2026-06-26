@@ -23,7 +23,7 @@ test.describe('Home Page', () => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(
       page.getByRole('heading', {
-        name: 'SansiStore cerca de ti',
+        name: 'Bienvenido a SansiStore',
       })
     ).toBeVisible();
     await expect(page.getByPlaceholder('¿Qué estás buscando hoy?')).toHaveAttribute(
@@ -35,6 +35,6 @@ test.describe('Home Page', () => {
   test('opens the products catalog when focusing the home search', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.getByPlaceholder('¿Qué estás buscando hoy?').click();
-    await expect(page).toHaveURL('/productos');
+    await expect(page).toHaveURL(/\/productos(?:\?focusSearch=true)?$/);
   });
 });

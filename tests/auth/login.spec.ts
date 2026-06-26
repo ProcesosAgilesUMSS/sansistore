@@ -1,6 +1,10 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../pages/login.page';
 
+function isLoginPath(url: string) {
+  return url.includes('/login') || url.includes('/iniciar-sesion');
+}
+
 test.describe('Auth - Login', () => {
   test('should login with email/password and show user on /me', async ({
     page,
@@ -18,20 +22,20 @@ test.describe('Auth - Login', () => {
     expect(await login.passwordField.inputValue()).toBe('12345678');
 
     for (let attempt = 0; attempt < 3; attempt++) {
-      if (!page.url().includes('/login')) {
+      if (!isLoginPath(page.url())) {
         break;
       }
       try {
         await login.loginButton.click({ noWaitAfter: true, timeout: 2000 });
       } catch {
-        if (!page.url().includes('/login')) {
+        if (!isLoginPath(page.url())) {
           break;
         }
       }
       await page.waitForTimeout(1000);
     }
 
-    await expect(page).not.toHaveURL(/\/login/, { timeout: 30_000 });
+    await expect(page).not.toHaveURL(/\/(?:login|iniciar-sesion)/, { timeout: 30_000 });
 
     await page.goto('/me');
     await expect(page.getByText('No autenticado')).toBeHidden({

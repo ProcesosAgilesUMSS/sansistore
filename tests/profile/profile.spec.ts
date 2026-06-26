@@ -8,6 +8,10 @@ test.describe('Perfil de Usuario', () => {
     DEFAULT: 'juan.paredes@est.umss.edu',
   };
 
+  function isLoginPath(url: string) {
+    return url.includes('/login') || url.includes('/iniciar-sesion');
+  }
+
   // ===== HELPERS REUTILIZABLES =====
   
   async function loginAsUser(page: Page, email: string = USERS.DEFAULT) {
@@ -21,16 +25,16 @@ test.describe('Perfil de Usuario', () => {
       .getByRole('button', { name: 'Iniciar sesión', exact: true });
     
     for (let attempt = 0; attempt < 3; attempt++) {
-      if (!page.url().includes('/login')) break;
+      if (!isLoginPath(page.url())) break;
       try {
         await loginButton.click({ noWaitAfter: true, timeout: 2000 });
       } catch (error) {
-        if (!page.url().includes('/login')) break;
+        if (!isLoginPath(page.url())) break;
       }
       await page.waitForTimeout(1000);
     }
     
-    await expect(page).not.toHaveURL(/\/login/, { timeout: 30_000 });
+    await expect(page).not.toHaveURL(/\/(?:login|iniciar-sesion)/, { timeout: 30_000 });
   }
 
   async function waitForLoginForm(page: Page) {

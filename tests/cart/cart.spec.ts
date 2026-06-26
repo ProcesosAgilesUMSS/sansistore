@@ -290,7 +290,7 @@ test.describe('Cart - Carrito', () => {
 
     await page.goto('/logout');
 
-    await expect(page).toHaveURL('/login');
+    await expect(page).toHaveURL('/iniciar-sesion');
     await page.goto('/me');
     await expect(page.getByText('No autenticado')).toBeVisible();
 
@@ -315,7 +315,7 @@ test.describe('Cart - Carrito', () => {
 
     await page.goto('/logout');
 
-    await expect(page).toHaveURL('/login');
+    await expect(page).toHaveURL('/iniciar-sesion');
 
     await loginWithEmail(page, 'carlos.docente@est.umss.edu');
 
