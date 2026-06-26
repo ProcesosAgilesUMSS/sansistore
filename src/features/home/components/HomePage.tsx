@@ -1,35 +1,24 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { navigate } from 'astro:transitions/client';
 import { ChevronLeft, ChevronRight, Package, Search } from 'lucide-react';
-import { FaFilter } from 'react-icons/fa';
 import CategoryFilter from '../../../components/CategoryFilter';
 import { CartProvider } from '../../cart';
 import ProductCard from '../../catalog/components/ProductCard';
 import { fetchCatalogCategories, type CatalogCategory } from '../../catalog/services/categoryService';
 import { fetchCatalogProducts } from '../../catalog/services/catalogService';
-import type { CatalogProduct, CatalogSort } from '../../catalog/types';
+import type { CatalogProduct } from '../../catalog/types';
 import {
   filterCatalogProducts,
   getCatalogUrl,
   sortCatalogProducts,
 } from '../../catalog/utils/catalogFilters';
 
-const SORT_OPTIONS: { value: CatalogSort; label: string }[] = [
-  { value: 'best-sellers', label: 'Popular' },
-  { value: 'recent', label: 'Recientes' },
-  { value: 'name-asc', label: 'A-Z' },
-  { value: 'name-desc', label: 'Z-A' },
-];
-
 const PRODUCTS_PER_VIEW = 4;
 const MOBILE_PRODUCTS_PER_VIEW = 2;
 const AUTOPLAY_INTERVAL_MS = 2600;
 
 function HomeCatalogControls() {
-  const [showSortDropdown, setShowSortDropdown] = useState(false);
-  const sortRef = useRef<HTMLDivElement>(null);
   const navigatingToCatalogRef = useRef(false);
-  const selectedSortLabel = 'Popular';
 
   const goToCatalogSearch = () => {
     if (navigatingToCatalogRef.current) return;
@@ -37,19 +26,8 @@ function HomeCatalogControls() {
     void navigate('/productos?focusSearch=true');
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (sortRef.current && !sortRef.current.contains(event.target as Node)) {
-        setShowSortDropdown(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   return (
-    <div className="mb-8 flex flex-col gap-4">
+    <div className="mb-4 flex flex-col gap-4">
       <div className="flex w-full flex-row items-center gap-3">
         <div className="relative w-auto">
           <CategoryFilter
@@ -84,39 +62,6 @@ function HomeCatalogControls() {
             maxLength={100}
             className="w-full rounded-full border border-border-light bg-card-bg-light py-3 pl-11 pr-11 text-[15px] sm:text-sm text-text-light placeholder:text-text-light/30 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all"
           />
-        </div>
-        <div ref={sortRef} className="relative shrink-0">
-          <button
-            type="button"
-            onClick={() => setShowSortDropdown(!showSortDropdown)}
-            className="flex items-center gap-2 rounded-full border border-border-light bg-card-bg-light px-4 py-2.5 text-sm font-semibold text-text-light transition-all hover:border-primary hover:text-primary"
-            title="Ordenar productos"
-            aria-label="Ordenar productos"
-          >
-            <FaFilter size={16} />
-            <span className="hidden sm:inline">{selectedSortLabel}</span>
-          </button>
-          {showSortDropdown && (
-            <div className="absolute right-0 top-full mt-1 min-w-56 rounded-lg border border-border-light bg-card-bg-light py-1 shadow-lg z-20">
-              {SORT_OPTIONS.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => {
-                    setShowSortDropdown(false);
-                    void navigate(getCatalogUrl({ sortBy: option.value }));
-                  }}
-                  className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-colors ${
-                    option.value === 'best-sellers'
-                      ? 'bg-primary/15 text-primary'
-                      : 'text-text-light hover:bg-secondary-bg-light'
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
       </div>
     </div>
@@ -207,45 +152,47 @@ function ProductCarousel({
 
   const canGoBack = visiblePosition > 0;
   const canGoForward = visiblePosition < maxPosition;
+  const useCompactCardWidth = carouselProducts.length <= productsPerView;
 
   return (
-    <section ref={carouselRef} className="py-8">
-      <div className="mb-4 flex items-center justify-between gap-4">
-        <h2 className="text-xl font-black tracking-tight text-text-light sm:text-2xl">
+    <section ref={carouselRef} className="py-4">
+      <div className="mb-3 flex items-center justify-between gap-4">
+        <h2 className="flex items-center gap-2 text-lg font-black tracking-tight text-text-light sm:text-xl">
+          <span className="inline-block h-4 w-1 rounded-full bg-primary" />
           {title}
         </h2>
         <a
           href={href}
-          className="inline-flex shrink-0 items-center gap-1 rounded-full border border-border-light px-4 py-2 text-sm font-bold text-text-light transition-all hover:border-primary hover:text-primary"
+          className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/30 px-4 py-1.5 text-xs font-bold text-primary transition-all hover:bg-primary hover:text-white sm:text-sm"
         >
           Ver más
-          <ChevronRight size={16} />
+          <ChevronRight size={14} />
         </a>
       </div>
 
       <div className="relative overflow-hidden">
-        {canGoBack && (
-          <button
-            type="button"
-            aria-label={`Anterior en ${title}`}
-            onClick={() => setActivePosition((current) => Math.max(0, current - 1))}
-            className="absolute left-2 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-border-light bg-card-bg-light/90 text-text-light shadow-lg backdrop-blur transition-all hover:border-primary hover:text-primary"
-          >
-            <ChevronLeft size={20} />
-          </button>
-        )}
-        {canGoForward && (
-          <button
-            type="button"
-            aria-label={`Siguiente en ${title}`}
-            onClick={() =>
-              setActivePosition((current) => Math.min(maxPosition, current + 1))
-            }
-            className="absolute right-2 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-border-light bg-card-bg-light/90 text-text-light shadow-lg backdrop-blur transition-all hover:border-primary hover:text-primary"
-          >
-            <ChevronRight size={20} />
-          </button>
-        )}
+        <button
+          type="button"
+          aria-label={`Anterior en ${title}`}
+          onClick={() => setActivePosition((current) => Math.max(0, current - 1))}
+          className={`absolute left-1 top-1/2 z-20 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-border-light bg-card-bg-light/95 text-text-light shadow-md backdrop-blur-sm transition-all duration-200 hover:border-primary hover:text-primary ${
+            canGoBack ? 'opacity-100' : 'pointer-events-none opacity-0'
+          }`}
+        >
+          <ChevronLeft size={18} />
+        </button>
+        <button
+          type="button"
+          aria-label={`Siguiente en ${title}`}
+          onClick={() =>
+            setActivePosition((current) => Math.min(maxPosition, current + 1))
+          }
+          className={`absolute right-1 top-1/2 z-20 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-border-light bg-card-bg-light/95 text-text-light shadow-md backdrop-blur-sm transition-all duration-200 hover:border-primary hover:text-primary ${
+            canGoForward ? 'opacity-100' : 'pointer-events-none opacity-0'
+          }`}
+        >
+          <ChevronRight size={18} />
+        </button>
         <div
           ref={trackRef}
           className="flex gap-3 transition-transform duration-700 ease-out sm:gap-4"
@@ -256,7 +203,9 @@ function ProductCarousel({
           {carouselProducts.map((product) => (
             <div
               key={`${title}-${product.id}`}
-              className="min-w-[calc((100%_-_0.75rem)/2)] max-w-[240px] sm:min-w-[calc((100%_-_1rem)/2)] md:min-w-[calc((100%_-_3rem)/4)] md:max-w-[270px]"
+              className={useCompactCardWidth
+                ? 'min-w-[calc((100%_-_0.75rem)/2)] max-w-[240px] sm:min-w-[calc((100%_-_1rem)/2)] md:min-w-[calc((100%_-_3rem)/4)] md:max-w-[270px]'
+                : 'min-w-[calc((100%_-_0.75rem)/2)] sm:min-w-[calc((100%_-_1rem)/2)] md:min-w-[calc((100%_-_3rem)/4)]'}
             >
               <ProductCard product={product} />
             </div>
@@ -341,34 +290,42 @@ function HomePageInner() {
     <main className="min-h-screen bg-bg-light text-text-light">
       <section id="productos" className="bg-bg-light py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1
-                className="text-text-light"
-                style={{
-                  fontSize: 'clamp(1.6rem, 3vw, 2.2rem)',
-                  letterSpacing: '-0.03em',
-                  fontWeight: 900,
-                }}
-              >
-                SansiStore cerca de ti
-              </h1>
-            </div>
+          <div className="mb-10 flex items-center justify-center">
+            <h2
+              className="text-center text-text-light"
+              style={{
+                fontSize: 'clamp(1.6rem, 3vw, 2.2rem)',
+                letterSpacing: '-0.03em',
+                fontWeight: 900,
+              }}
+            >
+              Bienvenido a Sansi<span className="text-primary">Store</span>
+            </h2>
           </div>
 
           <HomeCatalogControls />
 
           {loading && (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-              {Array.from({ length: 6 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="animate-pulse overflow-hidden rounded-2xl border border-border-light bg-card-bg-light"
-                >
-                  <div className="aspect-square bg-secondary-bg-light" />
-                  <div className="space-y-2 p-4">
-                    <div className="h-3 w-3/4 rounded bg-secondary-bg-light" />
-                    <div className="h-3 w-1/3 rounded bg-secondary-bg-light" />
+            <div className="space-y-6 pt-4">
+              {Array.from({ length: 3 }).map((_, sectionIndex) => (
+                <div key={sectionIndex}>
+                  <div className="mb-3 flex items-center gap-2">
+                    <div className="h-4 w-1 animate-pulse rounded-full bg-primary/30" />
+                    <div className="h-5 w-24 animate-pulse rounded bg-secondary-bg-light" />
+                  </div>
+                  <div className="flex gap-3 overflow-hidden sm:gap-4">
+                    {Array.from({ length: 4 }).map((_, cardIndex) => (
+                      <div
+                        key={cardIndex}
+                        className="min-w-[calc((100%-0.75rem)/2)] animate-pulse overflow-hidden rounded-2xl border border-border-light bg-card-bg-light md:min-w-[calc((100%-3rem)/4)]"
+                      >
+                        <div className="aspect-square bg-secondary-bg-light" />
+                        <div className="space-y-2 p-3">
+                          <div className="h-3 w-3/4 rounded bg-secondary-bg-light" />
+                          <div className="h-3 w-1/3 rounded bg-secondary-bg-light" />
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               ))}
@@ -391,7 +348,7 @@ function HomePageInner() {
           )}
 
           {!loading && !error && (
-            <div className="space-y-5">
+            <div>
               <ProductCarousel
                 title="Ofertas"
                 products={offers}
