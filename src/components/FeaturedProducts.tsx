@@ -139,6 +139,7 @@ function FeaturedProductsInner({
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const ITEMS_PER_PAGE = 12;
   const searchRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const sortRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -189,6 +190,20 @@ function FeaturedProductsInner({
       if (sortParam && sortParam !== sortBy) setSortBy(sortParam);
       if (isValidPageNumber && pageNum !== currentPage) setCurrentPage(pageNum);
     }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const url = new URL(window.location.href);
+    if (url.searchParams.get('focusSearch') !== 'true') return;
+
+    window.requestAnimationFrame(() => {
+      searchInputRef.current?.focus();
+
+      url.searchParams.delete('focusSearch');
+      window.history.replaceState({}, '', url.toString());
+    });
   }, []);
 
   useEffect(() => {
@@ -467,6 +482,7 @@ function FeaturedProductsInner({
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-text-light opacity-40"
               />
               <input
+                ref={searchInputRef}
                 type="text"
                 placeholder="¿Qué estás buscando hoy?"
                 value={searchTerm}

@@ -47,7 +47,7 @@ function HomeCatalogControls() {
   const goToCatalogSearch = () => {
     if (navigatingToCatalogRef.current) return;
     navigatingToCatalogRef.current = true;
-    void navigate('/productos');
+    void navigate('/productos?focusSearch=true');
   };
 
   useEffect(() => {
