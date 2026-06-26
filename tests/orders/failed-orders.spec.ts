@@ -94,6 +94,9 @@ async function login(page: Page, email: string) {
     await loginPage.loginButton.click({ noWaitAfter: true });
     await expect(page).not.toHaveURL(/\/login/, { timeout: 8_000 });
   }).toPass({ timeout: 40_000 });
+  await expect(page).toHaveURL(/\/$/, { timeout: 30_000 });
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(500);
 }
 
 test.describe('Pedidos con fallos', () => {

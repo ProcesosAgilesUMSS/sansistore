@@ -2,6 +2,7 @@
 import { test, expect, type Page } from '@playwright/test';
 
 test.describe('Perfil de Usuario', () => {
+  test.describe.configure({ mode: 'serial', timeout: 60_000 });
   // ===== CONSTANTES DE USUARIOS =====
   const USERS = {
     SUPER: 'marko@umss.edu',
@@ -15,7 +16,7 @@ test.describe('Perfil de Usuario', () => {
   // ===== HELPERS REUTILIZABLES =====
   
   async function loginAsUser(page: Page, email: string = USERS.DEFAULT) {
-    await page.goto('/login');
+    await page.goto('/iniciar-sesion');
     await waitForLoginForm(page);
     
     const { emailField, passwordField } = await fillLoginCredentials(page, email);
@@ -93,46 +94,19 @@ test.describe('Perfil de Usuario', () => {
   }
 
   async function waitForProfileHydration(page: Page) {
-    await expect
-      .poll(
-        async () => {
-          try {
-            return await page.evaluate(() => {
-              const elements = document.querySelectorAll(
-                'button[aria-label="Editar teléfono"], section.bg-card-bg-light'
-              );
-              for (const el of elements) {
-                if (Object.keys(el).some(key => key.startsWith('__reactProps'))) {
-                  return true;
-                }
-              }
-              return false;
-            });
-          } catch (e) {
-            return false;
-          }
-        },
-        { timeout: 15_000 }
-      )
-      .toBe(true);
+    await expect(page.getByRole('heading', { name: 'Mi Perfil' })).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.getByText('Información personal')).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(
+      page.locator('button[aria-label="Editar Teléfono celular"]')
+    ).toBeVisible({ timeout: 15_000 });
   }
 
   async function waitForReactProps(page: Page, selector: string) {
-    await expect
-      .poll(
-        async () => {
-          try {
-            return await page.evaluate((sel) => {
-              const el = document.querySelector(sel);
-              return el && Object.keys(el).some(key => key.startsWith('__reactProps'));
-            }, selector);
-          } catch (e) {
-            return false;
-          }
-        },
-        { timeout: 10_000 }
-      )
-      .toBe(true);
+    await expect(page.locator(selector)).toBeVisible({ timeout: 10_000 });
   }
 
   // ===== TESTS =====
@@ -157,9 +131,7 @@ test.describe('Perfil de Usuario', () => {
       await page.goto('/me');
       await waitForProfileHydration(page);
 
-      await expect(
-        page.locator('dd', { hasText: USERS.DEFAULT })
-      ).toBeVisible({ timeout: 15_000 });
+      await expect(page.getByText(USERS.DEFAULT)).toBeVisible({ timeout: 15_000 });
       
       await expect(page.getByText('No autenticado')).toBeHidden({
         timeout: 15_000,
@@ -176,9 +148,9 @@ test.describe('Perfil de Usuario', () => {
     });
 
     test('permite editar y guardar telefono y email de respaldo', async ({ page }) => {
-      const editPhoneButton = page.locator('button[aria-label="Editar teléfono"]');
+      const editPhoneButton = page.locator('button[aria-label="Editar Teléfono celular"]');
       await expect(editPhoneButton).toBeVisible({ timeout: 10_000 });
-      await waitForReactProps(page, 'button[aria-label="Editar teléfono"]');
+      await waitForReactProps(page, 'button[aria-label="Editar Teléfono celular"]');
       await editPhoneButton.click();
 
       const phoneInput = page.locator('input[placeholder="Ej. 71234567"]');
@@ -188,12 +160,12 @@ test.describe('Perfil de Usuario', () => {
       await phoneInput.clear();
       await phoneInput.fill(testPhone);
 
-      const confirmPhoneButton = page.locator('button[aria-label="Confirmar teléfono"]');
+      const confirmPhoneButton = page.locator('button[aria-label="Confirmar Teléfono celular"]');
       await confirmPhoneButton.click();
 
-      const editMailButton = page.locator('button[aria-label="Editar correo de respaldo"]');
+      const editMailButton = page.locator('button[aria-label="Editar Correo de respaldo"]');
       await expect(editMailButton).toBeVisible({ timeout: 10_000 });
-      await waitForReactProps(page, 'button[aria-label="Editar correo de respaldo"]');
+      await waitForReactProps(page, 'button[aria-label="Editar Correo de respaldo"]');
       await editMailButton.click();
 
       const mailInput = page.locator('input[placeholder="ejemplo@correo.com"]');
@@ -203,7 +175,7 @@ test.describe('Perfil de Usuario', () => {
       await mailInput.clear();
       await mailInput.fill(testBackupEmail);
 
-      const confirmMailButton = page.locator('button[aria-label="Confirmar correo"]');
+      const confirmMailButton = page.locator('button[aria-label="Confirmar Correo de respaldo"]');
       await confirmMailButton.click();
 
       const toastSuccess = page.locator('text="Teléfono celular actualizado correctamente"');
@@ -212,81 +184,67 @@ test.describe('Perfil de Usuario', () => {
         timeout: 10_000,
       });
 
-      await expect(
-        page.locator('label', { hasText: 'Teléfono celular' }).locator('..').locator('span', { hasText: testPhone })
-      ).toBeVisible({ timeout: 5_000 });
+      await expect(page.getByText(testPhone, { exact: true })).toBeVisible({ timeout: 5_000 });
       
-      await expect(
-        page.locator('label', { hasText: 'Correo de respaldo' }).locator('..').locator('span', { hasText: testBackupEmail })
-      ).toBeVisible({ timeout: 5_000 });
+      await expect(page.getByText(testBackupEmail, { exact: true })).toBeVisible({ timeout: 5_000 });
     });
 
     test('persiste los cambios al recargar la pagina', async ({ page }) => {
       const testPhone = '76543210';
       const testBackupEmail = 'persist@test.com';
 
-      const editPhoneButton = page.locator('button[aria-label="Editar teléfono"]');
+      const editPhoneButton = page.locator('button[aria-label="Editar Teléfono celular"]');
       await expect(editPhoneButton).toBeVisible({ timeout: 10_000 });
-      await waitForReactProps(page, 'button[aria-label="Editar teléfono"]');
+      await waitForReactProps(page, 'button[aria-label="Editar Teléfono celular"]');
       await editPhoneButton.click();
 
       const phoneInput = page.locator('input[placeholder="Ej. 71234567"]');
       await expect(phoneInput).toBeEditable({ timeout: 10_000 });
       await phoneInput.clear();
       await phoneInput.fill(testPhone);
-      await page.locator('button[aria-label="Confirmar teléfono"]').click();
+      await page.locator('button[aria-label="Confirmar Teléfono celular"]').click();
+      await expect(page.locator('text="Teléfono celular actualizado correctamente"')).toBeVisible({
+        timeout: 10_000,
+      });
 
-      const editMailButton = page.locator('button[aria-label="Editar correo de respaldo"]');
+      const editMailButton = page.locator('button[aria-label="Editar Correo de respaldo"]');
       await expect(editMailButton).toBeVisible({ timeout: 10_000 });
-      await waitForReactProps(page, 'button[aria-label="Editar correo de respaldo"]');
+      await waitForReactProps(page, 'button[aria-label="Editar Correo de respaldo"]');
       await editMailButton.click();
 
       const mailInput = page.locator('input[placeholder="ejemplo@correo.com"]');
       await expect(mailInput).toBeEditable({ timeout: 10_000 });
       await mailInput.clear();
       await mailInput.fill(testBackupEmail);
-      await page.locator('button[aria-label="Confirmar correo"]').click();
+      await page.locator('button[aria-label="Confirmar Correo de respaldo"]').click();
 
-      const toastSuccess = page.locator('text="Teléfono celular actualizado correctamente"');
-      const toastSuccess2 = page.locator('text="Correo de respaldo actualizado correctamente"');
-      await expect(toastSuccess.or(toastSuccess2)).toBeVisible({
+      await expect(page.locator('text="Correo de respaldo actualizado correctamente"')).toBeVisible({
         timeout: 10_000,
       });
 
-      await page.waitForTimeout(5000);
+      await page.waitForTimeout(8000);
 
       await page.reload();
       await waitForProfileHydration(page);
 
-      await page.waitForTimeout(2000);
+      const editPhoneButtonAfterReload = page.locator('button[aria-label="Editar Teléfono celular"]');
+      await editPhoneButtonAfterReload.click();
+      await expect(page.locator('input[placeholder="Ej. 71234567"]')).toHaveValue(testPhone, {
+        timeout: 30_000,
+      });
+      await page.locator('button[aria-label="Cancelar edición de Teléfono celular"]').click();
 
-      const phoneSpan = page.locator('label', { hasText: 'Teléfono celular' })
-        .locator('..')
-        .locator('span')
-        .filter({ hasText: testPhone });
-      
-      const phoneSpanFallback = page.locator('section.bg-card-bg-light')
-        .locator('span')
-        .filter({ hasText: testPhone });
-      
-      await expect(phoneSpan.or(phoneSpanFallback)).toBeVisible({ timeout: 15_000 });
-      
-      const emailSpan = page.locator('label', { hasText: 'Correo de respaldo' })
-        .locator('..')
-        .locator('span')
-        .filter({ hasText: testBackupEmail });
-      
-      const emailSpanFallback = page.locator('section.bg-card-bg-light')
-        .locator('span')
-        .filter({ hasText: testBackupEmail });
-      
-      await expect(emailSpan.or(emailSpanFallback)).toBeVisible({ timeout: 15_000 });
+      const editMailButtonAfterReload = page.locator('button[aria-label="Editar Correo de respaldo"]');
+      await editMailButtonAfterReload.click();
+      await expect(page.locator('input[placeholder="ejemplo@correo.com"]')).toHaveValue(testBackupEmail, {
+        timeout: 30_000,
+      });
     });
 
     test('valida formatos incorrectos', async ({ page }) => {
-      const editPhoneButton = page.locator('button[aria-label="Editar teléfono"]');
+      const editPhoneButton = page.locator('button[aria-label="Editar Teléfono celular"]');
       await expect(editPhoneButton).toBeVisible({ timeout: 10_000 });
-      await waitForReactProps(page, 'button[aria-label="Editar teléfono"]');
+      await waitForReactProps(page, 'button[aria-label="Editar Teléfono celular"]');
       await editPhoneButton.click();
 
       const phoneInput = page.locator('input[placeholder="Ej. 71234567"]');
@@ -295,15 +253,15 @@ test.describe('Perfil de Usuario', () => {
       await phoneInput.clear();
       await phoneInput.fill('123');
       
-      await page.locator('button[aria-label="Confirmar teléfono"]').click();
+      await page.locator('button[aria-label="Confirmar Teléfono celular"]').click();
 
       await expect(page.locator('text="Debe tener 8 dígitos e iniciar con 6 o 7."')).toBeVisible({
         timeout: 5_000,
       });
 
-      const editMailButton = page.locator('button[aria-label="Editar correo de respaldo"]');
+      const editMailButton = page.locator('button[aria-label="Editar Correo de respaldo"]');
       await expect(editMailButton).toBeVisible({ timeout: 10_000 });
-      await waitForReactProps(page, 'button[aria-label="Editar correo de respaldo"]');
+      await waitForReactProps(page, 'button[aria-label="Editar Correo de respaldo"]');
       await editMailButton.click();
 
       const mailInput = page.locator('input[placeholder="ejemplo@correo.com"]');
@@ -312,7 +270,7 @@ test.describe('Perfil de Usuario', () => {
       await mailInput.clear();
       await mailInput.fill('invalid-email');
       
-      await page.locator('button[aria-label="Confirmar correo"]').click();
+      await page.locator('button[aria-label="Confirmar Correo de respaldo"]').click();
 
       await expect(page.locator('text="Formato de correo electrónico inválido."')).toBeVisible({
         timeout: 5_000,
@@ -330,13 +288,9 @@ test.describe('Perfil de Usuario', () => {
       await page.goto('/me');
       await waitForProfileHydration(page);
 
-      await expect(
-        page.locator('footer a[href="/location"]').filter({ hasText: 'Mis direcciones' })
-      ).toBeVisible({ timeout: 10_000 });
+      await expect(page.getByRole('link', { name: /Mis direcciones/ })).toBeVisible({ timeout: 10_000 });
       
-      await expect(
-        page.locator('footer a[href="/mis-pedidos"]').filter({ hasText: 'Mis pedidos' })
-      ).toBeVisible({ timeout: 10_000 });
+      await expect(page.getByRole('link', { name: /Mis pedidos y devoluciones/ })).toBeVisible({ timeout: 10_000 });
 
       await expect(
         page.locator('h4', { hasText: 'Mis pedidos y devoluciones' })
@@ -352,9 +306,7 @@ test.describe('Perfil de Usuario', () => {
         page.locator('h3', { hasText: 'Estadísticas de delivery' })
       ).toBeVisible({ timeout: 10_000 });
       
-      await expect(
-        page.locator('.bg-white\\/50.rounded-xl').filter({ hasText: 'Total' })
-      ).toBeVisible({ timeout: 5_000 });
+      await expect(page.getByText('Total', { exact: true })).toBeVisible({ timeout: 5_000 });
     });
 
     test('usuario normal ve solo secciones permitidas', async ({ page }) => {
@@ -364,9 +316,7 @@ test.describe('Perfil de Usuario', () => {
       await page.goto('/me');
       await waitForProfileHydration(page);
 
-      await expect(
-        page.locator('footer a[href="/location"]').filter({ hasText: 'Mis direcciones' })
-      ).toBeVisible({ timeout: 10_000 });
+      await expect(page.getByRole('link', { name: /Mis direcciones/ })).toBeVisible({ timeout: 10_000 });
 
       await expect(
         page.locator('div', { hasText: /Calificación: \d+\.\d+ \/ 5.0/ })
@@ -387,9 +337,9 @@ test.describe('Perfil de Usuario', () => {
     });
 
     test('telefono vacio muestra error obligatorio', async ({ page }) => {
-      const editPhoneButton = page.locator('button[aria-label="Editar teléfono"]');
+      const editPhoneButton = page.locator('button[aria-label="Editar Teléfono celular"]');
       await expect(editPhoneButton).toBeVisible({ timeout: 10_000 });
-      await waitForReactProps(page, 'button[aria-label="Editar teléfono"]');
+      await waitForReactProps(page, 'button[aria-label="Editar Teléfono celular"]');
       await editPhoneButton.click();
 
       const phoneInput = page.locator('input[placeholder="Ej. 71234567"]');
@@ -397,7 +347,7 @@ test.describe('Perfil de Usuario', () => {
       
       await phoneInput.clear();
       
-      await page.locator('button[aria-label="Confirmar teléfono"]').click();
+      await page.locator('button[aria-label="Confirmar Teléfono celular"]').click();
 
       await expect(page.locator('text="El teléfono celular es obligatorio."')).toBeVisible({
         timeout: 5_000,
@@ -405,9 +355,9 @@ test.describe('Perfil de Usuario', () => {
     });
 
     test('correo de respaldo con mas de 100 caracteres muestra error', async ({ page }) => {
-      const editMailButton = page.locator('button[aria-label="Editar correo de respaldo"]');
+      const editMailButton = page.locator('button[aria-label="Editar Correo de respaldo"]');
       await expect(editMailButton).toBeVisible({ timeout: 10_000 });
-      await waitForReactProps(page, 'button[aria-label="Editar correo de respaldo"]');
+      await waitForReactProps(page, 'button[aria-label="Editar Correo de respaldo"]');
       await editMailButton.click();
 
       const mailInput = page.locator('input[placeholder="ejemplo@correo.com"]');
@@ -417,7 +367,7 @@ test.describe('Perfil de Usuario', () => {
       await mailInput.clear();
       await mailInput.fill(longEmail);
       
-      await page.locator('button[aria-label="Confirmar correo"]').click();
+      await page.locator('button[aria-label="Confirmar Correo de respaldo"]').click();
 
       await expect(page.locator('text="El correo no puede exceder los 100 caracteres."')).toBeVisible({
         timeout: 5_000,
@@ -434,9 +384,9 @@ test.describe('Perfil de Usuario', () => {
     });
 
     test('permite editar y guardar el CI', async ({ page }) => {
-      const editCiButton = page.locator('button[aria-label="Editar CI"]');
+      const editCiButton = page.locator('button[aria-label="Editar Carnet de identidad"]');
       await expect(editCiButton).toBeVisible({ timeout: 10_000 });
-      await waitForReactProps(page, 'button[aria-label="Editar CI"]');
+      await waitForReactProps(page, 'button[aria-label="Editar Carnet de identidad"]');
       await editCiButton.click();
 
       const ciInput = page.locator('input[placeholder="Ej. 12345678"]');
@@ -446,22 +396,20 @@ test.describe('Perfil de Usuario', () => {
       await ciInput.clear();
       await ciInput.fill(testCi);
 
-      const confirmCiButton = page.locator('button[aria-label="Confirmar CI"]');
+      const confirmCiButton = page.locator('button[aria-label="Confirmar Carnet de identidad"]');
       await confirmCiButton.click();
 
       await expect(page.locator('text="Carnet de identidad actualizado correctamente"')).toBeVisible({
         timeout: 10_000,
       });
 
-      await expect(
-        page.locator('label', { hasText: 'Carnet de identidad' }).locator('..').locator('span', { hasText: testCi })
-      ).toBeVisible({ timeout: 5_000 });
+      await expect(page.getByText(testCi, { exact: true })).toBeVisible({ timeout: 5_000 });
     });
 
     test('valida CI con formato incorrecto', async ({ page }) => {
-      const editCiButton = page.locator('button[aria-label="Editar CI"]');
+      const editCiButton = page.locator('button[aria-label="Editar Carnet de identidad"]');
       await expect(editCiButton).toBeVisible({ timeout: 10_000 });
-      await waitForReactProps(page, 'button[aria-label="Editar CI"]');
+      await waitForReactProps(page, 'button[aria-label="Editar Carnet de identidad"]');
       await editCiButton.click();
 
       const ciInput = page.locator('input[placeholder="Ej. 12345678"]');
@@ -470,7 +418,7 @@ test.describe('Perfil de Usuario', () => {
       await ciInput.clear();
       await ciInput.fill('12AB3456');
 
-      const confirmCiButton = page.locator('button[aria-label="Confirmar CI"]');
+      const confirmCiButton = page.locator('button[aria-label="Confirmar Carnet de identidad"]');
       await confirmCiButton.click();
 
       await expect(page.locator('text="El CI solo debe contener números."')).toBeVisible({
@@ -479,9 +427,9 @@ test.describe('Perfil de Usuario', () => {
     });
 
     test('valida CI con longitud incorrecta', async ({ page }) => {
-      const editCiButton = page.locator('button[aria-label="Editar CI"]');
+      const editCiButton = page.locator('button[aria-label="Editar Carnet de identidad"]');
       await expect(editCiButton).toBeVisible({ timeout: 10_000 });
-      await waitForReactProps(page, 'button[aria-label="Editar CI"]');
+      await waitForReactProps(page, 'button[aria-label="Editar Carnet de identidad"]');
       await editCiButton.click();
 
       const ciInput = page.locator('input[placeholder="Ej. 12345678"]');
@@ -490,7 +438,7 @@ test.describe('Perfil de Usuario', () => {
       await ciInput.clear();
       await ciInput.fill('123');
 
-      const confirmCiButton = page.locator('button[aria-label="Confirmar CI"]');
+      const confirmCiButton = page.locator('button[aria-label="Confirmar Carnet de identidad"]');
       await confirmCiButton.click();
 
       await expect(page.locator('text="El CI debe tener entre 5 y 10 dígitos."')).toBeVisible({

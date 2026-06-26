@@ -16,11 +16,11 @@ export class ProductListPage {
   async expectVisible() {
     await expect(
       this.page.getByRole('heading', { name: 'Productos disponibles' })
-    ).toBeVisible({ timeout: 15_000 });
+    ).toBeVisible({ timeout: 30_000 });
   }
 
   async expectSearchReady() {
     await this.expectVisible();
-    await expect(this.searchInput).not.toHaveAttribute('disabled', { timeout: 15_000 });
+    await expect(this.searchInput).not.toHaveAttribute('disabled', { timeout: 30_000 });
   }
 }

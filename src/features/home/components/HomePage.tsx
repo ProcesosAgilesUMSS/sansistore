@@ -57,6 +57,7 @@ function HomeCatalogControls() {
           <input
             type="text"
             placeholder="¿Qué estás buscando hoy?"
+            onClick={goToCatalogSearch}
             onFocus={goToCatalogSearch}
             onPointerDown={goToCatalogSearch}
             maxLength={100}

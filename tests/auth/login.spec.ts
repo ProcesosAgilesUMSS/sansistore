@@ -41,9 +41,9 @@ test.describe('Auth - Login', () => {
     await expect(page.getByText('No autenticado')).toBeHidden({
       timeout: 15_000,
     });
-    await expect(
-      page.locator('dd', { hasText: 'juan.paredes@est.umss.edu' })
-    ).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('juan.paredes@est.umss.edu')).toBeVisible({
+      timeout: 15_000,
+    });
   });
 
   test('should show "No autenticado" on /me when not authenticated', async ({

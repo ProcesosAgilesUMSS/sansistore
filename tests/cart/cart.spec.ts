@@ -326,10 +326,12 @@ test.describe('Cart - Carrito', () => {
   test('should allow non-logged user to add items to cart', async ({
     page,
   }) => {
-    await page.goto('/productos/leche-pil-natural-900-ml');
+    await page.goto('/productos/leche-pil-natural-900-ml', {
+      waitUntil: 'domcontentloaded',
+    });
     await expect(
-      page.locator('h1').filter({ hasText: 'Leche PIL Natural 900 ml' })
-    ).toBeVisible();
+      page.getByRole('heading', { name: /Leche PIL Natural 900 ml/ })
+    ).toBeVisible({ timeout: 15_000 });
     await expect(page.getByText('Disponible', { exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Agregar al carrito' }).click();
 

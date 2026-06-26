@@ -207,12 +207,21 @@ function FeaturedProductsInner({
   useEffect(() => {
     if (loading || favoritesLoading || !pendingSearchFocusRef.current) return;
 
-    const focusTimer = window.setTimeout(() => {
-      searchInputRef.current?.focus({ preventScroll: true });
-      pendingSearchFocusRef.current = false;
-    }, 0);
+    let attempts = 0;
+    const focusTimer = window.setInterval(() => {
+      const input = searchInputRef.current;
+      if (!input) return;
 
-    return () => window.clearTimeout(focusTimer);
+      input.focus({ preventScroll: true });
+      attempts += 1;
+
+      if (document.activeElement === input || attempts >= 40) {
+        pendingSearchFocusRef.current = false;
+        window.clearInterval(focusTimer);
+      }
+    }, 50);
+
+    return () => window.clearInterval(focusTimer);
   }, [loading, favoritesLoading]);
 
   useEffect(() => {

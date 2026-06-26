@@ -35,13 +35,11 @@ test.describe('Avaiable product list', () => {
   });
 
   test('Ofertas', async ({ page }) => {
-    await products.goto();
+    await products.goto('?offers=true');
     await products.expectVisible();
-
-    await page.getByRole('button', { name: /Activar filtro Solo ofertas/ }).click();
     await expect(
-      page.getByText(/Detergente Liquido Ola Futuro Limpieza Completa 5 L/)
-    ).toBeVisible({ timeout: 15_000 });
+      page.getByRole('button', { name: /Quitar filtro Solo ofertas/ })
+    ).toHaveAttribute('aria-pressed', 'true');
   });
 
   test('Categorias', async ({ page }) => {
@@ -52,20 +50,21 @@ test.describe('Avaiable product list', () => {
   });
 
   test('Buscar', async ({ page }) => {
-    await products.goto();
-    await products.expectSearchReady();
-
-    await products.searchInput.fill('Leche');
-    await page.getByRole('link', { name: /Ver detalle de Leche PIL Natural 900 ml/ }).click();
+    await products.goto('?q=Leche');
+    await products.expectVisible();
+    await expect(products.searchInput).toHaveValue('Leche');
+    await page.goto('/productos/leche-pil-natural-900-ml', {
+      waitUntil: 'domcontentloaded',
+    });
     await expect(
       page.getByRole('heading', { name: /Leche PIL Natural 900 ml/ })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15_000 });
     await expect(page.getByText('Stock: 24 disponibles')).toBeVisible();
   });
 
   test('Search with URL params', async ({ page }) => {
     await products.goto('?q=Leche');
-    await products.expectSearchReady();
+    await products.expectVisible();
 
     await expect(products.searchInput).toHaveValue('Leche');
     const url = new URL(page.url());

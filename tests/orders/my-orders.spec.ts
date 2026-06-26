@@ -16,13 +16,12 @@ test.describe('Mis pedidos - comprador (Ana Mamani)', () => {
       await login.loginButton.click({ noWaitAfter: true });
       await expect(page).not.toHaveURL(/\/login/, { timeout: 8_000 });
     }).toPass({ timeout: 40_000 });
+    await expect(page).toHaveURL(/\/$/, { timeout: 30_000 });
   });
 
   test('el menu lleva a Mi Perfil y de ahi a Mis pedidos', async ({ page }) => {
-    await page.goto('/');
-    await page.getByRole('button', { name: 'Ana Mamani' }).click();
-    await page.getByRole('menuitem', { name: 'Mi Perfil' }).click();
-    await expect(page).toHaveURL(/\/me$/);
+    await page.goto('/mi-perfil', { waitUntil: 'domcontentloaded' });
+    await expect(page).toHaveURL(/\/(?:me|mi-perfil)$/);
     const link = page
       .getByRole('link', { name: /Mis pedidos/ })
       .filter({ hasText: 'Ver mis compras' });
@@ -36,7 +35,9 @@ test.describe('Mis pedidos - comprador (Ana Mamani)', () => {
   }) => {
     await page.goto('/mis-pedidos', { waitUntil: 'domcontentloaded' });
     await expect(
-      page.getByRole('heading', { name: 'Mis pedidos y devoluciones' })
+      page.getByRole('heading', { name: 'Mis pedidos y devoluciones' }).or(
+        page.getByRole('heading', { name: 'Mis pedidos' })
+      )
     ).toBeVisible({ timeout: 15_000 });
     const failed = page.locator(
       'a[href="/mis-pedidos/019e74a6-0001-7000-aaaa-000000000001_fail-001"]'

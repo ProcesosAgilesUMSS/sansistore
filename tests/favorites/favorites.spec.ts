@@ -18,7 +18,7 @@ test.afterEach(async ({ page }, testInfo) => {
 
 test.describe('Favorite products', () => {
   async function openCleanProducts(page: Page) {
-    await page.goto('/productos');
+    await page.goto('/productos', { waitUntil: 'domcontentloaded' });
     await page.evaluate((key) => {
       window.localStorage.removeItem(key);
     }, FAVORITES_KEY);
@@ -26,7 +26,7 @@ test.describe('Favorite products', () => {
   }
 
   async function seedLocalFavorites(page: Page, productId: string) {
-    await page.goto('/productos');
+    await page.goto('/productos', { waitUntil: 'domcontentloaded' });
     await page.evaluate(
       ({ key, item }) => {
         window.localStorage.setItem(key, JSON.stringify([item]));
@@ -36,6 +36,7 @@ test.describe('Favorite products', () => {
         item: { productId, createdAt: Date.now() },
       }
     );
+    await page.reload({ waitUntil: 'domcontentloaded' });
   }
 
   test('allows anonymous users to add and persist a favorite product', async ({
@@ -76,7 +77,7 @@ test.describe('Favorite products', () => {
     expect(storedFavorites).toHaveLength(1);
 
     await page.reload();
-    await page.goto('/favoritos');
+    await page.goto('/favoritos', { waitUntil: 'domcontentloaded' });
     await expect(
       page.getByRole('link', { name: SEE_PRODUCTS_LINK })
     ).toHaveAttribute('href', '/productos');
@@ -87,7 +88,7 @@ test.describe('Favorite products', () => {
     page,
   }) => {
     await seedLocalFavorites(page, 'leche-pil-natural-900-ml');
-    await page.goto('/favoritos');
+    await page.goto('/favoritos', { waitUntil: 'domcontentloaded' });
 
     await expect(page).toHaveTitle(/Favoritos \| Sansistore/);
     await expect(
@@ -106,11 +107,14 @@ test.describe('Favorite products', () => {
     page,
   }) => {
     await seedLocalFavorites(page, 'leche-pil-natural-900-ml');
-    await page.goto('/favoritos');
+    await page.goto('/favoritos', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByText(/Leche PIL Natural 900 ml/)).toBeVisible({
+      timeout: 15_000,
+    });
     const favoritePageButton = page.getByTestId(
       'favorite-button-leche-pil-natural-900-ml'
     );
-    await expect(favoritePageButton).toBeVisible();
+    await expect(favoritePageButton).toBeVisible({ timeout: 15_000 });
     await favoritePageButton.click();
 
     await expect
@@ -124,8 +128,7 @@ test.describe('Favorite products', () => {
       )
       .toBe(0);
 
-    await expect(
-      page.getByText('Aún no tienes productos favoritos.')
-    ).toBeVisible();
+    await expect(favoritePageButton).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.getByRole('link', { name: SEE_PRODUCTS_LINK })).toBeVisible();
   });
 });

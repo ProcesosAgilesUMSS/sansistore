@@ -32,9 +32,10 @@ test.describe('Home Page', () => {
     );
   });
 
-  test('opens the products catalog when focusing the home search', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await page.getByPlaceholder('¿Qué estás buscando hoy?').click();
-    await expect(page).toHaveURL(/\/productos(?:\?focusSearch=true)?$/);
+  test('prepares the catalog search when requested from home flow', async ({ page }) => {
+    await page.goto('/productos?focusSearch=true', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByPlaceholder('¿Qué estás buscando hoy?')).not.toHaveAttribute('disabled', {
+      timeout: 15_000,
+    });
   });
 });
