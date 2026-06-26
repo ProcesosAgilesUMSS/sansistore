@@ -133,6 +133,7 @@ function ProductCarousel({
   href: string;
 }) {
   const carouselRef = useRef<HTMLElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
   const carouselProducts = useMemo(() => products.slice(0, 12), [products]);
   const [productsPerView, setProductsPerView] = useState(() => {
     if (typeof window === 'undefined') return PRODUCTS_PER_VIEW;
@@ -143,6 +144,7 @@ function ProductCarousel({
   });
   const [activePosition, setActivePosition] = useState(0);
   const [hasStarted, setHasStarted] = useState(false);
+  const [stepWidth, setStepWidth] = useState(0);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(min-width: 768px)');
@@ -157,6 +159,21 @@ function ProductCarousel({
   const maxPosition = Math.max(0, carouselProducts.length - productsPerView);
   const visiblePosition = Math.min(activePosition, maxPosition);
   const positionCount = maxPosition + 1;
+
+  useEffect(() => {
+    const measure = () => {
+      const firstItem = trackRef.current?.firstElementChild as HTMLElement | null;
+      if (!firstItem) return;
+
+      const styles = window.getComputedStyle(trackRef.current!);
+      const gap = Number.parseFloat(styles.columnGap || styles.gap || '0');
+      setStepWidth(firstItem.offsetWidth + gap);
+    };
+
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [carouselProducts.length, productsPerView]);
 
   useEffect(() => {
     const carousel = carouselRef.current;
@@ -230,15 +247,16 @@ function ProductCarousel({
           </button>
         )}
         <div
-          className="-mx-1.5 flex transition-transform duration-700 ease-out sm:-mx-2"
+          ref={trackRef}
+          className="flex gap-3 transition-transform duration-700 ease-out sm:gap-4"
           style={{
-            transform: `translateX(-${visiblePosition * (100 / productsPerView)}%)`,
+            transform: `translateX(-${visiblePosition * stepWidth}px)`,
           }}
         >
           {carouselProducts.map((product) => (
             <div
               key={`${title}-${product.id}`}
-              className="min-w-[50%] px-1.5 sm:px-2 md:min-w-[25%]"
+              className="min-w-[calc((100%_-_0.75rem)/2)] sm:min-w-[calc((100%_-_1rem)/2)] md:min-w-[calc((100%_-_3rem)/4)]"
             >
               <ProductCard product={product} />
             </div>
@@ -323,8 +341,8 @@ function HomePageInner() {
     <main className="min-h-screen bg-bg-light text-text-light">
       <section id="productos" className="bg-bg-light py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
+          <div className="mb-10 flex flex-col items-center text-center">
+            <div className="max-w-3xl">
               <h1
                 className="text-text-light"
                 style={{
@@ -333,7 +351,7 @@ function HomePageInner() {
                   fontWeight: 900,
                 }}
               >
-                SansiStore para la comunidad UMSS
+                Todo lo que necesitas, cerca de la comunidad UMSS
               </h1>
             </div>
           </div>

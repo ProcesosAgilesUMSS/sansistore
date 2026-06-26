@@ -23,7 +23,7 @@ test.describe('Home Page', () => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(
       page.getByRole('heading', {
-        name: 'SansiStore para la comunidad UMSS',
+        name: 'Todo lo que necesitas, cerca de la comunidad UMSS',
       })
     ).toBeVisible();
     await expect(page.getByPlaceholder('¿Qué estás buscando hoy?')).toHaveAttribute(
