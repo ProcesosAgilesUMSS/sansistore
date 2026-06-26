@@ -256,7 +256,7 @@ function ProductCarousel({
           {carouselProducts.map((product) => (
             <div
               key={`${title}-${product.id}`}
-              className="min-w-[calc((100%_-_0.75rem)/2)] sm:min-w-[calc((100%_-_1rem)/2)] md:min-w-[calc((100%_-_3rem)/4)]"
+              className="min-w-[calc((100%_-_0.75rem)/2)] max-w-[240px] sm:min-w-[calc((100%_-_1rem)/2)] md:min-w-[calc((100%_-_3rem)/4)] md:max-w-[270px]"
             >
               <ProductCard product={product} />
             </div>
@@ -341,17 +341,17 @@ function HomePageInner() {
     <main className="min-h-screen bg-bg-light text-text-light">
       <section id="productos" className="bg-bg-light py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-10 flex flex-col items-center text-center">
-            <div className="max-w-3xl">
+          <div className="mb-10 flex justify-center">
+            <div className="inline-flex max-w-full rounded-full border border-primary/25 bg-primary/10 px-5 py-2.5 shadow-sm shadow-primary/10">
               <h1
-                className="text-text-light"
+                className="text-nowrap bg-gradient-to-r from-primary via-text-light to-primary bg-clip-text text-transparent"
                 style={{
-                  fontSize: 'clamp(1.6rem, 3vw, 2.2rem)',
+                  fontSize: 'clamp(1.35rem, 2.5vw, 2rem)',
                   letterSpacing: '-0.03em',
                   fontWeight: 900,
                 }}
               >
-                Todo lo que necesitas, cerca de la comunidad UMSS
+                SansiStore cerca de ti
               </h1>
             </div>
           </div>
