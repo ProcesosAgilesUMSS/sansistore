@@ -39,6 +39,7 @@ function saveSearchTerm(term: string) {
     const updated = [term, ...filtered].slice(0, MAX_HISTORY_ITEMS);
     localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(updated));
   } catch {
+    return;
   }
 }
 
@@ -50,6 +51,7 @@ function deleteSearchTerm(term: string) {
     );
     localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(updated));
   } catch {
+    return;
   }
 }
 

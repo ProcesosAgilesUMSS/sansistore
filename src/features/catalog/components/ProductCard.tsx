@@ -95,6 +95,7 @@ export default function ProductCard({
   const { addToCart } = useCartContext();
   const { isFavorite, toggleFavorite } = useFavorites();
   const [bumping, setBumping] = useState(false);
+  const [bumpKey, setBumpKey] = useState(0);
   const bumpTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const showOffer = hasValidOffer(product);
   const badgeData = getBadgeData(product);
@@ -225,7 +226,7 @@ export default function ProductCard({
           <span className="relative shrink-0">
             {bumping && (
               <span
-                key={Date.now()}
+                key={bumpKey}
                 aria-hidden="true"
                 className="cart-bump pointer-events-none absolute -top-2 left-1/2 z-30 rounded-full bg-primary px-1.5 py-0.5 text-[11px] font-extrabold leading-none text-white shadow-md shadow-primary/40"
               >
@@ -240,6 +241,7 @@ export default function ProductCard({
                 event.preventDefault();
                 addToCart(product.id, effectiveStock, currentPrice);
                 if (bumpTimeoutRef.current) clearTimeout(bumpTimeoutRef.current);
+                setBumpKey((current) => current + 1);
                 setBumping(true);
                 bumpTimeoutRef.current = setTimeout(() => setBumping(false), 700);
               }}
