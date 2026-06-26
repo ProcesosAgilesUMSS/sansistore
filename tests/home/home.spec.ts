@@ -32,10 +32,9 @@ test.describe('Home Page', () => {
     );
   });
 
-  test('searches from home in the products catalog', async ({ page }) => {
+  test('opens the products catalog when focusing the home search', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await page.getByPlaceholder('¿Qué estás buscando hoy?').fill('leche');
-    await page.getByPlaceholder('¿Qué estás buscando hoy?').press('Enter');
-    await expect(page).toHaveURL('/productos?q=leche');
+    await page.getByPlaceholder('¿Qué estás buscando hoy?').click();
+    await expect(page).toHaveURL('/productos');
   });
 });

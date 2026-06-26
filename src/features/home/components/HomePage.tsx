@@ -40,9 +40,15 @@ function buildProductWindows(products: CatalogProduct[]) {
 
 function HomeCatalogControls() {
   const [showSortDropdown, setShowSortDropdown] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
   const sortRef = useRef<HTMLDivElement>(null);
+  const navigatingToCatalogRef = useRef(false);
   const selectedSortLabel = 'Popular';
+
+  const goToCatalogSearch = () => {
+    if (navigatingToCatalogRef.current) return;
+    navigatingToCatalogRef.current = true;
+    void navigate('/productos');
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -74,13 +80,7 @@ function HomeCatalogControls() {
           Ofertas
         </a>
       </div>
-      <form
-        className="flex w-full flex-row items-center gap-3"
-        onSubmit={(event) => {
-          event.preventDefault();
-          void navigate(getCatalogUrl({ term: searchTerm }));
-        }}
-      >
+      <div className="flex w-full flex-row items-center gap-3">
         <div
           className="relative flex-1"
           aria-label="Buscar productos en el catálogo"
@@ -92,8 +92,8 @@ function HomeCatalogControls() {
           <input
             type="text"
             placeholder="¿Qué estás buscando hoy?"
-            value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
+            onFocus={goToCatalogSearch}
+            onPointerDown={goToCatalogSearch}
             maxLength={100}
             className="w-full rounded-full border border-border-light bg-card-bg-light py-3 pl-11 pr-11 text-[15px] sm:text-sm text-text-light placeholder:text-text-light/30 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all"
           />
@@ -131,7 +131,7 @@ function HomeCatalogControls() {
             </div>
           )}
         </div>
-      </form>
+      </div>
     </div>
   );
 }
@@ -185,7 +185,7 @@ function ProductCarousel({
   const canGoForward = visibleSlide < slides.length - 1;
 
   return (
-    <section ref={carouselRef} className="py-10">
+    <section ref={carouselRef} className="py-8">
       <div className="mb-4 flex items-center justify-between gap-4">
         <h2 className="text-xl font-black tracking-tight text-text-light sm:text-2xl">
           {title}
@@ -313,20 +313,22 @@ function HomePageInner() {
   );
 
   return (
-    <main className="min-h-screen bg-bg-light pt-14 text-text-light">
+    <main className="min-h-screen bg-bg-light text-text-light">
       <section id="productos" className="bg-bg-light py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-10">
-            <h1
-              className="text-text-light"
-              style={{
-                fontSize: 'clamp(1.6rem, 3vw, 2.2rem)',
-                letterSpacing: '-0.03em',
-                fontWeight: 900,
-              }}
-            >
-              SansiStore para la comunidad UMSS
-            </h1>
+          <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h1
+                className="text-text-light"
+                style={{
+                  fontSize: 'clamp(1.6rem, 3vw, 2.2rem)',
+                  letterSpacing: '-0.03em',
+                  fontWeight: 900,
+                }}
+              >
+                SansiStore para la comunidad UMSS
+              </h1>
+            </div>
           </div>
 
           <HomeCatalogControls />
@@ -364,7 +366,7 @@ function HomePageInner() {
           )}
 
           {!loading && !error && (
-            <div className="space-y-8">
+            <div className="space-y-5">
               <ProductCarousel
                 title="Ofertas"
                 products={offers}
