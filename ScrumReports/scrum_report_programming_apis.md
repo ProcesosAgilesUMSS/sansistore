@@ -558,3 +558,13 @@
 - **Yesterday:** Mantuve contacto con el lider del grupo de CoreDevs para ver cómo ayudar en el problema de stock dentro de la aplicación
 - **Today:** Participaré en la reunión planeatada y comunicaré las inquietudes que existen en el equipo.
 - **Blockers:** Aún no se está seguro de qué haremos en este Sprint ni que es lo que se debe presentar en la demo final.
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday (24/06):** 
+  - Participación en la reunión con el equipo para definir el plan del nuevo sprint.
+  - Propuesta de reparto de tareas para la revisión de stock y documentación interactiva.
+  - La tarea de documentación quedó en espera hasta que el ingeniero defina el alcance y formato.
+- **Today (25/06):** 
+  - Esperar definiciones del ingeniero sobre el alcance de la documentación interactiva.
+  - Participación en la reunión general de revisión de equipos.
+- **Blockers:** Pendiente de confirmación del ingeniero sobre el formato y alcance de la documentación.
