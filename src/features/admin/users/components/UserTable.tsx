@@ -22,19 +22,19 @@ export default function UserTable({ users, onEdit }: UserTableProps) {
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="bg-primary/10">
-              <th className="px-5 py-3.5 font-semibold text-[13px] text-(--theme-text)">
+              <th className="px-5 py-3.5 font-semibold text-sm text-(--theme-text)">
                 Nombre
               </th>
-              <th className="px-5 py-3.5 font-semibold text-[13px] text-(--theme-text)">
+              <th className="px-5 py-3.5 font-semibold text-sm text-(--theme-text)">
                 Correo
               </th>
-              <th className="px-5 py-3.5 font-semibold text-[13px] text-(--theme-text)">
+              <th className="px-5 py-3.5 font-semibold text-sm text-(--theme-text)">
                 Rol
               </th>
-              <th className="px-5 py-3.5 font-semibold text-[13px] text-(--theme-text)">
+              <th className="px-5 py-3.5 font-semibold text-sm text-(--theme-text)">
                 Estado
               </th>
-              <th className="px-5 py-3.5 font-semibold text-[13px] text-(--theme-text) text-center">
+              <th className="px-5 py-3.5 font-semibold text-sm text-(--theme-text) text-center">
                 Acciones
               </th>
             </tr>
@@ -43,8 +43,8 @@ export default function UserTable({ users, onEdit }: UserTableProps) {
             {users.map((user, idx) => {
               const role = user.roles[0];
               const roleColor = ROLE_COLORS[role] || {
-                bg: 'rgba(150,150,150,0.15)',
-                text: '#666',
+                bg: 'var(--theme-secondary-bg)',
+                text: 'var(--theme-text)',
               };
 
               return (
@@ -57,15 +57,15 @@ export default function UserTable({ users, onEdit }: UserTableProps) {
                     ${idx % 2 === 0 ? 'bg-(--theme-card-bg)' : 'bg-(--theme-bg)'}
                   `}
                 >
-                  <td className="px-5 py-4 text-[13px] font-medium text-(--theme-text)">
+                  <td className="px-5 py-4 text-sm font-medium text-(--theme-text)">
                     {user.displayName}
                   </td>
-                  <td className="px-5 py-4 text-[13px] text-(--theme-text)/60">
+                  <td className="px-5 py-4 text-sm text-(--theme-text)/60">
                     {user.email}
                   </td>
                   <td className="px-5 py-4">
                     <span
-                      className="inline-block px-3 py-1 rounded-full text-[12px] font-medium"
+                      className="inline-block px-3 py-1 rounded-full text-xs font-medium"
                       style={{
                         backgroundColor: roleColor.bg,
                         color: roleColor.text,
@@ -77,11 +77,11 @@ export default function UserTable({ users, onEdit }: UserTableProps) {
                   <td className="px-5 py-4">
                     <span
                       className={`
-                        inline-block px-3 py-1 rounded-full text-[12px] font-medium
+                        inline-block px-3 py-1 rounded-full text-xs font-medium
                         ${
                           user.isActive
-                            ? 'bg-[rgba(136,176,75,0.15)] text-[#5a7a2e]'
-                            : 'bg-[rgba(150,150,150,0.15)] text-[#888]'
+                            ? 'bg-primary/15 text-primary'
+                            : 'bg-(--theme-secondary-bg) text-(--theme-text)/50'
                         }
                       `}
                     >
@@ -108,8 +108,8 @@ export default function UserTable({ users, onEdit }: UserTableProps) {
         {users.map((user) => {
           const role = user.roles[0];
           const roleColor = ROLE_COLORS[role] || {
-            bg: 'rgba(150,150,150,0.15)',
-            text: '#666',
+            bg: 'var(--theme-secondary-bg)',
+            text: 'var(--theme-text)',
           };
 
           return (
@@ -119,10 +119,10 @@ export default function UserTable({ users, onEdit }: UserTableProps) {
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="min-w-0 flex-1">
-                  <p className="text-[14px] font-semibold text-(--theme-text) truncate">
+                  <p className="text-sm font-semibold text-(--theme-text) truncate">
                     {user.displayName}
                   </p>
-                  <p className="text-[12px] text-(--theme-text)/50 truncate mt-0.5">
+                  <p className="text-xs text-(--theme-text)/50 truncate mt-0.5">
                     {user.email}
                   </p>
                 </div>
@@ -136,7 +136,7 @@ export default function UserTable({ users, onEdit }: UserTableProps) {
               </div>
               <div className="flex items-center gap-2">
                 <span
-                  className="inline-block px-2.5 py-1 rounded-full text-[11px] font-medium"
+                  className="inline-block px-2.5 py-1 rounded-full text-xs font-medium"
                   style={{
                     backgroundColor: roleColor.bg,
                     color: roleColor.text,
@@ -146,11 +146,11 @@ export default function UserTable({ users, onEdit }: UserTableProps) {
                 </span>
                 <span
                   className={`
-                    inline-block px-2.5 py-1 rounded-full text-[11px] font-medium
+                    inline-block px-2.5 py-1 rounded-full text-xs font-medium
                     ${
                       user.isActive
-                        ? 'bg-[rgba(136,176,75,0.15)] text-[#5a7a2e]'
-                        : 'bg-[rgba(150,150,150,0.15)] text-[#888]'
+                        ? 'bg-primary/15 text-primary'
+                        : 'bg-(--theme-secondary-bg) text-(--theme-text)/50'
                     }
                   `}
                 >

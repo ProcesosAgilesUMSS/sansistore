@@ -1,10 +1,13 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import AdminProtectedLayout from '../../features/admin/components/AdminProtectedLayout.tsx';
-
+import Navbar from '../../components/Navbar';
 
 ---
 
 <Layout title="Admin · Sansistore">
-  <AdminProtectedLayout client:load />
+  <Navbar client:load />
+  <main class="flex h-screen overflow-hidden pt-14">
+    <AdminProtectedLayout client:load />
+  </main>
 </Layout>

@@ -40,7 +40,7 @@ export function FailedOrderDetailModal({
       <section className="w-full max-w-lg overflow-hidden rounded-3xl border border-(--theme-border) bg-(--theme-card-bg) text-(--theme-text) shadow-2xl">
         <header className="flex items-start justify-between gap-4 border-b border-(--theme-border) px-6 py-5">
           <div>
-            <p className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-primary">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
               {order.type}
             </p>
             <h2 className="mt-1 text-lg font-black">Pedido fallido</h2>
@@ -59,19 +59,19 @@ export function FailedOrderDetailModal({
         <div className="space-y-5 px-6 py-5">
           <div className="grid grid-cols-2 gap-3 rounded-2xl border border-(--theme-border) bg-(--theme-secondary-bg)/50 p-4">
             <div>
-              <p className="text-[0.65rem] font-bold uppercase opacity-50">
+              <p className="text-xs font-bold uppercase opacity-50">
                 Cliente
               </p>
               <p className="mt-1 text-sm font-bold">{order.customerName}</p>
             </div>
             <div>
-              <p className="text-[0.65rem] font-bold uppercase opacity-50">
+              <p className="text-xs font-bold uppercase opacity-50">
                 Zona
               </p>
               <p className="mt-1 text-sm font-bold">{order.zone}</p>
             </div>
             <div>
-              <p className="text-[0.65rem] font-bold uppercase opacity-50">
+              <p className="text-xs font-bold uppercase opacity-50">
                 Monto
               </p>
               <p className="mt-1 text-sm font-bold text-primary">
@@ -79,7 +79,7 @@ export function FailedOrderDetailModal({
               </p>
             </div>
             <div>
-              <p className="text-[0.65rem] font-bold uppercase opacity-50">
+              <p className="text-xs font-bold uppercase opacity-50">
                 Fecha
               </p>
               <p className="mt-1 text-sm font-bold">
@@ -97,7 +97,7 @@ export function FailedOrderDetailModal({
           </div>
 
           <div>
-            <p className="mb-1 text-[0.65rem] font-bold uppercase tracking-[0.12em] opacity-55">
+            <p className="mb-1 text-xs font-bold uppercase tracking-[0.12em] opacity-55">
               Motivo del fallo
             </p>
             <p className="rounded-2xl border border-(--theme-border) bg-(--theme-secondary-bg)/40 px-4 py-3 text-sm font-medium">
@@ -106,7 +106,7 @@ export function FailedOrderDetailModal({
           </div>
 
           <div>
-            <p className="mb-2 text-[0.65rem] font-bold uppercase tracking-[0.12em] opacity-55">
+            <p className="mb-2 text-xs font-bold uppercase tracking-[0.12em] opacity-55">
               Productos ({order.items.length})
             </p>
             <ul className="divide-y divide-(--theme-border) overflow-hidden rounded-2xl border border-(--theme-border)">
@@ -123,7 +123,7 @@ export function FailedOrderDetailModal({
                     <span className="min-w-0 font-semibold">
                       {item.productName}
                     </span>
-                    <span className="shrink-0 rounded-full bg-primary/12 px-2.5 py-0.5 font-bold text-primary">
+                    <span className="shrink-0 rounded-full bg-primary/10 px-2.5 py-0.5 font-bold text-primary">
                       x{item.quantity}
                     </span>
                   </li>
@@ -140,7 +140,7 @@ export function FailedOrderDetailModal({
           )}
 
           {error && (
-            <div className="flex items-start gap-2 rounded-2xl border border-red-300/60 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 dark:border-red-800/40 dark:bg-red-900/20 dark:text-red-300">
+            <div className="flex items-start gap-2 rounded-2xl border border-(--theme-error-border) bg-(--theme-error-bg) px-4 py-3 text-sm font-semibold text-(--theme-error)">
               <AlertTriangle className="mt-0.5 shrink-0" size={16} />
               <span>{error}</span>
             </div>

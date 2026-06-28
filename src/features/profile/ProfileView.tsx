@@ -365,15 +365,15 @@ export default function ProfileView() {
 								className="-mt-12 size-24 rounded-full border-4 border-(--theme-card-bg) object-cover shadow-md"
 							/>
 						) : (
-							<div className="-mt-12 flex size-24 items-center justify-center rounded-full border-4 border-(--theme-card-bg) bg-primary text-3xl font-black text-white shadow-md">
+							<div className="-mt-12 flex size-24 items-center justify-center rounded-full border-4 border-(--theme-card-bg) bg-primary text-2xl font-black text-white shadow-md">
 								{profile.displayName.charAt(0).toUpperCase()}
 							</div>
 						)}
 
-						<h2 className="mt-3 text-xl font-black tracking-tight text-(--theme-text)">
+						<h2 className="mt-3 text-lg font-black tracking-tight text-(--theme-text)">
 							{profile.displayName}
 						</h2>
-						<p className="mt-0.5 text-[13px] font-medium text-(--theme-text) opacity-60">
+						<p className="mt-0.5 text-sm font-medium text-(--theme-text) opacity-60">
 							{profile.email}
 						</p>
 
@@ -382,7 +382,7 @@ export default function ProfileView() {
 								{profile.roles.map((role) => (
 									<span
 										key={role}
-										className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-bold text-primary"
+										className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary"
 									>
 										{formatRole(role)}
 									</span>
@@ -632,7 +632,7 @@ function EditableField({
 					{icon}
 				</div>
 				<div className="min-w-0 flex-1">
-					<p className="text-[11px] font-bold uppercase tracking-wider text-(--theme-text) opacity-50">
+					<p className="text-xs font-bold uppercase tracking-wider text-(--theme-text) opacity-50">
 						{label}
 					</p>
 					{isEditing ? (
@@ -694,7 +694,7 @@ function EditableField({
 				)}
 			</div>
 			{isEditing && error && (
-				<p className="mt-1.5 pl-12 text-[11px] font-medium text-(--theme-error)">
+				<p className="mt-1.5 pl-12 text-xs font-medium text-(--theme-error)">
 					{error}
 				</p>
 			)}
@@ -721,10 +721,10 @@ function StatCard({
 }) {
 	return (
 		<div className={`rounded-xl border p-3 text-center ${STAT_TONES[tone]}`}>
-			<p className="text-[10px] font-bold uppercase tracking-wider opacity-70">
+			<p className="text-xs font-bold uppercase tracking-wider opacity-70">
 				{label}
 			</p>
-			<p className="mt-1 text-xl font-black">{value}</p>
+			<p className="mt-1 text-lg font-black">{value}</p>
 		</div>
 	);
 }
@@ -751,7 +751,7 @@ function AccountLink({
 				</div>
 				<div className="flex flex-col">
 					<h4 className="text-sm font-bold text-(--theme-text)">{title}</h4>
-					<span className="text-[11px] font-medium text-(--theme-text) opacity-50">
+					<span className="text-xs font-medium text-(--theme-text) opacity-50">
 						{subtitle}
 					</span>
 				</div>

@@ -7,7 +7,7 @@ export default function DeleteModal({ onConfirm, onCancel }: DeleteModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
       <div className="w-full max-w-sm rounded-[2rem] border border-border-light bg-card-bg-light p-6 shadow-xl">
-        <h3 className="text-xl font-bold text-text-light mb-2">Eliminar comentario</h3>
+        <h3 className="text-lg font-bold text-text-light mb-2">Eliminar comentario</h3>
         <p className="text-sm text-text-light opacity-80 mb-6">¿Estás seguro de que deseas eliminar este comentario? Esta acción no se puede deshacer.</p>
         <div className="flex gap-3 justify-end">
           <button

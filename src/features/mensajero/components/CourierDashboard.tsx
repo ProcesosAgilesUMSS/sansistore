@@ -80,7 +80,7 @@ function OrderDetailView({
 }) {
 	return (
 		<section className={pageClassName}>
-			<div className="mx-auto max-w-6xl px-4 sm:px-6">
+			<div className="mx-auto max-w-7xl px-4 sm:px-6">
 				<button
 					type="button"
 					onClick={onBack}
@@ -91,7 +91,7 @@ function OrderDetailView({
 				</button>
 
 				<div className="mb-8">
-					<h1 className="text-4xl font-black tracking-[-0.04em]">
+					<h1 className="text-2xl font-black tracking-[-0.04em]">
 						Detalle de cobro del pedido
 					</h1>
 					<p className={`mt-2 text-sm font-semibold ${mutedTextClass}`}>
@@ -122,7 +122,7 @@ function OrderDetailView({
 								<p className={`text-sm font-medium ${mutedTextClass}`}>
 									Cliente
 								</p>
-								<p className="mt-1 text-3xl font-medium tracking-[-0.03em]">
+								<p className="mt-1 text-2xl font-medium tracking-[-0.03em]">
 									{selectedOrder.buyerName}
 								</p>
 							</div>
@@ -223,7 +223,7 @@ function OrderDetailView({
 								<div className="flex items-start gap-3">
 									<ReceiptText className={`mt-1 h-5 w-5 ${iconClass}`} />
 									<div>
-										<p className="text-xl font-medium">
+										<p className="text-lg font-medium">
 											{selectedOrderHasValidAmount
 												? formatMoney(selectedOrder.total)
 												: INVALID_AMOUNT_MESSAGE}
@@ -237,7 +237,7 @@ function OrderDetailView({
 								<div className="flex items-start gap-3">
 									<NotebookText className={`mt-1 h-5 w-5 ${iconClass}`} />
 									<div>
-										<p className="text-xl font-medium">Sin observaciones</p>
+										<p className="text-lg font-medium">Sin observaciones</p>
 										<p className={`text-sm font-medium ${mutedTextClass}`}>
 											Observaciones
 										</p>
@@ -252,7 +252,7 @@ function OrderDetailView({
 							<p className="text-sm font-medium text-text-light opacity-70">
 								Te llevas a cobrar
 							</p>
-							<p className="mt-1 text-3xl font-medium tracking-[-0.03em]">
+							<p className="mt-1 text-2xl font-medium tracking-[-0.03em]">
 								{selectedOrderHasValidAmount
 									? formatMoney(selectedOrder.total)
 									: "Monto no disponible"}
@@ -267,7 +267,7 @@ function OrderDetailView({
 								Monto a cobrar
 							</p>
 							{selectedOrderHasValidAmount ? (
-								<p className="mt-2 text-5xl font-medium tracking-[-0.05em] text-primary">
+								<p className="mt-2 text-2xl font-medium tracking-[-0.05em] text-primary">
 									{formatMoney(selectedOrder.total)}
 								</p>
 							) : (
@@ -513,7 +513,7 @@ export default function CourierDashboard({
 
 	return (
 		<section className={getPageClass(embedded)}>
-			<div className="mx-auto max-w-6xl px-4 sm:px-6">
+			<div className="mx-auto max-w-7xl px-4 sm:px-6">
 				<div className="mb-10 flex flex-col gap-3">
 					<p className="text-sm font-bold uppercase tracking-[0.28em] text-primary">
 						Operacion de entregas
@@ -521,7 +521,7 @@ export default function CourierDashboard({
 
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
 						<div>
-							<h1 className="text-4xl font-black tracking-[-0.04em] sm:text-5xl">
+							<h1 className="text-2xl font-black tracking-[-0.04em] sm:text-2xl">
 								Gestion de entregas
 							</h1>
 							<p
@@ -549,7 +549,7 @@ export default function CourierDashboard({
 								<p className="text-sm font-medium text-text-light opacity-70">
 									Pendientes
 								</p>
-								<strong className="text-[3rem] leading-none font-black tracking-[-0.05em]">
+								<strong className="text-2xl leading-none font-black tracking-[-0.05em]">
 									{stats.pendingCount}
 								</strong>
 							</div>
@@ -565,7 +565,7 @@ export default function CourierDashboard({
 								<p className="text-sm font-medium text-text-light opacity-70">
 									Entregados hoy
 								</p>
-								<strong className="text-[3rem] leading-none font-black tracking-[-0.05em]">
+								<strong className="text-2xl leading-none font-black tracking-[-0.05em]">
 									{stats.deliveredTodayCount}
 								</strong>
 							</div>
@@ -581,7 +581,7 @@ export default function CourierDashboard({
 								<p className="text-sm font-medium text-text-light opacity-70">
 									Total a cobrar
 								</p>
-								<strong className="text-[2.7rem] leading-none font-black tracking-[-0.05em]">
+								<strong className="text-2xl leading-none font-black tracking-[-0.05em]">
 									{formatMoney(stats.pendingCashTotal)}
 								</strong>
 							</div>
@@ -651,7 +651,7 @@ export default function CourierDashboard({
 										return (
 											<tr
 												key={order.id}
-												className="border-t border-border-light text-[1.05rem] text-text-light"
+												className="border-t border-border-light text-base text-text-light"
 											>
 												<td className="px-8 py-5 font-medium">
 													{order.displayId}

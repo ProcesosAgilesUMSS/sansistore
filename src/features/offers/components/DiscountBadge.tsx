@@ -18,7 +18,7 @@ export default function DiscountBadge({ originalPrice, discountPercentage }: Dis
         <span className="text-sm text-text-light/50 line-through">
           Bs. {originalPrice.toFixed(2)}
         </span>
-        <span className="text-xl font-bold text-primary">
+        <span className="text-lg font-bold text-primary">
           Bs. {finalPrice.toFixed(2)}
         </span>
       </div>

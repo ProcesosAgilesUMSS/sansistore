@@ -546,3 +546,31 @@
 - **Yesterday:** Avancé en el rediseño de la interfaz de inicio de sesión sin tarjetas, el diseño con barra lateral de la sección de perfil y la consolidación de la pantalla de ubicaciones para unificarla en un solo componente master-detail.
 - **Today:** Completé el rediseño de inicio de sesión (`LoginPage.tsx`, `/iniciar-sesion`) con restricción estricta de Google Auth a cuentas `@umss.edu`; implementé el nuevo layout responsivo de perfil con barra lateral y cargadores skeleton (`ProfileView.tsx`, `/mi-perfil`); unifiqué la vista de ubicaciones (`LocationSection.tsx`, `/ubicaciones`) eliminando los modales encadenados; añadí animaciones al carrito y un banner interactivo y cerrable para el emulador de Firebase.
 - **Blockers:** n/a.
+
+# 06/25/2026
+
+## Castro Tejada Steven Lisandro
+- **Yesterday:** Implementé la nueva home pública de SansiStore en `/`, conecté la transición hacia `/productos`, ajusté la lógica de carruseles destacados y refiné la selección de productos para ofertas, populares, novedades y categorías. El trabajo quedó reflejado principalmente en las HUs #707, #708 y #709 junto con las tasks #711, #712 y #713.
+- **Today:** Además dejé preparada la entrega técnica de esta rama para revisión, documentando el alcance en las issues del Sprint 5 y consolidando todo en el PR #715 hacia `main`.
+- **Today:** Revisar visualmente la home y consolidar cualquier ajuste final de UX o criterios de selección.
+- **Blockers:** n/a.
+
+## Gutierrez Hinojosa Jhon Deymar
+- **Yesterday:** Corregí y estabilicé los tests automatizados afectados por los cambios en home, catálogo, perfil, favoritos, courier y pedidos, hasta dejar verde la ejecución principal de Playwright. Este trabajo quedó asociado sobre todo a la task #714.
+- **Today:** Dar seguimiento a la estabilidad de las pruebas y apoyar en cualquier ajuste adicional de CI/CD.
+- **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+- **Yesterday:** Participé como representante del equipo en la reunión del día, comuniqué los puntos tratados al grupo y ayudé a coordinar el seguimiento interno de las tareas relacionadas con la entrega.
+- **Today:** Continuar apoyando en la coordinación del equipo y en el seguimiento de acuerdos posteriores a la reunión.
+- **Blockers:** n/a.
+
+## Merudia Calderon Dayeza
+- **Yesterday:** Revisé las historias de usuario implementadas por el equipo, validando su planteamiento, separación funcional y coherencia con los criterios definidos para el sprint; la revisión se centró especialmente en las HUs #707, #708, #709 y #710.
+- **Today:** Continuar con la revisión de HUs pendientes y apoyar en la validación funcional de lo entregado.
+- **Blockers:** n/a.
+
+## Velasquez Vela Marcos
+- **Yesterday:** Implementé nuevos tests automatizados para los flujos impactados por la nueva home, los carruseles destacados y la transición hacia el catálogo, fortaleciendo la cobertura e2e del módulo de tienda. Este trabajo se relaciona principalmente con la task #714.
+- **Today:** Revisar la cobertura restante y apoyar en la validación final de los flujos automatizados.
+- **Blockers:** n/a.

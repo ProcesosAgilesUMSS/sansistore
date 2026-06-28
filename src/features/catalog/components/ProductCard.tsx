@@ -228,7 +228,7 @@ export default function ProductCard({
               <span
                 key={bumpKey}
                 aria-hidden="true"
-                className="cart-bump pointer-events-none absolute -top-2 left-1/2 z-30 rounded-full bg-primary px-1.5 py-0.5 text-[11px] font-extrabold leading-none text-white shadow-md shadow-primary/40"
+                className="cart-bump pointer-events-none absolute -top-2 left-1/2 z-30 rounded-full bg-primary px-1.5 py-0.5 text-xs font-extrabold leading-none text-white shadow-md shadow-primary/40"
               >
                 +1
               </span>
@@ -251,7 +251,7 @@ export default function ProductCard({
                   : 'cursor-not-allowed text-text-light opacity-30'
               } ${bumping ? 'cart-icon-pop' : ''}`}
             >
-              <FaCartPlus className="text-lg sm:text-xl" />
+              <FaCartPlus className="text-lg sm:text-lg" />
             </button>
           </span>
         </div>

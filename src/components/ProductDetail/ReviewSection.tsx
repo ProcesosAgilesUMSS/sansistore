@@ -120,7 +120,7 @@ export default function ReviewSection({
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-3">
           <MessageSquare size={18} className="text-primary" />
-          <h2 className="text-xl font-black text-text-light">Comentarios del producto</h2>
+          <h2 className="text-lg font-black text-text-light">Comentarios del producto</h2>
         </div>
         {reviewsCount > 0 && (
           <div className="flex items-center gap-2 text-sm font-medium text-text-light">

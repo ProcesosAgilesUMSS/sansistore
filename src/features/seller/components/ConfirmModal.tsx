@@ -42,8 +42,7 @@ export const ConfirmModal = ({
 
         <h2
           id="confirm-title"
-          className="text-xl font-800 tracking-tight text-(--theme-text)"
-          style={{ fontFamily: 'Outfit, sans-serif' }}
+          className="text-lg font-800 tracking-tight text-(--theme-text)"
         >
           Marcar pedido como listo
         </h2>

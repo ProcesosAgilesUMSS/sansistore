@@ -120,7 +120,7 @@ export default function PerfilForm() {
     <div className="w-full max-w-md mx-auto mt-20 p-4">
       <div className="rounded-[1.25rem] bg-card-bg-light border border-border-light p-6 shadow-sm">
         
-        <h2 className="font-black text-[clamp(1.25rem,3vw,1.75rem)] text-text-light tracking-[-0.04em] leading-none mb-2">
+        <h2 className="font-black text-2xl text-text-light tracking-[-0.04em] leading-none mb-2">
           Datos de Contacto
         </h2>
         <p className="text-sm text-text-light/60 mb-6">
@@ -162,14 +162,14 @@ export default function PerfilForm() {
           </div>
 
           {error && (
-            <div className="flex items-start gap-2 p-3 rounded-[0.75rem] bg-error-bg border border-error-border text-error text-[13px] font-medium">
+            <div className="flex items-start gap-2 p-3 rounded-[0.75rem] bg-error-bg border border-error-border text-error text-sm font-medium">
               <AlertCircle size={16} className="shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
           )}
 
           {success && (
-            <div className="flex items-center gap-2 p-3 rounded-[0.75rem] bg-success-bg border border-success-border text-success text-[13px] font-medium">
+            <div className="flex items-center gap-2 p-3 rounded-[0.75rem] bg-success-bg border border-success-border text-success text-sm font-medium">
               <CheckCircle size={16} className="shrink-0" />
               <span>Datos actualizados correctamente</span>
             </div>
@@ -178,7 +178,7 @@ export default function PerfilForm() {
           <button
             type="submit"
             disabled={saving}
-            className="w-full mt-2 py-3 rounded-full bg-primary text-white uppercase font-bold text-[12px] tracking-wider transition-all duration-200 hover:opacity-90 hover:scale-[1.02] active:scale-95 hover:shadow-lg disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none"
+            className="w-full mt-2 py-3 rounded-full bg-primary text-white uppercase font-bold text-xs tracking-wider transition-all duration-200 hover:opacity-90 hover:scale-[1.02] active:scale-95 hover:shadow-lg disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none"
           >
             {saving ? 'Guardando...' : 'Guardar Cambios'}
           </button>

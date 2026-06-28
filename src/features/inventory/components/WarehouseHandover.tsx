@@ -86,11 +86,11 @@ export const WarehouseHandover: React.FC = () => {
     <>
       <div className="bg-(--theme-card-bg) border border-(--theme-border) rounded-3xl p-6 shadow-sm h-full flex flex-col">
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-purple-500/10 rounded-xl text-purple-500">
+          <div className="p-2 bg-(--theme-info-bg) rounded-xl text-(--theme-info)">
             <SendToBack className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="font-['Outfit'] font-bold text-lg text-(--theme-text)">Pedidos en Espera</h2>
+            <h2 className="font-display font-bold text-lg text-(--theme-text)">Pedidos en Espera</h2>
             <p className="text-xs opacity-60 text-(--theme-text)">Pedidos empaquetados listos para ser retirados por el vendedor</p>
           </div>
         </div>
@@ -105,14 +105,14 @@ export const WarehouseHandover: React.FC = () => {
             {orders.map(order => (
               <div key={order.id} className="border border-(--theme-border) bg-(--theme-secondary-bg) rounded-2xl p-4 flex flex-col justify-between">
                 <div className="mb-4">
-                  <span className="block text-xs text-text-light/50 truncate">
+                  <span className="block text-xs text-(--theme-text)/50 truncate">
                     {parseOrderId(order.id).uuid}
                   </span>
                   <div className="flex justify-between items-start mb-3">
                     <span className="text-md font-bold px-2 py-1 rounded-md font-bold">
                       {parseOrderId(order.id).friendlyName}
                     </span>
-                    <span className="text-xs font-bold px-2 py-1 rounded-md bg-purple-500/20 text-purple-500">
+                    <span className="text-xs font-bold px-2 py-1 rounded-md bg-(--theme-info-bg) text-(--theme-info)">
                       EMPAQUETADO
                     </span>
                   </div>
@@ -131,7 +131,7 @@ export const WarehouseHandover: React.FC = () => {
 
                 <button
                   onClick={() => setActiveOrderForModal(order)}
-                  className="w-full bg-purple-500 text-white py-2.5 rounded-xl text-sm font-bold transition-all duration-200 hover:bg-purple-600 active:scale-[0.98] flex justify-center items-center gap-2"
+                  className="w-full bg-(--theme-info) text-white py-2.5 rounded-xl text-sm font-bold transition-all duration-200 hover:brightness-95 active:scale-[0.98] flex justify-center items-center gap-2"
                 >
                   <ListFilter className="w-4 h-4" />
                   VER DETALLES
@@ -155,19 +155,19 @@ export const WarehouseHandover: React.FC = () => {
             </button>
 
             <div className="mb-4">
-              <span className="block text-xs text-text-light/50 truncate">
+              <span className="block text-xs text-(--theme-text)/50 truncate">
                 {parseOrderId(activeOrderForModal.id).uuid}
               </span>
               <span className="text-lg font-bold px-2 py-0.5 rounded-md font-bold">
                 {parseOrderId(activeOrderForModal.id).friendlyName}
               </span>
-              <h2 className="font-['Outfit'] font-black text-xl text-(--theme-text) mt-2 mb-1">
+              <h2 className="font-display font-black text-lg text-(--theme-text) mt-2 mb-1">
                 Verificación de Pedido
               </h2>
             </div>
 
             {/* Datos del Vendedor */}
-            <p className="text-[10px] text-(--theme-text) opacity-50 font-bold uppercase tracking-wider mb-1">
+            <p className="text-xs text-(--theme-text) opacity-50 font-bold uppercase tracking-wider mb-1">
               Datos del Vendedor
             </p>
 
@@ -176,7 +176,7 @@ export const WarehouseHandover: React.FC = () => {
               {activeOrderForModal.seller?.photoURL ? (
                 <img src={activeOrderForModal.seller.photoURL} className="w-12 h-12 rounded-full object-cover shrink-0 border border-(--theme-border)" />
               ) : (
-                <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0 text-purple-500">
+                <div className="w-12 h-12 rounded-full bg-(--theme-info-bg) flex items-center justify-center shrink-0 text-(--theme-info)">
                   <User className="w-6 h-6" />
                 </div>
               )}
@@ -185,21 +185,21 @@ export const WarehouseHandover: React.FC = () => {
                   {getSellerName(activeOrderForModal)}
                 </p>
                 {activeOrderForModal.seller?.email && (
-                  <p className="text-[11px] text-(--theme-text) opacity-50 truncate">
+                  <p className="text-xs text-(--theme-text) opacity-50 truncate">
                     {activeOrderForModal.seller.email}
                   </p>
                 )}
                 {activeOrderForModal.seller?.institutionalId && (
-                  <p className="text-[11px] text-(--theme-text) opacity-50 truncate">
+                  <p className="text-xs text-(--theme-text) opacity-50 truncate">
                     {activeOrderForModal.seller.institutionalId}
                   </p>
                 )}
                 {activeOrderForModal.seller?.phone ? (
-                  <p className="text-[11px] text-(--theme-text) opacity-50 truncate">
+                  <p className="text-xs text-(--theme-text) opacity-50 truncate">
                     {activeOrderForModal.seller.phone}
                   </p>
                 ) : (
-                  <p className="text-[11px] text-(--theme-text) opacity-50 italic">
+                  <p className="text-xs text-(--theme-text) opacity-50 italic">
                     Sin teléfono registrado
                   </p>
                 )}
@@ -209,11 +209,11 @@ export const WarehouseHandover: React.FC = () => {
 
             {/* Lista de productos */}
             <div className="flex-grow overflow-y-auto my-2 pr-1 space-y-2 max-h-[35vh]">
-              <p className="text-[10px] text-(--theme-text) opacity-50 font-bold uppercase tracking-wider mb-1">Contenido</p>
+              <p className="text-xs text-(--theme-text) opacity-50 font-bold uppercase tracking-wider mb-1">Contenido</p>
               {activeOrderForModal.items.map((item, idx) => (
                 <div key={idx} className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-2xl p-3 flex justify-between items-center">
                   <p className="font-bold text-sm text-(--theme-text)">{item.productName}</p>
-                  <span className="font-black bg-purple-500/10 text-purple-500 px-3 py-1 rounded-xl text-sm">x{item.quantity}</span>
+                  <span className="font-black bg-(--theme-info-bg) text-(--theme-info) px-3 py-1 rounded-xl text-sm">x{item.quantity}</span>
                 </div>
               ))}
             </div>
@@ -222,7 +222,7 @@ export const WarehouseHandover: React.FC = () => {
             <div className="pt-4 mt-4 border-t border-(--theme-border)/50">
               <button
                 onClick={() => setActiveOrderForModal(null)}
-                className="w-full px-4 py-3 rounded-2xl font-['Outfit'] font-bold text-sm border border-(--theme-border) text-(--theme-text) hover:bg-(--theme-secondary-bg) transition"
+                className="w-full px-4 py-3 rounded-2xl font-display font-bold text-sm border border-(--theme-border) text-(--theme-text) hover:bg-(--theme-secondary-bg) transition"
               >
                 Cerrar
               </button>

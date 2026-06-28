@@ -37,26 +37,26 @@ const parseLocalDate = (dateStr: string) => {
 const toInputDate = (date: Date) => date.toISOString().split('T')[0];
 
 const METHOD_STYLES: Record<PaymentMethod, string> = {
-  EFECTIVO: 'bg-[rgba(136,176,75,0.15)] text-[#5E7E2F]',
-  QR: 'bg-[rgba(93,75,221,0.12)] text-[#534AB7]',
-  TRANSFERENCIA: 'bg-blue-500/10 text-blue-600',
-  TARJETA: 'bg-orange-500/10 text-orange-600',
+  EFECTIVO: 'bg-primary/15 text-primary',
+  QR: 'bg-(--theme-info-bg) text-(--theme-info)',
+  TRANSFERENCIA: 'bg-(--theme-info-bg) text-(--theme-info)',
+  TARJETA: 'bg-(--theme-warning-bg) text-(--theme-warning)',
 };
 
 const STATUS_STYLES: Record<PaymentStatus, string> = {
-  VERIFICADO: 'bg-teal-500/10 text-teal-700',
-  PENDIENTE: 'bg-amber-500/10 text-amber-700',
-  RECHAZADO: 'bg-red-500/10 text-red-600',
+  VERIFICADO: 'bg-(--theme-success-bg) text-(--theme-success)',
+  PENDIENTE: 'bg-(--theme-warning-bg) text-(--theme-warning)',
+  RECHAZADO: 'bg-(--theme-error)/10 text-(--theme-error)',
 };
 
 const MethodBadge = ({ method }: { method: PaymentMethod }) => (
-  <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full ${METHOD_STYLES[method]}`}>
+  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${METHOD_STYLES[method]}`}>
     {PAYMENT_METHOD_LABELS[method]?.toUpperCase() ?? method}
   </span>
 );
 
 const StatusBadge = ({ status }: { status: PaymentStatus }) => (
-  <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full ${STATUS_STYLES[status]}`}>
+  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${STATUS_STYLES[status]}`}>
     {status}
   </span>
 );
@@ -127,23 +127,23 @@ export default function PaymentAuditPanel() {
   };
 
   return (
-    <div className="max-w-5xl">
+    <div>
       <div className="mb-6">
-        <h2 className="text-[15px] font-semibold text-[var(--theme-text)]">
+        <h2 className="text-base font-semibold text-(--theme-text)">
           Historial de cobros
         </h2>
-        <p className="text-[11px] text-[var(--theme-text)]/50 mt-0.5">
+        <p className="text-xs text-(--theme-text)/50 mt-0.5">
           Registro de pagos confirmados por vendedores y mensajeros
         </p>
       </div>
 
-      <p className="text-[10px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-widest mb-3 pb-2 border-b border-[var(--theme-border)]">
+      <p className="text-xs font-semibold text-(--theme-text)/40 uppercase tracking-widest mb-3 pb-2 border-b border-(--theme-border)">
         Filtros
       </p>
 
       <div className="flex flex-wrap gap-3 mb-5">
         <div>
-          <label className="block text-[10px] font-semibold text-[var(--theme-text)]/50 uppercase tracking-wide mb-1.5">
+          <label className="block text-xs font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">
             Buscar pedido
           </label>
           <input
@@ -151,39 +151,39 @@ export default function PaymentAuditPanel() {
             placeholder="ID del pedido..."
             value={orderSearch}
             onChange={(e) => setOrderSearch(e.target.value)}
-            className="bg-[var(--theme-secondary-bg)] border border-[var(--theme-border)] rounded-lg px-3 py-2 text-[13px] text-[var(--theme-text)] outline-none focus:border-[#88B04B] w-[130px] placeholder:text-[var(--theme-text)]/30"
+            className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-lg px-3 py-2 text-sm text-(--theme-text) outline-none focus:border-primary w-[130px] placeholder:text-(--theme-text)/30"
           />
         </div>
         <div>
-          <label className="block text-[10px] font-semibold text-[var(--theme-text)]/50 uppercase tracking-wide mb-1.5">
+          <label className="block text-xs font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">
             Fecha inicio
           </label>
           <input
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="bg-[var(--theme-secondary-bg)] border border-[var(--theme-border)] rounded-lg px-3 py-2 text-[13px] text-[var(--theme-text)] outline-none focus:border-[#88B04B]"
+            className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-lg px-3 py-2 text-sm text-(--theme-text) outline-none focus:border-primary"
           />
         </div>
         <div>
-          <label className="block text-[10px] font-semibold text-[var(--theme-text)]/50 uppercase tracking-wide mb-1.5">
+          <label className="block text-xs font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">
             Fecha fin
           </label>
           <input
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="bg-[var(--theme-secondary-bg)] border border-[var(--theme-border)] rounded-lg px-3 py-2 text-[13px] text-[var(--theme-text)] outline-none focus:border-[#88B04B]"
+            className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-lg px-3 py-2 text-sm text-(--theme-text) outline-none focus:border-primary"
           />
         </div>
         <div>
-          <label className="block text-[10px] font-semibold text-[var(--theme-text)]/50 uppercase tracking-wide mb-1.5">
+          <label className="block text-xs font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">
             Encargado
           </label>
           <select
             value={collectorFilter}
             onChange={(e) => setCollectorFilter(e.target.value)}
-            className="bg-[var(--theme-secondary-bg)] border border-[var(--theme-border)] rounded-lg px-3 py-2 text-[13px] text-[var(--theme-text)] outline-none focus:border-[#88B04B]"
+            className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-lg px-3 py-2 text-sm text-(--theme-text) outline-none focus:border-primary"
           >
             <option value="todos">Todos</option>
             {collectors.map((collector) => (
@@ -194,13 +194,13 @@ export default function PaymentAuditPanel() {
           </select>
         </div>
         <div>
-          <label className="block text-[10px] font-semibold text-[var(--theme-text)]/50 uppercase tracking-wide mb-1.5">
+          <label className="block text-xs font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">
             Método de pago
           </label>
           <select
             value={methodFilter}
             onChange={(e) => setMethodFilter(e.target.value as PaymentMethod | 'ALL')}
-            className="bg-[var(--theme-secondary-bg)] border border-[var(--theme-border)] rounded-lg px-3 py-2 text-[13px] text-[var(--theme-text)] outline-none focus:border-[#88B04B]"
+            className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-lg px-3 py-2 text-sm text-(--theme-text) outline-none focus:border-primary"
           >
             <option value="ALL">Todos</option>
             {(Object.keys(PAYMENT_METHOD_LABELS) as PaymentMethod[]).map((key) => (
@@ -214,7 +214,7 @@ export default function PaymentAuditPanel() {
           <button
             onClick={handleFilter}
             disabled={loading}
-            className="bg-[#88B04B] text-white text-[13px] font-semibold px-5 py-2 rounded-full hover:bg-[#5E7E2F] transition-colors disabled:opacity-60"
+            className="bg-primary text-white text-sm font-semibold px-5 py-2 rounded-full hover:bg-primary/90 transition-colors disabled:opacity-60"
           >
             {loading ? 'Cargando...' : 'Filtrar'}
           </button>
@@ -222,7 +222,7 @@ export default function PaymentAuditPanel() {
             onClick={handleFilter}
             disabled={loading}
             title="Actualizar registros"
-            className="border border-[var(--theme-border)] text-[var(--theme-text)]/60 text-[13px] font-semibold px-3 py-2 rounded-full hover:border-[#88B04B] hover:text-[#88B04B] transition-colors disabled:opacity-60"
+            className="border border-(--theme-border) text-(--theme-text)/60 text-sm font-semibold px-3 py-2 rounded-full hover:border-primary hover:text-primary transition-colors disabled:opacity-60"
           >
             Actualizar
           </button>
@@ -230,8 +230,8 @@ export default function PaymentAuditPanel() {
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 px-4 py-3 rounded-xl text-[12px] font-medium bg-red-500/10 border border-red-500/20 text-red-500 mb-4">
-          <span className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center text-white text-[10px] font-bold">
+        <div className="flex items-center gap-2 px-4 py-3 rounded-xl text-xs font-medium bg-(--theme-error-bg) border border-(--theme-error-border) text-(--theme-error) mb-4">
+          <span className="w-5 h-5 rounded-full bg-(--theme-error) flex items-center justify-center text-white text-xs font-bold">
             !
           </span>
           {error}
@@ -241,58 +241,58 @@ export default function PaymentAuditPanel() {
       {loading && (
         <div className="flex flex-col gap-2">
           {[1, 2, 3, 4, 5].map((item) => (
-            <div key={item} className="h-12 bg-[var(--theme-secondary-bg)] rounded-xl animate-pulse" />
+            <div key={item} className="h-12 bg-(--theme-secondary-bg) rounded-xl animate-pulse" />
           ))}
         </div>
       )}
 
       {!loading && (
         <>
-          <p className="text-[10px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-widest mb-3 pb-2 border-b border-[var(--theme-border)]">
+          <p className="text-xs font-semibold text-(--theme-text)/40 uppercase tracking-widest mb-3 pb-2 border-b border-(--theme-border)">
             Registros ({logs.length})
           </p>
 
           {logs.length === 0 ? (
-            <div className="text-center py-12 border border-dashed border-[var(--theme-border)] rounded-xl">
-              <p className="text-[13px] text-[var(--theme-text)]/40">
+            <div className="text-center py-12 border border-dashed border-(--theme-border) rounded-xl">
+              <p className="text-sm text-(--theme-text)/40">
                 No se encontraron cobros con los filtros seleccionados.
               </p>
             </div>
           ) : (
-            <div className="border border-[var(--theme-border)] rounded-xl overflow-hidden">
+            <div className="border border-(--theme-border) rounded-xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse min-w-[700px]">
                   <thead>
-                    <tr className="bg-[var(--theme-secondary-bg)]">
-                      <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">Pedido</th>
-                      <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">Encargado</th>
-                      <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">Monto</th>
-                      <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">Método</th>
-                      <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">Estado</th>
-                      <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">Fecha y hora</th>
+                    <tr className="bg-(--theme-secondary-bg)">
+                      <th className="text-left text-xs font-semibold text-(--theme-text)/40 uppercase tracking-wide px-4 py-2.5">Pedido</th>
+                      <th className="text-left text-xs font-semibold text-(--theme-text)/40 uppercase tracking-wide px-4 py-2.5">Encargado</th>
+                      <th className="text-left text-xs font-semibold text-(--theme-text)/40 uppercase tracking-wide px-4 py-2.5">Monto</th>
+                      <th className="text-left text-xs font-semibold text-(--theme-text)/40 uppercase tracking-wide px-4 py-2.5">Método</th>
+                      <th className="text-left text-xs font-semibold text-(--theme-text)/40 uppercase tracking-wide px-4 py-2.5">Estado</th>
+                      <th className="text-left text-xs font-semibold text-(--theme-text)/40 uppercase tracking-wide px-4 py-2.5">Fecha y hora</th>
                     </tr>
                   </thead>
                   <tbody>
                     {logs.map((log, index) => (
                       <tr
                         key={log.logId}
-                        className={index % 2 === 0 ? 'bg-[var(--theme-card-bg)]' : 'bg-[var(--theme-secondary-bg)]/50'}
+                        className={index % 2 === 0 ? 'bg-(--theme-card-bg)' : 'bg-(--theme-secondary-bg)/50'}
                       >
-                        <td className="px-4 py-2.5 font-mono text-[11px] font-medium text-[var(--theme-text)]">
+                        <td className="px-4 py-2.5 font-mono text-xs font-medium text-(--theme-text)">
                           {log.orderId}
                         </td>
                         <td className="px-4 py-2.5">
-                          <div className="text-[12px] font-medium text-[var(--theme-text)]">
+                          <div className="text-xs font-medium text-(--theme-text)">
                             {log.collectedByName}
                           </div>
-                          <div className="text-[10px] text-[var(--theme-text)]/40">
+                          <div className="text-xs text-(--theme-text)/40">
                             {log.collectedByEmail}
                           </div>
-                          <div className="text-[8px] text-[var(--theme-text)]/30 uppercase tracking-wide">
+                          <div className="text-xs text-(--theme-text)/30 uppercase tracking-wide">
                             {log.collectedByRole}
                           </div>
                         </td>
-                        <td className="px-4 py-2.5 text-[12px] font-medium text-[var(--theme-text)]">
+                        <td className="px-4 py-2.5 text-xs font-medium text-(--theme-text)">
                           {formatCurrency(log.amount)}
                         </td>
                         <td className="px-4 py-2.5">
@@ -301,7 +301,7 @@ export default function PaymentAuditPanel() {
                         <td className="px-4 py-2.5">
                           <StatusBadge status={log.status} />
                         </td>
-                        <td className="px-4 py-2.5 text-[11px] text-[var(--theme-text)]/70">
+                        <td className="px-4 py-2.5 text-xs text-(--theme-text)/70">
                           {formatDateTime(log.timestamp)}
                         </td>
                       </tr>

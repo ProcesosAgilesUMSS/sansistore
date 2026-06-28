@@ -7,7 +7,6 @@ import { Header } from './Header';
 import { ErrorMessage } from './ErrorMessage';
 import { EmptyOrders } from './EmptyOrders';
 import { OrderDetailsModal } from './OrderDetailsModal';
-import { SectionHeader } from './SectionHeader';
 import { SkeletonRows } from './SkeletonRows';
 import { StatusPill } from './StatusPill';
 import { formatCurrency } from '../utils/currency';
@@ -52,8 +51,7 @@ function DecisionModal({
 
         <h2
           id="failed-order-decision-title"
-          className="text-xl font-800 tracking-tight text-(--theme-text)"
-          style={{ fontFamily: 'Outfit, sans-serif' }}
+          className="text-lg font-800 tracking-tight text-(--theme-text)"
         >
           {isRestart ? 'Reiniciar pedido' : 'Cancelar pedido'}
         </h2>
@@ -138,8 +136,7 @@ function FailedOrderCard({
                   {parseOrderId(order.orderId).uuid}
                 </p>
                 <h3
-                  className="mt-1 text-xl font-bold tracking-tight text-(--theme-text)"
-                  style={{ fontFamily: 'Outfit, sans-serif' }}
+                  className="mt-1 text-lg font-bold tracking-tight text-(--theme-text)"
                 >
                   {parseOrderId(order.orderId).friendlyName}
                 </h3>
@@ -152,7 +149,7 @@ function FailedOrderCard({
               </div>
 
               <div className="text-right">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-(--theme-text) opacity-40">
+                <p className="text-xs uppercase tracking-[0.2em] text-(--theme-text) opacity-40">
                   Total
                 </p>
                 <p className="font-900 text-2xl tracking-tight text-primary">
@@ -167,7 +164,7 @@ function FailedOrderCard({
 
             {order.incidentReason && (
               <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                <p className="text-[11px] font-800 uppercase tracking-[0.2em] opacity-70">
+                <p className="text-xs font-800 uppercase tracking-[0.2em] opacity-70">
                   Motivo del fallo
                 </p>
                 <p className="mt-1 font-700">{order.incidentReason}</p>
@@ -176,7 +173,7 @@ function FailedOrderCard({
 
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <div className="rounded-2xl border border-(--theme-border) bg-(--theme-secondary-bg)/60 px-4 py-3">
-                <p className="text-[11px] font-800 uppercase tracking-[0.22em] text-(--theme-text) opacity-45">
+                <p className="text-xs font-800 uppercase tracking-[0.22em] text-(--theme-text) opacity-45">
                   Ubicación
                 </p>
                 <p className="mt-1 text-sm font-700 text-(--theme-text)">
@@ -188,7 +185,7 @@ function FailedOrderCard({
               </div>
 
               <div className="rounded-2xl border border-(--theme-border) bg-(--theme-secondary-bg)/60 px-4 py-3">
-                <p className="text-[11px] font-800 uppercase tracking-[0.22em] text-(--theme-text) opacity-45">
+                <p className="text-xs font-800 uppercase tracking-[0.22em] text-(--theme-text) opacity-45">
                   Fecha
                 </p>
                 <p className="mt-1 text-sm font-700 text-(--theme-text)">
@@ -204,7 +201,7 @@ function FailedOrderCard({
           <div className="rounded-3xl border border-(--theme-border) bg-(--theme-secondary-bg)/40 p-4">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="text-[11px] font-800 uppercase tracking-[0.22em] text-(--theme-text) opacity-45">
+                <p className="text-xs font-800 uppercase tracking-[0.22em] text-(--theme-text) opacity-45">
                   Productos
                 </p>
                 <p className="mt-1 text-sm font-700 text-(--theme-text)">
@@ -212,7 +209,7 @@ function FailedOrderCard({
                 </p>
               </div>
 
-              <span className="rounded-full border border-(--theme-border) bg-(--theme-card-bg) px-3 py-1 text-[11px] font-800 uppercase tracking-[0.18em] text-(--theme-text) opacity-70">
+              <span className="rounded-full border border-(--theme-border) bg-(--theme-card-bg) px-3 py-1 text-xs font-800 uppercase tracking-[0.18em] text-(--theme-text) opacity-70">
                 Fallido
               </span>
             </div>
@@ -370,7 +367,6 @@ export default function FailedOrdersPanel({ embedded = false }: { embedded?: boo
 
       <div className="grid w-full gap-6">
         <section className="w-full rounded-3xl p-5">
-          <SectionHeader title="No entregados" count={orders.length} />
 
           {loading ? (
             <SkeletonRows count={3} />

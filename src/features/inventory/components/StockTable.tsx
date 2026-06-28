@@ -3,6 +3,7 @@ import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { Package, XCircle } from 'lucide-react';
 import { ProductDetailModal } from './ProductDetailModal';
+import { ProductThumb } from './ProductThumb';
 import { type InventoryProduct } from '../models/product.model';
 import { writeBatch } from 'firebase/firestore'; // 
 
@@ -117,7 +118,7 @@ export const StockTable: React.FC = () => {
 
   if (status === 'error') {
     return (
-      <div className="text-center py-20 text-red-400">
+      <div className="text-center py-20 text-(--theme-error)">
         <XCircle className="w-10 h-10 mx-auto mb-3 opacity-60" />
         <p className="font-bold mb-1">No se pudo cargar el inventario</p>
         <p className="text-sm opacity-70">
@@ -141,26 +142,18 @@ export const StockTable: React.FC = () => {
           >
             {/* Badge */}
             {product.badge && (
-              <span className="absolute top-2 left-2 bg-primary text-white text-[0.55rem] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full">
+              <span className="absolute top-2 left-2 bg-primary text-white text-xs font-bold uppercase tracking-widest px-2 py-0.5 rounded-full">
                 {product.badge}
               </span>
             )}
 
-            <div className="w-24 h-24 mb-3 rounded-xl overflow-hidden bg-white flex items-center justify-center">
-              {product.imageUrl ? (
-                <img
-                  src={product.imageUrl}
-                  alt={product.name}
-                  className="object-cover w-full h-full"
-                />
-              ) : (
-                <Package className="w-10 h-10 opacity-20 text-gray-400" />
-              )}
+            <div className="w-24 h-24 mb-3 rounded-xl overflow-hidden bg-(--theme-card-bg) border border-(--theme-border) flex items-center justify-center">
+              <ProductThumb src={product.imageUrl} alt={product.name} />
             </div>
-            <span className="font-['Outfit'] font-bold text-sm text-(--theme-text) text-center line-clamp-2">
+            <span className="font-display font-bold text-sm text-(--theme-text) text-center line-clamp-2">
               {product.name}
             </span>
-            <span className="text-[0.65rem] uppercase tracking-widest text-(--theme-text) opacity-40 mt-1">
+            <span className="text-xs uppercase tracking-widest text-(--theme-text) opacity-40 mt-1">
               {product.categoryId}
             </span>
           </button>

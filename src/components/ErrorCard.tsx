@@ -21,15 +21,15 @@ export default function ErrorCard({ isOpen, onClose, message, title }: ErrorModa
         <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-[#88B04B]/10 text-[#88B04B]">
           <AlertCircle size={24} />
         </div>
-        <h3 className="text-center font-display font-extrabold text-[20px] text-[#1E1E1E] dark:text-[#F5F3EF] mb-2 tracking-tight">
+        <h3 className="text-center font-display font-extrabold text-lg text-[#1E1E1E] dark:text-[#F5F3EF] mb-2 tracking-tight">
           {title}
         </h3>
-        <p className="text-center font-medium text-[14px] text-[#1E1E1E]/70 dark:text-[#F5F3EF]/70 mb-6 leading-relaxed">
+        <p className="text-center font-medium text-sm text-[#1E1E1E]/70 dark:text-[#F5F3EF]/70 mb-6 leading-relaxed">
           {message}
         </p>
         <button
           onClick={onClose}
-          className="w-full py-3 px-6 rounded-full bg-[#1E1E1E] dark:bg-[#F5F3EF] text-[#FFFFFF] dark:text-[#1E1E1E] uppercase font-bold text-[12px] tracking-wider transition-all hover:opacity-90 active:scale-95"
+          className="w-full py-3 px-6 rounded-full bg-[#1E1E1E] dark:bg-[#F5F3EF] text-[#FFFFFF] dark:text-[#1E1E1E] uppercase font-bold text-xs tracking-wider transition-all hover:opacity-90 active:scale-95"
         >
           Aceptar
         </button>

@@ -206,7 +206,7 @@ export default function CourierBuyerMap() {
 			<p className="mb-1 text-xs font-bold uppercase text-primary">
 				{isSeller ? "Ubicacion del vendedor" : "Pedido del comprador"}
 			</p>
-			<h1 className="text-xl font-black leading-tight tracking-normal sm:text-2xl">
+			<h1 className="text-lg font-black leading-tight tracking-normal sm:text-2xl">
 				{order?.customerName ?? "Cliente no registrado"}
 			</h1>
 
@@ -252,7 +252,7 @@ export default function CourierBuyerMap() {
 								<Banknote size={16} />
 								Cobro
 							</p>
-							<p className="mt-2 text-3xl font-black">
+							<p className="mt-2 text-2xl font-black">
 								{formatBolivianos(order?.cashToCollect ?? 0)}
 							</p>
 						</div>
@@ -342,7 +342,7 @@ export default function CourierBuyerMap() {
 				<p className="mb-1 text-xs font-bold uppercase text-primary">
 					{isSeller ? "Ubicación del vendedor" : "Pedido del comprador"}
 				</p>
-				<h1 className="text-xl font-black leading-tight tracking-normal sm:text-2xl">
+				<h1 className="text-lg font-black leading-tight tracking-normal sm:text-2xl">
 					{order?.customerName ?? "Cliente no registrado"}
 				</h1>
 
@@ -388,7 +388,7 @@ export default function CourierBuyerMap() {
 									<Banknote size={16} />
 									Cobro
 								</p>
-								<p className="mt-2 text-3xl font-black">
+								<p className="mt-2 text-2xl font-black">
 									{formatBolivianos(order?.cashToCollect ?? 0)}
 								</p>
 							</div>

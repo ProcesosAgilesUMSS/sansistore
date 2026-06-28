@@ -55,6 +55,40 @@
         color: var(--theme-text);
         font-family: 'Inter', system-ui, sans-serif;
     }
+
+    /* Scrollbar global de la página: siempre reserva su carril
+       (scrollbar-gutter: stable) para evitar saltos de ancho cuando aparece o
+       desaparece, y queda estilizado con los tokens del tema. */
+    html {
+        scrollbar-gutter: stable;
+        scrollbar-width: thin;
+        scrollbar-color:
+            color-mix(in srgb, var(--theme-text) 24%, transparent)
+            transparent;
+    }
+
+    html::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+    }
+
+    html::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    html::-webkit-scrollbar-thumb {
+        background: color-mix(in srgb, var(--theme-text) 18%, transparent);
+        border: 3px solid transparent;
+        border-radius: 9999px;
+        background-clip: content-box;
+    }
+
+    html::-webkit-scrollbar-thumb:hover {
+        background: color-mix(in srgb, var(--theme-text) 30%, transparent);
+        border: 3px solid transparent;
+        border-radius: 9999px;
+        background-clip: content-box;
+    }
 }
 
 @theme {
@@ -155,6 +189,38 @@
 
     html[data-theme='light'] .theme-icon-dark {
         display: none;
+    }
+
+    .admin-scrollbar {
+        scrollbar-gutter: stable;
+        scrollbar-width: thin;
+        scrollbar-color:
+            color-mix(in srgb, var(--theme-text) 24%, transparent)
+            color-mix(in srgb, var(--theme-secondary-bg) 42%, transparent);
+    }
+
+    .admin-scrollbar::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+    }
+
+    .admin-scrollbar::-webkit-scrollbar-track {
+        background: color-mix(in srgb, var(--theme-secondary-bg) 42%, transparent);
+        border-radius: 9999px;
+    }
+
+    .admin-scrollbar::-webkit-scrollbar-thumb {
+        background: color-mix(in srgb, var(--theme-text) 18%, transparent);
+        border: 3px solid transparent;
+        border-radius: 9999px;
+        background-clip: content-box;
+    }
+
+    .admin-scrollbar:hover::-webkit-scrollbar-thumb {
+        background: color-mix(in srgb, var(--theme-text) 30%, transparent);
+        border: 3px solid transparent;
+        border-radius: 9999px;
+        background-clip: content-box;
     }
 }
 

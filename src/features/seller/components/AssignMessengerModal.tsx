@@ -45,8 +45,7 @@ export function AssignMessengerModal({
 					<div className="min-w-0">
 						<h2
 							id="order-details-title"
-							className="text-xl font-bold leading-tight tracking-tight text-(--theme-text) sm:mt-2 sm:text-2xl"
-							style={{ fontFamily: "Outfit, sans-serif" }}
+							className="text-lg font-bold leading-tight tracking-tight text-(--theme-text) sm:mt-2 sm:text-2xl"
 						>
 							{parseOrderId(order.orderId).friendlyName}
 						</h2>
@@ -67,7 +66,7 @@ export function AssignMessengerModal({
 
 				<div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
 					<div className="rounded-3xl border border-(--theme-border) bg-(--theme-secondary-bg)/50 p-4">
-						<p className="text-[11px] font-800 uppercase tracking-[0.24em] text-(--theme-text) opacity-45">
+						<p className="text-xs font-800 uppercase tracking-[0.24em] text-(--theme-text) opacity-45">
 							Pedido listo
 						</p>
 						<p className="mt-1 text-lg font-900 text-(--theme-text)">
@@ -133,7 +132,7 @@ export function AssignMessengerModal({
 												<p className="font-800 flex items-center gap-2">
 													{messenger.displayName}
 													<span
-														className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-700 uppercase tracking-wide ${
+														className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-700 uppercase tracking-wide ${
 															messenger.isAvailable
 																? "bg-success-bg text-success border border-success-border"
 																: "bg-danger-bg text-danger border border-danger-border"

@@ -92,7 +92,7 @@ function ClosureCard({
           <p className="text-sm font-semibold text-[var(--theme-text)] truncate">
             {closure.courierName}
           </p>
-          <p className="text-xs text-[var(--theme-text)]/40">
+          <p className="text-xs text-(--theme-text)/40">
             {fmtDateKey(closure.dateKey)} · {fmtTime(closure.closedAt)}
           </p>
         </div>
@@ -193,23 +193,23 @@ function RejectModal({
     <>
       <div className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm" onClick={onCancel} />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-[var(--theme-card-bg)] border border-[var(--theme-border)]
+        <div className="w-full max-w-md bg-(--theme-card-bg) border border-(--theme-border)
           rounded-2xl shadow-2xl">
 
-          <div className="px-6 pt-6 pb-4 border-b border-[var(--theme-border)]">
-            <h2 className="text-[16px] font-bold text-[var(--theme-text)]">
+          <div className="px-6 pt-6 pb-4 border-b border-(--theme-border)">
+            <h2 className="text-base font-semibold text-(--theme-text)">
               Rechazar cierre de jornada
             </h2>
-            <p className="text-[12px] text-[var(--theme-text)]/50 mt-1">
+            <p className="text-xs text-(--theme-text)/50 mt-1">
               {closure.courierName} · {fmtDateKey(closure.dateKey)} ·{' '}
-              <span className={tone.diff !== 0 ? 'text-red-500' : ''}>
+              <span className={tone.diff !== 0 ? 'text-(--theme-error)' : ''}>
                 {tone.label}
               </span>
             </p>
           </div>
 
           <div className="px-6 py-5">
-            <label className="block text-[11px] font-semibold text-[var(--theme-text)]/50
+            <label className="block text-xs font-semibold text-(--theme-text)/50
               uppercase tracking-wide mb-1.5">
               Motivo del rechazo *
             </label>
@@ -219,28 +219,28 @@ function RejectModal({
               onChange={(e) => setReason(e.target.value)}
               rows={3}
               placeholder="Ej: el monto registrado no coincide con el total de entregas confirmadas..."
-              className="w-full p-3 rounded-xl text-[13px] bg-[var(--theme-bg)]
-                border border-[var(--theme-border)] text-[var(--theme-text)]
-                placeholder:text-[var(--theme-text)]/30 outline-none
-                focus:border-red-400 transition-colors resize-none"
+              className="w-full p-3 rounded-xl text-sm bg-(--theme-bg)
+                border border-(--theme-border) text-(--theme-text)
+                placeholder:text-(--theme-text)/30 outline-none
+                focus:border-(--theme-error-border) transition-colors resize-none"
             />
           </div>
 
-          <div className="flex gap-3 px-6 py-4 border-t border-[var(--theme-border)]">
+          <div className="flex gap-3 px-6 py-4 border-t border-(--theme-border)">
             <button
               onClick={onCancel}
               disabled={submitting}
-              className="flex-1 py-2.5 rounded-xl text-[13px] font-medium bg-[var(--theme-bg)]
-                border border-[var(--theme-border)] text-[var(--theme-text)]/60
-                hover:text-[var(--theme-text)] transition-colors disabled:opacity-50"
+              className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-(--theme-bg)
+                border border-(--theme-border) text-(--theme-text)/60
+                hover:text-(--theme-text) transition-colors disabled:opacity-50"
             >
               Cancelar
             </button>
             <button
               onClick={() => onConfirm(reason.trim())}
               disabled={submitting || !reason.trim()}
-              className="flex-1 py-2.5 rounded-xl text-[13px] font-medium bg-red-600
-                hover:bg-red-700 text-white transition-colors
+              className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-(--theme-error)
+                hover:bg-(--theme-error) text-white transition-colors
                 disabled:opacity-40 disabled:cursor-not-allowed
                 flex items-center justify-center gap-2"
             >
@@ -283,10 +283,10 @@ export default function CourierSessionsValidation() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-[15px] font-semibold text-[var(--theme-text)]">
+          <h2 className="text-base font-semibold text-(--theme-text)">
             Cierres de jornada pendientes
           </h2>
-          <p className="text-[11px] text-[var(--theme-text)]/50 mt-0.5">
+          <p className="text-xs text-(--theme-text)/50 mt-0.5">
             {loading
               ? 'Cargando...'
               : `${closures.length} jornada${closures.length !== 1 ? 's' : ''} esperando validación`}
@@ -296,8 +296,8 @@ export default function CourierSessionsValidation() {
           onClick={refresh}
           disabled={loading}
           className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium
-            bg-[var(--theme-secondary-bg)] text-[var(--theme-text)]/60
-            hover:text-[var(--theme-text)] disabled:opacity-50 transition-colors"
+            bg-(--theme-secondary-bg) text-(--theme-text)/60
+            hover:text-(--theme-text) disabled:opacity-50 transition-colors"
         >
           <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
           Actualizar
@@ -306,9 +306,9 @@ export default function CourierSessionsValidation() {
 
       {/* Error de validación */}
       {validateError && (
-        <div className="flex items-center gap-3 px-4 py-3 bg-red-50 dark:bg-red-500/10
-          border border-red-200 dark:border-red-500/30 rounded-xl text-sm
-          text-red-600 dark:text-red-300">
+        <div className="flex items-center gap-3 px-4 py-3 bg-(--theme-error-bg)
+          border border-(--theme-error-border) rounded-xl text-sm
+          text-(--theme-error) dark:text-(--theme-error)">
           <AlertCircle size={16} className="flex-shrink-0" />
           {validateError}
         </div>
@@ -316,9 +316,9 @@ export default function CourierSessionsValidation() {
 
       {/* Error de carga */}
       {error && (
-        <div className="flex items-center gap-3 px-4 py-3 bg-red-50 dark:bg-red-500/10
-          border border-red-200 dark:border-red-500/30 rounded-xl text-sm
-          text-red-600 dark:text-red-300">
+        <div className="flex items-center gap-3 px-4 py-3 bg-(--theme-error-bg)
+          border border-(--theme-error-border) rounded-xl text-sm
+          text-(--theme-error) dark:text-(--theme-error)">
           <AlertCircle size={16} className="flex-shrink-0" />
           {error}
         </div>
@@ -327,14 +327,14 @@ export default function CourierSessionsValidation() {
       {/* Loading */}
       {loading && (
         <div className="flex items-center justify-center py-20">
-          <Loader2 size={24} className="animate-spin text-[#88b04b]" />
+          <Loader2 size={24} className="animate-spin text-primary" />
         </div>
       )}
 
       {/* Estado vacío */}
       {!loading && !error && closures.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20
-          text-[var(--theme-text)]/30 select-none">
+          text-(--theme-text)/30 select-none">
           <ClipboardList size={40} strokeWidth={1.2} />
           <p className="mt-3 text-sm">No hay jornadas pendientes de validación</p>
         </div>
@@ -359,7 +359,7 @@ export default function CourierSessionsValidation() {
                 onClick={loadMore}
                 disabled={loadingMore}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
-                  text-[#88b04b] hover:text-[#7aa043] disabled:opacity-50 transition-colors"
+                  text-primary hover:text-primary disabled:opacity-50 transition-colors"
               >
                 {loadingMore && <Loader2 size={14} className="animate-spin" />}
                 <ChevronDown size={14} />

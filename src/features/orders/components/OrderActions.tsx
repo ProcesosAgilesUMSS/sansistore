@@ -158,12 +158,12 @@ export default function OrderActions({
 				<div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm">
 					<div className="w-full max-w-md rounded-[28px] bg-(--theme-card-bg) border border-(--theme-border) p-6 shadow-2xl text-left text-(--theme-text)">
 						<div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/15 text-primary">
-							<span className="text-xl font-bold">$</span>
+							<span className="text-lg font-bold">$</span>
 						</div>
-						<h3 className="text-[1.6rem] font-semibold text-(--theme-text)">
+						<h3 className="text-2xl font-semibold text-(--theme-text)">
 							Validar pago del pedido
 						</h3>
-						<p className="mt-3 text-[1rem] leading-7 text-(--theme-text) opacity-70">
+						<p className="mt-3 text-base leading-7 text-(--theme-text) opacity-70">
 							Este pedido se marcará como pagado y se actualizará el inventario.
 						</p>
 						<div className="mt-5 rounded-2xl border border-(--theme-border) px-4 py-3 text-sm text-(--theme-text) opacity-60">

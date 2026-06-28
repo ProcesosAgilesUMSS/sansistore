@@ -38,7 +38,7 @@ export default function OrderIdGenerator() {
         </p>
 
         <div className="rounded-xl border border-border-light bg-bg-light/60 p-4 mb-6">
-          <p className="text-[10px] font-mono text-text-light/40 break-all">{uuid}</p>
+          <p className="text-xs font-mono text-text-light/40 break-all">{uuid}</p>
           <p className="text-2xl font-black text-text-light mt-1">
             {friendlyName}
           </p>

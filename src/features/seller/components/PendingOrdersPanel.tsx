@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { SectionHeader } from './SectionHeader';
 import { usePendingOrders } from '../hooks/usePendingOrders';
 import type { PendingOrder } from '../types/pendingOrders';
 
@@ -19,7 +20,7 @@ function ProductsList({ productos }: { productos: PendingOrder['productos'] }) {
   return (
     <span className="flex items-center gap-2">
       <span className="truncate max-w-[28ch]">{productos[0].nombre}</span>
-      <span className="shrink-0 rounded border border-[#1e1e1e33] border-dotted px-[5px] py-[1px] text-[10px] uppercase tracking-wide dark:border-white/20">
+      <span className="shrink-0 rounded border border-[#1e1e1e33] border-dotted px-[5px] py-[1px] text-xs uppercase tracking-wide dark:border-white/20">
         +{productos.length - 1}
       </span>
     </span>
@@ -63,7 +64,7 @@ function TableRow({
 
 function ColHeader({ children }: { children: string }) {
   return (
-    <th className="pb-3 text-left uppercase text-[10px] tracking-widest font-normal opacity-50">
+    <th className="pb-3 text-left uppercase text-xs tracking-widest font-normal opacity-50">
       <span className="mr-1 opacity-60">/</span>{children}
     </th>
   );
@@ -86,7 +87,7 @@ function OrderDetailView({
       <div className="flex items-start justify-between mb-8">
         <div>
           <p className="uppercase text-xs tracking-widest opacity-50 mb-3">/ detalle del pedido</p>
-          <h2 className="text-[clamp(2rem,8vw,5rem)] tracking-[-0.05em] leading-none font-light mb-4">
+          <h2 className="text-2xl tracking-[-0.05em] leading-none font-light mb-4">
             {order.id_pedido}
           </h2>
           <div className="flex items-center gap-2 text-sm">
@@ -110,7 +111,7 @@ function OrderDetailView({
         </p>
       ) : (
         <>
-          <div className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-4 uppercase text-[10px] tracking-widest font-normal opacity-50 border-b border-dotted pb-3 mb-1 border-[#1e1e1e44] dark:border-white/20">
+          <div className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-4 uppercase text-xs tracking-widest font-normal opacity-50 border-b border-dotted pb-3 mb-1 border-[#1e1e1e44] dark:border-white/20">
             <span>/ Producto</span>
             <span>/ Cantidad</span>
             <span>/ P. Unitario</span>
@@ -133,7 +134,7 @@ function OrderDetailView({
                   <div>
                     <p className="text-sm font-medium">{p.nombre}</p>
                     {producto.productId && (
-                      <p className="text-[11px] opacity-40 mt-0.5">Cód: {producto.productId}</p>
+                      <p className="text-xs opacity-40 mt-0.5">Cód: {producto.productId}</p>
                     )}
                   </div>
                   <p className="text-sm tabular-nums">{producto.quantity ?? '—'}</p>
@@ -192,21 +193,8 @@ export default function PendingOrdersPanel() {
   const [selectedOrder, setSelectedOrder] = useState<PendingOrder | null>(null);
 
   return (
-    <section
-      className="min-h-[calc(100vh-80px)] px-6 md:px-12 lg:px-20 xl:px-28 py-12"
-      aria-labelledby="pending-orders-title"
-    >
-      <h1
-        id="pending-orders-title"
-        className="tracking-[-0.07em] text-[clamp(3rem,10vw,7rem)] leading-none mb-14 font-light"
-      >
-        Pedidos pendientes
-        {!loading && (
-          <sup className="text-[0.3em] tracking-tight ml-4 align-super opacity-50 font-normal">
-            ({orders.length === 0 ? 'sin pedidos' : orders.length})
-          </sup>
-        )}
-      </h1>
+    <section aria-labelledby="pending-orders-title">
+      <SectionHeader title="Pedidos pendientes" count={loading ? undefined : orders.length} />
 
       {error && (
         <div className="mb-8 border border-dotted border-red-400 bg-red-50 px-5 py-4 rounded text-sm text-red-700 dark:bg-red-900/20 dark:text-red-300">

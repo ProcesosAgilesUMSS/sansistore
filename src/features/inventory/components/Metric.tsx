@@ -11,7 +11,7 @@ interface Props {
 export const Metric: React.FC<Props> = ({ label, value, dim, blue }) => {
   return (
     <div className="text-center">
-      <p className="text-[10px] uppercase tracking-widest opacity-40 text-(--theme-text) mb-1">
+      <p className="text-xs uppercase tracking-widest opacity-40 text-(--theme-text) mb-1">
         {label}
       </p>
 
@@ -20,7 +20,7 @@ export const Metric: React.FC<Props> = ({ label, value, dim, blue }) => {
           dim
             ? 'opacity-50 text-(--theme-text)'
             : blue
-              ? 'text-blue-400'
+              ? 'text-(--theme-info)'
               : 'text-(--theme-text)'
         }`}
       >

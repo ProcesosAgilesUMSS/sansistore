@@ -34,9 +34,9 @@ export const InventoryItemCard: React.FC<Props> = ({ item }) => {
           isLowStock
             ? `
               border-l-[3px]
-              border-l-amber-500
+              border-l-(--theme-warning)
               rounded-l-none
-              bg-amber-500/5
+              bg-(--theme-warning-bg)
             `
             : ''
         }
@@ -52,14 +52,14 @@ export const InventoryItemCard: React.FC<Props> = ({ item }) => {
         <p className="text-sm font-medium text-(--theme-text) m-0 flex items-center gap-2">
           <Package
             className={`w-4 h-4 shrink-0 ${
-              isLowStock ? 'text-amber-500' : 'opacity-30'
+              isLowStock ? 'text-(--theme-warning)' : 'opacity-30'
             }`}
           />
 
           {item.name}
         </p>
 
-        <span className="mt-1 inline-block text-[11px] uppercase tracking-wider opacity-60 bg-(--theme-secondary-bg) px-2 py-0.5 rounded">
+        <span className="mt-1 inline-block text-xs uppercase tracking-wider opacity-60 bg-(--theme-secondary-bg) px-2 py-0.5 rounded">
           {item.categoryId}
         </span>
       </div>

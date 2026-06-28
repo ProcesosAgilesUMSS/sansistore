@@ -13,7 +13,7 @@ const toSlug = (text: string) =>
     .replace(/\s+/g, '-');
 
 const FieldError = ({ message }: { message?: string }) =>
-  message ? <p className="mt-1 text-xs text-red-500">{message}</p> : null;
+  message ? <p className="mt-1 text-xs text-(--theme-error)">{message}</p> : null;
 
 interface Props {
   form: UseFormReturn<ProductFormValues>;
@@ -55,7 +55,7 @@ export const ProductFormFields = ({
           Categoría *
         </label>
         {categoriesError && (
-          <p className="mb-1 text-xs text-red-500">{categoriesError}</p>
+          <p className="mb-1 text-xs text-(--theme-error)">{categoriesError}</p>
         )}
         <select
           {...register('categoryId')}
@@ -225,7 +225,7 @@ export const ProductFormFields = ({
             <button
               type="button"
               onClick={onRemoveImage}
-              className="mt-1 text-xs font-bold text-red-500 hover:opacity-80 transition flex items-center gap-1"
+              className="mt-1 text-xs font-bold text-(--theme-error) hover:opacity-80 transition flex items-center gap-1"
             >
               <X className="w-3 h-3" /> Quitar imagen
             </button>
@@ -262,7 +262,7 @@ export const ProductFormFields = ({
               <button
                 type="button"
                 onClick={onCancelUpload}
-                className="text-xs font-bold text-red-500 hover:opacity-80 transition"
+                className="text-xs font-bold text-(--theme-error) hover:opacity-80 transition"
               >
                 Cancelar subida
               </button>

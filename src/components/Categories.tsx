@@ -78,7 +78,7 @@ export default function Categories() {
               <div className="relative h-full flex flex-col items-center justify-center p-6 text-center">
 
                 <span
-                  className="text-4xl mb-3 transition-transform duration-300 group-hover:scale-110"
+                  className="text-2xl mb-3 transition-transform duration-300 group-hover:scale-110"
                 >
                   {cat.emoji}
                 </span>

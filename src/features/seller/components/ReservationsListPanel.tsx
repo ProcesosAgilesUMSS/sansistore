@@ -2,32 +2,17 @@ import { useReservations } from '../hooks/useReservations';
 import { StatusPill } from './StatusPill';
 import { formatCurrency } from '../utils/currency';
 import { formatDate } from '../utils/formatDate';
+import { SectionHeader } from './SectionHeader';
 
 export default function ReservationsListPanel() {
   const { reservations, loading, error } = useReservations();
 
   return (
     <div className="min-h-screen bg-(--theme-bg) px-4 pb-10 pt-10 md:px-8 xl:px-10">
-      <header className="mb-8 rounded-[1.75rem] border border-(--theme-border) bg-(--theme-card-bg) px-6 py-6 shadow-sm backdrop-blur-sm">
-        <p
-          className="mb-3 text-xs font-800 uppercase tracking-[0.25em]"
-          style={{ color: 'var(--color-primary)' }}
-        >
-          Sección Reservas
-        </p>
-
-        <h1
-          className="text-3xl font-900 leading-tight text-(--theme-text) md:text-4xl"
-          style={{ fontFamily: 'Outfit, sans-serif' }}
-        >
-          Reserva de Productos
-        </h1>
-
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-(--theme-text) opacity-70 md:text-base">
-          Visualización en tiempo real de los productos reservados para preparar los
-          pedidos.
-        </p>
-      </header>
+      <SectionHeader
+        title="Reserva de productos"
+        subtitle="Productos reservados para preparar los pedidos."
+      />
 
       {error && (
         <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-4 text-sm text-red-700 dark:border-red-800/40 dark:bg-red-900/20 dark:text-red-300">
@@ -39,8 +24,7 @@ export default function ReservationsListPanel() {
         <div className="mb-5 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div>
             <h2
-              className="text-xl font-800 text-(--theme-text)"
-              style={{ fontFamily: 'Outfit, sans-serif' }}
+              className="text-lg font-800 text-(--theme-text)"
             >
               Lista de reservas
             </h2>
@@ -107,7 +91,6 @@ export default function ReservationsListPanel() {
                     <div className="flex flex-wrap items-center gap-2">
                       <h3
                         className="font-800 text-lg tracking-tight text-(--theme-text)"
-                        style={{ fontFamily: 'Outfit, sans-serif' }}
                       >
                         Reserva #{reservation.orderId}
                       </h3>
@@ -142,11 +125,11 @@ export default function ReservationsListPanel() {
                   </div>
 
                   <div className="rounded-2xl bg-(--theme-secondary-bg) px-4 py-3 text-left lg:text-right">
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-(--theme-text) opacity-40">
+                    <p className="text-xs uppercase tracking-[0.2em] text-(--theme-text) opacity-40">
                       Total del pedido
                     </p>
 
-                    <p className="font-800 text-xl tracking-tight text-primary">
+                    <p className="font-800 text-lg tracking-tight text-primary">
                       {formatCurrency(reservation.total)}
                     </p>
                   </div>

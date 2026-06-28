@@ -53,7 +53,7 @@ export default function CancelNoPaymentModal({
 						</span>
 
 						<div>
-							<h2 className="text-lg font-black leading-tight tracking-normal sm:text-xl">
+							<h2 className="text-lg font-black leading-tight tracking-normal sm:text-lg">
 								Cancelar pedido
 							</h2>
 							<p className="text-sm font-medium opacity-70">

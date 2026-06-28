@@ -104,7 +104,7 @@ export default function LoginPage() {
 						<span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-white shadow-lg shadow-primary/30">
 							<ShoppingBag size={28} strokeWidth={2.4} />
 						</span>
-						<h1 className="mt-5 text-3xl font-black tracking-tight text-(--theme-text)">
+						<h1 className="mt-5 text-2xl font-black tracking-tight text-(--theme-text)">
 							Sansi<span className="text-primary">Store</span>
 						</h1>
 						<p className="mt-2 text-sm text-(--theme-text) opacity-60">

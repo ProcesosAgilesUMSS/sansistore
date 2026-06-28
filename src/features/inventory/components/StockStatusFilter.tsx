@@ -26,21 +26,21 @@ export const StockStatusFilter = ({
       key: 'all',
       label: 'Todos',
       icon: <LayoutGrid className="w-3.5 h-3.5" />,
-      activeClass: 'bg-white text-black border-transparent shadow-sm shadow-primary/25',
-      activeBadgeClass: 'bg-black/10 text-black',
+      activeClass: 'bg-primary text-white border-transparent shadow-sm',
+      activeBadgeClass: 'bg-white/25 text-white',
     },
     {
       key: 'low',
       label: 'Stock Bajo',
       icon: <AlertTriangle className="w-3.5 h-3.5" />,
-      activeClass: 'bg-amber-500 text-white border-transparent shadow-sm shadow-amber-500/25',
+      activeClass: 'bg-(--theme-warning) text-white border-transparent shadow-sm',
       activeBadgeClass: 'bg-white/25 text-white',
     },
     {
       key: 'normal',
       label: 'Normal',
       icon: <CheckCircle className="w-3.5 h-3.5" />,
-      activeClass: 'bg-green-500 text-white border-transparent shadow-sm shadow-green-500/25',
+      activeClass: 'bg-primary text-white border-transparent shadow-sm',
       activeBadgeClass: 'bg-white/25 text-white',
     },
   ];
@@ -79,7 +79,7 @@ export const StockStatusFilter = ({
             {count !== undefined && (
               <span
                 className={`
-                  ml-1 px-1.5 py-0.5 rounded-full text-[0.6rem] font-black tracking-wide transition-colors
+                  ml-1 px-1.5 py-0.5 rounded-full text-xs font-black tracking-wide transition-colors
                   /* Aquí lee dinámicamente la clase correspondiente al badge activo */
                   ${isActive ? opt.activeBadgeClass : 'bg-(--theme-border) text-(--theme-text) opacity-80'}
                 `}

@@ -51,12 +51,12 @@ export default function CreatedOrdersList() {
 					onNotification={showNotification}
 				/>
 			) : null}
-			<div className="max-w-6xl mx-auto px-4 sm:px-6 pb-10">
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 pb-10">
 				<section className="rounded-2xl border border-(--theme-border) bg-(--theme-card-bg) p-5 shadow-sm">
 					<SectionHeader title="Pedidos creados" count={orders.length} />
 					<ul className="grid grid-cols-18 mx-auto w-full">
 						{/* Header */}
-						<li className="grid grid-cols-subgrid col-span-full uppercase border-b border-dotted border-(--theme-border) pb-3 mb-1 text-[10px] tracking-widest font-normal opacity-60">
+						<li className="grid grid-cols-subgrid col-span-full uppercase border-b border-dotted border-(--theme-border) pb-3 mb-1 text-xs tracking-widest font-normal opacity-60">
 							<div className="hidden min-[570px]:flex col-span-full min-[570px]:col-start-1 min-[570px]:col-end-4 min-[775px]:col-end-3 gap-x-2">
 								<span>/</span>
 								Orden

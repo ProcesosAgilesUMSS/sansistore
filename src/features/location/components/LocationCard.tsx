@@ -117,7 +117,7 @@ export default function LocationCard({
                         </span>
                     </div>
 
-                    <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-primary truncate block w-full">
+                    <p className="mt-1 text-xs font-bold uppercase tracking-widest text-primary truncate block w-full">
                         {type}
                     </p>
                 </div>

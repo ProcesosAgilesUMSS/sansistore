@@ -7,7 +7,7 @@ import { ProductModal } from '../../features/inventory/components/ProductModal.t
 <InventoryLayout title="Sansistore | Mis Productos">
   <div class="flex items-center justify-between mb-8">
     <h1
-      class="font-['Outfit'] font-black text-2xl tracking-tight text-(--theme-text)"
+      class="font-display font-black text-2xl tracking-tight text-(--theme-text)"
     >
       Mis <span class="text-primary">Productos</span>
     </h1>
@@ -16,9 +16,5 @@ import { ProductModal } from '../../features/inventory/components/ProductModal.t
     <ProductModal client:load />
   </div>
 
-  <div
-    class="bg-(--theme-card-bg) border border-(--theme-border) rounded-2xl p-6"
-  >
-    <StockTable client:load />
-  </div>
+  <StockTable client:load />
 </InventoryLayout>

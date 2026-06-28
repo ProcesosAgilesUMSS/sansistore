@@ -26,10 +26,9 @@ export default function OrderGridSection({
       className="px-3 grid bg-bg-light
       grid-cols-[repeat(8,1fr)]
       min-[760px]:grid-cols-[repeat(16,1fr)]
-      min-[960px]:grid-cols-[repeat(24,1fr)]
-      font-['Inter',sans-serif]"
+      min-[960px]:grid-cols-[repeat(24,1fr)]"
     >
-      <h2 className="col-start-1 min-[960px]:col-start-3 col-span-full tracking-[-0.09em] text-[calc(4.48431vw+20.5112px)] leading-[100%]">
+      <h2 className="col-start-1 min-[960px]:col-start-3 col-span-full tracking-[-0.09em] text-2xl leading-[100%]">
         {title}
       </h2>
 

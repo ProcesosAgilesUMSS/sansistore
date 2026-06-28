@@ -28,16 +28,16 @@ export function NavItem({
 
   const baseClass = `
     flex items-center gap-2.5 px-2.5 py-2 rounded-[0.625rem]
-    text-[0.8rem] font-medium text-(--theme-text)
+    text-sm font-medium text-(--theme-text)
     border border-transparent no-underline
     transition-all duration-180 ease-[cubic-bezier(0.4,0,0.2,1)]
     max-md:flex-col max-md:gap-[3px] max-md:px-2.5 max-md:py-1.5
-    max-md:text-[0.6rem] max-md:min-w-[60px] max-md:text-center max-md:flex-1
+    max-md:text-xs max-md:min-w-[60px] max-md:text-center max-md:flex-1
     ${disabled ? 'opacity-30 pointer-events-none cursor-not-allowed' : 'cursor-pointer'}
   `;
 
   const activeClass = `
-    bg-[rgba(136,176,75,0.12)] !border-[rgba(136,176,75,0.28)]
+    bg-primary/10 !border-primary/30
     !text-primary font-semibold !opacity-100
   `;
 
@@ -60,7 +60,7 @@ export function NavItem({
         <span
           className="
           w-1.5 h-1.5 rounded-full bg-primary ml-auto shrink-0
-          shadow-[0_0_6px_rgba(136,176,75,0.6)] max-md:hidden
+          shadow-primary/30 max-md:hidden
         "
         />
       )}
@@ -68,11 +68,11 @@ export function NavItem({
       {count != null && (
         <span
           className={`
-          ml-auto text-[0.62rem] font-bold px-1.5 py-px rounded-full shrink-0 max-md:hidden
+          ml-auto text-xs font-bold px-1.5 py-px rounded-full shrink-0 max-md:hidden
           ${
             countType === 'alert'
-              ? 'bg-[rgba(224,82,82,0.14)] text-[#e05252]'
-              : 'bg-[rgba(224,154,82,0.14)] text-[#e09a52]'
+              ? 'bg-(--theme-error-bg) text-(--theme-error)'
+              : 'bg-(--theme-warning-bg) text-(--theme-warning)'
           }
         `}
         >

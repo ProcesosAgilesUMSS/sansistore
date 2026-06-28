@@ -61,8 +61,7 @@ function ReserveModal({
 
         <h2
           id="reserve-title"
-          className="text-xl font-800 tracking-tight text-(--theme-text)"
-          style={{ fontFamily: 'Outfit, sans-serif' }}
+          className="text-lg font-800 tracking-tight text-(--theme-text)"
         >
           Reservar pedido
         </h2>
@@ -139,8 +138,7 @@ export default function ReservedOrdersPanel({ embedded = false }: { embedded?: b
 
       <header className="mb-8 rounded-[1.75rem] border border-(--theme-border) bg-(--theme-card-bg) px-6 py-6 shadow-sm backdrop-blur-sm">
         <h1
-          className="text-3xl font-900 leading-tight text-(--theme-text) md:text-4xl"
-          style={{ fontFamily: 'Outfit, sans-serif' }}
+          className="text-2xl font-900 leading-tight text-(--theme-text) md:text-2xl"
         >
           Reservar pedidos
         </h1>
@@ -160,8 +158,7 @@ export default function ReservedOrdersPanel({ embedded = false }: { embedded?: b
                 Cobrado hoy
               </p>
               <p
-                className="mt-2 text-3xl font-900 leading-tight text-(--theme-text) md:text-4xl"
-                style={{ fontFamily: 'Outfit, sans-serif' }}
+                className="mt-2 text-2xl font-900 leading-tight text-(--theme-text) md:text-2xl"
               >
                 {collectionsLoading
                   ? 'Calculando...'
@@ -186,8 +183,7 @@ export default function ReservedOrdersPanel({ embedded = false }: { embedded?: b
                 Pedidos cobrados
               </p>
               <p
-                className="mt-2 text-3xl font-900 leading-tight text-(--theme-text)"
-                style={{ fontFamily: 'Outfit, sans-serif' }}
+                className="mt-2 text-2xl font-900 leading-tight text-(--theme-text)"
               >
                 {collectionsLoading ? '...' : dailyCollections?.orderCount ?? 0}
               </p>

@@ -72,7 +72,7 @@ export default function ReturnCard({ returnReq }: ReturnCardProps) {
             <span className="font-mono text-xs font-bold opacity-60">
               Ref: #{returnReq.orderId.substring(0, 8).toUpperCase()}
             </span>
-            <span className={`inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${getReturnStatusStyles(returnReq.status)}`}>
+            <span className={`inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${getReturnStatusStyles(returnReq.status)}`}>
               {getReturnStatusIcon(returnReq.status)}
               {getReturnStatusLabel(returnReq.status)}
             </span>

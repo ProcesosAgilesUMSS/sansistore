@@ -54,7 +54,7 @@ export default function ConfirmPaymentModal({
 				{/* Header */}
 				<header className="flex shrink-0 items-start justify-between gap-3 border-b border-border-light px-4 py-4 sm:gap-4 sm:px-6 sm:py-5">
 					<div>
-						<h2 className="text-xl font-black tracking-tight">
+						<h2 className="text-lg font-black tracking-tight">
 							Registrar pago
 						</h2>
 						<p className="mt-0.5 text-sm font-semibold opacity-60">

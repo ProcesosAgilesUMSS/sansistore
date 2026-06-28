@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useGetOrders } from '../hooks/useGetOrders';
 import type { Order } from '../types';
-import { SectionHeader } from './SectionHeader';
 import { Header } from './Header';
 import { OrderDetailsModal } from './OrderDetailsModal';
 import ReassignModal from './ReassignModal';
@@ -96,7 +95,6 @@ export default function RejectedOrdersPanel({ embedded = false }: { embedded?: b
 
       <div className="grid w-full gap-6">
         <section className="w-full rounded-3xl p-5">
-          <SectionHeader title="Pendiente reasignación" count={rejected.length} />
 
           {loading ? (
             <SkeletonRows

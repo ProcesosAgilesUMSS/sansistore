@@ -82,7 +82,7 @@ export default function SideBarInventory({ pathname }: SideBarInventoryProps) {
     >
       {/* logo repetido??? 
       <div className="flex items-center gap-2.5 px-2 pb-5 mb-5 border-b border-(--theme-border)">
-        <span className="font-['Outfit'] font-black text-[1.05rem] text-(--theme-text) tracking-tight leading-none">
+        <span className="font-display font-black text-base text-(--theme-text) tracking-tight leading-none">
           sansi<span className="text-primary">store</span>
         </span>
       </div>
@@ -93,7 +93,7 @@ export default function SideBarInventory({ pathname }: SideBarInventoryProps) {
         <div key={si} className="mb-6">
           <span
             className="
-              block text-[0.58rem]
+              block text-xs
               font-bold tracking-[0.14em]
               uppercase text-(--theme-text)
               opacity-35 px-2.5 mb-1.5

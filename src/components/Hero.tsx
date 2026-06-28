@@ -2,7 +2,7 @@ import { ArrowRight } from 'lucide-react';
 
 export default function Hero() {
   return (
-    <section className="pt-14 min-h-[80vh] flex items-center bg-bg-light" style={{ fontFamily: 'Inter, sans-serif' }}>
+    <section className="pt-14 min-h-[80vh] flex items-center bg-bg-light">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-20 flex flex-col items-center text-center gap-6">
 
         {/* Badge */}

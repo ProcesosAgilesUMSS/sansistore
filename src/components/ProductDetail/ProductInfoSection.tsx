@@ -133,7 +133,7 @@ export default function ProductInfoSection({ product, loading }: ProductInfoSect
       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">
         Detalle del producto
       </p>
-      <h1 className="mt-3 text-3xl font-black tracking-tight text-text-light sm:text-4xl">
+      <h1 className="mt-3 text-2xl font-black tracking-tight text-text-light sm:text-2xl">
         <span
           ref={titleRef as React.RefObject<HTMLSpanElement>}
           title={product.name}

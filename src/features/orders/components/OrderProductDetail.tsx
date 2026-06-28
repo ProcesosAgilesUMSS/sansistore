@@ -32,7 +32,7 @@ export default function OrderProductDetail({
           <p className="text-xs font-mono text-text-light/40 mb-1">{uuid}</p>
           <h3
             id="order-detail-title"
-            className="text-[clamp(1.75rem,4vw,3rem)] font-black tracking-[-0.04em] leading-none text-text-light"
+            className="text-2xl font-black tracking-[-0.04em] leading-none text-text-light"
           >
             {friendlyName}
           </h3>
@@ -41,7 +41,7 @@ export default function OrderProductDetail({
           </p>
           <div className="text-sm flex items-center gap-3 mt-3">
             <span className="text-text-light/60">Estado:</span>
-            <div className="inline-flex items-center gap-1.5 rounded border border-border-light px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-text-light">
+            <div className="inline-flex items-center gap-1.5 rounded border border-border-light px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-text-light">
               <div
                 className={`size-1.5 rounded-full ${
                   order.status === "CREADO" ? "bg-orange-500" :
@@ -101,10 +101,10 @@ export default function OrderProductDetail({
       ) : (
         <div className="mt-8 bg-card-bg-light border border-border-light rounded-[1.25rem] overflow-hidden">
           <div className="hidden sm:grid grid-cols-[2fr_1fr_1fr_1fr] gap-4 px-5 py-4 border-b border-border-light bg-secondary-bg-light/30">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-text-light/40">/ Producto</span>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-text-light/40">/ Cantidad</span>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-text-light/40">/ P. Unitario</span>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-text-light/40 text-right">Subtotal</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-text-light/40">/ Producto</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-text-light/40">/ Cantidad</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-text-light/40">/ P. Unitario</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-text-light/40 text-right">Subtotal</span>
           </div>
 
           <ul className="divide-y divide-border-light">
@@ -115,23 +115,23 @@ export default function OrderProductDetail({
               >
                 <div>
                   <p className="text-sm font-bold text-text-light">{item.productName}</p>
-                  <p className="text-[11px] font-mono font-bold text-text-light/40 mt-0.5">
+                  <p className="text-xs font-mono font-bold text-text-light/40 mt-0.5">
                     {item.productId}
                   </p>
                 </div>
                 
                 <div className="flex justify-between sm:block mt-2 sm:mt-0">
-                  <span className="sm:hidden text-[11px] font-bold uppercase tracking-wider text-text-light/40">Cantidad</span>
+                  <span className="sm:hidden text-xs font-bold uppercase tracking-wider text-text-light/40">Cantidad</span>
                   <p className="text-sm text-text-light/80">{item.quantity}</p>
                 </div>
 
                 <div className="flex justify-between sm:block">
-                  <span className="sm:hidden text-[11px] font-bold uppercase tracking-wider text-text-light/40">P. Unitario</span>
+                  <span className="sm:hidden text-xs font-bold uppercase tracking-wider text-text-light/40">P. Unitario</span>
                   <p className="text-sm text-text-light/80">Bs {item.unitPrice}</p>
                 </div>
 
                 <div className="flex justify-between sm:block">
-                  <span className="sm:hidden text-[11px] font-bold uppercase tracking-wider text-text-light/40">Subtotal</span>
+                  <span className="sm:hidden text-xs font-bold uppercase tracking-wider text-text-light/40">Subtotal</span>
                   <p className="font-black text-sm text-text-light sm:text-right">Bs {item.subtotal}</p>
                 </div>
               </li>
@@ -140,8 +140,8 @@ export default function OrderProductDetail({
 
           {typeof order.total === "number" && (
             <div className="px-5 py-6 border-t border-border-light bg-secondary-bg-light/20 flex justify-between sm:justify-end items-center gap-6">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-text-light/40">Total</span>
-              <p className="text-[clamp(1.25rem,3vw,1.75rem)] font-black leading-none text-text-light">
+              <span className="text-xs font-bold uppercase tracking-wider text-text-light/40">Total</span>
+              <p className="text-2xl font-black leading-none text-text-light">
                 Bs {order.total}
               </p>
             </div>

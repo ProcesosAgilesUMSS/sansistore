@@ -151,18 +151,18 @@ export default function MyOrdersDashboard() {
           <div className="grid grid-cols-3 gap-2 sm:min-w-[330px]">
             <div className="rounded-lg border border-(--theme-border) bg-(--theme-secondary-bg) px-3 py-2">
               <PackageCheck size={16} className="mb-1 text-primary" />
-              <p className="text-xl font-display font-black">{orders.length}</p>
-              <p className="text-[10px] font-bold uppercase tracking-wider opacity-55">Pedidos</p>
+              <p className="text-lg font-display font-black">{orders.length}</p>
+              <p className="text-xs font-bold uppercase tracking-wider opacity-55">Pedidos</p>
             </div>
             <div className="rounded-lg border border-(--theme-border) bg-(--theme-secondary-bg) px-3 py-2">
               <Truck size={16} className="mb-1 text-primary" />
-              <p className="text-xl font-display font-black">{activeCount}</p>
-              <p className="text-[10px] font-bold uppercase tracking-wider opacity-55">Activos</p>
+              <p className="text-lg font-display font-black">{activeCount}</p>
+              <p className="text-xs font-bold uppercase tracking-wider opacity-55">Activos</p>
             </div>
             <div className="rounded-lg border border-(--theme-border) bg-(--theme-secondary-bg) px-3 py-2">
               <RotateCcw size={16} className="mb-1 text-primary" />
               <p className="text-2xl font-display font-black">{returns.length}</p>
-              <p className="text-[10px] font-bold uppercase tracking-wider opacity-55">
+              <p className="text-xs font-bold uppercase tracking-wider opacity-55">
                 Devoluciones
               </p>
             </div>

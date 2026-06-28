@@ -19,7 +19,7 @@ function DetailRow({
 }) {
   return (
     <div className="rounded-2xl border border-(--theme-border) bg-(--theme-secondary-bg)/70 px-4 py-3">
-      <p className="text-[11px] font-800 uppercase tracking-[0.24em] text-(--theme-text) opacity-45">
+      <p className="text-xs font-800 uppercase tracking-[0.24em] text-(--theme-text) opacity-45">
         {label}
       </p>
       <p className="mt-1 wrap-break-words text-sm font-700 text-(--theme-text)">
@@ -57,7 +57,6 @@ export function OrderDetailsModal({ order, onClose }: Props) {
               <h2
                 id="order-details-title"
                 className="mt-2 text-2xl font-bold tracking-tight text-(--theme-text)"
-                style={{ fontFamily: "Outfit, sans-serif" }}
               >
                 {parseOrderId(order.orderId).friendlyName}
               </h2>
@@ -104,7 +103,7 @@ export function OrderDetailsModal({ order, onClose }: Props) {
 
               {order.incidentReason && (
                 <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                  <p className="text-[11px] font-800 uppercase tracking-[0.22em] opacity-70">
+                  <p className="text-xs font-800 uppercase tracking-[0.22em] opacity-70">
                     Motivo registrado
                   </p>
                   <p className="mt-1 font-700">{order.incidentReason}</p>

@@ -82,7 +82,7 @@ export function ReassignModal({
 					<div className="min-w-0">
 						<h2
 							id="reassign-messenger-title"
-							className="font-display text-xl font-bold leading-tight tracking-tight text-(--theme-text) sm:mt-2 sm:text-2xl"
+							className="font-display text-lg font-bold leading-tight tracking-tight text-(--theme-text) sm:mt-2 sm:text-2xl"
 						>
 							{parseOrderId(order.orderId).friendlyName}
 						</h2>
@@ -106,7 +106,7 @@ export function ReassignModal({
 
 				<div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
 					<div className="rounded-3xl border border-(--theme-border) bg-(--theme-secondary-bg)/50 p-4">
-						<p className="text-[11px] font-800 uppercase tracking-[0.24em] text-(--theme-text) opacity-45">
+						<p className="text-xs font-800 uppercase tracking-[0.24em] text-(--theme-text) opacity-45">
 							Pedido pendiente
 						</p>
 						<p className="mt-1 text-lg font-900 text-(--theme-text)">
@@ -185,7 +185,7 @@ export function ReassignModal({
 													{messenger.displayName}
 													{!isRejecting && (
 														<span
-															className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-700 uppercase tracking-wide border ${
+															className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-700 uppercase tracking-wide border ${
 																messenger.isAvailable
 																	? "bg-success-bg text-success border-success-border"
 																	: "bg-danger-bg text-danger border-danger-border"

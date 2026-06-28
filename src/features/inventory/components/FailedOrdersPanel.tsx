@@ -14,10 +14,10 @@ function TypeBadge({ type }: { type: FailedOrder['type'] }) {
   const isCancelled = type === 'CANCELADO';
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[0.62rem] font-bold uppercase tracking-[0.12em] ${
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] ${
         isCancelled
-          ? 'bg-[rgba(224,82,82,0.14)] text-[#e05252]'
-          : 'bg-[rgba(224,154,82,0.14)] text-[#e09a52]'
+          ? 'bg-(--theme-error-bg) text-(--theme-error)'
+          : 'bg-(--theme-warning-bg) text-(--theme-warning)'
       }`}
     >
       {isCancelled ? <PackageX size={12} /> : <AlertTriangle size={12} />}
@@ -66,7 +66,7 @@ export function FailedOrdersPanel() {
       </div>
 
       {error && (
-        <div className="rounded-2xl border border-red-300/60 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 dark:border-red-800/40 dark:bg-red-900/20 dark:text-red-300">
+        <div className="rounded-2xl border border-(--theme-error-border) bg-(--theme-error-bg) px-4 py-3 text-sm font-semibold text-(--theme-error)">
           {error}
         </div>
       )}
@@ -103,7 +103,7 @@ export function FailedOrdersPanel() {
                 <div className="flex items-center gap-2">
                   <TypeBadge type={order.type} />
                   {order.stockRestored && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-primary/12 px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.1em] text-primary">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-bold uppercase tracking-[0.1em] text-primary">
                       <PackageCheck size={11} />
                       Stock repuesto
                     </span>

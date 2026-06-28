@@ -61,22 +61,25 @@ if (import.meta.env.PUBLIC_APP_ENV !== 'production') {
   const authEmulatorUrl =
     import.meta.env.PUBLIC_AUTH_EMULATOR_URL || 'http://127.0.0.1:9099';
 
+  // Auth emulator (independiente de Firestore: si Firestore falla, Auth igual
+  // debe conectar, de lo contrario el cliente emite tokens contra Firebase real
+  // y el Admin SDK los rechaza con "Token invalido").
+  try {
+    // disableWarnings oculta el banner rojo que Firebase inyecta solo;
+    // mostramos nuestro propio aviso cerrable (EmulatorBanner).
+    connectAuthEmulator(auth, authEmulatorUrl, { disableWarnings: true });
+    console.log(`Firebase Auth: connected to emulator at ${authEmulatorUrl}`);
+  } catch (e) {
+    console.warn('Firebase Auth: could not connect to emulator', e);
+  }
+
   // Firestore emulator
   try {
     connectFirestoreEmulator(db, firestoreEmulatorHost, firestoreEmulatorPort);
-    // Connect auth emulator as well
-    try {
-      // disableWarnings oculta el banner rojo que Firebase inyecta solo;
-      // mostramos nuestro propio aviso cerrable (EmulatorBanner).
-      connectAuthEmulator(auth, authEmulatorUrl, { disableWarnings: true });
-      console.log(`Firebase Auth: connected to emulator at ${authEmulatorUrl}`);
-    } catch (e) {
-      console.warn('Firebase Auth: could not connect to emulator', e);
-    }
     console.log(
       `Firebase: connected to emulators (firestore at ${firestoreEmulatorHost}:${firestoreEmulatorPort})`
     );
   } catch (e) {
-    console.warn('Firebase: could not connect to emulators', e);
+    console.warn('Firebase: could not connect to firestore emulator', e);
   }
 }

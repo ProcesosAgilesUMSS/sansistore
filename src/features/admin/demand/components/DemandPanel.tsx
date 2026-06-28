@@ -12,13 +12,12 @@ const parseLocalDate = (dateStr: string) => {
   return new Date(year, month - 1, day);
 };
 
-// Color de barra según nivel de demanda — usa colores del design system
 const barColor = (count: number, max: number): string => {
   if (max === 0) return 'var(--theme-border)';
   const ratio = count / max;
-  if (ratio >= 0.6) return '#88B04B';          // alta demanda — brand primary
-  if (ratio <= 0.15) return 'var(--theme-border)'; // baja demanda — token border
-  return '#5B8DB8';                              // normal — azul neutro
+  if (ratio >= 0.6) return 'var(--color-primary)';
+  if (ratio <= 0.15) return 'var(--theme-border)';
+  return 'var(--theme-info)';
 };
 
 export default function DemandPanel() {
@@ -63,14 +62,14 @@ export default function DemandPanel() {
   const maxCount = summary ? Math.max(...summary.byHour.map((h) => h.count)) : 0;
 
   return (
-    <div className="max-w-6xl">
+    <div>
 
       {/* Título */}
       <div className="mb-6">
-        <h2 className="text-[15px] font-semibold text-(--theme-text)">
+        <h2 className="text-base font-semibold text-(--theme-text)">
           Demanda por horarios
         </h2>
-        <p className="text-[11px] text-(--theme-text)/50 mt-0.5">
+        <p className="text-xs text-(--theme-text)/50 mt-0.5">
           Análisis de pedidos agrupados por franja horaria
         </p>
       </div>
@@ -79,22 +78,22 @@ export default function DemandPanel() {
       {summary && !loading && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           <div className="bg-(--theme-secondary-bg) rounded-xl px-4 py-3">
-            <p className="text-[9px] text-(--theme-text)/40 uppercase tracking-wide mb-1.5">Hora pico</p>
-            <p className="text-[16px] font-semibold text-[#88B04B] leading-none">
+            <p className="text-xs text-(--theme-text)/40 uppercase tracking-wide mb-1.5">Hora pico</p>
+            <p className="text-base font-semibold text-primary leading-none">
               {String(summary.peakHour).padStart(2, '0')}:00 – {String(summary.peakHour + 1).padStart(2, '0')}:00
             </p>
           </div>
           <div className="bg-(--theme-secondary-bg) rounded-xl px-4 py-3">
-            <p className="text-[9px] text-(--theme-text)/40 uppercase tracking-wide mb-1.5">Total pedidos</p>
-            <p className="text-[22px] font-semibold text-(--theme-text) leading-none">{summary.totalOrders}</p>
+            <p className="text-xs text-(--theme-text)/40 uppercase tracking-wide mb-1.5">Total pedidos</p>
+            <p className="text-2xl font-semibold text-(--theme-text) leading-none">{summary.totalOrders}</p>
           </div>
           <div className="bg-(--theme-secondary-bg) rounded-xl px-4 py-3">
-            <p className="text-[9px] text-(--theme-text)/40 uppercase tracking-wide mb-1.5">Promedio / hora</p>
-            <p className="text-[22px] font-semibold text-(--theme-text) leading-none">{summary.avgPerHour}</p>
+            <p className="text-xs text-(--theme-text)/40 uppercase tracking-wide mb-1.5">Promedio / hora</p>
+            <p className="text-2xl font-semibold text-(--theme-text) leading-none">{summary.avgPerHour}</p>
           </div>
           <div className="bg-(--theme-secondary-bg) rounded-xl px-4 py-3">
-            <p className="text-[9px] text-(--theme-text)/40 uppercase tracking-wide mb-1.5">Hora más baja</p>
-            <p className="text-[16px] font-semibold text-(--theme-text)/60 leading-none">
+            <p className="text-xs text-(--theme-text)/40 uppercase tracking-wide mb-1.5">Hora más baja</p>
+            <p className="text-base font-semibold text-(--theme-text)/60 leading-none">
               {String(summary.minHour).padStart(2, '0')}:00 – {String(summary.minHour + 1).padStart(2, '0')}:00
             </p>
           </div>
@@ -102,40 +101,40 @@ export default function DemandPanel() {
       )}
 
       {/* Filtros */}
-      <p className="text-[10px] font-semibold text-(--theme-text)/40 uppercase tracking-widest mb-3 pb-2 border-b border-(--theme-border)">
+      <p className="text-xs font-semibold text-(--theme-text)/40 uppercase tracking-widest mb-3 pb-2 border-b border-(--theme-border)">
         Filtros
       </p>
       <div className="flex flex-wrap gap-3 mb-6">
         <div>
-          <label className="block text-[10px] font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">
+          <label className="block text-xs font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">
             Fecha inicio
           </label>
           <input
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-lg px-3 py-2 text-[13px] text-(--theme-text) outline-none focus:border-[#88B04B] transition-colors"
+            className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-lg px-3 py-2 text-sm text-(--theme-text) outline-none focus:border-primary transition-colors"
           />
         </div>
         <div>
-          <label className="block text-[10px] font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">
+          <label className="block text-xs font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">
             Fecha fin
           </label>
           <input
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-lg px-3 py-2 text-[13px] text-(--theme-text) outline-none focus:border-[#88B04B] transition-colors"
+            className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-lg px-3 py-2 text-sm text-(--theme-text) outline-none focus:border-primary transition-colors"
           />
         </div>
         <div>
-          <label className="block text-[10px] font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">
+          <label className="block text-xs font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">
             Categoría
           </label>
           <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
-            className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-lg px-3 py-2 text-[13px] text-(--theme-text) outline-none focus:border-[#88B04B] transition-colors"
+            className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-lg px-3 py-2 text-sm text-(--theme-text) outline-none focus:border-primary transition-colors"
           >
             <option value="todas">Todas las categorías</option>
             <option value="lacteos">Lácteos</option>
@@ -148,7 +147,7 @@ export default function DemandPanel() {
           <button
             onClick={handleGenerate}
             disabled={loading}
-            className="bg-[#88B04B] text-white text-[13px] font-semibold px-5 py-2 rounded-full hover:bg-[#5E7E2F] transition-colors disabled:opacity-60"
+            className="bg-primary text-white text-sm font-semibold px-5 py-2 rounded-full hover:bg-primary/90 transition-colors disabled:opacity-60"
           >
             {loading ? 'Cargando...' : 'Generar reporte'}
           </button>
@@ -157,8 +156,8 @@ export default function DemandPanel() {
 
       {/* Error */}
       {error && (
-        <div className="flex items-center gap-2 px-4 py-3 rounded-xl text-[12px] font-medium bg-(--theme-error-bg) border border-(--theme-error-border) text-(--theme-error) mb-4">
-          <span className="w-5 h-5 rounded-full bg-(--theme-error) flex items-center justify-center text-white text-[10px] font-bold">!</span>
+        <div className="flex items-center gap-2 px-4 py-3 rounded-xl text-xs font-medium bg-(--theme-error-bg) border border-(--theme-error-border) text-(--theme-error) mb-4">
+          <span className="w-5 h-5 rounded-full bg-(--theme-error) flex items-center justify-center text-white text-xs font-bold">!</span>
           {error}
         </div>
       )}
@@ -175,10 +174,10 @@ export default function DemandPanel() {
       {/* Sin datos */}
       {!loading && summary && summary.totalOrders === 0 && (
         <div className="text-center py-12 border border-dashed border-(--theme-border) rounded-xl">
-          <p className="text-[13px] text-(--theme-text)/40">
+          <p className="text-sm text-(--theme-text)/40">
             No se encontraron pedidos en el rango de fechas seleccionado.
           </p>
-          <p className="text-[11px] text-(--theme-text)/30 mt-1">
+          <p className="text-xs text-(--theme-text)/30 mt-1">
             Intentá con un rango de fechas diferente.
           </p>
         </div>
@@ -190,10 +189,10 @@ export default function DemandPanel() {
 
           {/* Histograma */}
           <div className="md:col-span-2 bg-(--theme-secondary-bg) rounded-xl p-5">
-            <p className="text-[13px] font-semibold text-(--theme-text) mb-1">
+            <p className="text-sm font-semibold text-(--theme-text) mb-1">
               Pedidos por franja horaria
             </p>
-            <p className="text-[10px] text-(--theme-text)/40 mb-4">
+            <p className="text-xs text-(--theme-text)/40 mb-4">
               {startDate} — {endDate}
             </p>
 
@@ -234,29 +233,28 @@ export default function DemandPanel() {
               </svg>
             </div>
 
-            {/* Leyenda con tokens */}
             <div className="flex gap-4 mt-2">
               <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-sm bg-[#88B04B]" />
-                <span className="text-[10px] text-(--theme-text)/50">Alta demanda</span>
+                <div className="w-2.5 h-2.5 rounded-sm bg-primary" />
+                <span className="text-xs text-(--theme-text)/50">Alta demanda</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-sm bg-[#5B8DB8]" />
-                <span className="text-[10px] text-(--theme-text)/50">Normal</span>
+                <div className="w-2.5 h-2.5 rounded-sm bg-(--theme-info)" />
+                <span className="text-xs text-(--theme-text)/50">Normal</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-sm bg-[var(--theme-border)]" />
-                <span className="text-[10px] text-(--theme-text)/50">Baja demanda</span>
+                <div className="w-2.5 h-2.5 rounded-sm bg-(--theme-border)" />
+                <span className="text-xs text-(--theme-text)/50">Baja demanda</span>
               </div>
             </div>
           </div>
 
           {/* Top 5 horas pico */}
           <div className="bg-(--theme-secondary-bg) rounded-xl p-5">
-            <p className="text-[13px] font-semibold text-(--theme-text) mb-1">
+            <p className="text-sm font-semibold text-(--theme-text) mb-1">
               Horas pico
             </p>
-            <p className="text-[10px] text-(--theme-text)/40 mb-4">
+            <p className="text-xs text-(--theme-text)/40 mb-4">
               Top 5 franjas con más pedidos
             </p>
             <div className="flex flex-col gap-2">
@@ -266,14 +264,14 @@ export default function DemandPanel() {
                 return (
                   <div key={item.hour} className="bg-(--theme-bg) rounded-lg px-3 py-2.5">
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[11px] font-semibold text-(--theme-text)">
+                      <span className="text-xs font-semibold text-(--theme-text)">
                         {String(item.hour).padStart(2, '0')}:00 – {String(item.hour + 1).padStart(2, '0')}:00
                       </span>
-                      <span className="text-[10px] text-(--theme-text)/50">
+                      <span className="text-xs text-(--theme-text)/50">
                         {item.count} pedidos
                       </span>
                     </div>
-                    <div className="h-1.5 bg-[var(--theme-border)] rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-(--theme-border) rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all"
                         style={{ width: `${pct}%`, background: color }}
