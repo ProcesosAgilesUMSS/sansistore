@@ -448,3 +448,249 @@ También realice pruebas funcionales en entorno local sobre el flujo completo de
 - **Yesterday:** Diagnóstico y rastreo de varios bugs visuales que fueron reportados en la plataforma.
 - **Today:** Trabajo y resolución de los issues #425, #407 y #82. Realizamos code review grupal.
 - **Blockers:** NONE
+
+
+# 04/06/ 2026
+## Daily Reports - Team 6 SoftwareOne
+
+
+### Llanos Vega Juan Carlos
+
+
+- **Yesterday:** Revisión de los bug presentados en los requerimientos reportados como pendientes para la continuación del desarrollo del proyecto.
+- **Today:** Actualización de los cambios al local desde la rama principal, resolución del issue #426 y realizamos code review grupal.
+- **Blockers:** Ninguno
+
+
+### Rodriguez Torrico Arnold Guery
+
+
+- **Yesterday:** Revisión de la arquitectura y del flujo necesario para implementar el requerimiento asignado.
+- **Today:** Trabajo y resolución del issue #81. Realizamos code review grupal.
+- **Blockers:** Ninguno.
+
+
+### Pereira Fiorilo Oliver Do Santos
+- **Yesterday:** Validación de algunos detalles pendientes en mi módulo y pruebas generales.
+- **Today:** Participación activa y realizamos code review grupal.
+- **Blockers:** Ninguno.
+
+
+### Paqui Rojas Aaron David
+
+
+- **Yesterday:** Análisis técnico y configuración del entorno local para abordar el ticket #84.
+- **Today:** Trabajo y resolución del issue #84. Realizamos code review grupal.
+- **Blockers:** Ninguno.
+
+
+### Gutiérrez Fuentes Alexander Raul
+
+
+- **Yesterday:** Diagnóstico y rastreo de varios bugs visuales que fueron reportados en la plataforma.
+- **Today:** Trabajo y resolución de los issues #425, #407 y #82. Realizamos code review grupal.
+- **Blockers:** NONE
+
+
+# 09/06/ 2026
+## Daily Reports - Team 6 SoftwareOne
+
+
+### Llanos Vega Juan Carlos
+- **Yesterday:** Participé en la retrospectiva del último sprint y se dio inicio al planning.
+- **Today:** Terminamos el sprint planning, me asignaron mis tareas y comencé con el desarrollo.
+- **Blockers:** Ninguno
+
+
+### Rodriguez Torrico Arnold Guery
+- **Yesterday:** Estuvimos en la reunión de retrospectiva para evaluar el sprint anterior y planificamos el siguiente.
+- **Today:** Finalización de la planificación, selección de requerimientos y primeras configuraciones de mi código.
+- **Blockers:** Ninguno.
+
+
+### Pereira Fiorilo Oliver Do Santos
+- **Yesterday:** Revisamos las mejoras en la retrospectiva y empezamos la planificación del nuevo ciclo.
+- **Today:** Tomé los issues correspondientes a este sprint y arranqué con el desarrollo de los mismos.
+- **Blockers:** Ninguno.
+
+
+### Paqui Rojas Aaron David
+- **Yesterday:** Análisis de lo logrado en el sprint pasado durante la retrospectiva y comienzo del planning.
+- **Today:** Asignación definitiva de tareas y comienzo formal del desarrollo de código.
+- **Blockers:** Ninguno.
+
+
+### Gutiérrez Fuentes Alexander Raul
+- **Yesterday:** Retrospectiva grupal enfocada en lecciones aprendidas y organización del planning inicial.
+- **Today:** Repartición final de issues en el planning e inicio inmediato del desarrollo técnico.
+- **Blockers:** NONE
+
+
+# 11/06/ 2026
+## Daily Reports - Team 6 SoftwareOne
+
+
+### Llanos Vega Juan Carlos
+- **Yesterday:** Avance sustancial en el código de mis issues asignados en el planning.
+- **Today:** Preparación intensiva para la demo del sprint; dediqué el día a pulir y terminar mis tareas.
+- **Blockers:** Ninguno
+
+
+### Rodriguez Torrico Arnold Guery
+- **Yesterday:** Desarrollo de la lógica principal de mis tareas y resolución de obstáculos.
+- **Today:** Afinación de los últimos detalles y finalización de implementaciones para dejar todo listo para la demo.
+- **Blockers:** Ninguno.
+
+
+### Pereira Fiorilo Oliver Do Santos
+- **Yesterday:** Programación continua y pruebas iniciales de los requerimientos de mi módulo.
+- **Today:** Cierre de issues pendientes y retoques finales enfocados en la demostración de este sprint.
+- **Blockers:** Ninguno.
+
+
+### Paqui Rojas Aaron David
+- **Yesterday:** Codificación de requerimientos técnicos y validaciones locales.
+- **Today:** Enfoque total en culminar las tareas asignadas y pulir el software de cara a la demo del equipo.
+- **Blockers:** Ninguno.
+
+
+### Gutiérrez Fuentes Alexander Raul
+- **Yesterday:** Implementación de funcionalidades y revisión general del código.
+- **Today:** Ajustes finales y culminación de mis implementaciones para asegurar una buena presentación en la demo.
+- **Blockers:** NONE
+
+
+# 16/06/ 2026
+## Daily Reports - Team 6 SoftwareOne
+
+
+### Llanos Vega Juan Carlos
+- **Yesterday:** Llevamos a cabo la retrospectiva del sprint para analizar qué mejorar.
+- **Today:** Sesión de sprint planning, estimación de tickets y comienzo del nuevo ciclo de trabajo.
+- **Blockers:** Ninguno
+
+
+### Rodriguez Torrico Arnold Guery
+- **Yesterday:** Reflexión sobre el sprint finalizado en nuestra retrospectiva.
+- **Today:** Planeación del siguiente sprint, revisión de historias de usuario e inicio de las tareas.
+- **Blockers:** Ninguno.
+
+
+### Pereira Fiorilo Oliver Do Santos
+- **Yesterday:** Junta de retrospectiva para discutir puntos fuertes y áreas de mejora.
+- **Today:** Distribución de tareas en el planning y puesta en marcha del desarrollo de los requerimientos.
+- **Blockers:** Ninguno.
+
+
+### Paqui Rojas Aaron David
+- **Yesterday:** Análisis grupal en la retrospectiva sobre el desempeño del último sprint.
+- **Today:** Aceptación de nuevos issues durante el planning y comienzo de la codificación.
+- **Blockers:** Ninguno.
+
+
+### Gutiérrez Fuentes Alexander Raul
+- **Yesterday:** Participación en la reunión de retrospectiva evaluando el progreso.
+- **Today:** Organización general en el sprint planning, toma de requerimientos e inicio de implementaciones.
+- **Blockers:** NONE
+
+
+# 18/06/ 2026
+## Daily Reports - Team 6 SoftwareOne
+
+
+### Llanos Vega Juan Carlos
+- **Yesterday:** Avances significativos en el frontend y ajustes de integración.
+- **Today:** El día de hoy estuvo centrado en pulir mis implementaciones y cerrar los issues de cara a la demo del sprint.
+- **Blockers:** Ninguno
+
+
+### Rodriguez Torrico Arnold Guery
+- **Yesterday:** Desarrollo de los tickets actuales y resolución de bugs encontrados.
+- **Today:** Preparativos finales para la demo; logré concluir y perfeccionar mis tareas asignadas.
+- **Blockers:** Ninguno.
+
+
+### Pereira Fiorilo Oliver Do Santos
+- **Yesterday:** Implementación de componentes y pruebas de integración.
+- **Today:** Conclusión de los detalles técnicos y pulido general para dejar la presentación de mis issues lista.
+- **Blockers:** Ninguno.
+
+
+### Paqui Rojas Aaron David
+- **Yesterday:** Continuación del trabajo en el repositorio y commits de mis avances.
+- **Today:** Revisión final de mi código y término de mis requerimientos para la demostración de este sprint.
+- **Blockers:** Ninguno.
+
+
+### Gutiérrez Fuentes Alexander Raul
+- **Yesterday:** Escritura de código, resolución de problemas y avance grupal.
+- **Today:** Remate de implementaciones y ajustes visuales para la demo, asegurando que mis tareas estén finalizadas.
+- **Blockers:** NONE
+
+
+# 23/06/ 2026
+## Daily Reports - Team 6 SoftwareOne
+
+
+### Llanos Vega Juan Carlos
+- **Yesterday:** Balance del último sprint en nuestra retrospectiva y primeros pasos del planning.
+- **Today:** Definición de tareas para el nuevo sprint y comienzo de programación.
+- **Blockers:** Ninguno
+
+
+### Rodriguez Torrico Arnold Guery
+- **Yesterday:** Junta retrospectiva donde analizamos el rendimiento y empezamos a planificar.
+- **Today:** Análisis técnico de los nuevos requerimientos y comienzo de su desarrollo.
+- **Blockers:** Ninguno.
+
+
+### Pereira Fiorilo Oliver Do Santos
+- **Yesterday:** Evaluación del sprint cerrado en la retrospectiva y revisión del backlog.
+- **Today:** Asignación de mis nuevas historias de usuario e inicio de mis tareas.
+- **Blockers:** Ninguno.
+
+
+### Paqui Rojas Aaron David
+- **Yesterday:** Participación activa en la retrospectiva identificando mejoras.
+- **Today:** Planning completado, tickets seleccionados y comienzo de mis implementaciones.
+- **Blockers:** Ninguno.
+
+
+### Gutiérrez Fuentes Alexander Raul
+- **Yesterday:** Sesión de retrospectiva enfocada en la eficiencia del equipo.
+- **Today:** Repartición de trabajo en el planning y comienzo inmediato con el código.
+- **Blockers:** NONE
+
+
+# 25/06/ 2026
+## Daily Reports - Team 6 SoftwareOne
+
+
+### Llanos Vega Juan Carlos
+- **Yesterday:** Codificación intensiva y ajustes menores a los issues en curso.
+- **Today:** Preparación de todo el entorno para la demo, finalizando y puliendo las tareas que me correspondían.
+- **Blockers:** Ninguno
+
+
+### Rodriguez Torrico Arnold Guery
+- **Yesterday:** Adelantos en el desarrollo, pruebas funcionales en local.
+- **Today:** Últimos retoques a mis implementaciones, cerrando los tickets para que la demo fluya sin problemas.
+- **Blockers:** Ninguno.
+
+
+### Pereira Fiorilo Oliver Do Santos
+- **Yesterday:** Refactorización y avance continuo en las historias asignadas.
+- **Today:** Día dedicado a pulir detalles y culminar el código para la demostración de cierre de sprint.
+- **Blockers:** Ninguno.
+
+
+### Paqui Rojas Aaron David
+- **Yesterday:** Desarrollo principal y resolución de incidencias en mi módulo.
+- **Today:** Finalización técnica de mis tareas y preparación exhaustiva para la demo grupal.
+- **Blockers:** Ninguno.
+
+
+### Gutiérrez Fuentes Alexander Raul
+- **Yesterday:** Seguimiento del progreso, desarrollo y revisión de Pull Requests.
+- **Today:** Culminación y revisión de mis implementaciones, asegurando que estén pulidas para presentarlas en la demo.
+- **Blockers:** NONE
