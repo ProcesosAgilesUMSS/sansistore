@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Tag, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { createOfferService, getProductsService } from '../services/offerService';
 import type { ProductOption } from '../services/offerService';
 import DiscountBadge from './DiscountBadge';
@@ -105,19 +105,6 @@ export default function OfferForm() {
 
   return (
     <div className="bg-card-bg-light border border-border-light rounded-2xl p-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
-          <Tag className="w-4 h-4 text-primary" />
-        </div>
-        <div>
-          <h2 className="font-display font-bold text-base text-text-light">
-            Crear Nueva Oferta
-          </h2>
-          <p className="text-xs text-text-light/40">
-            El catálogo se actualizará automáticamente
-          </p>
-        </div>
-      </div>
 
       {successMessage && (
         <div

@@ -2,31 +2,17 @@ import { useReservations } from '../hooks/useReservations';
 import { StatusPill } from './StatusPill';
 import { formatCurrency } from '../utils/currency';
 import { formatDate } from '../utils/formatDate';
+import { SectionHeader } from './SectionHeader';
 
 export default function ReservationsListPanel() {
   const { reservations, loading, error } = useReservations();
 
   return (
     <div className="min-h-screen bg-(--theme-bg) px-4 pb-10 pt-10 md:px-8 xl:px-10">
-      <header className="mb-8 rounded-[1.75rem] border border-(--theme-border) bg-(--theme-card-bg) px-6 py-6 shadow-sm backdrop-blur-sm">
-        <p
-          className="mb-3 text-xs font-800 uppercase tracking-[0.25em]"
-          style={{ color: 'var(--color-primary)' }}
-        >
-          Sección Reservas
-        </p>
-
-        <h1
-          className="text-2xl font-900 leading-tight text-(--theme-text) md:text-2xl"
-        >
-          Reserva de Productos
-        </h1>
-
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-(--theme-text) opacity-70 md:text-base">
-          Visualización en tiempo real de los productos reservados para preparar los
-          pedidos.
-        </p>
-      </header>
+      <SectionHeader
+        title="Reserva de productos"
+        subtitle="Productos reservados para preparar los pedidos."
+      />
 
       {error && (
         <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-4 text-sm text-red-700 dark:border-red-800/40 dark:bg-red-900/20 dark:text-red-300">

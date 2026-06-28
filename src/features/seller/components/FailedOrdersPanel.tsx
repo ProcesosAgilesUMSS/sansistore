@@ -7,7 +7,6 @@ import { Header } from './Header';
 import { ErrorMessage } from './ErrorMessage';
 import { EmptyOrders } from './EmptyOrders';
 import { OrderDetailsModal } from './OrderDetailsModal';
-import { SectionHeader } from './SectionHeader';
 import { SkeletonRows } from './SkeletonRows';
 import { StatusPill } from './StatusPill';
 import { formatCurrency } from '../utils/currency';
@@ -368,7 +367,6 @@ export default function FailedOrdersPanel({ embedded = false }: { embedded?: boo
 
       <div className="grid w-full gap-6">
         <section className="w-full rounded-3xl p-5">
-          <SectionHeader title="No entregados" count={orders.length} />
 
           {loading ? (
             <SkeletonRows count={3} />

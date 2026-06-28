@@ -3,7 +3,6 @@ import { useGetOrders } from '../hooks/useGetOrders';
 import { useGetMessengers } from '../hooks/useGetMessengers';
 import { useAssignOrdersToDelivery } from '../hooks/useAssignOrdersToDelivery';
 import type { Order } from '../types';
-import { SectionHeader } from './SectionHeader';
 import { Header } from './Header';
 import { OrderDetailsModal } from './OrderDetailsModal';
 import { AssignMessengerModal } from './AssignMessengerModal';
@@ -99,7 +98,6 @@ export default function ReadyOrdersPanel({ embedded = false }: { embedded?: bool
 
       <div className="grid w-full gap-6">
         <section className="w-full rounded-3xl p-5">
-          <SectionHeader title="Listos para asignar" count={ready.length} />
 
           {loading ? (
             <SkeletonRows

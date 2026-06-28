@@ -3,6 +3,7 @@ import { ClipboardList, DollarSign, ReceiptText } from 'lucide-react';
 import { useOrderHistory } from '../hooks/useOrderHistory';
 import { formatCurrency } from '../utils/currency';
 import { formatDate } from '../utils/formatDate';
+import { SectionHeader } from './SectionHeader';
 import { parseOrderId } from '@features/cart/services/orderService';
 
 function StatusBadge({ label }: { label: string }) {
@@ -64,17 +65,10 @@ export default function OrderHistoryPanel({
           : 'min-h-screen bg-(--theme-bg) px-4 pb-10 pt-10 md:px-8 xl:px-10'
       }
     >
-      <header className="mb-8 rounded-[1.75rem] border border-(--theme-border) bg-(--theme-card-bg) px-6 py-6 shadow-sm backdrop-blur-sm">
-        <h1
-          className="text-2xl font-900 leading-tight text-(--theme-text) md:text-2xl"
-        >
-          Historial de pedidos
-        </h1>
-
-        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-(--theme-text) opacity-70 md:text-base">
-          Consulta los pedidos pagados del vendedor y revisa el detalle de cada cobro para seguimiento y auditoria.
-        </p>
-      </header>
+      <SectionHeader
+        title="Historial de pedidos"
+        subtitle="Consulta los pedidos pagados del vendedor y revisa el detalle de cada cobro para seguimiento y auditoría."
+      />
 
       <section className="mb-8 grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.1fr)]">
         <SummaryCard

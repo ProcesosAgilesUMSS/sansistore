@@ -177,7 +177,7 @@ function RejectModal({
           rounded-2xl shadow-2xl">
 
           <div className="px-6 pt-6 pb-4 border-b border-(--theme-border)">
-            <h2 className="text-base font-bold text-(--theme-text)">
+            <h2 className="text-base font-semibold text-(--theme-text)">
               Rechazar cierre de jornada
             </h2>
             <p className="text-xs text-(--theme-text)/50 mt-1">

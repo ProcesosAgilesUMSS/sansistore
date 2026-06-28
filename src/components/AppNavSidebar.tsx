@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ChevronRight, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { sellerNavGroups } from '../features/seller/constants/navGroups';
 import { inventoryNavGroups } from '../features/inventory/constants/navGroups';
@@ -138,7 +138,6 @@ export default function AppNavSidebar({ nav, pathname, title = 'Menú' }: AppNav
                       </span>
                     )}
                     <span className="flex-1">{item.label}</span>
-                    {active && <ChevronRight size={12} className="opacity-50" />}
                   </a>
                 );
               })}

@@ -12,6 +12,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { type InventoryProduct } from '../models/product.model';
+import { ProductThumb } from './ProductThumb';
 
 interface Props {
   product: InventoryProduct;
@@ -70,15 +71,12 @@ export const ProductDetailModal: React.FC<Props> = ({
       <div className="bg-(--theme-card-bg) border border-(--theme-border) rounded-3xl w-full max-w-sm shadow-2xl animate-in fade-in zoom-in duration-200 overflow-hidden flex flex-col max-h-[90vh]">
         
         <div className="relative h-48 bg-(--theme-secondary-bg) flex items-center justify-center overflow-hidden shrink-0">
-          {product.imageUrl ? (
-            <img
-              src={product.imageUrl}
-              alt={product.name}
-              className="object-cover w-full h-full"
-            />
-          ) : (
-            <ImageOff className="w-14 h-14 opacity-20 text-(--theme-text)" />
-          )}
+          <ProductThumb
+            src={product.imageUrl}
+            alt={product.name}
+            fallbackIcon={ImageOff}
+            fallbackClassName="w-14 h-14 opacity-20 text-(--theme-text)"
+          />
 
           {product.badge && (
             <span className="absolute top-3 left-3 bg-primary text-white text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full flex items-center gap-1">

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { collection, getDocs, writeBatch, doc, getDoc, serverTimestamp, increment } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '../../../lib/firebase';
-import { PackageOpen, CheckCircle2, RefreshCw, AlertCircle, TrendingUp, X } from 'lucide-react';
+import { CheckCircle2, RefreshCw, AlertCircle, TrendingUp, X } from 'lucide-react';
 
 interface ProductOption {
   id: string;
@@ -196,12 +196,6 @@ export const StockMovementForm: React.FC = () => {
     <div className="relative">
       {/* --- FORMULARIO PRINCIPAL --- */}
       <div className="bg-(--theme-card-bg) border border-(--theme-border) rounded-3xl p-6 shadow-sm">
-        <div className="flex items-center gap-2 mb-6 border-b border-(--theme-border) pb-4">
-          <PackageOpen className="w-5 h-5 text-primary" />
-          <h2 className="font-display font-bold text-lg text-(--theme-text)">
-            Registrar Ajuste / Operación
-          </h2>
-        </div>
 
         {successMessage && (
           <div className="mb-4 p-3 bg-primary/10 border border-primary/30 text-primary rounded-xl text-sm flex items-center gap-2">

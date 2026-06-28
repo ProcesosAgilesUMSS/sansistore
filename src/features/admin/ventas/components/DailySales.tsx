@@ -115,13 +115,6 @@ export default function DailySales() {
           <h3 className="text-xs font-bold text-(--theme-text)/50 uppercase tracking-wider">
             Ventas por día
           </h3>
-          <span className="text-xs text-primary font-medium flex items-center gap-1">
-            {/* Ícono de recargar simple en SVG */}
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            Actualización en tiempo real
-          </span>
         </div>
 
         <div className="bg-(--theme-card-bg) rounded-2xl overflow-hidden">
@@ -151,15 +144,6 @@ export default function DailySales() {
               ))}
             </tbody>
           </table>
-        </div>
-
-        {/* Info Box Firestore */}
-        <div className="bg-(--theme-success-bg) border border-(--theme-success-border) rounded-2xl p-5 mt-4">
-          <h4 className="text-sm font-bold text-(--theme-text) mb-1">Datos en tiempo real</h4>
-          <p className="text-xs text-(--theme-text)/60">
-            La información se actualiza automáticamente desde Firestore.<br/>
-            Solo se incluyen órdenes confirmadas o completadas.
-          </p>
         </div>
       </div>
 

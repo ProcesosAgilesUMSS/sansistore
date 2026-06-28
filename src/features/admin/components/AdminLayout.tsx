@@ -153,7 +153,7 @@ export default function AdminLayout({ initialSection = "pedidos" }: AdminLayoutP
           fixed inset-y-0 left-0 z-40 h-screen w-[256px]
           bg-(--theme-card-bg) border-r border-(--theme-border)
           transition-transform duration-300
-          md:sticky md:top-14 md:z-0 md:h-[calc(100vh-3.5rem)] md:translate-x-0
+          md:static md:z-0 md:h-full md:translate-x-0
           md:bg-transparent md:border-(--theme-text)/8
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
         `}
@@ -310,7 +310,6 @@ export default function AdminLayout({ initialSection = "pedidos" }: AdminLayoutP
 												{item.badge}
 											</span>
 										)}
-										{isActive && <ChevronRight size={12} className="opacity-50" />}
 									</button>
 								);
 							})}
@@ -330,7 +329,7 @@ export default function AdminLayout({ initialSection = "pedidos" }: AdminLayoutP
 						{sidebarOpen ? <X size={18} /> : <Menu size={18} />}
 						Menú
 					</button>
-					<div className="mx-auto w-full max-w-7xl">
+					<div className="mx-auto w-full min-w-0 max-w-7xl">
 						{activeSection === "pedidos" && (
 							<OrderReceptionPanel />
 						)}

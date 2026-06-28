@@ -5,7 +5,6 @@ import type { Order } from '../types';
 import { ConfirmModal } from './ConfirmModal';
 import { CardOrder } from './CardOrder';
 import { OrderDetailsModal } from './OrderDetailsModal';
-import { SectionHeader } from './SectionHeader';
 import { Header } from './Header';
 import { EmptyOrders } from './EmptyOrders';
 import { SkeletonRows } from './SkeletonRows';
@@ -79,7 +78,6 @@ export default function PackagedOrdersPanel({ embedded = false }: { embedded?: b
 
       <div className="grid w-full gap-6">
         <section className="w-full rounded-3xl p-5">
-          <SectionHeader title="Empaquetados" count={packaged.length} />
 
           {loading ? (
             <SkeletonRows

@@ -9,8 +9,10 @@ const serviceAccountJson = import.meta.env.FIREBASE_SERVICE_ACCOUNT_KEY;
 const useEmulators = import.meta.env.PUBLIC_APP_ENV !== 'production';
 
 if (useEmulators) {
-  process.env.FIRESTORE_EMULATOR_HOST ||= 'localhost:8080';
-  process.env.FIREBASE_AUTH_EMULATOR_HOST ||= 'localhost:9099';
+  // Usar 127.0.0.1 (IPv4) en vez de 'localhost': Node resuelve 'localhost' a
+  // ::1 (IPv6) primero, pero los emuladores escuchan solo en IPv4 → ECONNREFUSED.
+  process.env.FIRESTORE_EMULATOR_HOST ||= '127.0.0.1:8080';
+  process.env.FIREBASE_AUTH_EMULATOR_HOST ||= '127.0.0.1:9099';
 }
 
 function getCredential() {

@@ -101,10 +101,14 @@ export default function Navbar() {
     };
   }, []);
 
-  const isActive = (href: string) =>
-    href === '/'
+  const isActive = (href: string, match?: string) => {
+    // 'match' permite marcar activa una sección con varias rutas hermanas
+    // (ej. Ordenes apunta a /seller/created-orders pero abarca todo /seller/*).
+    const base = match ?? href;
+    return base === '/'
       ? currentPath === '/'
-      : currentPath === href || currentPath.startsWith(href + '/');
+      : currentPath === base || currentPath.startsWith(base + '/');
+  };
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
@@ -223,7 +227,7 @@ export default function Navbar() {
             <div className="hidden md:flex items-center gap-8 whitespace-nowrap">
               {[
                 { label: 'Productos', href: '/productos', reqComprador: true },
-                { label: 'Ordenes', href: '/seller/created-orders', reqVendedor: true },
+                { label: 'Ordenes', href: '/seller/created-orders', match: '/seller', reqVendedor: true },
                 { label: 'Inventario', href: '/inventory', reqOperadorInv: true },
                 { label: 'Entregas', href: '/courier', reqMensajero: true },
                 { label: 'Admin', href: '/admin', reqAdmin: true },
@@ -237,7 +241,7 @@ export default function Navbar() {
                   return true;
                 })
                 .map((item) => {
-                  const active = isActive(item.href);
+                  const active = isActive(item.href, item.match);
                   return (
                     <a
                       key={item.label}
@@ -366,7 +370,7 @@ export default function Navbar() {
             <div className="md:hidden py-3 flex flex-col gap-3 border-t border-border-light">
               {[
                 { label: 'Productos', href: '/productos', reqComprador: true },
-                { label: 'Ordenes', href: '/seller/created-orders', reqVendedor: true },
+                { label: 'Ordenes', href: '/seller/created-orders', match: '/seller', reqVendedor: true },
                 { label: 'Inventario', href: '/inventory', reqOperadorInv: true },
                 { label: 'Entregas', href: '/courier', reqMensajero: true },
                 { label: 'Admin', href: '/admin', reqAdmin: true },
@@ -380,7 +384,7 @@ export default function Navbar() {
                   return true;
                 })
                 .map((item) => {
-                  const active = isActive(item.href);
+                  const active = isActive(item.href, item.match);
                   return (
                     <a
                       key={item.label}

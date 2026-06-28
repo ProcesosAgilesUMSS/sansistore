@@ -3,7 +3,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../../../lib/firebase';
 import { getSellerProducts, registerPurchase, type ProductForPurchase } from '../services/purchaseService';
-import { ShoppingCart, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 
 type FormState = 'idle' | 'loading' | 'submitting' | 'success' | 'error';
 
@@ -182,19 +182,6 @@ export default function PurchaseForm() {
 
   return (
     <div className="bg-[var(--theme-card-bg)] border border-[var(--theme-border)] rounded-2xl p-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
-          <ShoppingCart className="w-4 h-4 text-primary" />
-        </div>
-        <div>
-          <h2 className="font-display font-bold text-base text-[var(--theme-text)]">
-            Registrar Compra
-          </h2>
-          <p className="text-xs text-[var(--theme-text)] opacity-40">
-            El stock del inventario se actualizará automáticamente
-          </p>
-        </div>
-      </div>
 
       {formState === 'success' && feedback && (
         <div

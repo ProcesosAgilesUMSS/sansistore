@@ -83,7 +83,7 @@ export default function ConfigPanel() {
   // ── Loading skeleton ───────────────────────────────────────
   if (loading) {
     return (
-      <div className="max-w-lg flex flex-col gap-4">
+      <div className="flex flex-col gap-4">
         <div className="h-16 bg-(--theme-secondary-bg) rounded-xl animate-pulse" />
         <div className="h-10 bg-(--theme-secondary-bg) rounded-lg animate-pulse w-1/2" />
         <div className="h-20 bg-(--theme-secondary-bg) rounded-lg animate-pulse" />
@@ -92,7 +92,7 @@ export default function ConfigPanel() {
   }
 
   return (
-    <div className="max-w-lg">
+    <div>
 
       {/* ── Sección: título ─────────────────────────────────── */}
       <div className="mb-5">
@@ -117,7 +117,7 @@ export default function ConfigPanel() {
             {currentValue} min
           </p>
           <p className="text-xs text-(--theme-text)/40 mt-1">
-            Valor actual en Firestore (settings/config)
+            Valor actual configurado
           </p>
         </div>
         {/* Ícono de reloj decorativo */}

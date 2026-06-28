@@ -26,7 +26,6 @@ import { EmptyOrders } from './EmptyOrders';
 import { ErrorMessage } from './ErrorMessage';
 import { Header } from './Header';
 import { OrderDetailsModal } from './OrderDetailsModal';
-import { SectionHeader } from './SectionHeader';
 import { SkeletonRows } from './SkeletonRows';
 import { StatusPill } from './StatusPill';
 
@@ -566,7 +565,6 @@ export default function RegisterFailureReasons({
 
       <div className="grid w-full gap-8">
         <section className="w-full rounded-3xl p-5">
-          <SectionHeader title="Rechazados pendientes" count={ordersAwaitingReason.length} />
 
           {loadingOrders ? (
             <SkeletonRows count={3} />

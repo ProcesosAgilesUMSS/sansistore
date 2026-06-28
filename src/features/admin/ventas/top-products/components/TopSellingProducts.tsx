@@ -221,7 +221,7 @@ export default function TopSellingProducts() {
       {/* Header */}
       <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h2 className="text-lg sm:text-2xl font-bold text-(--theme-text) tracking-tight">
+          <h2 className="text-base font-semibold text-(--theme-text)">
             Productos más vendidos
           </h2>
           <p className="text-xs text-(--theme-text)/50 mt-0.5">
@@ -398,18 +398,6 @@ export default function TopSellingProducts() {
           </p>
         </div>
       )}
-
-      {/* Real-time info box */}
-      <div className="flex items-start gap-3 bg-(--theme-success-bg) border border-(--theme-success-border) rounded-2xl p-4 sm:p-5">
-        <Trophy size={16} className="text-primary flex-shrink-0 mt-0.5" />
-        <div>
-          <h4 className="text-sm font-bold text-(--theme-text) mb-0.5">Datos en tiempo real</h4>
-          <p className="text-xs text-(--theme-text)/60 leading-relaxed">
-            El ranking se actualiza automáticamente desde Firestore.
-            Solo se muestran productos con al menos una venta confirmada.
-          </p>
-        </div>
-      </div>
     </div>
   );
 }

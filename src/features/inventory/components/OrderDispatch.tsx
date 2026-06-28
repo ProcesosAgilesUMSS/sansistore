@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { collection, query, where, onSnapshot, getDocs, doc, updateDoc, serverTimestamp, getDoc, writeBatch, increment } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '@/lib/firebase';
-import { PackageSearch, PackageCheck, AlertCircle, CheckCircle2, Play, X, ListFilter, ArchiveRestore, CheckSquare, ChevronRight, ArrowLeft, AlertTriangle } from 'lucide-react';
+import { PackageSearch, PackageCheck, AlertCircle, CheckCircle2, Play, X, ArchiveRestore, CheckSquare, ChevronRight, ArrowLeft, AlertTriangle } from 'lucide-react';
 import { parseOrderId } from '@/features/cart/services/orderService';
 
 interface OrderItem {
@@ -260,8 +260,8 @@ export const OrderDispatch: React.FC = () => {
 
   return (
     <>
-      <div className="bg-(--theme-card-bg) border border-(--theme-border) rounded-3xl p-6 shadow-sm h-full flex flex-col">
-        
+      <div className="h-full flex flex-col">
+
         <div className="flex items-center gap-3 mb-4">
           <div className="p-2 bg-primary/10 rounded-xl text-primary">
             <PackageSearch className="w-6 h-6" />
@@ -315,45 +315,53 @@ export const OrderDispatch: React.FC = () => {
             <p className="text-sm text-(--theme-text) opacity-60">Actualmente no existen registros con este estado.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 overflow-y-auto pr-2">
-            {displayedOrders.map(order => (
-              <div key={order.id} className={`border border-(--theme-border) bg-(--theme-secondary-bg) rounded-2xl p-4 flex flex-col justify-between transition hover:border-primary/30 ${order.status === 'DEVUELTO' ? 'border-(--theme-error-border)' : ''}`}>
-                <div className="mb-4">
-                  <div className="flex justify-between items-start mb-4">
-                    <span className={`text-lg font-display font-black px-2.5 py-1 rounded-lg tracking-wider ${
-                      order.status === 'RESERVADO' ? 'bg-primary text-white shadow-sm' :
-                      order.status === 'PENDIENTE' ? 'bg-(--theme-warning) text-white ' :
-                      order.status === 'DEVUELTO' ? 'bg-(--theme-error) text-white shadow-sm' :
-                      'bg-(--theme-info) text-white'
-                    }`}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 overflow-y-auto pr-1">
+            {displayedOrders.map(order => {
+              const dotColor =
+                order.status === 'RESERVADO' ? 'bg-primary' :
+                order.status === 'PENDIENTE' ? 'bg-(--theme-warning)' :
+                order.status === 'DEVUELTO' ? 'bg-(--theme-error)' :
+                'bg-(--theme-info)';
+              const totalUnits = order.items.reduce((acc, item) => acc + item.quantity, 0);
+              const initials = getSellerName(order).trim().slice(0, 2).toUpperCase();
+
+              return (
+                <button
+                  key={order.id}
+                  onClick={() => handleOpenModal(order)}
+                  className="group text-left border border-(--theme-border) bg-(--theme-secondary-bg) rounded-2xl p-4 flex flex-col gap-3 transition-all hover:border-primary/40 hover:shadow-sm active:scale-[0.99]"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono text-sm font-bold tracking-wide text-(--theme-text)">
                       #{parseOrderId(order.id).friendlyName}
+                    </span>
+                    <span className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-(--theme-text) opacity-55">
+                      <span className={`w-2 h-2 rounded-full ${dotColor}`} />
+                      {order.status}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    {order.seller?.photoURL && (
-                      <img src={order.seller.photoURL} alt={getSellerName(order)} className="w-6 h-6 rounded-full object-cover shrink-0" />
+                  <div className="flex items-center gap-2.5">
+                    {order.seller?.photoURL ? (
+                      <img src={order.seller.photoURL} alt={getSellerName(order)} className="w-8 h-8 rounded-full object-cover shrink-0" />
+                    ) : (
+                      <span className="w-8 h-8 rounded-full bg-primary/15 text-primary text-xs font-bold flex items-center justify-center shrink-0">
+                        {initials}
+                      </span>
                     )}
-                    <h3 className="font-bold text-sm text-(--theme-text)">{getSellerName(order)}</h3>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-sm text-(--theme-text) truncate">{getSellerName(order)}</p>
+                      <p className="text-xs text-(--theme-text) opacity-50">{totalUnits} unidad(es)</p>
+                    </div>
                   </div>
-                  <p className="text-xs text-(--theme-text) opacity-50 mt-1">
-                    Total {order.items.reduce((acc, item) => acc + item.quantity, 0)} unidad(es).
-                  </p>
-                </div>
 
-                <button
-                  onClick={() => handleOpenModal(order)}
-                  className={`w-full text-white py-2.5 rounded-xl text-sm font-bold transition-all duration-200 active:scale-[0.98] flex justify-center items-center gap-2 shadow-sm ${
-                    order.status === 'RESERVADO' ? 'bg-primary hover:brightness-95' :
-                    order.status === 'PENDIENTE' ? 'bg-(--theme-warning) hover:brightness-95' :
-                    order.status === 'DEVUELTO' ? 'bg-(--theme-error) hover:brightness-95' :
-                    'bg-(--theme-info) hover:brightness-95'
-                  }`}
-                >
-                  <ListFilter className="w-4 h-4" /> VER DETALLES
+                  <div className="mt-1 flex items-center justify-end gap-1.5 text-xs font-semibold text-(--theme-text) opacity-55 group-hover:text-primary group-hover:opacity-100 transition-colors">
+                    Ver detalles
+                    <ChevronRight className="w-4 h-4" />
+                  </div>
                 </button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
   CalendarClock,
   CheckCircle2,
-  ChevronRight,
   Menu,
   PackageCheck,
   Truck,
@@ -72,7 +71,6 @@ export default function DeliveryActionsPanel() {
               >
                 <span className="shrink-0">{section.icon}</span>
                 <span className="flex-1">{section.label}</span>
-                {active && <ChevronRight size={12} className="opacity-50" />}
               </button>
             );
           })}

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { SectionHeader } from './SectionHeader';
 import { usePendingOrders } from '../hooks/usePendingOrders';
 import type { PendingOrder } from '../types/pendingOrders';
 
@@ -192,21 +193,8 @@ export default function PendingOrdersPanel() {
   const [selectedOrder, setSelectedOrder] = useState<PendingOrder | null>(null);
 
   return (
-    <section
-      className="min-h-[calc(100vh-80px)] px-6 md:px-12 lg:px-20 xl:px-28 py-12"
-      aria-labelledby="pending-orders-title"
-    >
-      <h1
-        id="pending-orders-title"
-        className="tracking-[-0.07em] text-2xl leading-none mb-14 font-light"
-      >
-        Pedidos pendientes
-        {!loading && (
-          <sup className="text-xs tracking-tight ml-4 align-super opacity-50 font-normal">
-            ({orders.length === 0 ? 'sin pedidos' : orders.length})
-          </sup>
-        )}
-      </h1>
+    <section aria-labelledby="pending-orders-title">
+      <SectionHeader title="Pedidos pendientes" count={loading ? undefined : orders.length} />
 
       {error && (
         <div className="mb-8 border border-dotted border-red-400 bg-red-50 px-5 py-4 rounded text-sm text-red-700 dark:bg-red-900/20 dark:text-red-300">

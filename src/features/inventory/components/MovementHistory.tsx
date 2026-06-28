@@ -11,7 +11,7 @@ import {
   DocumentSnapshot
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
-import { ArrowDownRight, ArrowUpRight, PlusCircle, Clock, ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight, PlusCircle, ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react';
 
 interface Movement {
   id: string;
@@ -174,14 +174,7 @@ export const MovementHistory: React.FC = () => {
   }
 
   return (
-    <div className="bg-(--theme-card-bg) border border-(--theme-border) rounded-3xl p-6 shadow-sm h-full flex flex-col">
-      <div className="flex items-center gap-2 mb-6 border-b border-(--theme-border) pb-4">
-        <Clock className="w-5 h-5 opacity-60 text-(--theme-text)" />
-        <h2 className="font-display font-bold text-lg text-(--theme-text)">
-          Movimientos de Inventario
-        </h2>
-      </div>
-
+    <div className="h-full flex flex-col">
       <div className="space-y-4 flex-grow overflow-y-auto pr-1 min-h-[400px]">
         {movements.length === 0 ? (
           <p className="text-sm opacity-40 text-center py-10 font-display">No hay movimientos registrados.</p>

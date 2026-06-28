@@ -198,7 +198,7 @@ return (
       {loading && (
         <div className="mb-6 bg-(--theme-success-bg) border border-(--theme-success-border) rounded-xl p-4
         text-primary text-sm font-medium">
-          ⟳ Cargando datos desde Firestore...
+          ⟳ Cargando datos...
         </div>
       )}
 

@@ -139,7 +139,7 @@ export default function AccessLogPanel() {
       <div className="mb-6">
         <h2 className="text-base font-semibold text-(--theme-text)">Bitácora de accesos</h2>
         <p className="text-xs text-(--theme-text)/50 mt-0.5">
-          Registro de entradas y salidas al sistema — colección accessLogs
+          Registro de entradas y salidas al sistema
         </p>
       </div>
 

@@ -3,6 +3,7 @@ import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { Package, XCircle } from 'lucide-react';
 import { ProductDetailModal } from './ProductDetailModal';
+import { ProductThumb } from './ProductThumb';
 import { type InventoryProduct } from '../models/product.model';
 import { writeBatch } from 'firebase/firestore'; // 
 
@@ -146,16 +147,8 @@ export const StockTable: React.FC = () => {
               </span>
             )}
 
-            <div className="w-24 h-24 mb-3 rounded-xl overflow-hidden bg-white flex items-center justify-center">
-              {product.imageUrl ? (
-                <img
-                  src={product.imageUrl}
-                  alt={product.name}
-                  className="object-cover w-full h-full"
-                />
-              ) : (
-                <Package className="w-10 h-10 opacity-20 text-(--theme-text)/35" />
-              )}
+            <div className="w-24 h-24 mb-3 rounded-xl overflow-hidden bg-(--theme-card-bg) border border-(--theme-border) flex items-center justify-center">
+              <ProductThumb src={product.imageUrl} alt={product.name} />
             </div>
             <span className="font-display font-bold text-sm text-(--theme-text) text-center line-clamp-2">
               {product.name}

@@ -147,7 +147,7 @@ export default function OrderReceptionPanel() {
       <div className="rounded-2xl border border-(--theme-border) bg-(--theme-card-bg) p-5">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-black text-(--theme-text)">
+            <h2 className="text-base font-semibold text-(--theme-text)">
               Validación de recepción
             </h2>
             <p className="mt-1 text-sm text-(--theme-text)/55">

@@ -2,6 +2,7 @@ import { CalendarDays, DollarSign, ReceiptText, UserCheck } from 'lucide-react';
 import { useState } from 'react';
 import { useDailyCollections } from '@features/seller/hooks/useDailyCollections';
 import { parseOrderId } from '@features/cart/services/orderService';
+import { SectionHeader } from './SectionHeader';
 
 const currencyFormatter = new Intl.NumberFormat('es-BO', {
   style: 'currency',
@@ -64,18 +65,10 @@ export default function DailyCollectionsPanel({
           : 'min-h-screen bg-(--theme-bg) px-4 pb-10 pt-10 md:px-8 xl:px-10'
       }
     >
-      <header className="mb-8 rounded-[1.75rem] border border-(--theme-border) bg-(--theme-card-bg) px-6 py-6 shadow-sm backdrop-blur-sm">
-        <h1
-          className="text-2xl font-900 leading-tight text-(--theme-text) md:text-2xl"
-        >
-          Pagos registrados por mensajeros
-        </h1>
-
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-(--theme-text) opacity-70 md:text-base">
-          Verifica los cobros contra entrega registrados en backend por cada
-          mensajero para el control financiero del vendedor.
-        </p>
-      </header>
+      <SectionHeader
+        title="Pagos registrados por mensajeros"
+        subtitle="Verifica los cobros contra entrega registrados por cada mensajero para el control financiero del vendedor."
+      />
 
       <section className="mb-8 grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)_minmax(0,0.8fr)]">
         <div className="rounded-3xl border border-(--theme-border) bg-(--theme-card-bg) px-6 py-5 shadow-sm">
