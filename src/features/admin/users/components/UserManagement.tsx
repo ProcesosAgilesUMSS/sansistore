@@ -70,7 +70,7 @@ export default function UserManagement() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="
-              w-full pl-10 pr-4 py-2.5 rounded-xl text-[13px]
+              w-full pl-10 pr-4 py-2.5 rounded-xl text-sm
               bg-(--theme-card-bg) border border-(--theme-border)
               text-(--theme-text)
               placeholder:text-(--theme-text)/30
@@ -88,7 +88,7 @@ export default function UserManagement() {
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
               className="
-                flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px]
+                flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm
                 bg-(--theme-card-bg) border border-(--theme-border)
                 text-(--theme-text)/70
                 hover:border-primary/40
@@ -120,7 +120,7 @@ export default function UserManagement() {
                       setDropdownOpen(false);
                     }}
                     className={`
-                      w-full text-left px-4 py-2.5 text-[13px]
+                      w-full text-left px-4 py-2.5 text-sm
                       transition-colors duration-100
                       ${
                         roleFilter === option.value
@@ -140,10 +140,10 @@ export default function UserManagement() {
           <button
             onClick={() => setIsModalOpen(true)}
             className="
-              flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-medium
+              flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium
               bg-primary text-white
-              hover:bg-[#7aa043]
-              active:bg-[#6d9039]
+              hover:bg-primary/90
+              active:bg-primary/100
               transition-colors duration-150
               shadow-sm
               whitespace-nowrap

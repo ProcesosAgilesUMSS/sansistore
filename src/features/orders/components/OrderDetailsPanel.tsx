@@ -268,10 +268,10 @@ export default function OrderDetailsPanel({
 					<div className={`${cardClass} flex flex-col gap-3`}>
 						<div className="flex flex-wrap items-start justify-between gap-2">
 							<div className="min-w-0 flex-1">
-								<p className="font-mono text-[10px] font-bold uppercase tracking-wider opacity-40 truncate">
+								<p className="font-mono text-xs font-bold uppercase tracking-wider opacity-40 truncate">
 									{uuid}
 								</p>
-								<h2 className="mt-1 font-display font-extrabold text-xl tracking-tight">
+								<h2 className="mt-1 font-display font-extrabold text-lg tracking-tight">
 									{friendlyName}
 								</h2>
 							</div>
@@ -305,7 +305,7 @@ export default function OrderDetailsPanel({
 									<h4 className="text-sm font-bold mb-1">
 										Código de confirmación
 									</h4>
-									<p className="text-xl font-mono font-black tracking-widest text-primary">
+									<p className="text-lg font-mono font-black tracking-widest text-primary">
 										{order.secret}
 									</p>
 								</div>

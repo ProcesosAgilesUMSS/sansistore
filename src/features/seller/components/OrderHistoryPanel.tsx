@@ -36,8 +36,7 @@ function SummaryCard({
             {title}
           </p>
           <p
-            className="mt-2 text-3xl font-900 leading-tight text-(--theme-text)"
-            style={{ fontFamily: 'Outfit, sans-serif' }}
+            className="mt-2 text-2xl font-900 leading-tight text-(--theme-text)"
           >
             {value}
           </p>
@@ -67,8 +66,7 @@ export default function OrderHistoryPanel({
     >
       <header className="mb-8 rounded-[1.75rem] border border-(--theme-border) bg-(--theme-card-bg) px-6 py-6 shadow-sm backdrop-blur-sm">
         <h1
-          className="text-3xl font-900 leading-tight text-(--theme-text) md:text-4xl"
-          style={{ fontFamily: 'Outfit, sans-serif' }}
+          className="text-2xl font-900 leading-tight text-(--theme-text) md:text-2xl"
         >
           Historial de pedidos
         </h1>
@@ -108,7 +106,7 @@ export default function OrderHistoryPanel({
       <section className="rounded-3xl border border-(--theme-border) bg-(--theme-card-bg) p-5 shadow-sm">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-(--theme-border) px-5 py-4">
           <div>
-            <h2 className="text-xl font-900 tracking-[0.12em] text-(--theme-text)">
+            <h2 className="text-lg font-900 tracking-[0.12em] text-(--theme-text)">
               Pedidos pagados
             </h2>
             <p className="mt-1 text-sm font-600 text-(--theme-text) opacity-60">
@@ -165,7 +163,7 @@ export default function OrderHistoryPanel({
 
                 <div className="mt-4 grid gap-3 text-sm text-(--theme-text) opacity-75 md:grid-cols-3">
                   <div>
-                    <p className="text-[11px] font-800 uppercase tracking-[0.18em] opacity-55">
+                    <p className="text-xs font-800 uppercase tracking-[0.18em] opacity-55">
                       Total
                     </p>
                     <p className="mt-1 text-base font-800 text-primary">
@@ -173,7 +171,7 @@ export default function OrderHistoryPanel({
                     </p>
                   </div>
                   <div>
-                    <p className="text-[11px] font-800 uppercase tracking-[0.18em] opacity-55">
+                    <p className="text-xs font-800 uppercase tracking-[0.18em] opacity-55">
                       Estado de entrega
                     </p>
                     <p className="mt-1 font-700">
@@ -181,7 +179,7 @@ export default function OrderHistoryPanel({
                     </p>
                   </div>
                   <div>
-                    <p className="text-[11px] font-800 uppercase tracking-[0.18em] opacity-55">
+                    <p className="text-xs font-800 uppercase tracking-[0.18em] opacity-55">
                       Ultima actualizacion
                     </p>
                     <p className="mt-1 font-700">

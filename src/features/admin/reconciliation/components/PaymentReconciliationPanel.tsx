@@ -46,7 +46,7 @@ const filterOptions: { label: string; value: ReconciliationFilter }[] = [
 function IssueBadge({ issueType }: { issueType: ReconciliationIssueType }) {
 	return (
 		<span
-			className={`inline-flex items-center rounded-full border px-2 py-1 text-[10px] font-bold ${issueStyles[issueType]}`}
+			className={`inline-flex items-center rounded-full border px-2 py-1 text-xs font-bold ${issueStyles[issueType]}`}
 		>
 			{RECONCILIATION_ISSUE_LABELS[issueType]}
 		</span>
@@ -64,7 +64,7 @@ function SummaryCard({
 }) {
 	return (
 		<div className="rounded-xl border border-(--theme-border) bg-(--theme-card-bg) p-4">
-			<p className="text-[10px] font-bold uppercase tracking-widest text-(--theme-text) opacity-40">
+			<p className="text-xs font-bold uppercase tracking-widest text-(--theme-text) opacity-40">
 				{label}
 			</p>
 			<p
@@ -82,13 +82,13 @@ function OrderIdSummary({ orderId }: { orderId: string }) {
 	return (
 		<>
 			<p
-				className="max-w-[180px] truncate font-mono text-[12px] font-black uppercase text-(--theme-text)"
+				className="max-w-[180px] truncate font-mono text-xs font-black uppercase text-(--theme-text)"
 				title={orderId}
 			>
 				#{friendlyName}
 			</p>
 			{uuid !== friendlyName && (
-				<p className="mt-1 max-w-[180px] truncate font-mono text-[10px] text-(--theme-text) opacity-45">
+				<p className="mt-1 max-w-[180px] truncate font-mono text-xs text-(--theme-text) opacity-45">
 					{uuid}
 				</p>
 			)}
@@ -154,12 +154,12 @@ export default function PaymentReconciliationPanel() {
 	);
 
 	return (
-		<div className="max-w-6xl">
+		<div>
 			<div className="mb-6">
-				<h2 className="text-[15px] font-semibold text-(--theme-text)">
+				<h2 className="text-base font-semibold text-(--theme-text)">
 					Conciliacion de pagos
 				</h2>
-				<p className="mt-0.5 text-[11px] text-(--theme-text) opacity-50">
+				<p className="mt-0.5 text-xs text-(--theme-text) opacity-50">
 					Pedidos entregados con diferencias frente a los pagos registrados.
 				</p>
 			</div>
@@ -188,7 +188,7 @@ export default function PaymentReconciliationPanel() {
 			</div>
 
 			<div className="mb-5 rounded-xl border border-(--theme-border) bg-(--theme-card-bg) p-4">
-				<p className="mb-3 border-b border-(--theme-border) pb-2 text-[10px] font-bold uppercase tracking-widest text-(--theme-text) opacity-40">
+				<p className="mb-3 border-b border-(--theme-border) pb-2 text-xs font-bold uppercase tracking-widest text-(--theme-text) opacity-40">
 					Filtros
 				</p>
 
@@ -196,7 +196,7 @@ export default function PaymentReconciliationPanel() {
 					<div className="relative w-full lg:max-w-md">
 						<label
 							htmlFor="payment-reconciliation-search"
-							className="mb-1.5 block text-[10px] font-bold uppercase tracking-wide text-(--theme-text) opacity-50"
+							className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-(--theme-text) opacity-50"
 						>
 							Buscar pedido o cliente
 						</label>
@@ -210,12 +210,12 @@ export default function PaymentReconciliationPanel() {
 							value={search}
 							onChange={(event) => setSearch(event.target.value)}
 							placeholder="ID, cliente o telefono"
-							className="h-10 w-full rounded-lg border border-(--theme-border) bg-(--theme-secondary-bg) pl-9 pr-3 text-[13px] text-(--theme-text) outline-none placeholder:text-(--theme-text)/30 focus:border-primary"
+							className="h-10 w-full rounded-lg border border-(--theme-border) bg-(--theme-secondary-bg) pl-9 pr-3 text-sm text-(--theme-text) outline-none placeholder:text-(--theme-text)/30 focus:border-primary"
 						/>
 					</div>
 
 					<div>
-						<p className="mb-1.5 block text-[10px] font-bold uppercase tracking-wide text-(--theme-text) opacity-50">
+						<p className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-(--theme-text) opacity-50">
 							Tipo de diferencia
 						</p>
 						<div className="flex flex-wrap gap-2">
@@ -226,7 +226,7 @@ export default function PaymentReconciliationPanel() {
 										key={option.value}
 										type="button"
 										onClick={() => setIssueFilter(option.value)}
-										className={`h-10 rounded-full border px-4 text-[12px] font-bold transition-colors ${
+										className={`h-10 rounded-full border px-4 text-xs font-bold transition-colors ${
 											active
 												? "border-primary bg-primary text-white"
 												: "border-(--theme-border) text-(--theme-text) opacity-65 hover:border-primary hover:text-primary hover:opacity-100"
@@ -242,7 +242,7 @@ export default function PaymentReconciliationPanel() {
 			</div>
 
 			{error && (
-				<div className="mb-4 flex items-center gap-2 rounded-xl border border-(--theme-error-border) bg-(--theme-error-bg) px-4 py-3 text-[12px] font-semibold text-(--theme-error)">
+				<div className="mb-4 flex items-center gap-2 rounded-xl border border-(--theme-error-border) bg-(--theme-error-bg) px-4 py-3 text-xs font-semibold text-(--theme-error)">
 					<AlertTriangle size={16} />
 					{error}
 				</div>
@@ -262,10 +262,10 @@ export default function PaymentReconciliationPanel() {
 			{!loading && filteredItems.length === 0 && (
 				<div className="rounded-xl border border-dashed border-(--theme-border) bg-(--theme-card-bg) px-6 py-12 text-center">
 					<CheckCircle2 className="mx-auto text-primary" size={32} />
-					<p className="mt-3 text-[14px] font-bold text-(--theme-text)">
+					<p className="mt-3 text-sm font-bold text-(--theme-text)">
 						No hay diferencias para revisar
 					</p>
-					<p className="mt-1 text-[12px] text-(--theme-text) opacity-50">
+					<p className="mt-1 text-xs text-(--theme-text) opacity-50">
 						Los pedidos entregados coinciden con los pagos registrados segun los
 						filtros actuales.
 					</p>
@@ -275,10 +275,10 @@ export default function PaymentReconciliationPanel() {
 			{!loading && filteredItems.length > 0 && (
 				<>
 					<div className="mb-3 flex items-center justify-between">
-						<p className="text-[10px] font-bold uppercase tracking-widest text-(--theme-text) opacity-40">
+						<p className="text-xs font-bold uppercase tracking-widest text-(--theme-text) opacity-40">
 							Resultados ({filteredItems.length})
 						</p>
-						<div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-(--theme-text) opacity-45">
+						<div className="inline-flex items-center gap-1.5 text-xs font-semibold text-(--theme-text) opacity-45">
 							<RefreshCw size={12} />
 							Actualizacion automatica
 						</div>
@@ -289,25 +289,25 @@ export default function PaymentReconciliationPanel() {
 							<table className="w-full min-w-[900px] border-collapse">
 								<thead>
 									<tr className="bg-(--theme-secondary-bg)">
-										<th className="px-4 py-3 text-left text-[9px] font-bold uppercase tracking-wide text-(--theme-text) opacity-45">
+										<th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-(--theme-text) opacity-45">
 											Pedido
 										</th>
-										<th className="px-4 py-3 text-left text-[9px] font-bold uppercase tracking-wide text-(--theme-text) opacity-45">
+										<th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-(--theme-text) opacity-45">
 											Cliente
 										</th>
-										<th className="px-4 py-3 text-left text-[9px] font-bold uppercase tracking-wide text-(--theme-text) opacity-45">
+										<th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-(--theme-text) opacity-45">
 											Total
 										</th>
-										<th className="px-4 py-3 text-left text-[9px] font-bold uppercase tracking-wide text-(--theme-text) opacity-45">
+										<th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-(--theme-text) opacity-45">
 											Pago
 										</th>
-										<th className="px-4 py-3 text-left text-[9px] font-bold uppercase tracking-wide text-(--theme-text) opacity-45">
+										<th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-(--theme-text) opacity-45">
 											Diferencia
 										</th>
-										<th className="px-4 py-3 text-left text-[9px] font-bold uppercase tracking-wide text-(--theme-text) opacity-45">
+										<th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-(--theme-text) opacity-45">
 											Estado
 										</th>
-										<th className="px-4 py-3 text-left text-[9px] font-bold uppercase tracking-wide text-(--theme-text) opacity-45">
+										<th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-(--theme-text) opacity-45">
 											Tipo
 										</th>
 									</tr>
@@ -324,39 +324,39 @@ export default function PaymentReconciliationPanel() {
 										>
 											<td className="px-4 py-3 align-top">
 												<OrderIdSummary orderId={item.orderId} />
-												<p className="mt-1 text-[10px] text-(--theme-text) opacity-45">
+												<p className="mt-1 text-xs text-(--theme-text) opacity-45">
 													{formatDateTime(item.deliveredAt ?? item.updatedAt)}
 												</p>
 											</td>
 											<td className="px-4 py-3 align-top">
-												<p className="text-[12px] font-bold text-(--theme-text)">
+												<p className="text-xs font-bold text-(--theme-text)">
 													{item.customerName}
 												</p>
-												<p className="text-[10px] text-(--theme-text) opacity-45">
+												<p className="text-xs text-(--theme-text) opacity-45">
 													{item.customerPhone || "Sin telefono"}
 												</p>
 											</td>
-											<td className="px-4 py-3 align-top text-[12px] font-bold text-(--theme-text)">
+											<td className="px-4 py-3 align-top text-xs font-bold text-(--theme-text)">
 												{formatCurrency(item.orderTotal)}
 											</td>
 											<td className="px-4 py-3 align-top">
-												<p className="text-[12px] font-bold text-(--theme-text)">
+												<p className="text-xs font-bold text-(--theme-text)">
 													{item.paymentAmount === null
 														? "Sin pago"
 														: formatCurrency(item.paymentAmount)}
 												</p>
-												<p className="text-[10px] text-(--theme-text) opacity-45">
+												<p className="text-xs text-(--theme-text) opacity-45">
 													{item.paymentMethod}
 												</p>
 											</td>
-											<td className="px-4 py-3 align-top text-[12px] font-black text-(--theme-danger)">
+											<td className="px-4 py-3 align-top text-xs font-black text-(--theme-danger)">
 												{formatCurrency(item.difference)}
 											</td>
 											<td className="px-4 py-3 align-top">
-												<p className="text-[11px] font-bold text-(--theme-text)">
+												<p className="text-xs font-bold text-(--theme-text)">
 													{item.paymentStatus}
 												</p>
-												<p className="text-[10px] text-(--theme-text) opacity-45">
+												<p className="text-xs text-(--theme-text) opacity-45">
 													Entrega: {item.deliveryStatus}
 												</p>
 											</td>

@@ -111,12 +111,12 @@ export default function MessengerPerformancePage() {
 		report.deliveries.length === 0;
 
 	return (
-		<div className="max-w-5xl">
+		<div>
 			<div className="mb-6">
-				<h2 className="text-[15px] font-semibold text-[var(--theme-text)]">
+				<h2 className="text-base font-semibold text-(--theme-text)">
 					Desempeño de mensajeros
 				</h2>
-				<p className="text-[11px] text-[var(--theme-text)]/50 mt-0.5">
+				<p className="text-xs text-(--theme-text)/50 mt-0.5">
 					Consultá el rendimiento de los mensajeros según sus entregas
 					realizadas.
 				</p>
@@ -146,27 +146,27 @@ export default function MessengerPerformancePage() {
 			/>
 
 			{!loadingMessengers && messengers.length === 0 && !error && (
-				<p className="text-[11px] text-[var(--theme-text)]/40 mt-3">
+				<p className="text-xs text-(--theme-text)/40 mt-3">
 					No hay mensajeros activos registrados.
 				</p>
 			)}
 
 			{validationError && (
-				<p className="text-[11px] text-red-500 mt-3">{validationError}</p>
+				<p className="text-xs text-(--theme-error) mt-3">{validationError}</p>
 			)}
 
 			<div className="mt-6">
 				{loading && (
-					<div className="text-center py-12 border border-dashed border-[var(--theme-border)] rounded-xl">
-						<p className="text-[13px] text-[var(--theme-text)]/40">
+					<div className="text-center py-12 border border-dashed border-(--theme-border) rounded-xl">
+						<p className="text-sm text-(--theme-text)/40">
 							Cargando desempeño del mensajero...
 						</p>
 					</div>
 				)}
 
 				{error && !loading && (
-					<div className="flex items-center gap-2 px-4 py-3 rounded-xl text-[12px] font-medium bg-red-500/10 border border-red-500/20 text-red-500">
-						<span className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">
+					<div className="flex items-center gap-2 px-4 py-3 rounded-xl text-xs font-medium bg-(--theme-error-bg) border border-(--theme-error-border) text-(--theme-error)">
+						<span className="w-5 h-5 rounded-full bg-(--theme-error) flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
 							!
 						</span>
 						{error}
@@ -175,21 +175,21 @@ export default function MessengerPerformancePage() {
 
 				{!hasSearched && !loading && !error && (
 					<>
-						<p className="text-[10px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-widest mb-3 pb-2 border-b border-[var(--theme-border)]">
+						<p className="text-xs font-semibold text-(--theme-text)/40 uppercase tracking-widest mb-3 pb-2 border-b border-(--theme-border)">
 							Últimos pedidos completados
 						</p>
 
 						{loadingRecentDeliveries && (
-							<div className="text-center py-12 border border-dashed border-[var(--theme-border)] rounded-xl">
-								<p className="text-[13px] text-[var(--theme-text)]/40">
+							<div className="text-center py-12 border border-dashed border-(--theme-border) rounded-xl">
+								<p className="text-sm text-(--theme-text)/40">
 									Cargando desempeño del mensajero...
 								</p>
 							</div>
 						)}
 
 						{recentDeliveriesError && !loadingRecentDeliveries && (
-							<div className="flex items-center gap-2 px-4 py-3 rounded-xl text-[12px] font-medium bg-red-500/10 border border-red-500/20 text-red-500">
-								<span className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">
+							<div className="flex items-center gap-2 px-4 py-3 rounded-xl text-xs font-medium bg-(--theme-error-bg) border border-(--theme-error-border) text-(--theme-error)">
+								<span className="w-5 h-5 rounded-full bg-(--theme-error) flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
 									!
 								</span>
 								{recentDeliveriesError}
@@ -199,8 +199,8 @@ export default function MessengerPerformancePage() {
 						{!loadingRecentDeliveries &&
 							!recentDeliveriesError &&
 							recentDeliveries.length === 0 && (
-								<div className="text-center py-12 border border-dashed border-[var(--theme-border)] rounded-xl">
-									<p className="text-[13px] text-[var(--theme-text)]/40">
+								<div className="text-center py-12 border border-dashed border-(--theme-border) rounded-xl">
+									<p className="text-sm text-(--theme-text)/40">
 										No hay pedidos completados recientes.
 									</p>
 								</div>
@@ -218,8 +218,8 @@ export default function MessengerPerformancePage() {
 				)}
 
 				{showEmptyData && (
-					<div className="text-center py-12 border border-dashed border-[var(--theme-border)] rounded-xl">
-						<p className="text-[13px] text-[var(--theme-text)]/40">
+					<div className="text-center py-12 border border-dashed border-(--theme-border) rounded-xl">
+						<p className="text-sm text-(--theme-text)/40">
 							No hay entregas registradas para este mensajero en la fecha
 							seleccionada.
 						</p>
@@ -228,12 +228,12 @@ export default function MessengerPerformancePage() {
 
 				{report && report.deliveries.length > 0 && !loading && !error && (
 					<>
-						<p className="text-[10px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-widest mb-3 pb-2 border-b border-[var(--theme-border)]">
+						<p className="text-xs font-semibold text-(--theme-text)/40 uppercase tracking-widest mb-3 pb-2 border-b border-(--theme-border)">
 							Resumen del día
 						</p>
 						<MessengerPerformanceKpis report={report} />
 
-						<p className="text-[10px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-widest mb-3 pb-2 border-b border-[var(--theme-border)]">
+						<p className="text-xs font-semibold text-(--theme-text)/40 uppercase tracking-widest mb-3 pb-2 border-b border-(--theme-border)">
 							Historial de entregas
 						</p>
 						<MessengerPerformanceTable deliveries={report.deliveries} />

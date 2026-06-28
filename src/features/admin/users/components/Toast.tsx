@@ -50,8 +50,8 @@ export default function Toast({ message, type, onClose, duration = 4000 }: Toast
           flex items-center gap-3 px-4 py-3.5 rounded-xl shadow-lg border
           transition-all duration-300 ease-out
           ${isSuccess
-            ? 'bg-[#f0f7e6] border-[rgba(136,176,75,0.3)] text-[#3d5a1e]'
-            : 'bg-[#fef2f2] border-[rgba(220,60,60,0.2)] text-[#991b1b]'
+            ? 'bg-(--theme-success-bg) border-(--theme-success-border) text-(--theme-success)'
+            : 'bg-(--theme-error-bg) border-(--theme-error-border) text-(--theme-error)'
           }
           ${isVisible && !isExiting
             ? 'opacity-100 translate-y-0'
@@ -63,16 +63,16 @@ export default function Toast({ message, type, onClose, duration = 4000 }: Toast
       >
         {isSuccess
           ? <CheckCircle2 size={18} className="text-primary shrink-0" />
-          : <XCircle size={18} className="text-[#dc3c3c] shrink-0" />
+          : <XCircle size={18} className="text-(--theme-error) shrink-0" />
         }
-        <p className="text-[13px] font-medium flex-1">{message}</p>
+        <p className="text-sm font-medium flex-1">{message}</p>
         <button
           onClick={handleClose}
           className={`
             p-1 rounded-md shrink-0 transition-colors
             ${isSuccess
-              ? 'hover:bg-primary/10 text-[#3d5a1e]/50 hover:text-[#3d5a1e]'
-              : 'hover:bg-[#dc3c3c]/10 text-[#991b1b]/50 hover:text-[#991b1b]'
+              ? 'hover:bg-primary/10 text-(--theme-success)/50 hover:text-(--theme-success)'
+              : 'hover:bg-(--theme-error-bg) text-(--theme-error)/50 hover:text-(--theme-error)'
             }
           `}
         >

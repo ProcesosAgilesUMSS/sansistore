@@ -54,7 +54,7 @@ export const ProductModal: React.FC = () => {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-(--theme-bg) font-['Outfit'] font-bold text-sm tracking-wide transition-all duration-200 hover:brightness-110 active:scale-95"
+        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-(--theme-bg) font-display font-bold text-sm tracking-wide transition-all duration-200 hover:brightness-110 active:scale-95"
       >
         + Nuevo producto
       </button>
@@ -64,13 +64,13 @@ export const ProductModal: React.FC = () => {
           
           {isSuccess ? (
             
-            <div className="bg-(--theme-card-bg) border border-green-500/30 shadow-2xl rounded-2xl p-8 animate-in zoom-in-95 fade-in duration-200 flex flex-col items-center max-w-sm w-full">
-              <div className="w-16 h-16 rounded-full bg-green-500/15 flex items-center justify-center text-green-500 mb-4">
+            <div className="bg-(--theme-card-bg) border border-primary/30 shadow-2xl rounded-2xl p-8 animate-in zoom-in-95 fade-in duration-200 flex flex-col items-center max-w-sm w-full">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
                 <CheckCircle2 className="w-8 h-8" />
               </div>
-              <p className="font-['Outfit'] font-black text-2xl text-(--theme-text) mb-2">¡Producto Creado!</p>
+              <p className="font-display font-black text-2xl text-(--theme-text) mb-2">¡Producto Creado!</p>
               <p className="text-sm text-(--theme-text) opacity-70 text-center">
-                <strong className="text-green-500">{successProductName}</strong> ha sido añadido exitosamente a tu tienda.
+                <strong className="text-primary">{successProductName}</strong> ha sido añadido exitosamente a tu tienda.
               </p>
               <div className="mt-6 flex items-center gap-2 opacity-50">
                 <div className="w-4 h-4 border-2 border-(--theme-text) border-t-transparent rounded-full animate-spin"></div>
@@ -87,7 +87,7 @@ export const ProductModal: React.FC = () => {
                 <X className="w-4 h-4" />
               </button>
 
-              <h2 className="font-['Outfit'] font-black text-2xl text-(--theme-text) mb-1">
+              <h2 className="font-display font-black text-2xl text-(--theme-text) mb-1">
                 Nuevo Producto
               </h2>
               <p className="text-sm text-(--theme-text) opacity-50 mb-6">
@@ -95,7 +95,7 @@ export const ProductModal: React.FC = () => {
               </p>
 
               {uploadError && (
-                <div className="mb-4 p-3 rounded-2xl bg-red-50 border border-red-200 text-red-600 text-sm flex items-start gap-2">
+                <div className="mb-4 p-3 rounded-2xl bg-(--theme-error-bg) border border-(--theme-error-border) text-(--theme-error) text-sm flex items-start gap-2">
                   <X className="w-4 h-4 mt-0.5 shrink-0" />
                   <span>{uploadError}</span>
                 </div>
@@ -119,14 +119,14 @@ export const ProductModal: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleClose}
-                    className="flex-1 px-4 py-3 rounded-2xl font-['Outfit'] font-bold text-sm border border-(--theme-border) text-(--theme-text) opacity-70 hover:opacity-100 hover:bg-(--theme-secondary-bg) transition"
+                    className="flex-1 px-4 py-3 rounded-2xl font-display font-bold text-sm border border-(--theme-border) text-(--theme-text) opacity-70 hover:opacity-100 hover:bg-(--theme-secondary-bg) transition"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
                     disabled={isBusy}
-                    className="flex-[1.2] px-4 py-3 rounded-2xl bg-primary text-(--theme-bg) font-['Outfit'] font-bold text-sm shadow-lg shadow-primary/20 hover:brightness-110 disabled:opacity-50 transition-all"
+                    className="flex-[1.2] px-4 py-3 rounded-2xl bg-primary text-(--theme-bg) font-display font-bold text-sm shadow-lg shadow-primary/20 hover:brightness-110 disabled:opacity-50 transition-all"
                   >
                     {isBusy ? 'Guardando...' : 'Guardar producto'}
                   </button>

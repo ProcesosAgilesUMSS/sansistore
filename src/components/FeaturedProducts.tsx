@@ -513,7 +513,7 @@ function FeaturedProductsInner({
                   setShowSuggestions(true);
                 }}
                 onBlur={() => setInputFocused(false)}
-                className="w-full rounded-full border border-border-light bg-card-bg-light py-3 pl-11 pr-11 text-[15px] sm:text-sm text-text-light placeholder:text-text-light/30 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all disabled:opacity-50"
+                className="w-full rounded-full border border-border-light bg-card-bg-light py-3 pl-11 pr-11 text-sm sm:text-sm text-text-light placeholder:text-text-light/30 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all disabled:opacity-50"
               />
               {searchTerm && (
                 <button

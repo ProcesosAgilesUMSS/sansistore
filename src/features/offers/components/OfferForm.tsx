@@ -12,7 +12,7 @@ const inputClass = (hasError = false) =>
   }`;
 
 const labelClass =
-  'text-[0.68rem] font-bold tracking-widest uppercase text-text-light/50';
+  'text-xs font-bold tracking-widest uppercase text-text-light/50';
 
 export default function OfferForm() {
   const [productId, setProductId] = useState('');
@@ -110,10 +110,10 @@ export default function OfferForm() {
           <Tag className="w-4 h-4 text-primary" />
         </div>
         <div>
-          <h2 className="font-['Outfit'] font-bold text-base text-text-light">
+          <h2 className="font-display font-bold text-base text-text-light">
             Crear Nueva Oferta
           </h2>
-          <p className="text-[0.7rem] text-text-light/40">
+          <p className="text-xs text-text-light/40">
             El catálogo se actualizará automáticamente
           </p>
         </div>

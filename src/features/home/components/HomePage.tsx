@@ -73,7 +73,7 @@ function HomeCatalogControls() {
             onFocus={goToCatalogSearch}
             onPointerDown={goToCatalogSearch}
             maxLength={100}
-            className="w-full rounded-full border border-border-light bg-card-bg-light py-3 pl-11 pr-11 text-[15px] sm:text-sm text-text-light placeholder:text-text-light/30 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all"
+            className="w-full rounded-full border border-border-light bg-card-bg-light py-3 pl-11 pr-11 text-sm sm:text-sm text-text-light placeholder:text-text-light/30 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all"
           />
         </div>
       </div>
@@ -173,7 +173,7 @@ function ProductCarousel({
   return (
     <section ref={carouselRef} className="py-4">
       <div className="mb-3 flex items-center justify-between gap-4">
-        <h2 className="flex items-center gap-2 text-lg font-black tracking-tight text-text-light sm:text-xl">
+        <h2 className="flex items-center gap-2 text-lg font-black tracking-tight text-text-light sm:text-lg">
           <span className="inline-block h-4 w-1 rounded-full bg-primary" />
           {title}
         </h2>

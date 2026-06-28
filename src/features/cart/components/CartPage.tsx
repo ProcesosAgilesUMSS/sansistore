@@ -251,7 +251,7 @@ function CartSummary({ items }: { items: CartDisplayItem[] }) {
 function EmptyCart() {
   return (
     <section className="rounded-lg border border-border-light bg-bg-light p-6 py-12">
-      <h2 className="text-xl font-semibold">Mi Carrito</h2>
+      <h2 className="text-lg font-semibold">Mi Carrito</h2>
       <p className="mt-4">Tu carrito está vacío</p>
       <div className="mt-6 max-w-sm rounded-lg border border-border-light p-4">
         <div className="flex justify-between text-lg font-bold">

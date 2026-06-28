@@ -42,7 +42,7 @@ export function CheckoutSummaryPanel({
         <p className="mb-1 text-xs font-semibold text-text-light opacity-70">
           Total a pagar al recibir
         </p>
-        <p className="text-3xl font-black text-primary">
+        <p className="text-2xl font-black text-primary">
           {formatMoney(orderTotal)}
         </p>
         <p className="mt-1 text-xs font-semibold text-text-light opacity-70">

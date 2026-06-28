@@ -46,7 +46,7 @@ export default function OrderModal({
 			/>
 			<div className="bg-(--theme-card-bg) border border-(--theme-border) text-(--theme-text) max-w-2xl w-full px-6 py-6 rounded-2xl flex flex-col max-h-[90vh] overflow-y-auto relative shadow-2xl">
 				<div className="flex gap-x-8 items-center mb-2">
-					<span className="tracking-tight text-3xl font-display font-black">
+					<span className="tracking-tight text-2xl font-display font-black">
 						{parseOrderId(order.id).friendlyName}
 					</span>
 					<div className="flex gap-x-2 items-center">
@@ -174,7 +174,7 @@ export default function OrderModal({
 				</div>
 
 				<div className="grid grid-cols-20">
-					<div className="col-span-full grid grid-cols-subgrid py-3 border-y border-dotted border-(--theme-border) mt-2 text-[10px] uppercase tracking-widest opacity-60">
+					<div className="col-span-full grid grid-cols-subgrid py-3 border-y border-dotted border-(--theme-border) mt-2 text-xs uppercase tracking-widest opacity-60">
 						<div className="col-start-1 col-end-3">Cant.</div>
 						<div className="col-start-4 col-end-13 min-[570px]:col-start-3 min-[570px]:col-end-10">
 							Producto
@@ -276,7 +276,7 @@ export default function OrderModal({
 
 					<div className="flex justify-between items-baseline leading-[130%]">
 						<div className="text-(--theme-text) opacity-60">Total:</div>
-						<div className="tracking-tight text-xl font-800">
+						<div className="tracking-tight text-lg font-800">
 							{formatCurrency(order.total)}
 						</div>
 					</div>

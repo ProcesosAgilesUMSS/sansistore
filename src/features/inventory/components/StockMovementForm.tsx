@@ -198,20 +198,20 @@ export const StockMovementForm: React.FC = () => {
       <div className="bg-(--theme-card-bg) border border-(--theme-border) rounded-3xl p-6 shadow-sm">
         <div className="flex items-center gap-2 mb-6 border-b border-(--theme-border) pb-4">
           <PackageOpen className="w-5 h-5 text-primary" />
-          <h2 className="font-['Outfit'] font-bold text-lg text-(--theme-text)">
+          <h2 className="font-display font-bold text-lg text-(--theme-text)">
             Registrar Ajuste / Operación
           </h2>
         </div>
 
         {successMessage && (
-          <div className="mb-4 p-3 bg-green-500/10 border border-green-500/20 text-green-500 rounded-xl text-sm flex items-center gap-2">
+          <div className="mb-4 p-3 bg-primary/10 border border-primary/30 text-primary rounded-xl text-sm flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 shrink-0" />
             <span className="font-bold">{successMessage}</span>
           </div>
         )}
 
         {errorMessage && (
-          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-500 rounded-xl text-sm flex items-center gap-2">
+          <div className="mb-4 p-3 bg-(--theme-error-bg) border border-(--theme-error-border) text-(--theme-error) rounded-xl text-sm flex items-center gap-2">
             <AlertCircle className="w-5 h-5 shrink-0" />
             <span className="font-bold">{errorMessage}</span>
           </div>
@@ -223,7 +223,7 @@ export const StockMovementForm: React.FC = () => {
               type="button"
               onClick={() => handleMovementTypeChange('ENTRADA')}
               className={`py-2 text-sm font-bold rounded-lg transition-all ${
-                movementType === 'ENTRADA' ? 'bg-green-500 text-white shadow-md' : 'text-(--theme-text) opacity-50 hover:opacity-100'
+                movementType === 'ENTRADA' ? 'bg-primary text-white shadow-sm' : 'text-(--theme-text) opacity-50 hover:opacity-100'
               }`}
             >
               ENTRADA
@@ -232,7 +232,7 @@ export const StockMovementForm: React.FC = () => {
               type="button"
               onClick={() => handleMovementTypeChange('SALIDA')}
               className={`py-2 text-sm font-bold rounded-lg transition-all ${
-                movementType === 'SALIDA' ? 'bg-red-500 text-white shadow-md' : 'text-(--theme-text) opacity-50 hover:opacity-100'
+                movementType === 'SALIDA' ? 'bg-(--theme-error) text-white shadow-md' : 'text-(--theme-text) opacity-50 hover:opacity-100'
               }`}
             >
               SALIDA
@@ -304,7 +304,7 @@ export const StockMovementForm: React.FC = () => {
 
             {isNewBatch && (
               <div className="space-y-1 animate-[fadeIn_0.2s_ease-out]">
-                <label className="text-xs uppercase tracking-wider font-bold text-green-500">
+                <label className="text-xs uppercase tracking-wider font-bold text-primary">
                   Precio Total Compra Lote (Bs.)
                 </label>
                 <input
@@ -314,7 +314,7 @@ export const StockMovementForm: React.FC = () => {
                   step="0.01"
                   value={totalCost || ''}
                   onChange={(e) => setTotalCost(Math.max(0, Number(e.target.value)))}
-                  className="w-full bg-(--theme-secondary-bg) border border-green-500/40 rounded-xl px-4 py-3 text-sm focus:border-green-500 focus:outline-none text-(--theme-text)"
+                  className="w-full bg-(--theme-secondary-bg) border border-primary/30 rounded-xl px-4 py-3 text-sm focus:border-primary/30 focus:outline-none text-(--theme-text)"
                   placeholder="Ej. 450.00"
                 />
               </div>
@@ -325,7 +325,7 @@ export const StockMovementForm: React.FC = () => {
             type="submit"
             disabled={isSubmitting || !isFormValid}
             className={`w-full mt-2 text-white py-3.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
-              movementType === 'ENTRADA' ? 'bg-green-500 hover:bg-green-400' : 'bg-red-500 hover:bg-red-400'
+              movementType === 'ENTRADA' ? 'bg-primary hover:brightness-110' : 'bg-(--theme-error) hover:brightness-110'
             } disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed`}
           >
             {isSubmitting ? <RefreshCw className="animate-spin w-4 h-4" /> : 'Confirmar Operación'}
@@ -340,7 +340,7 @@ export const StockMovementForm: React.FC = () => {
             <div className="flex justify-between items-start mb-4">
               <div className="flex items-center gap-2 text-primary">
                 <TrendingUp className="w-6 h-6" />
-                <h3 className="font-['Outfit'] font-bold text-xl text-(--theme-text)">Margen y Venta</h3>
+                <h3 className="font-display font-bold text-lg text-(--theme-text)">Margen y Venta</h3>
               </div>
               <button onClick={() => setShowPriceModal(false)} className="opacity-50 hover:opacity-100">
                 <X className="w-5 h-5" />
@@ -361,8 +361,8 @@ export const StockMovementForm: React.FC = () => {
                 <span className="font-bold">{quantity} u.</span>
               </div>
               <div className="pt-2 mt-2 border-t border-(--theme-border) flex justify-between text-sm">
-                <span className="font-bold text-orange-500">Costo Unitario (Compra):</span>
-                <span className="font-bold text-orange-500">{unitCostCalculation} Bs. c/u</span>
+                <span className="font-bold text-(--theme-warning)">Costo Unitario (Compra):</span>
+                <span className="font-bold text-(--theme-warning)">{unitCostCalculation} Bs. c/u</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="opacity-70">Precio de Venta Actual:</span>
@@ -382,7 +382,7 @@ export const StockMovementForm: React.FC = () => {
                 onChange={(e) => setNewSalesPrice(Number(e.target.value))}
                 className="w-full bg-(--theme-secondary-bg) border-2 border-primary rounded-xl px-4 py-3 text-lg font-bold focus:outline-none"
               />
-              <p className="text-[11px] opacity-60 text-center">
+              <p className="text-xs opacity-60 text-center">
                 El precio debe ser mayor al costo unitario para generar ganancia.
               </p>
             </div>
@@ -390,14 +390,14 @@ export const StockMovementForm: React.FC = () => {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowPriceModal(false)}
-                className="flex-1 py-3 rounded-xl font-bold text-sm bg-gray-500/20 hover:bg-gray-500/30 transition-all"
+                className="flex-1 py-3 rounded-xl font-bold text-sm bg-(--theme-secondary-bg) hover:opacity-80 transition-all"
               >
                 Cancelar
               </button>
               <button
                 onClick={executeSubmit}
                 disabled={isSubmitting || newSalesPrice <= 0}
-                className="flex-1 py-3 rounded-xl font-bold text-sm bg-green-500 hover:bg-green-400 text-white transition-all disabled:opacity-50"
+                className="flex-1 py-3 rounded-xl font-bold text-sm bg-primary hover:brightness-110 text-white transition-all disabled:opacity-50"
               >
                 {isSubmitting ? 'Guardando...' : 'Confirmar y Guardar'}
               </button>

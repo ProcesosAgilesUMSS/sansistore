@@ -58,7 +58,7 @@ function CartButton() {
     <a
       href="/carrito"
       aria-label={`Carrito, ${mounted ? totalUnits : 0} unidades`}
-      className="relative transition-all text-text-light opacity-[0.60] hover:text-primary hover:opacity-100"
+      className="relative inline-flex items-center justify-center transition-all text-text-light opacity-[0.60] hover:text-primary hover:opacity-100"
     >
       <ShoppingCart
         size={18}
@@ -68,7 +68,7 @@ function CartButton() {
       {mounted && totalUnits > 0 && (
         <span
           key={totalUnits}
-          className={`absolute -top-1 -right-1 text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold border border-primary bg-primary text-bg-dark transition-transform duration-300 ease-out ${isAnimating ? 'scale-110' : 'scale-100'
+          className={`absolute -top-1.5 -right-2 min-w-4 h-4 px-1 rounded-full flex items-center justify-center text-[10px] leading-none font-bold bg-primary text-white ring-2 ring-(--theme-bg) transition-transform duration-300 ease-out ${isAnimating ? 'scale-110' : 'scale-100'
             }`}
         >
           {totalUnits > 99 ? '99+' : totalUnits}
@@ -214,7 +214,7 @@ export default function Navbar() {
               <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-white shadow-sm shadow-primary/30 transition-transform group-hover:scale-105 group-active:scale-95">
                 <ShoppingBag size={17} strokeWidth={2.4} />
               </span>
-              <span className="font-display font-black tracking-tight text-[18px] leading-none text-text-light">
+              <span className="font-display font-black tracking-tight text-lg leading-none text-text-light">
                 Sansi<span className="text-primary">Store</span>
               </span>
             </a>
@@ -243,7 +243,7 @@ export default function Navbar() {
                       key={item.label}
                       href={item.href}
                       aria-current={active ? 'page' : undefined}
-                      className={`relative text-[13px] font-semibold tracking-[0.02em] transition-all hover:text-primary ${
+                      className={`relative text-sm font-semibold tracking-[0.02em] transition-all hover:text-primary ${
                         active
                           ? 'text-primary opacity-100 after:absolute after:-bottom-4.5 after:left-0 after:right-0 after:h-0.5 after:bg-primary after:rounded-full'
                           : 'text-text-light opacity-[0.60] hover:opacity-100'
@@ -295,7 +295,7 @@ export default function Navbar() {
                           className="w-7 h-7 rounded-full object-cover"
                         />
                       )}
-                      <span className="hidden sm:inline max-w-35 truncate text-[13px] text-text-light opacity-70">
+                      <span className="hidden sm:inline max-w-35 truncate text-sm text-text-light opacity-70">
                         {user.displayName}
                       </span>
                       <ChevronDown
@@ -313,7 +313,7 @@ export default function Navbar() {
                         <a
                           role="menuitem"
                           href="/mi-perfil"
-                          className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light opacity-70 transition-colors hover:bg-border-light/40 hover:text-primary hover:opacity-100"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-text-light opacity-70 transition-colors hover:bg-border-light/40 hover:text-primary hover:opacity-100"
                         >
                           <UserIcon size={14} />
                           Mi Perfil
@@ -323,7 +323,7 @@ export default function Navbar() {
                           <a
                             role="menuitem"
                             href="/courier"
-                          className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold text-text-light opacity-70 transition-colors hover:bg-border-light/40 hover:text-primary hover:opacity-100"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-text-light opacity-70 transition-colors hover:bg-border-light/40 hover:text-primary hover:opacity-100"
                           >
                             Mensajero
                           </a>
@@ -333,7 +333,7 @@ export default function Navbar() {
                           type="button"
                           role="menuitem"
                           onClick={handleLogout}
-                          className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-[13px] font-semibold text-text-light opacity-70 transition-colors hover:bg-border-light/40 hover:text-primary hover:opacity-100"
+                          className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-semibold text-text-light opacity-70 transition-colors hover:bg-border-light/40 hover:text-primary hover:opacity-100"
                         >
                           <LogOut size={14} />
                           Cerrar sesión
@@ -344,7 +344,7 @@ export default function Navbar() {
                 ) : (
                   <a
                     href="/iniciar-sesion"
-                    className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-1.5 text-[13px] font-semibold text-white transition-all hover:brightness-110 active:scale-95"
+                    className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-white transition-all hover:brightness-110 active:scale-95"
                   >
                     <UserIcon size={15} />
                     Iniciar sesión
@@ -386,7 +386,7 @@ export default function Navbar() {
                       key={item.label}
                       href={item.href}
                       aria-current={active ? 'page' : undefined}
-                      className={`text-[13px] font-semibold tracking-[0.02em] transition-all hover:text-primary ${
+                      className={`text-sm font-semibold tracking-[0.02em] transition-all hover:text-primary ${
                         active
                           ? 'text-primary opacity-100'
                           : 'text-text-light opacity-[0.55] hover:opacity-100'
@@ -402,7 +402,7 @@ export default function Navbar() {
                 <>
                   <a
                     href="/mi-perfil"
-                    className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
+                    className="text-sm font-semibold text-primary opacity-90 transition-all hover:opacity-100"
                   >
                     Mi Perfil
                   </a>
@@ -410,7 +410,7 @@ export default function Navbar() {
                   {canAccessCourier && (
                     <a
                       href="/courier"
-                      className="text-[13px] font-semibold text-primary opacity-90 transition-all hover:opacity-100"
+                      className="text-sm font-semibold text-primary opacity-90 transition-all hover:opacity-100"
                     >
                       Mensajero
                     </a>
@@ -421,7 +421,7 @@ export default function Navbar() {
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="text-left text-[13px] font-semibold text-text-light opacity-[0.55] transition-all hover:text-primary hover:opacity-100"
+                    className="text-left text-sm font-semibold text-text-light opacity-[0.55] transition-all hover:text-primary hover:opacity-100"
                   >
                     Cerrar sesión
                   </button>

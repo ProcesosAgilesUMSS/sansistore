@@ -75,7 +75,7 @@ export default function LocationSection() {
             {/* HEADER estilo productos: título izquierda + acción derecha */}
             <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-[clamp(1.6rem,3vw,2.2rem)] font-black leading-none tracking-[-0.03em] text-(--theme-text)">
+                    <h1 className="text-2xl font-black leading-none tracking-[-0.03em] text-(--theme-text)">
                         Mis ubicaciones
                     </h1>
                     <p className="mt-2 text-sm text-(--theme-text) opacity-60">

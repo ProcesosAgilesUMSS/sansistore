@@ -15,34 +15,34 @@ const formatDateTime = (date: Date): string =>
 
 const RoleBadge = ({ role }: { role: string }) => {
   const styles: Record<string, string> = {
-    vendedor: 'bg-blue-500/10 text-blue-600',
-    operador_inv: 'bg-purple-500/10 text-purple-600',
-    mensajero: 'bg-orange-500/10 text-orange-600',
-    admin: 'bg-[rgba(136,176,75,0.15)] text-[#5E7E2F]',
+    vendedor: 'bg-(--theme-info-bg) text-(--theme-info)',
+    operador_inv: 'bg-(--theme-info-bg) text-(--theme-info)',
+    mensajero: 'bg-(--theme-warning-bg) text-(--theme-warning)',
+    admin: 'bg-primary/15 text-primary',
     comprador: 'bg-(--theme-secondary-bg) text-(--theme-text)/60',
   };
   return (
-    <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full ${styles[role] ?? 'bg-(--theme-secondary-bg) text-(--theme-text)/60'}`}>
+    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${styles[role] ?? 'bg-(--theme-secondary-bg) text-(--theme-text)/60'}`}>
       {role}
     </span>
   );
 };
 
 const ActionBadge = ({ action }: { action: string }) => (
-  <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full ${
-    action === 'LOGIN' ? 'bg-[rgba(136,176,75,0.15)] text-[#5E7E2F]' : 'bg-(--theme-error-bg) text-(--theme-error)'
+  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+    action === 'LOGIN' ? 'bg-primary/15 text-primary' : 'bg-(--theme-error-bg) text-(--theme-error)'
   }`}>
     {action}
   </span>
 );
 
 const StatusBadge = ({ status }: { status: string }) => (
-  <span className={`inline-flex items-center gap-1 text-[9px] font-semibold px-2 py-0.5 rounded-full ${
+  <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${
     status === 'ACTIVO'
-      ? 'bg-[rgba(136,176,75,0.15)] text-[#5E7E2F]'
+      ? 'bg-primary/15 text-primary'
       : 'bg-(--theme-secondary-bg) text-(--theme-text)/50'
   }`}>
-    <span className={`w-1.5 h-1.5 rounded-full ${status === 'ACTIVO' ? 'bg-[#88B04B]' : 'bg-(--theme-text)/30'}`} />
+    <span className={`w-1.5 h-1.5 rounded-full ${status === 'ACTIVO' ? 'bg-primary' : 'bg-(--theme-text)/30'}`} />
     {status}
   </span>
 );
@@ -133,12 +133,12 @@ export default function AccessLogPanel() {
   const paginatedLogs = logs.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   return (
-    <div className="max-w-6xl">
+    <div>
 
       {/* Título */}
       <div className="mb-6">
-        <h2 className="text-[15px] font-semibold text-(--theme-text)">Bitácora de accesos</h2>
-        <p className="text-[11px] text-(--theme-text)/50 mt-0.5">
+        <h2 className="text-base font-semibold text-(--theme-text)">Bitácora de accesos</h2>
+        <p className="text-xs text-(--theme-text)/50 mt-0.5">
           Registro de entradas y salidas al sistema — colección accessLogs
         </p>
       </div>
@@ -153,30 +153,30 @@ export default function AccessLogPanel() {
               onClick={() => setShowActiveSessions((v) => !v)}
               className="w-full text-left bg-(--theme-secondary-bg) rounded-xl px-4 py-3 hover:bg-(--theme-border) transition-colors"
             >
-              <p className="text-[22px] font-semibold text-[#88B04B] leading-none">{activeUsers}</p>
-              <p className="text-[9px] text-(--theme-text)/40 mt-1.5 uppercase tracking-wide flex items-center gap-1">
+              <p className="text-2xl font-semibold text-primary leading-none">{activeUsers}</p>
+              <p className="text-xs text-(--theme-text)/40 mt-1.5 uppercase tracking-wide flex items-center gap-1">
                 Sesiones activas
-                <span className="text-[#88B04B]">{showActiveSessions ? '▲' : '▼'}</span>
+                <span className="text-primary">{showActiveSessions ? '▲' : '▼'}</span>
               </p>
             </button>
             {showActiveSessions && (
               <div className="absolute top-full left-0 mt-1 w-72 bg-(--theme-card-bg) border border-(--theme-border) rounded-xl shadow-lg z-20 overflow-hidden">
                 <div className="px-3 py-2 border-b border-(--theme-border)">
-                  <p className="text-[10px] font-semibold text-(--theme-text)/50 uppercase tracking-wide">Usuarios con sesión activa</p>
+                  <p className="text-xs font-semibold text-(--theme-text)/50 uppercase tracking-wide">Usuarios con sesión activa</p>
                 </div>
                 {activeUsersList.length === 0 ? (
-                  <p className="text-[12px] text-(--theme-text)/40 px-3 py-3">No hay sesiones activas.</p>
+                  <p className="text-xs text-(--theme-text)/40 px-3 py-3">No hay sesiones activas.</p>
                 ) : (
                   <div className="max-h-60 overflow-y-auto">
                     {activeUsersList.map((u) => (
                       <div key={u.uid} className="px-3 py-2.5 border-b border-(--theme-border)/50 last:border-0">
-                        <p className="text-[12px] font-semibold text-(--theme-text) truncate">{u.displayName}</p>
-                        <p className="text-[10px] text-(--theme-text)/40 truncate">{u.email}</p>
+                        <p className="text-xs font-semibold text-(--theme-text) truncate">{u.displayName}</p>
+                        <p className="text-xs text-(--theme-text)/40 truncate">{u.email}</p>
                         <div className="flex items-center gap-1.5 mt-1">
                           {u.roles.map((r) => (
-                            <span key={r} className="text-[9px] bg-(--theme-secondary-bg) text-(--theme-text)/60 px-1.5 py-0.5 rounded-full">{r}</span>
+                            <span key={r} className="text-xs bg-(--theme-secondary-bg) text-(--theme-text)/60 px-1.5 py-0.5 rounded-full">{r}</span>
                           ))}
-                          <span className="ml-auto text-[9px] text-(--theme-text)/40">
+                          <span className="ml-auto text-xs text-(--theme-text)/40">
                             {u.timestamp.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </div>
@@ -189,39 +189,39 @@ export default function AccessLogPanel() {
           </div>
 
           <div className="bg-(--theme-secondary-bg) rounded-xl px-4 py-3">
-            <p className="text-[22px] font-semibold text-(--theme-text) leading-none">{todayLogins}</p>
-            <p className="text-[9px] text-(--theme-text)/40 mt-1.5 uppercase tracking-wide">Logins hoy</p>
+            <p className="text-2xl font-semibold text-(--theme-text) leading-none">{todayLogins}</p>
+            <p className="text-xs text-(--theme-text)/40 mt-1.5 uppercase tracking-wide">Logins hoy</p>
           </div>
           <div className="bg-(--theme-secondary-bg) rounded-xl px-4 py-3">
-            <p className="text-[22px] font-semibold text-blue-600 leading-none">{vendedores}</p>
-            <p className="text-[9px] text-(--theme-text)/40 mt-1.5 uppercase tracking-wide">Accesos vendedor</p>
+            <p className="text-2xl font-semibold text-(--theme-info) leading-none">{vendedores}</p>
+            <p className="text-xs text-(--theme-text)/40 mt-1.5 uppercase tracking-wide">Accesos vendedor</p>
           </div>
           <div className="bg-(--theme-secondary-bg) rounded-xl px-4 py-3">
-            <p className="text-[22px] font-semibold text-purple-600 leading-none">{operadores}</p>
-            <p className="text-[9px] text-(--theme-text)/40 mt-1.5 uppercase tracking-wide">Accesos operador</p>
+            <p className="text-2xl font-semibold text-(--theme-info) leading-none">{operadores}</p>
+            <p className="text-xs text-(--theme-text)/40 mt-1.5 uppercase tracking-wide">Accesos operador</p>
           </div>
         </div>
       )}
 
       {/* Filtros */}
-      <p className="text-[10px] font-semibold text-(--theme-text)/40 uppercase tracking-widest mb-3 pb-2 border-b border-(--theme-border)">
+      <p className="text-xs font-semibold text-(--theme-text)/40 uppercase tracking-widest mb-3 pb-2 border-b border-(--theme-border)">
         Filtros
       </p>
       <div className="flex flex-wrap gap-3 mb-5">
         <div>
-          <label className="block text-[10px] font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">Fecha inicio</label>
+          <label className="block text-xs font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">Fecha inicio</label>
           <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)}
-            className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-lg px-3 py-2 text-[13px] text-(--theme-text) outline-none focus:border-[#88B04B]" />
+            className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-lg px-3 py-2 text-sm text-(--theme-text) outline-none focus:border-primary" />
         </div>
         <div>
-          <label className="block text-[10px] font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">Fecha fin</label>
+          <label className="block text-xs font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">Fecha fin</label>
           <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)}
-            className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-lg px-3 py-2 text-[13px] text-(--theme-text) outline-none focus:border-[#88B04B]" />
+            className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-lg px-3 py-2 text-sm text-(--theme-text) outline-none focus:border-primary" />
         </div>
         <div>
-          <label className="block text-[10px] font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">Rol</label>
+          <label className="block text-xs font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">Rol</label>
           <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)}
-            className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-lg px-3 py-2 text-[13px] text-(--theme-text) outline-none focus:border-[#88B04B]">
+            className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-lg px-3 py-2 text-sm text-(--theme-text) outline-none focus:border-primary">
             <option value="todos">Todos los roles</option>
             <option value="vendedor">Vendedor ⭐</option>
             <option value="operador_inv">Operador ⭐</option>
@@ -231,9 +231,9 @@ export default function AccessLogPanel() {
           </select>
         </div>
         <div>
-          <label className="block text-[10px] font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">Acción</label>
+          <label className="block text-xs font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">Acción</label>
           <select value={actionFilter} onChange={(e) => setActionFilter(e.target.value as 'ALL' | 'LOGIN' | 'LOGOUT')}
-            className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-lg px-3 py-2 text-[13px] text-(--theme-text) outline-none focus:border-[#88B04B]">
+            className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-lg px-3 py-2 text-sm text-(--theme-text) outline-none focus:border-primary">
             <option value="ALL">Todas las acciones</option>
             <option value="LOGIN">Solo LOGIN</option>
             <option value="LOGOUT">Solo LOGOUT</option>
@@ -241,11 +241,11 @@ export default function AccessLogPanel() {
         </div>
         <div className="flex items-end gap-2">
           <button onClick={handleFilter} disabled={loading}
-            className="bg-[#88B04B] text-white text-[13px] font-semibold px-5 py-2 rounded-full hover:bg-[#5E7E2F] transition-colors disabled:opacity-60">
+            className="bg-primary text-white text-sm font-semibold px-5 py-2 rounded-full hover:bg-primary/90 transition-colors disabled:opacity-60">
             {loading ? 'Cargando...' : 'Filtrar'}
           </button>
           <button onClick={handleRefresh} disabled={loading} title="Actualizar registros"
-            className="border border-(--theme-border) text-(--theme-text)/60 text-[13px] font-semibold px-3 py-2 rounded-full hover:border-[#88B04B] hover:text-[#88B04B] transition-colors disabled:opacity-60">
+            className="border border-(--theme-border) text-(--theme-text)/60 text-sm font-semibold px-3 py-2 rounded-full hover:border-primary hover:text-primary transition-colors disabled:opacity-60">
             ↻
           </button>
         </div>
@@ -253,8 +253,8 @@ export default function AccessLogPanel() {
 
       {/* Error */}
       {error && (
-        <div className="flex items-center gap-2 px-4 py-3 rounded-xl text-[12px] font-medium bg-(--theme-error-bg) border border-(--theme-error-border) text-(--theme-error) mb-4">
-          <span className="w-5 h-5 rounded-full bg-(--theme-error) flex items-center justify-center text-white text-[10px] font-bold">!</span>
+        <div className="flex items-center gap-2 px-4 py-3 rounded-xl text-xs font-medium bg-(--theme-error-bg) border border-(--theme-error-border) text-(--theme-error) mb-4">
+          <span className="w-5 h-5 rounded-full bg-(--theme-error) flex items-center justify-center text-white text-xs font-bold">!</span>
           {error}
         </div>
       )}
@@ -272,14 +272,14 @@ export default function AccessLogPanel() {
       {!loading && (
         <>
           <div className="flex items-center justify-between mb-3 pb-2 border-b border-(--theme-border)">
-            <p className="text-[10px] font-semibold text-(--theme-text)/40 uppercase tracking-widest">
+            <p className="text-xs font-semibold text-(--theme-text)/40 uppercase tracking-widest">
               Registros ({logs.length}) — Página {currentPage} de {totalPages || 1}
             </p>
           </div>
 
           {logs.length === 0 ? (
             <div className="text-center py-12 border border-dashed border-(--theme-border) rounded-xl">
-              <p className="text-[13px] text-(--theme-text)/40">
+              <p className="text-sm text-(--theme-text)/40">
                 No se encontraron registros con los filtros seleccionados.
               </p>
             </div>
@@ -289,19 +289,19 @@ export default function AccessLogPanel() {
                 <table className="w-full border-collapse">
                   <thead>
                     <tr className="bg-(--theme-secondary-bg)">
-                      <th className="text-left text-[9px] font-semibold text-(--theme-text)/40 uppercase tracking-wide px-4 py-2.5">Usuario</th>
-                      <th className="text-left text-[9px] font-semibold text-(--theme-text)/40 uppercase tracking-wide px-4 py-2.5">Rol</th>
-                      <th className="text-left text-[9px] font-semibold text-(--theme-text)/40 uppercase tracking-wide px-4 py-2.5">Acción</th>
-                      <th className="text-left text-[9px] font-semibold text-(--theme-text)/40 uppercase tracking-wide px-4 py-2.5">Fecha y hora</th>
-                      <th className="text-left text-[9px] font-semibold text-(--theme-text)/40 uppercase tracking-wide px-4 py-2.5">Estado sesión</th>
+                      <th className="text-left text-xs font-semibold text-(--theme-text)/40 uppercase tracking-wide px-4 py-2.5">Usuario</th>
+                      <th className="text-left text-xs font-semibold text-(--theme-text)/40 uppercase tracking-wide px-4 py-2.5">Rol</th>
+                      <th className="text-left text-xs font-semibold text-(--theme-text)/40 uppercase tracking-wide px-4 py-2.5">Acción</th>
+                      <th className="text-left text-xs font-semibold text-(--theme-text)/40 uppercase tracking-wide px-4 py-2.5">Fecha y hora</th>
+                      <th className="text-left text-xs font-semibold text-(--theme-text)/40 uppercase tracking-wide px-4 py-2.5">Estado sesión</th>
                     </tr>
                   </thead>
                   <tbody>
                     {paginatedLogs.map((log, i) => (
                       <tr key={log.logId} className={i % 2 === 0 ? 'bg-(--theme-card-bg)' : 'bg-(--theme-secondary-bg)/50'}>
                         <td className="px-4 py-2.5">
-                          <div className="text-[12px] font-medium text-(--theme-text)">{log.displayName}</div>
-                          <div className="text-[10px] text-(--theme-text)/40">{log.email}</div>
+                          <div className="text-xs font-medium text-(--theme-text)">{log.displayName}</div>
+                          <div className="text-xs text-(--theme-text)/40">{log.email}</div>
                         </td>
                         <td className="px-4 py-2.5">
                           <div className="flex flex-wrap gap-1">
@@ -309,7 +309,7 @@ export default function AccessLogPanel() {
                           </div>
                         </td>
                         <td className="px-4 py-2.5"><ActionBadge action={log.action} /></td>
-                        <td className="px-4 py-2.5 text-[11px] text-(--theme-text)/70">{formatDateTime(log.timestamp)}</td>
+                        <td className="px-4 py-2.5 text-xs text-(--theme-text)/70">{formatDateTime(log.timestamp)}</td>
                         <td className="px-4 py-2.5"><StatusBadge status={log.status} /></td>
                       </tr>
                     ))}
@@ -323,14 +323,14 @@ export default function AccessLogPanel() {
                   <button
                     onClick={() => setCurrentPage(1)}
                     disabled={currentPage === 1}
-                    className="text-[11px] font-semibold px-3 py-1.5 rounded-lg border border-(--theme-border) text-(--theme-text)/50 hover:border-[#88B04B] hover:text-[#88B04B] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-(--theme-border) text-(--theme-text)/50 hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                   >
                     «
                   </button>
                   <button
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
-                    className="text-[11px] font-semibold px-3 py-1.5 rounded-lg border border-(--theme-border) text-(--theme-text)/50 hover:border-[#88B04B] hover:text-[#88B04B] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-(--theme-border) text-(--theme-text)/50 hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                   >
                     ‹ Anterior
                   </button>
@@ -345,15 +345,15 @@ export default function AccessLogPanel() {
                     }, [])
                     .map((p, idx) =>
                       typeof p === 'string' ? (
-                        <span key={`ellipsis-${idx}`} className="text-[11px] text-(--theme-text)/30 px-1">…</span>
+                        <span key={`ellipsis-${idx}`} className="text-xs text-(--theme-text)/30 px-1">…</span>
                       ) : (
                         <button
                           key={p}
                           onClick={() => setCurrentPage(p)}
-                          className={`text-[11px] font-semibold w-8 h-8 rounded-lg border transition-colors ${
+                          className={`text-xs font-semibold w-8 h-8 rounded-lg border transition-colors ${
                             currentPage === p
-                              ? 'bg-[#88B04B] border-[#88B04B] text-white'
-                              : 'border-(--theme-border) text-(--theme-text)/50 hover:border-[#88B04B] hover:text-[#88B04B]'
+                              ? 'bg-primary border-primary text-white'
+                              : 'border-(--theme-border) text-(--theme-text)/50 hover:border-primary hover:text-primary'
                           }`}
                         >
                           {p}
@@ -364,14 +364,14 @@ export default function AccessLogPanel() {
                   <button
                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
-                    className="text-[11px] font-semibold px-3 py-1.5 rounded-lg border border-(--theme-border) text-(--theme-text)/50 hover:border-[#88B04B] hover:text-[#88B04B] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-(--theme-border) text-(--theme-text)/50 hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                   >
                     Siguiente ›
                   </button>
                   <button
                     onClick={() => setCurrentPage(totalPages)}
                     disabled={currentPage === totalPages}
-                    className="text-[11px] font-semibold px-3 py-1.5 rounded-lg border border-(--theme-border) text-(--theme-text)/50 hover:border-[#88B04B] hover:text-[#88B04B] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-(--theme-border) text-(--theme-text)/50 hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                   >
                     »
                   </button>

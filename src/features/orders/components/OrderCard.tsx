@@ -94,11 +94,11 @@ export default function OrderCard({ order }: OrderCardProps) {
 				<div className="min-w-0 flex flex-col gap-1">
 					<div className="flex flex-col gap-0.5">
 						<div className="flex items-center gap-2.5 flex-wrap">
-							<span className="font-mono text-[10px] font-bold opacity-40 truncate max-w-[200px]">
+							<span className="font-mono text-xs font-bold opacity-40 truncate max-w-[200px]">
 								{uuid}
 							</span>
 							<span
-								className={`text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${getStatusStyles(order.status)}`}
+								className={`text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${getStatusStyles(order.status)}`}
 							>
 								{getStatusLabel(order.status)}
 							</span>
@@ -127,13 +127,13 @@ export default function OrderCard({ order }: OrderCardProps) {
 					{isDelivered && (
 						<div className="mt-2">
 							{withinWindow ? (
-								<span className="inline-flex items-center gap-1.5 text-[11px] font-bold px-3 py-1 rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/20">
+								<span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/20">
 									<RotateCcw size={12} /> Devolución disponible
 								</span>
 							) : (
 								<span
 									title="Han pasado más de 7 días desde la entrega"
-									className="inline-flex items-center gap-1.5 text-[11px] font-bold px-3 py-1 rounded-full bg-gray-500/10 text-gray-500 border border-gray-500/20 cursor-help"
+									className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-gray-500/10 text-gray-500 border border-gray-500/20 cursor-help"
 								>
 									<RotateCcw size={12} /> Plazo de devolución vencido
 								</span>
@@ -145,7 +145,7 @@ export default function OrderCard({ order }: OrderCardProps) {
 
 			<div className="flex items-center justify-between sm:justify-end gap-4 border-t border-(--theme-border) sm:border-none pt-3 sm:pt-0">
 				<div className="flex flex-col sm:text-right">
-					<span className="text-[11px] uppercase tracking-wider opacity-50 font-bold">
+					<span className="text-xs uppercase tracking-wider opacity-50 font-bold">
 						Total
 					</span>
 					<span className="text-lg font-display font-black text-primary">

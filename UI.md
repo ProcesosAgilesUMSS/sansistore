@@ -56,16 +56,16 @@ constante (ver `OrderStatusBadge.tsx`), nunca esparcidas por el JSX.
 - **Header (Navbar) y Footer SIEMPRE.** Toda página de la app va con `Navbar` arriba y
   `Footer` abajo. Usa un layout que ya los incluya (`SellerLayout`, `OrdersLayout`) o
   agrégalos; no dejes pantallas sueltas sin ellos.
-- **Ancho de contenido:** centra con `mx-auto` y usa **`max-w-6xl`** como ancho estándar
-  de página. (`max-w-2xl` para formularios/modales angostos.) No mezcles `5xl`/`7xl`/`4xl`
+- **Ancho de contenido:** centra con `mx-auto` y usa **`max-w-7xl`** como ancho estándar
+  de página. (`max-w-2xl` para formularios/modales angostos.) No mezcles `5xl`/`6xl`/`4xl`
   página por página — eso es lo que descuadra el ancho entre secciones.
 - **Header y Footer van casi full-width:** `w-full px-4 sm:px-8 lg:px-12 xl:px-16` (sin
-  `max-w`), pegados a los bordes. Solo el *contenido* de página se limita a `max-w-6xl`.
+  `max-w`), pegados a los bordes. Solo el *contenido* de página se limita a `max-w-7xl`.
 - **Cuerpo:** `min-h-screen flex flex-col` para que el footer quede abajo; el contenido
   principal `flex-1`.
 
 ```tsx
-<main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6">
+<main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6">
 ```
 
 ## Fuentes

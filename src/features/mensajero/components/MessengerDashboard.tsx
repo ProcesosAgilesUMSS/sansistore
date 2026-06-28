@@ -131,7 +131,7 @@ function CopyableOrderId({
 			type="button"
 		>
 			{showTechnicalId && (
-				<p className="font-mono text-[10px] font-bold opacity-40">{uuid}</p>
+				<p className="font-mono text-xs font-bold opacity-40">{uuid}</p>
 			)}
 			<h3 className={codeClassName}>{displayId}</h3>
 		</button>
@@ -305,7 +305,7 @@ function SummaryCard({
 				</span>
 				<span className="messenger-muted text-sm font-medium">{label}</span>
 			</div>
-			<p className="mt-4 text-3xl font-black tracking-normal">{value}</p>
+			<p className="mt-4 text-2xl font-black tracking-normal">{value}</p>
 		</article>
 	);
 }
@@ -459,7 +459,7 @@ function PendingOrderCard({
 
 					<div className="messenger-cash-box mt-5 rounded-2xl border-2 p-5">
 						<p className="text-xs font-medium uppercase">Monto a cobrar</p>
-						<p className="mt-2 text-3xl font-black">
+						<p className="mt-2 text-2xl font-black">
 							{formatBolivianos(order.cashToCollect)}
 						</p>
 						<p className="messenger-copy mt-1 text-xs">en efectivo</p>
@@ -628,10 +628,10 @@ function OrderDetailModal({
 			role="dialog"
 			aria-modal="true"
 		>
-			<section className="my-2 flex max-h-[calc(100dvh-1rem)] w-full max-w-6xl flex-col overflow-hidden rounded-[24px] border border-border-light bg-card-bg-light text-text-light shadow-2xl sm:my-0 sm:max-h-[calc(100dvh-2rem)] sm:rounded-[28px]">
+			<section className="my-2 flex max-h-[calc(100dvh-1rem)] w-full max-w-7xl flex-col overflow-hidden rounded-[24px] border border-border-light bg-card-bg-light text-text-light shadow-2xl sm:my-0 sm:max-h-[calc(100dvh-2rem)] sm:rounded-[28px]">
 				<header className="flex shrink-0 items-start justify-between gap-3 border-b border-border-light px-4 py-4 sm:gap-4 sm:px-6 sm:py-5">
 					<div>
-						<h2 className="text-xl font-black leading-tight tracking-normal sm:text-2xl">
+						<h2 className="text-lg font-black leading-tight tracking-normal sm:text-2xl">
 							Detalle de cobro del pedido
 						</h2>
 						<p className="text-sm font-semibold opacity-70">
@@ -666,7 +666,7 @@ function OrderDetailModal({
 							<p className="messenger-muted mt-5 text-xs font-bold uppercase">
 								Cliente
 							</p>
-							<p className="text-xl font-black">{order.customerName}</p>
+							<p className="text-lg font-black">{order.customerName}</p>
 						</article>
 
 						{order.deliveryStatus === "reprogrammed" && (
@@ -765,7 +765,7 @@ function OrderDetailModal({
 
 					<aside className="messenger-cash-box h-fit rounded-[24px] border-2 p-5">
 						<p className="text-xs font-bold uppercase">Te llevas a cobrar</p>
-						<p className="mt-2 text-3xl font-black">
+						<p className="mt-2 text-2xl font-black">
 							{formatBolivianos(order.cashToCollect)}
 						</p>
 						<p className="messenger-copy mt-1 text-xs">
@@ -969,13 +969,13 @@ function ShiftReportDetailModal({
 			role="dialog"
 			aria-modal="true"
 		>
-			<section className="my-2 flex max-h-[calc(100dvh-1rem)] w-full max-w-6xl flex-col overflow-hidden rounded-[24px] border border-border-light bg-card-bg-light text-text-light shadow-2xl sm:my-0 sm:max-h-[calc(100dvh-2rem)] sm:rounded-[28px]">
+			<section className="my-2 flex max-h-[calc(100dvh-1rem)] w-full max-w-7xl flex-col overflow-hidden rounded-[24px] border border-border-light bg-card-bg-light text-text-light shadow-2xl sm:my-0 sm:max-h-[calc(100dvh-2rem)] sm:rounded-[28px]">
 				<header className="flex shrink-0 items-start justify-between gap-3 border-b border-border-light px-4 py-4 sm:gap-4 sm:px-6 sm:py-5">
 					<div>
 						<p className="text-sm font-bold uppercase tracking-[0.24em] text-primary">
 							Reporte de jornada
 						</p>
-						<h2 className="mt-2 text-xl font-black leading-tight tracking-[-0.04em] sm:text-2xl">
+						<h2 className="mt-2 text-lg font-black leading-tight tracking-[-0.04em] sm:text-2xl">
 							Detalle de jornada - {formatDateKey(report.dateKey)}
 						</h2>
 						<p className="messenger-copy mt-1 text-sm font-semibold">
@@ -1025,7 +1025,7 @@ function ShiftReportDetailModal({
 					</aside>
 
 					<div className="space-y-5">
-						<h3 className="text-xl font-black">Pedidos registrados</h3>
+						<h3 className="text-lg font-black">Pedidos registrados</h3>
 
 						{allOrders.length > 0 ? (
 							<div className="space-y-4">
@@ -1717,7 +1717,7 @@ export default function MessengerDashboard({
 			{!embedded && (
 				<header className="messenger-header border-b">
 					<div className="messenger-header-inner flex items-center justify-between">
-						<a className="text-xl font-black tracking-normal" href="/">
+						<a className="text-lg font-black tracking-normal" href="/">
 							sansi <span className="messenger-logo-accent">store</span>
 						</a>
 
@@ -1744,7 +1744,7 @@ export default function MessengerDashboard({
 					<p className="text-sm font-bold uppercase tracking-[0.28em] text-primary">
 						Operacion de entregas
 					</p>
-					<h1 className="mt-4 text-4xl font-black tracking-[-0.04em] sm:text-5xl">
+					<h1 className="mt-4 text-2xl font-black tracking-[-0.04em] sm:text-2xl">
 						{activeTitle}
 					</h1>
 					<p className="messenger-copy mt-2 max-w-2xl text-sm font-semibold">

@@ -92,7 +92,7 @@ export default function UndeliveredModal({
 							<PackageX size={24} />
 						</span>
 						<div className="min-w-0">
-							<h2 className="text-lg font-black leading-tight tracking-normal sm:text-xl">
+							<h2 className="text-lg font-black leading-tight tracking-normal sm:text-lg">
 								Problema de entrega
 							</h2>
 							<p className="text-sm font-medium leading-snug opacity-70">

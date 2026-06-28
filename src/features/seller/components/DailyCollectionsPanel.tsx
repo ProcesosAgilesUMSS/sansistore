@@ -66,8 +66,7 @@ export default function DailyCollectionsPanel({
     >
       <header className="mb-8 rounded-[1.75rem] border border-(--theme-border) bg-(--theme-card-bg) px-6 py-6 shadow-sm backdrop-blur-sm">
         <h1
-          className="text-3xl font-900 leading-tight text-(--theme-text) md:text-4xl"
-          style={{ fontFamily: 'Outfit, sans-serif' }}
+          className="text-2xl font-900 leading-tight text-(--theme-text) md:text-2xl"
         >
           Pagos registrados por mensajeros
         </h1>
@@ -90,8 +89,7 @@ export default function DailyCollectionsPanel({
                 Total cobrado
               </p>
               <p
-                className="mt-2 text-3xl font-900 leading-tight text-(--theme-text) md:text-4xl"
-                style={{ fontFamily: 'Outfit, sans-serif' }}
+                className="mt-2 text-2xl font-900 leading-tight text-(--theme-text) md:text-2xl"
               >
                 {collectionsLoading
                   ? 'Calculando...'
@@ -119,8 +117,7 @@ export default function DailyCollectionsPanel({
                 Pedidos cobrados
               </p>
               <p
-                className="mt-2 text-3xl font-900 leading-tight text-(--theme-text)"
-                style={{ fontFamily: 'Outfit, sans-serif' }}
+                className="mt-2 text-2xl font-900 leading-tight text-(--theme-text)"
               >
                 {collectionsLoading
                   ? '...'
@@ -144,8 +141,7 @@ export default function DailyCollectionsPanel({
                 Confirmados
               </p>
               <p
-                className="mt-2 text-3xl font-900 leading-tight text-(--theme-text)"
-                style={{ fontFamily: 'Outfit, sans-serif' }}
+                className="mt-2 text-2xl font-900 leading-tight text-(--theme-text)"
               >
                 {collectionsLoading ? '...' : confirmedCount}
               </p>
@@ -160,7 +156,7 @@ export default function DailyCollectionsPanel({
       <section className="rounded-3xl border border-(--theme-border) bg-(--theme-card-bg) p-5 shadow-sm">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-(--theme-border) px-5 py-4">
           <div>
-            <h2 className="text-xl font-900 tracking-[0.12em] text-(--theme-text)">
+            <h2 className="text-lg font-900 tracking-[0.12em] text-(--theme-text)">
               Registro de cobros
             </h2>
             <p className="mt-1 text-sm font-600 text-(--theme-text) opacity-60">
@@ -213,11 +209,11 @@ export default function DailyCollectionsPanel({
                     Cliente: {order.customerName}
                   </p>
                   <div className="mt-1 flex flex-wrap gap-2">
-                    <span className="rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[11px] font-800 uppercase tracking-[0.12em] text-primary">
+                    <span className="rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs font-800 uppercase tracking-[0.12em] text-primary">
                       {order.paymentStatusLabel || order.paymentStatus}
                     </span>
                     <span
-                      className={`rounded-full border px-2 py-0.5 text-[11px] font-800 uppercase tracking-[0.12em] ${
+                      className={`rounded-full border px-2 py-0.5 text-xs font-800 uppercase tracking-[0.12em] ${
                         order.buyerReceptionConfirmed
                           ? 'border-primary/30 bg-primary/10 text-primary'
                           : 'border-(--theme-border) text-(--theme-text) opacity-60'

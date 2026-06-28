@@ -14,7 +14,7 @@ const inputClass = (hasError: boolean) =>
       : 'border-[var(--theme-border)] focus:border-primary'
   }`;
 
-const labelClass = 'text-[0.68rem] font-bold tracking-widest uppercase text-[var(--theme-text)] opacity-50';
+const labelClass = 'text-xs font-bold tracking-widest uppercase text-[var(--theme-text)] opacity-50';
 
 interface FormValues {
   productId: string;
@@ -187,10 +187,10 @@ export default function PurchaseForm() {
           <ShoppingCart className="w-4 h-4 text-primary" />
         </div>
         <div>
-          <h2 className="font-['Outfit'] font-bold text-base text-[var(--theme-text)]">
+          <h2 className="font-display font-bold text-base text-[var(--theme-text)]">
             Registrar Compra
           </h2>
-          <p className="text-[0.7rem] text-[var(--theme-text)] opacity-40">
+          <p className="text-xs text-[var(--theme-text)] opacity-40">
             El stock del inventario se actualizará automáticamente
           </p>
         </div>
@@ -243,7 +243,7 @@ export default function PurchaseForm() {
             ))}
           </select>
           {errors.productId && (
-            <p className="text-[0.7rem] text-red-500">{errors.productId}</p>
+            <p className="text-xs text-red-500">{errors.productId}</p>
           )}
         </div>
 
@@ -263,7 +263,7 @@ export default function PurchaseForm() {
               className={inputClass(!!errors.quantity)}
             />
             {errors.quantity && (
-              <p className="text-[0.7rem] text-red-500">{errors.quantity}</p>
+              <p className="text-xs text-red-500">{errors.quantity}</p>
             )}
           </div>
 
@@ -289,12 +289,12 @@ export default function PurchaseForm() {
               className={inputClass(!!errors.unitCost)}
             />
             {selectedProduct && values.unitCost && Number(values.unitCost) !== selectedProduct.price && (
-              <p className="text-[0.68rem] text-amber-500 opacity-80">
+              <p className="text-xs text-amber-500 opacity-80">
                 Precio catálogo: Bs. {selectedProduct.price.toFixed(2)}
               </p>
             )}
             {errors.unitCost && (
-              <p className="text-[0.7rem] text-red-500">{errors.unitCost}</p>
+              <p className="text-xs text-red-500">{errors.unitCost}</p>
             )}
           </div>
         </div>
@@ -304,11 +304,11 @@ export default function PurchaseForm() {
           <div className="rounded-xl bg-primary/5 border border-primary/20 px-4 py-3 flex items-center justify-between">
             <div className="flex flex-col gap-0.5">
               <span className="text-xs text-[var(--theme-text)] opacity-60">Costo total estimado</span>
-              <span className="text-[0.65rem] text-[var(--theme-text)] opacity-40">
+              <span className="text-xs text-[var(--theme-text)] opacity-40">
                 {values.quantity} u. × Bs. {Number(values.unitCost).toFixed(2)}
               </span>
             </div>
-            <span className="font-['Outfit'] font-bold text-primary text-lg">
+            <span className="font-display font-bold text-primary text-lg">
               Bs. {(Number(values.quantity) * Number(values.unitCost)).toFixed(2)}
             </span>
           </div>
@@ -327,7 +327,7 @@ export default function PurchaseForm() {
               className={inputClass(!!errors.purchaseDate)}
             />
             {errors.purchaseDate && (
-              <p className="text-[0.7rem] text-red-500">{errors.purchaseDate}</p>
+              <p className="text-xs text-red-500">{errors.purchaseDate}</p>
             )}
           </div>
 

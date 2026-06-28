@@ -1,93 +1,98 @@
 import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import {
+  CalendarClock,
+  CheckCircle2,
+  ChevronRight,
+  Menu,
+  PackageCheck,
+  Truck,
+  X,
+  XCircle,
+} from 'lucide-react';
 import MessengerDashboard from './MessengerDashboard';
 
 type DeliverySection = 'assigned' | 'accepted' | 'reprogrammed' | 'delivered' | 'not_delivered';
 
-const sections: Array<{ id: DeliverySection; label: string }> = [
-  { id: 'assigned', label: 'Gestión Entregas' },
-  { id: 'accepted', label: 'Pedidos aceptados' },
-  { id: 'reprogrammed', label: 'Reprogramados' },
-  { id: 'not_delivered', label: 'No entregados' },
-  { id: 'delivered', label: 'Entregados ' },
+const sections: Array<{ id: DeliverySection; label: string; icon: React.ReactNode }> = [
+  { id: 'assigned', label: 'Gestión Entregas', icon: <Truck size={15} /> },
+  { id: 'accepted', label: 'Pedidos aceptados', icon: <PackageCheck size={15} /> },
+  { id: 'reprogrammed', label: 'Reprogramados', icon: <CalendarClock size={15} /> },
+  { id: 'not_delivered', label: 'No entregados', icon: <XCircle size={15} /> },
+  { id: 'delivered', label: 'Entregados', icon: <CheckCircle2 size={15} /> },
 ];
 
+const sidebarItemActive = 'bg-primary/15 text-primary';
+const sidebarItemInactive =
+  'text-(--theme-text)/55 hover:text-(--theme-text) hover:bg-(--theme-text)/5';
+
 export default function DeliveryActionsPanel() {
-  const [activeSection, setActiveSection] =
-    useState<DeliverySection>('assigned');
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<DeliverySection>('assigned');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const selectSection = (section: DeliverySection) => {
     setActiveSection(section);
-    setMenuOpen(false);
+    setSidebarOpen(false);
   };
 
   return (
-    <section className="flex min-h-[calc(100vh-3.5rem)] flex-col items-stretch gap-4 p-4">
-      <nav className="rounded-xl border border-border-light bg-card-bg-light p-3 shadow-sm">
-        <p className="mb-3 px-2 text-xs font-semibold uppercase text-primary">
-          Delivery
-        </p>
-
+    <div className="flex h-full min-h-0 flex-1 self-stretch overflow-hidden bg-(--theme-bg)">
+      {sidebarOpen && (
         <button
           type="button"
-          onClick={() => setMenuOpen((open) => !open)}
-          className="flex w-full items-center justify-between rounded-xl border border-primary bg-secondary-bg-light p-2 text-left text-sm font-semibold text-primary md:hidden"
-        >
-          <span>
-            {sections.find((section) => section.id === activeSection)?.label}
-          </span>
-          {menuOpen ? <X size={18} /> : <Menu size={18} />}
-        </button>
+          aria-label="Cerrar menu lateral"
+          className="fixed inset-0 z-30 bg-black/40 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
-        {menuOpen && (
-          <div className="mt-2 space-y-2">
-            {sections.map((section) => {
-              const active = activeSection === section.id;
-
-              return (
-                <button
-                  key={section.id}
-                  type="button"
-                  onClick={() => selectSection(section.id)}
-                  className={`w-full rounded-xl p-2 text-left text-sm font-medium transition ${
-                    active
-                      ? 'bg-secondary-bg-light text-primary'
-                      : 'opacity-70 hover:bg-secondary-bg-light hover:text-primary hover:opacity-100'
-                  }`}
-                >
-                  {section.label}
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        <div className="hidden gap-2 md:grid md:grid-cols-4">
+      <aside
+        className={`
+          fixed inset-y-0 left-0 z-40 h-screen w-[256px]
+          bg-(--theme-card-bg) border-r border-(--theme-border)
+          transition-transform duration-300
+          md:sticky md:top-14 md:z-0 md:h-[calc(100vh-3.5rem)] md:translate-x-0
+          md:bg-transparent md:border-(--theme-text)/8
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}
+      >
+        <nav className="h-full overflow-y-auto px-4 py-5">
+          <p className="text-xs uppercase tracking-widest text-(--theme-text)/35 px-3 mb-2">
+            Delivery
+          </p>
           {sections.map((section) => {
             const active = activeSection === section.id;
-
             return (
               <button
                 key={section.id}
                 type="button"
                 onClick={() => selectSection(section.id)}
-                className={`w-full rounded-xl border p-3 text-center text-sm font-medium transition ${
-                  active
-                    ? 'border-primary bg-secondary-bg-light text-primary'
-                    : 'border-transparent opacity-70 hover:bg-secondary-bg-light hover:text-primary hover:opacity-100'
+                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm mb-0.5 transition-colors duration-150 text-left ${
+                  active ? sidebarItemActive : `${sidebarItemInactive} cursor-pointer`
                 }`}
               >
-                {section.label}
+                <span className="shrink-0">{section.icon}</span>
+                <span className="flex-1">{section.label}</span>
+                {active && <ChevronRight size={12} className="opacity-50" />}
               </button>
             );
           })}
-        </div>
-      </nav>
+        </nav>
+      </aside>
 
-      <section className="min-h-[calc(100vh-5.5rem)] min-w-0 flex-1">
-        <MessengerDashboard clientSection={activeSection} embedded />
-      </section>
-    </section>
+      <div className="flex min-w-0 flex-1 flex-col bg-(--theme-bg)">
+        <main className="admin-scrollbar flex-1 overflow-y-auto p-6 md:p-8">
+          <button
+            type="button"
+            className="mb-4 flex items-center gap-2 rounded-lg border border-(--theme-border) px-3 py-2 text-sm text-(--theme-text)/70 md:hidden"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
+            Menú
+          </button>
+
+          <MessengerDashboard clientSection={activeSection} embedded />
+        </main>
+      </div>
+    </div>
   );
 }

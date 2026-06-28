@@ -12,12 +12,11 @@ export const SectionHeader = ({ title, count }: Props) => {
           </div>
 
           <div className="min-w-0">
-            <p className="text-[11px] font-800 uppercase tracking-[0.26em] text-(--theme-text) opacity-45">
+            <p className="text-xs font-800 uppercase tracking-[0.26em] text-(--theme-text) opacity-45">
               Sección
             </p>
             <h2
               className="mt-1 text-base font-900 tracking-tight text-(--theme-text) md:text-lg"
-              style={{ fontFamily: 'Outfit, sans-serif' }}
             >
               {title}
             </h2>

@@ -50,7 +50,6 @@ export const BusyMessengerWarinigModal = ({
 				<h2
 					id="busy-warning-title"
 					className="mt-4 text-lg font-800 text-(--theme-text)"
-					style={{ fontFamily: "Outfit, sans-serif" }}
 				>
 					{messenger.displayName} está ocupado
 				</h2>

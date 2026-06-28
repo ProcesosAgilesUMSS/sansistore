@@ -267,7 +267,7 @@ export const OrderDispatch: React.FC = () => {
             <PackageSearch className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="font-['Outfit'] font-bold text-lg text-(--theme-text)">Pedidos a Empacar/desempacar</h2>
+            <h2 className="font-display font-bold text-lg text-(--theme-text)">Pedidos a Empacar/desempacar</h2>
             <p className="text-xs opacity-60 text-(--theme-text)">Busca, empaca y prepara los pedidos</p>
           </div>
         </div>
@@ -277,14 +277,14 @@ export const OrderDispatch: React.FC = () => {
             const isActive = filter === f;
             let activeStyle = '';
             if (isActive) {
-              if (f === 'RESERVADO') activeStyle = 'bg-green-500 text-white shadow-md shadow-green-500/20';
-              if (f === 'PENDIENTE') activeStyle = 'bg-amber-500 text-white shadow-md shadow-amber-500/20';
-              if (f === 'EMPAQUETADO') activeStyle = 'bg-purple-600 text-white shadow-md shadow-purple-600/20';
-              if (f === 'DEVUELTO') activeStyle = 'bg-red-500 text-white shadow-md shadow-red-500/20';
+              if (f === 'RESERVADO') activeStyle = 'bg-primary text-white shadow-sm';
+              if (f === 'PENDIENTE') activeStyle = 'bg-(--theme-warning) text-white shadow-sm';
+              if (f === 'EMPAQUETADO') activeStyle = 'bg-(--theme-info) text-white shadow-sm';
+              if (f === 'DEVUELTO') activeStyle = 'bg-(--theme-error) text-white shadow-sm';
             }
             return (
               <button key={f} onClick={() => setFilter(f)}
-                className={`px-5 py-1.5 rounded-full text-[11px] font-bold tracking-wide transition-all shrink-0 ${
+                className={`px-5 py-1.5 rounded-full text-xs font-bold tracking-wide transition-all shrink-0 ${
                   isActive ? activeStyle : 'bg-(--theme-secondary-bg) border border-(--theme-border) text-(--theme-text) opacity-60 hover:opacity-100'
                 }`}
               >
@@ -295,14 +295,14 @@ export const OrderDispatch: React.FC = () => {
         </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-500 rounded-xl text-sm flex items-center gap-2">
+          <div className="mb-4 p-3 bg-(--theme-error-bg) border border-(--theme-error-border) text-(--theme-error) rounded-xl text-sm flex items-center gap-2">
             <AlertCircle className="w-5 h-5 shrink-0" />
             <span className="font-bold">{error}</span>
           </div>
         )}
 
         {success && (
-          <div className="mb-4 p-3 bg-green-500/10 border border-green-500/20 text-green-500 rounded-xl text-sm flex items-center gap-2">
+          <div className="mb-4 p-3 bg-primary/10 border border-primary/30 text-primary rounded-xl text-sm flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 shrink-0" />
             <span className="font-bold">{success}</span>
           </div>
@@ -317,14 +317,14 @@ export const OrderDispatch: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 gap-4 overflow-y-auto pr-2">
             {displayedOrders.map(order => (
-              <div key={order.id} className={`border border-(--theme-border) bg-(--theme-secondary-bg) rounded-2xl p-4 flex flex-col justify-between transition hover:border-primary/30 ${order.status === 'DEVUELTO' ? 'border-red-500/30' : ''}`}>
+              <div key={order.id} className={`border border-(--theme-border) bg-(--theme-secondary-bg) rounded-2xl p-4 flex flex-col justify-between transition hover:border-primary/30 ${order.status === 'DEVUELTO' ? 'border-(--theme-error-border)' : ''}`}>
                 <div className="mb-4">
                   <div className="flex justify-between items-start mb-4">
-                    <span className={`text-l font-['Outfit'] font-black px-2.5 py-1 rounded-lg tracking-wider ${
-                      order.status === 'RESERVADO' ? 'bg-green-500 text-white shadow-md shadow-green-500/20' : 
-                      order.status === 'PENDIENTE' ? 'bg-amber-500 text-white ' :
-                      order.status === 'DEVUELTO' ? 'bg-red-500 text-white shadow-md shadow-red-500/20' :
-                      'bg-purple-500 text-white'
+                    <span className={`text-lg font-display font-black px-2.5 py-1 rounded-lg tracking-wider ${
+                      order.status === 'RESERVADO' ? 'bg-primary text-white shadow-sm' :
+                      order.status === 'PENDIENTE' ? 'bg-(--theme-warning) text-white ' :
+                      order.status === 'DEVUELTO' ? 'bg-(--theme-error) text-white shadow-sm' :
+                      'bg-(--theme-info) text-white'
                     }`}>
                       #{parseOrderId(order.id).friendlyName}
                     </span>
@@ -344,10 +344,10 @@ export const OrderDispatch: React.FC = () => {
                 <button
                   onClick={() => handleOpenModal(order)}
                   className={`w-full text-white py-2.5 rounded-xl text-sm font-bold transition-all duration-200 active:scale-[0.98] flex justify-center items-center gap-2 shadow-sm ${
-                    order.status === 'RESERVADO' ? 'bg-green-500 hover:bg-green-600' :
-                    order.status === 'PENDIENTE' ? 'bg-amber-500 hover:bg-amber-600' :
-                    order.status === 'DEVUELTO' ? 'bg-red-500 hover:bg-red-600' :
-                    'bg-purple-600 hover:bg-purple-700'
+                    order.status === 'RESERVADO' ? 'bg-primary hover:brightness-95' :
+                    order.status === 'PENDIENTE' ? 'bg-(--theme-warning) hover:brightness-95' :
+                    order.status === 'DEVUELTO' ? 'bg-(--theme-error) hover:brightness-95' :
+                    'bg-(--theme-info) hover:brightness-95'
                   }`}
                 >
                   <ListFilter className="w-4 h-4" /> VER DETALLES
@@ -373,20 +373,20 @@ export const OrderDispatch: React.FC = () => {
             {verifyingIndex === null ? (
               <>
                 <div className="mb-4">
-                  <span className={`text-l font-['Outfit'] font-black px-2.5 py-1 rounded-lg tracking-wider inline-block mb-2 ${
-                    activeOrderForModal.status === 'DEVUELTO' ? 'bg-red-500/15 text-red-600 dark:text-red-400' : 'bg-primary/15 text-primary'
+                  <span className={`text-lg font-display font-black px-2.5 py-1 rounded-lg tracking-wider inline-block mb-2 ${
+                    activeOrderForModal.status === 'DEVUELTO' ? 'bg-(--theme-error-bg) text-(--theme-error) dark:text-(--theme-error)' : 'bg-primary/10 text-primary'
                   }`}>
                     #{parseOrderId(activeOrderForModal.id).friendlyName}
                   </span>
-                  <h2 className="font-['Outfit'] font-black text-xl text-(--theme-text) mt-1 mb-1">
+                  <h2 className="font-display font-black text-lg text-(--theme-text) mt-1 mb-1">
                     {activeOrderForModal.status === 'DEVUELTO' ? 'Revisión de Devolución' : 'Detalle del Pedido'}
                   </h2>
                 </div>
 
                 {activeOrderForModal.status === 'DEVUELTO' && !isAllVerified && (
-                  <div className="mb-2 p-3 bg-[#F39C12]/10 border border-[#F39C12]/30 rounded-xl flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 text-[#F39C12] shrink-0 mt-0.5" />
-                    <p className="text-xs text-[#F39C12] font-medium leading-tight">
+                  <div className="mb-2 p-3 bg-(--theme-warning-bg) border border-(--theme-warning-border) rounded-xl flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 text-(--theme-warning) shrink-0 mt-0.5" />
+                    <p className="text-xs text-(--theme-warning) font-medium leading-tight">
                       Debes <strong>verificar el estado físico</strong> de todos los productos antes de devolverlos al inventario.
                     </p>
                   </div>
@@ -403,35 +403,35 @@ export const OrderDispatch: React.FC = () => {
                         onClick={() => activeOrderForModal.status === 'DEVUELTO' && startVerifyingItem(idx, item.quantity)}
                         className={`bg-(--theme-secondary-bg) border rounded-2xl p-3 flex justify-between items-center transition-all ${
                           activeOrderForModal.status === 'DEVUELTO' 
-                            ? 'cursor-pointer hover:border-primary/50 active:scale-[0.99] ' + (isVerified ? 'border-green-500/50 bg-green-500/5' : 'border-(--theme-border)') 
+                            ? 'cursor-pointer hover:border-primary/50 active:scale-[0.99] ' + (isVerified ? 'border-primary/30 bg-primary/10' : 'border-(--theme-border)')
                             : 'border-(--theme-border)'
                         }`}
                       >
                         <div className="flex items-center gap-3 flex-1 pr-3">
                           {activeOrderForModal.status === 'DEVUELTO' && (
                             <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-colors ${
-                              isVerified ? 'bg-green-500 text-white' : 'bg-(--theme-border) text-(--theme-text) opacity-50'
+                              isVerified ? 'bg-primary text-white' : 'bg-(--theme-border) text-(--theme-text) opacity-50'
                             }`}>
-                              {isVerified ? <CheckSquare className="w-3.5 h-3.5" /> : <span className="text-[10px] font-bold">{idx + 1}</span>}
+                              {isVerified ? <CheckSquare className="w-3.5 h-3.5" /> : <span className="text-xs font-bold">{idx + 1}</span>}
                             </div>
                           )}
                           <div>
-                            <p className="font-['Outfit'] font-bold text-sm text-(--theme-text) line-clamp-2">
+                            <p className="font-display font-bold text-sm text-(--theme-text) line-clamp-2">
                               {item.productName}
                             </p>
                             {isVerified && activeOrderForModal.status === 'DEVUELTO' ? (
-                              <p className="text-[11px] font-medium text-(--theme-text) opacity-80 mt-0.5 flex gap-2">
-                                <span className="text-green-500">Bien: {verification.good}</span>
-                                {verification.bad > 0 && <span className="text-red-500 flex items-center gap-1"><AlertTriangle className="w-3 h-3"/> Mal: {verification.bad}</span>}
+                              <p className="text-xs font-medium text-(--theme-text) opacity-80 mt-0.5 flex gap-2">
+                                <span className="text-primary">Bien: {verification.good}</span>
+                                {verification.bad > 0 && <span className="text-(--theme-error) flex items-center gap-1"><AlertTriangle className="w-3 h-3"/> Mal: {verification.bad}</span>}
                               </p>
                             ) : (
-                              <p className="text-[11px] font-mono text-(--theme-text) opacity-60 mt-0.5">ID: {item.productId}</p>
+                              <p className="text-xs font-mono text-(--theme-text) opacity-60 mt-0.5">ID: {item.productId}</p>
                             )}
                           </div>
                         </div>
                         
                         <div className="flex items-center gap-2 shrink-0">
-                          <span className="font-['Outfit'] font-black px-3 py-1.5 rounded-xl text-sm bg-primary/10 text-primary">
+                          <span className="font-display font-black px-3 py-1.5 rounded-xl text-sm bg-primary/10 text-primary">
                             x{item.quantity}
                           </span>
                           {activeOrderForModal.status === 'DEVUELTO' && !isVerified && (
@@ -446,7 +446,7 @@ export const OrderDispatch: React.FC = () => {
                 {/* AQUÍ ESTÁN LOS BOTONES RESTAURADOS PARA LOS OTROS ESTADOS */}
                 <div className="pt-4 mt-4 border-t border-(--theme-border)/50">
                   <div className="flex gap-3">
-                    <button onClick={() => setActiveOrderForModal(null)} className="flex-1 px-4 py-3 rounded-2xl font-['Outfit'] font-bold text-sm border border-(--theme-border) text-(--theme-text) opacity-70 hover:opacity-100 transition">
+                    <button onClick={() => setActiveOrderForModal(null)} className="flex-1 px-4 py-3 rounded-2xl font-display font-bold text-sm border border-(--theme-border) text-(--theme-text) opacity-70 hover:opacity-100 transition">
                       Cerrar
                     </button>
 
@@ -454,7 +454,7 @@ export const OrderDispatch: React.FC = () => {
                       <button
                         disabled={processingId === activeOrderForModal.id}
                         onClick={() => handleStartPicking(activeOrderForModal)}
-                        className="flex-[1.3] px-4 py-3 rounded-2xl font-['Outfit'] font-bold text-sm transition-all bg-green-500 text-white shadow-lg shadow-green-500/20 hover:brightness-110 flex justify-center items-center gap-2"
+                        className="flex-[1.3] px-4 py-3 rounded-2xl font-display font-bold text-sm transition-all bg-primary text-white shadow-lg hover:brightness-110 flex justify-center items-center gap-2"
                       >
                         <Play className="w-5 h-5" />
                         {processingId === activeOrderForModal.id ? 'Procesando...' : 'EMPEZAR A BUSCAR'}
@@ -465,7 +465,7 @@ export const OrderDispatch: React.FC = () => {
                       <button
                         disabled={processingId === activeOrderForModal.id}
                         onClick={() => handleFinishPacking(activeOrderForModal.id)}
-                        className="flex-[1.3] px-4 py-3 rounded-2xl font-['Outfit'] font-bold text-sm transition-all bg-amber-500 text-white shadow-lg shadow-amber-500/20 hover:brightness-110 flex justify-center items-center gap-2"
+                        className="flex-[1.3] px-4 py-3 rounded-2xl font-display font-bold text-sm transition-all bg-(--theme-warning) text-white shadow-lg hover:brightness-110 flex justify-center items-center gap-2"
                       >
                         <PackageCheck className="w-5 h-5" />
                         {processingId === activeOrderForModal.id ? 'Procesando...' : 'EMPAQUETAR'}
@@ -476,10 +476,10 @@ export const OrderDispatch: React.FC = () => {
                       <button
                         disabled={!isAllVerified || processingId === activeOrderForModal.id}
                         onClick={() => handleReturnStock(activeOrderForModal)}
-                        className={`flex-[1.3] px-4 py-3 rounded-2xl font-['Outfit'] font-bold text-sm transition-all flex justify-center items-center gap-2 ${
+                        className={`flex-[1.3] px-4 py-3 rounded-2xl font-display font-bold text-sm transition-all flex justify-center items-center gap-2 ${
                           !isAllVerified 
                             ? 'bg-(--theme-secondary-bg) border border-(--theme-border) text-(--theme-text) opacity-50 cursor-not-allowed' 
-                            : 'bg-red-500 text-white shadow-lg shadow-red-500/20 hover:brightness-110'
+                            : 'bg-(--theme-error) text-white shadow-lg hover:brightness-110'
                         }`}
                       >
                         <ArchiveRestore className="w-5 h-5" />
@@ -498,7 +498,7 @@ export const OrderDispatch: React.FC = () => {
                 
                 <div className="mb-6">
                   <p className="text-xs text-primary font-bold tracking-wider uppercase mb-1">Verificando Producto</p>
-                  <h3 className="font-['Outfit'] font-black text-xl text-(--theme-text) leading-tight">
+                  <h3 className="font-display font-black text-lg text-(--theme-text) leading-tight">
                     {activeOrderForModal.items[verifyingIndex].productName}
                   </h3>
                   <p className="text-sm mt-2 text-(--theme-text) opacity-70">
@@ -509,7 +509,7 @@ export const OrderDispatch: React.FC = () => {
                 <div className="space-y-5 flex-grow">
                   <div>
                     <label className="block text-sm font-bold text-(--theme-text) mb-2">
-                      ¿Cuántas unidades están en <span className="text-red-500">MAL estado</span>?
+                      ¿Cuántas unidades están en <span className="text-(--theme-error)">MAL estado</span>?
                     </label>
                     <input 
                       type="number" 
@@ -520,20 +520,20 @@ export const OrderDispatch: React.FC = () => {
                       className="w-full bg-(--theme-bg) border border-(--theme-border) text-(--theme-text) rounded-xl px-4 py-3 font-mono text-lg focus:outline-none focus:border-primary transition"
                     />
                     <p className="text-xs text-(--theme-text) opacity-60 mt-2">
-                      Se registrarán <strong className="text-green-500">{activeOrderForModal.items[verifyingIndex].quantity - tempBadQty}</strong> unidades en buen estado.
+                      Se registrarán <strong className="text-primary">{activeOrderForModal.items[verifyingIndex].quantity - tempBadQty}</strong> unidades en buen estado.
                     </p>
                   </div>
 
                   {tempBadQty > 0 && (
                     <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                       <label className="block text-sm font-bold text-(--theme-text) mb-2 flex items-center gap-2">
-                        <AlertTriangle className="w-4 h-4 text-[#F39C12]" /> Motivo del mal estado
+                        <AlertTriangle className="w-4 h-4 text-(--theme-warning)" /> Motivo del mal estado
                       </label>
                       <textarea 
                         value={tempReason}
                         onChange={(e) => setTempReason(e.target.value)}
                         placeholder="Ej: Empaque roto, producto vencido, dañado en transporte..."
-                        className="w-full bg-(--theme-bg) border border-(--theme-border) text-(--theme-text) rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#F39C12] transition resize-none h-24"
+                        className="w-full bg-(--theme-bg) border border-(--theme-border) text-(--theme-text) rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-(--theme-warning-border) transition resize-none h-24"
                       />
                     </div>
                   )}
@@ -543,7 +543,7 @@ export const OrderDispatch: React.FC = () => {
                   <button
                     onClick={saveVerification}
                     disabled={tempBadQty > 0 && tempReason.trim().length === 0}
-                    className="w-full py-3.5 rounded-2xl font-['Outfit'] font-bold text-sm bg-primary text-white shadow-lg hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    className="w-full py-3.5 rounded-2xl font-display font-bold text-sm bg-primary text-white shadow-lg hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                   >
                     GUARDAR VERIFICACIÓN
                   </button>

@@ -1,11 +1,14 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import AdminLayout from '../../../features/admin/components/AdminLayout.tsx';
-import UserManagement from '../../../features/admin/users/components/UserManagement';
+import Navbar from '../../../components/Navbar';
+import Footer from '../../../components/Footer';
 ---
 
 <Layout title="Usuarios · Sansistore">
-  <AdminLayout client:load>
-    <UserManagement client:load />
-  </AdminLayout>
+  <Navbar client:load />
+  <main class="flex min-h-0 flex-1 overflow-hidden pt-14">
+    <AdminLayout client:load initialSection="usuarios" />
+  </main>
+  <Footer client:load />
 </Layout>

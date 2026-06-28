@@ -40,12 +40,10 @@ export const OrderCard = ({
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <p className="font-800 text-xs tracking-tight text-(--theme-text) pb-2"
-              style={{ fontFamily: 'Outfit, sans-serif' }}
             >
               # {order.orderId?.toUpperCase()}
             </p>
             <p className="font-800 text-lg tracking-tight text-(--theme-text)"
-              style={{ fontFamily: 'Outfit, sans-serif' }}
             >
               {order.buyerName?.toUpperCase()}
             </p>
@@ -75,11 +73,11 @@ export const OrderCard = ({
           </div>
 
           <div className="text-right">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-(--theme-text) opacity-40">
+            <p className="text-xs uppercase tracking-[0.2em] text-(--theme-text) opacity-40">
               Total
             </p>
 
-            <p className="font-800 text-xl tracking-tight text-primary">
+            <p className="font-800 text-lg tracking-tight text-primary">
               {formatCurrency(order.total)}
             </p>
           </div>

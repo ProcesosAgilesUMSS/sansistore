@@ -59,14 +59,14 @@ export default function MyReturnsView() {
 
   if (!user) {
     return (
-      <div className="max-w-4xl mx-auto p-4 md:p-8 text-center opacity-60">
+      <div className="max-w-7xl mx-auto p-4 md:p-8 text-center opacity-60">
         <p className="text-sm">Debes iniciar sesión para ver tus devoluciones.</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4 md:p-8 font-sans text-(--theme-text)">
+    <div className="max-w-7xl mx-auto p-4 md:p-8 font-sans text-(--theme-text)">
 
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
@@ -78,7 +78,7 @@ export default function MyReturnsView() {
           <ArrowLeft size={20} />
         </a>
         <div>
-          <h1 className="text-3xl font-display font-extrabold tracking-tight flex items-center gap-3">
+          <h1 className="text-2xl font-display font-extrabold tracking-tight flex items-center gap-3">
             <RotateCcw className="text-primary" size={28} />
             Mis Devoluciones
           </h1>

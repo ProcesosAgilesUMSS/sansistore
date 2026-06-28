@@ -449,7 +449,7 @@ function CartViewInner() {
                 </span>
                 <AnimatedAmount
                   value={total}
-                  className="text-xl sm:text-2xl font-bold text-primary"
+                  className="text-lg sm:text-2xl font-bold text-primary"
                 />
               </div>
 

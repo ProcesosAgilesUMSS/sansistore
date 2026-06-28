@@ -145,46 +145,46 @@ export const MovementHistory: React.FC = () => {
   const typeConfig = {
     ENTRADA: {
       icon: <ArrowDownRight className="w-4 h-4" />,
-      style: 'bg-green-500/15 text-green-500',
-      amountColor: 'text-green-500',
+      style: 'bg-primary/10 text-primary',
+      amountColor: 'text-primary',
       sign: '+',
     },
     SALIDA: {
       icon: <ArrowUpRight className="w-4 h-4" />,
-      style: 'bg-red-500/15 text-red-500',
-      amountColor: 'text-red-400',
+      style: 'bg-(--theme-error-bg) text-(--theme-error)',
+      amountColor: 'text-(--theme-error)',
       sign: '-',
     },
     INICIALIZACION: {
       icon: <PlusCircle className="w-4 h-4" />,
-      style: 'bg-primary/15 text-primary',
-      amountColor: 'text-green-500',
+      style: 'bg-primary/10 text-primary',
+      amountColor: 'text-primary',
       sign: '+',
     },
     VENTA: {
       icon: <ShoppingCart className="w-4 h-4" />,
-      style: 'bg-blue-500/15 text-blue-500',
-      amountColor: 'text-blue-400',
+      style: 'bg-(--theme-info-bg) text-(--theme-info)',
+      amountColor: 'text-(--theme-info)',
       sign: '-',
     },
   };
 
   if (loading && movements.length === 0) {
-    return <div className="p-4 text-center text-sm opacity-50 font-['Outfit']">Cargando historial...</div>;
+    return <div className="p-4 text-center text-sm opacity-50 font-display">Cargando historial...</div>;
   }
 
   return (
     <div className="bg-(--theme-card-bg) border border-(--theme-border) rounded-3xl p-6 shadow-sm h-full flex flex-col">
       <div className="flex items-center gap-2 mb-6 border-b border-(--theme-border) pb-4">
         <Clock className="w-5 h-5 opacity-60 text-(--theme-text)" />
-        <h2 className="font-['Outfit'] font-bold text-lg text-(--theme-text)">
+        <h2 className="font-display font-bold text-lg text-(--theme-text)">
           Movimientos de Inventario
         </h2>
       </div>
 
       <div className="space-y-4 flex-grow overflow-y-auto pr-1 min-h-[400px]">
         {movements.length === 0 ? (
-          <p className="text-sm opacity-40 text-center py-10 font-['Outfit']">No hay movimientos registrados.</p>
+          <p className="text-sm opacity-40 text-center py-10 font-display">No hay movimientos registrados.</p>
         ) : (
           movements.map((mov) => {
             const config = typeConfig[mov.type] ?? typeConfig.SALIDA;
@@ -201,11 +201,11 @@ export const MovementHistory: React.FC = () => {
                     <p className="text-sm font-bold text-(--theme-text) line-clamp-1">
                       {mov.productId}
                     </p>
-                    <p className="text-[0.65rem] uppercase tracking-widest opacity-50 font-bold">
+                    <p className="text-xs uppercase tracking-widest opacity-50 font-bold">
                       {mov.type} • {mov.reason}
                     </p>
                     {operatorName && (
-                      <p className="text-[0.65rem] uppercase tracking-widest opacity-50 font-bold">
+                      <p className="text-xs uppercase tracking-widest opacity-50 font-bold">
                         {mov.type === 'VENTA' ? 'VENDEDOR' : 'OPERADOR'} • {operatorName}
                       </p>
                     )}
@@ -223,7 +223,7 @@ export const MovementHistory: React.FC = () => {
 
       {/* PAGINACIÓN */}
       <div className="mt-6 pt-4 border-t border-(--theme-border) flex items-center justify-between">
-        <span className="text-xs font-['Outfit'] text-(--theme-text) opacity-50">
+        <span className="text-xs font-display text-(--theme-text) opacity-50">
           Página <span className="font-bold text-primary">{page}</span>
         </span>
 

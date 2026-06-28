@@ -121,14 +121,14 @@ export default function UserEditModal({
 
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-lg bg-[var(--theme-card-bg)] border border-[var(--theme-border)] rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="w-full max-w-lg bg-(--theme-card-bg) border border-(--theme-border) rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
 
           {/* Header */}
-          <div className="px-6 pt-6 pb-4 border-b border-[var(--theme-border)]">
-            <h2 className="text-[17px] font-bold text-[var(--theme-text)]">
+          <div className="px-6 pt-6 pb-4 border-b border-(--theme-border)">
+            <h2 className="text-base font-bold text-(--theme-text)">
               Editar usuario
             </h2>
-            <p className="text-[12px] text-[var(--theme-text)]/40 mt-0.5">
+            <p className="text-xs text-(--theme-text)/40 mt-0.5">
               {user.displayName} · UID: {user.uid}
             </p>
           </div>
@@ -139,26 +139,26 @@ export default function UserEditModal({
             {/* Nombre + Teléfono */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-semibold text-[var(--theme-text)]/50 uppercase tracking-wide mb-1.5">
+                <label className="block text-xs font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">
                   Nombre completo *
                 </label>
                 <input
-                  className="w-full p-2.5 rounded-xl text-[13px] bg-[var(--theme-bg)] border border-[var(--theme-border)] text-[var(--theme-text)] placeholder:text-[var(--theme-text)]/30 outline-none focus:border-[#88b04b] transition-colors"
+                  className="w-full p-2.5 rounded-xl text-sm bg-(--theme-bg) border border-(--theme-border) text-(--theme-text) placeholder:text-(--theme-text)/30 outline-none focus:border-primary transition-colors"
                   value={name}
                   placeholder="Ej: Juan Mamani"
                   onChange={(e) => { setName(e.target.value); setError(""); }}
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-semibold text-[var(--theme-text)]/50 uppercase tracking-wide mb-1.5">
+                <label className="block text-xs font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">
                   Teléfono
                 </label>
                 <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-2.5 rounded-xl text-[13px] bg-[var(--theme-bg)] border border-[var(--theme-border)] text-[var(--theme-text)]/40 select-none whitespace-nowrap">
+                  <span className="px-2.5 py-2.5 rounded-xl text-sm bg-(--theme-bg) border border-(--theme-border) text-(--theme-text)/40 select-none whitespace-nowrap">
                     +591
                   </span>
                   <input
-                    className="flex-1 p-2.5 rounded-xl text-[13px] bg-[var(--theme-bg)] border border-[var(--theme-border)] text-[var(--theme-text)] placeholder:text-[var(--theme-text)]/30 outline-none focus:border-[#88b04b] transition-colors"
+                    className="flex-1 p-2.5 rounded-xl text-sm bg-(--theme-bg) border border-(--theme-border) text-(--theme-text) placeholder:text-(--theme-text)/30 outline-none focus:border-primary transition-colors"
                     value={phone}
                     placeholder="71234567"
                     inputMode="numeric"
@@ -166,7 +166,7 @@ export default function UserEditModal({
                     onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, '').slice(0, 8))}
                   />
                 </div>
-                <p className="text-[10px] text-[var(--theme-text)]/30 mt-1">
+                <p className="text-xs text-(--theme-text)/30 mt-1">
                   8 dígitos, inicia con 6 o 7.
                 </p>
               </div>
@@ -174,16 +174,16 @@ export default function UserEditModal({
 
             {/* Email */}
             <div>
-              <label className="block text-[11px] font-semibold text-[var(--theme-text)]/50 uppercase tracking-wide mb-1.5">
+              <label className="block text-xs font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">
                 Email *
               </label>
               <input
-                className="w-full p-2.5 rounded-xl text-[13px] bg-[var(--theme-bg)] border border-[var(--theme-border)] text-[var(--theme-text)] placeholder:text-[var(--theme-text)]/30 outline-none focus:border-[#88b04b] transition-colors"
+                className="w-full p-2.5 rounded-xl text-sm bg-(--theme-bg) border border-(--theme-border) text-(--theme-text) placeholder:text-(--theme-text)/30 outline-none focus:border-primary transition-colors"
                 value={email}
                 placeholder="usuario@umss.edu"
                 onChange={(e) => { setEmail(e.target.value); setError(""); }}
               />
-              <p className="text-[10px] text-[var(--theme-text)]/30 mt-1">
+              <p className="text-xs text-(--theme-text)/30 mt-1">
                 Solo se permiten dominios institucionales: @est.umss.edu, @ms.umss.edu, @umss.edu.bo, @umss.edu
               </p>
             </div>
@@ -191,10 +191,10 @@ export default function UserEditModal({
             {/* Roles */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-[11px] font-semibold text-[var(--theme-text)]/50 uppercase tracking-wide">
+                <label className="text-xs font-semibold text-(--theme-text)/50 uppercase tracking-wide">
                   Roles asignados *
                 </label>
-                <span className="text-[10px] text-[#88b04b]">(mín. 1, máx. 2)</span>
+                <span className="text-xs text-primary">(mín. 1, máx. 2)</span>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {ROLES.map((role) => {
@@ -208,67 +208,67 @@ export default function UserEditModal({
                         flex items-center gap-2 px-3 py-2.5 rounded-xl border cursor-pointer transition-all
                         ${disabled ? 'opacity-40 cursor-not-allowed' : ''}
                         ${active
-                          ? 'bg-[rgba(136,176,75,0.12)] border-[#88b04b]/40'
-                          : 'bg-[var(--theme-bg)] border-[var(--theme-border)] hover:border-[#88b04b]/30'
+                          ? 'bg-primary/10 border-primary/40'
+                          : 'bg-(--theme-bg) border-(--theme-border) hover:border-primary/30'
                         }
                       `}
                     >
                       <div className={`
-                        w-4 h-4 rounded border flex items-center justify-center text-[10px] flex-shrink-0 transition-colors
+                        w-4 h-4 rounded border flex items-center justify-center text-xs flex-shrink-0 transition-colors
                         ${active
-                          ? 'bg-[#88b04b] border-[#88b04b] text-white'
-                          : 'bg-transparent border-[var(--theme-border)]'
+                          ? 'bg-primary border-primary text-white'
+                          : 'bg-transparent border-(--theme-border)'
                         }
                       `}>
                         {active && "✓"}
                       </div>
-                      <span className={`text-[13px] ${active ? 'text-[var(--theme-text)]' : 'text-[var(--theme-text)]/60'}`}>
+                      <span className={`text-sm ${active ? 'text-(--theme-text)' : 'text-(--theme-text)/60'}`}>
                         {ROLE_LABELS[role.value]}
                       </span>
                     </div>
                   );
                 })}
               </div>
-              <p className="text-[10px] text-[var(--theme-text)]/25 mt-1.5">
+              <p className="text-xs text-(--theme-text)/25 mt-1.5">
                 El array roles se actualizará en Firestore.
               </p>
             </div>
 
             {/* Estado */}
-            <div className="flex items-center justify-between bg-[var(--theme-bg)] border border-[var(--theme-border)] px-4 py-3 rounded-xl">
+            <div className="flex items-center justify-between bg-(--theme-bg) border border-(--theme-border) px-4 py-3 rounded-xl">
               <div>
-                <p className="text-[13px] font-medium text-[var(--theme-text)]">
+                <p className="text-sm font-medium text-(--theme-text)">
                   Estado de la cuenta
                 </p>
-                <p className="text-[11px] text-[var(--theme-text)]/40">
+                <p className="text-xs text-(--theme-text)/40">
                   Desactivar impide el acceso al sistema
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <span className={`text-[12px] font-medium ${isActive ? 'text-[#88b04b]' : 'text-[var(--theme-text)]/40'}`}>
+                <span className={`text-xs font-medium ${isActive ? 'text-primary' : 'text-(--theme-text)/40'}`}>
                   {isActive ? 'Activo' : 'Inactivo'}
                 </span>
                 <button
                   onClick={() => setIsActive(!isActive)}
-                  className={`relative w-11 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ${isActive ? 'bg-[#88b04b]' : 'bg-[var(--theme-text)]/20'}`}
+                  className={`relative w-11 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ${isActive ? 'bg-primary' : 'bg-(--theme-text)/20'}`}
                 >
-                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${isActive ? 'translate-x-5' : 'translate-x-0'}`} />
+                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-(--theme-card-bg) shadow transition-transform duration-200 ${isActive ? 'translate-x-5' : 'translate-x-0'}`} />
                 </button>
               </div>
             </div>
 
             {/* Error */}
             {error && (
-              <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-[13px]">
-                <span className="w-4 h-4 rounded-full bg-red-500 text-white text-[9px] flex items-center justify-center font-bold flex-shrink-0">!</span>
+              <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-(--theme-error-bg) border border-(--theme-error-border) text-(--theme-error) text-sm">
+                <span className="w-4 h-4 rounded-full bg-(--theme-error) text-white text-xs flex items-center justify-center font-bold flex-shrink-0">!</span>
                 {error}
               </div>
             )}
 
             {/* Success */}
             {success && (
-              <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[rgba(136,176,75,0.12)] border border-[rgba(136,176,75,0.25)] text-[#88b04b] text-[13px]">
-                <span className="w-4 h-4 rounded-full bg-[#88b04b] text-white text-[9px] flex items-center justify-center font-bold flex-shrink-0">✓</span>
+              <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-(--theme-success-bg) border border-(--theme-success-border) text-(--theme-success) text-sm">
+                <span className="w-4 h-4 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold flex-shrink-0">✓</span>
                 {success}
               </div>
             )}
@@ -276,16 +276,16 @@ export default function UserEditModal({
           </div>
 
           {/* Footer */}
-          <div className="flex gap-3 px-6 py-4 border-t border-[var(--theme-border)]">
+          <div className="flex gap-3 px-6 py-4 border-t border-(--theme-border)">
             <button
               onClick={onClose}
-              className="flex-1 py-2.5 rounded-xl text-[13px] font-medium bg-[var(--theme-bg)] border border-[var(--theme-border)] text-[var(--theme-text)]/60 hover:text-[var(--theme-text)] hover:border-[var(--theme-text)]/20 transition-colors"
+              className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-(--theme-bg) border border-(--theme-border) text-(--theme-text)/60 hover:text-(--theme-text) hover:border-(--theme-text)/20 transition-colors"
             >
               Cancelar
             </button>
             <button
               onClick={handleSubmit}
-              className="flex-1 py-2.5 rounded-xl text-[13px] font-medium bg-[#88b04b] hover:bg-[#7aa043] active:bg-[#6d9039] text-white transition-colors shadow-sm"
+              className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-primary hover:bg-primary/90 active:bg-primary/100 text-white transition-colors shadow-sm"
             >
               Guardar cambios
             </button>

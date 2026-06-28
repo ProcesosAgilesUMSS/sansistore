@@ -6,8 +6,7 @@ export const Header = ({ title, description }: Props) => {
   return (
     <header className="mb-8 px-6 py-6">
       <h1
-        className="text-4xl font-black text-(--theme-text) sm:text-5xl"
-        style={{ fontFamily: 'Outfit, sans-serif' }}
+        className="text-2xl font-black text-(--theme-text) sm:text-2xl"
       >
         {title}
       </h1>

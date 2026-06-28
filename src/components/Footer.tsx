@@ -17,13 +17,13 @@ export default function Footer({ className = '' }: { className?: string }) {
           <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-white shadow-sm shadow-primary/30 transition-transform group-hover:scale-105 group-active:scale-95">
             <ShoppingBag size={15} strokeWidth={2.4} />
           </span>
-          <span className="font-display font-black tracking-tight text-[16px] leading-none text-(--theme-text)">
+          <span className="font-display font-black tracking-tight text-base leading-none text-(--theme-text)">
             Sansi<span className="text-primary">Store</span>
           </span>
         </a>
 
         {/* Copyright */}
-        <p className="text-(--theme-text) opacity-55 text-[12px] tracking-[0.02em]">
+        <p className="text-(--theme-text) opacity-55 text-xs tracking-[0.02em]">
           © 2026 SansiStore. Todos los derechos reservados.
         </p>
 

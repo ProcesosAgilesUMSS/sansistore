@@ -17,8 +17,7 @@ export default function ReservationsListPanel() {
         </p>
 
         <h1
-          className="text-3xl font-900 leading-tight text-(--theme-text) md:text-4xl"
-          style={{ fontFamily: 'Outfit, sans-serif' }}
+          className="text-2xl font-900 leading-tight text-(--theme-text) md:text-2xl"
         >
           Reserva de Productos
         </h1>
@@ -39,8 +38,7 @@ export default function ReservationsListPanel() {
         <div className="mb-5 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div>
             <h2
-              className="text-xl font-800 text-(--theme-text)"
-              style={{ fontFamily: 'Outfit, sans-serif' }}
+              className="text-lg font-800 text-(--theme-text)"
             >
               Lista de reservas
             </h2>
@@ -107,7 +105,6 @@ export default function ReservationsListPanel() {
                     <div className="flex flex-wrap items-center gap-2">
                       <h3
                         className="font-800 text-lg tracking-tight text-(--theme-text)"
-                        style={{ fontFamily: 'Outfit, sans-serif' }}
                       >
                         Reserva #{reservation.orderId}
                       </h3>
@@ -142,11 +139,11 @@ export default function ReservationsListPanel() {
                   </div>
 
                   <div className="rounded-2xl bg-(--theme-secondary-bg) px-4 py-3 text-left lg:text-right">
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-(--theme-text) opacity-40">
+                    <p className="text-xs uppercase tracking-[0.2em] text-(--theme-text) opacity-40">
                       Total del pedido
                     </p>
 
-                    <p className="font-800 text-xl tracking-tight text-primary">
+                    <p className="font-800 text-lg tracking-tight text-primary">
                       {formatCurrency(reservation.total)}
                     </p>
                   </div>

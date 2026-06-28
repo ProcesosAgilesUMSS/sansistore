@@ -84,17 +84,17 @@ const formatDateTime = (date: Date): string =>
 
 // Badge de acción con color por tipo
 const ACTION_STYLES: Record<SellerActionType, string> = {
-  RESERVAR: 'bg-[rgba(93,75,221,0.12)] text-[#534AB7]',
-  CANCELAR: 'bg-red-500/10 text-red-600',
-  MARCAR_LISTO: 'bg-[rgba(136,176,75,0.15)] text-[#5E7E2F]',
-  ASIGNAR: 'bg-blue-500/10 text-blue-600',
-  REASIGNAR: 'bg-orange-500/10 text-orange-600',
-  MARCAR_PAGADA: 'bg-teal-500/10 text-teal-700',
-  MARCAR_DEVUELTA: 'bg-amber-500/10 text-amber-700',
+  RESERVAR: 'bg-(--theme-info-bg) text-(--theme-info)',
+  CANCELAR: 'bg-(--theme-error)/10 text-(--theme-error)',
+  MARCAR_LISTO: 'bg-primary/15 text-primary',
+  ASIGNAR: 'bg-(--theme-info-bg) text-(--theme-info)',
+  REASIGNAR: 'bg-(--theme-warning-bg) text-(--theme-warning)',
+  MARCAR_PAGADA: 'bg-(--theme-success-bg) text-(--theme-success)',
+  MARCAR_DEVUELTA: 'bg-(--theme-warning-bg) text-(--theme-warning)',
 };
 
 const ActionBadge = ({ action }: { action: SellerActionType }) => (
-  <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full ${ACTION_STYLES[action]}`}>
+  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${ACTION_STYLES[action]}`}>
     {ACTION_LABELS[action]?.toUpperCase() ?? action}
   </span>
 );
@@ -170,49 +170,49 @@ export default function SellerActivityPanel() {
   };
 
   return (
-    <div className="max-w-5xl">
+    <div>
 
       {/* Título */}
       <div className="mb-6">
-        <h2 className="text-[15px] font-semibold text-[var(--theme-text)]">
+        <h2 className="text-base font-semibold text-(--theme-text)">
           Actividad de vendedores
         </h2>
-        <p className="text-[11px] text-[var(--theme-text)]/50 mt-0.5">
+        <p className="text-xs text-(--theme-text)/50 mt-0.5">
           Registro de acciones realizadas por vendedores sobre pedidos
         </p>
       </div>
 
 
       {/* Filtros */}
-      <p className="text-[10px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-widest mb-3 pb-2 border-b border-[var(--theme-border)]">
+      <p className="text-xs font-semibold text-(--theme-text)/40 uppercase tracking-widest mb-3 pb-2 border-b border-(--theme-border)">
         Filtros
       </p>
 
       <div className="flex flex-wrap gap-3 mb-5">
         <div>
-          <label className="block text-[10px] font-semibold text-[var(--theme-text)]/50 uppercase tracking-wide mb-1.5">Fecha inicio</label>
+          <label className="block text-xs font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">Fecha inicio</label>
           <input
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="bg-[var(--theme-secondary-bg)] border border-[var(--theme-border)] rounded-lg px-3 py-2 text-[13px] text-[var(--theme-text)] outline-none focus:border-[#88B04B]"
+            className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-lg px-3 py-2 text-sm text-(--theme-text) outline-none focus:border-primary"
           />
         </div>
         <div>
-          <label className="block text-[10px] font-semibold text-[var(--theme-text)]/50 uppercase tracking-wide mb-1.5">Fecha fin</label>
+          <label className="block text-xs font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">Fecha fin</label>
           <input
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="bg-[var(--theme-secondary-bg)] border border-[var(--theme-border)] rounded-lg px-3 py-2 text-[13px] text-[var(--theme-text)] outline-none focus:border-[#88B04B]"
+            className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-lg px-3 py-2 text-sm text-(--theme-text) outline-none focus:border-primary"
           />
         </div>
         <div>
-          <label className="block text-[10px] font-semibold text-[var(--theme-text)]/50 uppercase tracking-wide mb-1.5">Vendedor</label>
+          <label className="block text-xs font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">Vendedor</label>
           <select
             value={sellerFilter}
             onChange={(e) => setSellerFilter(e.target.value)}
-            className="bg-[var(--theme-secondary-bg)] border border-[var(--theme-border)] rounded-lg px-3 py-2 text-[13px] text-[var(--theme-text)] outline-none focus:border-[#88B04B]"
+            className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-lg px-3 py-2 text-sm text-(--theme-text) outline-none focus:border-primary"
           >
             <option value="todos">Todos los vendedores</option>
             {sellers.map((s) => (
@@ -221,11 +221,11 @@ export default function SellerActivityPanel() {
           </select>
         </div>
         <div>
-          <label className="block text-[10px] font-semibold text-[var(--theme-text)]/50 uppercase tracking-wide mb-1.5">Acción</label>
+          <label className="block text-xs font-semibold text-(--theme-text)/50 uppercase tracking-wide mb-1.5">Acción</label>
           <select
             value={actionFilter}
             onChange={(e) => setActionFilter(e.target.value as SellerActionType | 'ALL')}
-            className="bg-[var(--theme-secondary-bg)] border border-[var(--theme-border)] rounded-lg px-3 py-2 text-[13px] text-[var(--theme-text)] outline-none focus:border-[#88B04B]"
+            className="bg-(--theme-secondary-bg) border border-(--theme-border) rounded-lg px-3 py-2 text-sm text-(--theme-text) outline-none focus:border-primary"
           >
             <option value="ALL">Todas las acciones</option>
             {(Object.keys(ACTION_LABELS) as SellerActionType[]).map((key) => (
@@ -237,7 +237,7 @@ export default function SellerActivityPanel() {
           <button
             onClick={handleFilter}
             disabled={loading}
-            className="bg-[#88B04B] text-white text-[13px] font-semibold px-5 py-2 rounded-full hover:bg-[#5E7E2F] transition-colors disabled:opacity-60"
+            className="bg-primary text-white text-sm font-semibold px-5 py-2 rounded-full hover:bg-primary/90 transition-colors disabled:opacity-60"
           >
             {loading ? 'Cargando...' : 'Filtrar'}
           </button>
@@ -245,7 +245,7 @@ export default function SellerActivityPanel() {
             onClick={handleFilter}
             disabled={loading}
             title="Actualizar registros"
-            className="border border-[var(--theme-border)] text-[var(--theme-text)]/60 text-[13px] font-semibold px-3 py-2 rounded-full hover:border-[#88B04B] hover:text-[#88B04B] transition-colors disabled:opacity-60"
+            className="border border-(--theme-border) text-(--theme-text)/60 text-sm font-semibold px-3 py-2 rounded-full hover:border-primary hover:text-primary transition-colors disabled:opacity-60"
           >
             ↻
           </button>
@@ -254,8 +254,8 @@ export default function SellerActivityPanel() {
 
       {/* Error */}
       {error && (
-        <div className="flex items-center gap-2 px-4 py-3 rounded-xl text-[12px] font-medium bg-red-500/10 border border-red-500/20 text-red-500 mb-4">
-          <span className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center text-white text-[10px] font-bold">!</span>
+        <div className="flex items-center gap-2 px-4 py-3 rounded-xl text-xs font-medium bg-(--theme-error-bg) border border-(--theme-error-border) text-(--theme-error) mb-4">
+          <span className="w-5 h-5 rounded-full bg-(--theme-error) flex items-center justify-center text-white text-xs font-bold">!</span>
           {error}
         </div>
       )}
@@ -264,7 +264,7 @@ export default function SellerActivityPanel() {
       {loading && (
         <div className="flex flex-col gap-2">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-12 bg-[var(--theme-secondary-bg)] rounded-xl animate-pulse" />
+            <div key={i} className="h-12 bg-(--theme-secondary-bg) rounded-xl animate-pulse" />
           ))}
         </div>
       )}
@@ -272,53 +272,53 @@ export default function SellerActivityPanel() {
       {/* Tabla de actividad */}
       {!loading && (
         <>
-          <p className="text-[10px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-widest mb-3 pb-2 border-b border-[var(--theme-border)]">
+          <p className="text-xs font-semibold text-(--theme-text)/40 uppercase tracking-widest mb-3 pb-2 border-b border-(--theme-border)">
             Registros ({logs.length})
           </p>
 
           {logs.length === 0 ? (
-            <div className="text-center py-12 border border-dashed border-[var(--theme-border)] rounded-xl">
-              <p className="text-[13px] text-[var(--theme-text)]/40">
+            <div className="text-center py-12 border border-dashed border-(--theme-border) rounded-xl">
+              <p className="text-sm text-(--theme-text)/40">
                 No se encontraron registros con los filtros seleccionados.
               </p>
             </div>
           ) : (
-            <div className="border border-[var(--theme-border)] rounded-xl overflow-hidden">
+            <div className="border border-(--theme-border) rounded-xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse min-w-[640px]">
                   <thead>
-                    <tr className="bg-[var(--theme-secondary-bg)]">
-                      <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">Vendedor</th>
-                      <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">Acción</th>
-                      <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">Pedido</th>
-                      <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">Cambio de estado</th>
-                      <th className="text-left text-[9px] font-semibold text-[var(--theme-text)]/40 uppercase tracking-wide px-4 py-2.5">Fecha y hora</th>
+                    <tr className="bg-(--theme-secondary-bg)">
+                      <th className="text-left text-xs font-semibold text-(--theme-text)/40 uppercase tracking-wide px-4 py-2.5">Vendedor</th>
+                      <th className="text-left text-xs font-semibold text-(--theme-text)/40 uppercase tracking-wide px-4 py-2.5">Acción</th>
+                      <th className="text-left text-xs font-semibold text-(--theme-text)/40 uppercase tracking-wide px-4 py-2.5">Pedido</th>
+                      <th className="text-left text-xs font-semibold text-(--theme-text)/40 uppercase tracking-wide px-4 py-2.5">Cambio de estado</th>
+                      <th className="text-left text-xs font-semibold text-(--theme-text)/40 uppercase tracking-wide px-4 py-2.5">Fecha y hora</th>
                     </tr>
                   </thead>
                   <tbody>
                     {logs.map((log, i) => (
                       <tr
                         key={log.logId}
-                        className={i % 2 === 0 ? 'bg-[var(--theme-card-bg)]' : 'bg-[var(--theme-secondary-bg)]/50'}
+                        className={i % 2 === 0 ? 'bg-(--theme-card-bg)' : 'bg-(--theme-secondary-bg)/50'}
                       >
                         <td className="px-4 py-2.5">
-                          <div className="text-[12px] font-medium text-[var(--theme-text)]">{log.sellerName}</div>
-                          <div className="text-[10px] text-[var(--theme-text)]/40">{log.sellerEmail}</div>
+                          <div className="text-xs font-medium text-(--theme-text)">{log.sellerName}</div>
+                          <div className="text-xs text-(--theme-text)/40">{log.sellerEmail}</div>
                         </td>
                         <td className="px-4 py-2.5">
                           <ActionBadge action={log.actionType} />
                         </td>
-                        <td className="px-4 py-2.5 font-mono text-[11px] text-[var(--theme-text)]/70">
+                        <td className="px-4 py-2.5 font-mono text-xs text-(--theme-text)/70">
                           {log.orderId}
                         </td>
                         <td className="px-4 py-2.5">
-                          <div className="flex items-center gap-1.5 text-[11px]">
-                            <span className="text-[var(--theme-text)]/40">{log.previousStatus}</span>
-                            <span className="text-[var(--theme-text)]/30 text-[9px]">→</span>
-                            <span className="font-medium text-[var(--theme-text)]">{log.newStatus}</span>
+                          <div className="flex items-center gap-1.5 text-xs">
+                            <span className="text-(--theme-text)/40">{log.previousStatus}</span>
+                            <span className="text-(--theme-text)/30 text-xs">→</span>
+                            <span className="font-medium text-(--theme-text)">{log.newStatus}</span>
                           </div>
                         </td>
-                        <td className="px-4 py-2.5 text-[11px] text-[var(--theme-text)]/70">
+                        <td className="px-4 py-2.5 text-xs text-(--theme-text)/70">
                           {formatDateTime(log.timestamp)}
                         </td>
                       </tr>

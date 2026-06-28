@@ -242,7 +242,7 @@ export default function RegisterUserModal({
 			>
 				{/* Header */}
 				<div className="flex items-center justify-between px-6 pt-6 pb-2">
-					<h2 className="text-[17px] font-bold text-(--theme-text)">
+					<h2 className="text-base font-bold text-(--theme-text)">
 						Nuevo Usuario
 					</h2>
 					<button
@@ -257,9 +257,9 @@ export default function RegisterUserModal({
 
 				{/* Server error banner (inline, inside modal) */}
 				{serverError && (
-					<div className="mx-6 mt-2 flex items-start gap-2.5 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-[#991b1b]">
-						<AlertCircle size={16} className="shrink-0 mt-0.5 text-red-400" />
-						<p className="text-[12px] font-medium leading-relaxed">
+					<div className="mx-6 mt-2 flex items-start gap-2.5 px-4 py-3 rounded-xl bg-(--theme-error-bg) border border-(--theme-error-border) text-(--theme-error)">
+						<AlertCircle size={16} className="shrink-0 mt-0.5 text-(--theme-error)" />
+						<p className="text-xs font-medium leading-relaxed">
 							{serverError}
 						</p>
 					</div>
@@ -271,7 +271,7 @@ export default function RegisterUserModal({
 					<div>
 						<label
 							htmlFor="register-display-name"
-							className="block text-[13px] font-medium text-(--theme-text) mb-1.5"
+							className="block text-sm font-medium text-(--theme-text) mb-1.5"
 						>
 							Nombre completo
 						</label>
@@ -283,7 +283,7 @@ export default function RegisterUserModal({
 							disabled={isLoading}
 							onChange={(e) => handleNameChange(e.target.value)}
 							className={`
-                w-full px-4 py-2.5 rounded-xl text-[13px]
+                w-full px-4 py-2.5 rounded-xl text-sm
                 bg-(--theme-bg) border
                 text-(--theme-text)
                 placeholder:text-(--theme-text)/30
@@ -291,13 +291,13 @@ export default function RegisterUserModal({
                 disabled:opacity-50 disabled:cursor-not-allowed
                 ${
 									errors.displayName
-										? "border-red-400 focus:border-red-400"
+										? "border-(--theme-error-border) focus:border-(--theme-error-border)"
 										: "border-(--theme-border) focus:border-primary"
 								}
               `}
 						/>
 						{errors.displayName && (
-							<p className="mt-1 text-[11px] text-red-500">
+							<p className="mt-1 text-xs text-(--theme-error)">
 								{errors.displayName}
 							</p>
 						)}
@@ -307,9 +307,9 @@ export default function RegisterUserModal({
 					<div>
 						<label
 							htmlFor="register-ci"
-							className="block text-[13px] font-medium text-(--theme-text) mb-1.5"
+							className="block text-sm font-medium text-(--theme-text) mb-1.5"
 						>
-							Cédula de identidad <span className="text-red-400">*</span>
+							Cédula de identidad <span className="text-(--theme-error)">*</span>
 						</label>
 						<input
 							id="register-ci"
@@ -320,7 +320,7 @@ export default function RegisterUserModal({
 							onChange={(e) => handleCiChange(e.target.value)}
 							inputMode="numeric"
 							className={`
-                w-full px-4 py-2.5 rounded-xl text-[13px]
+                w-full px-4 py-2.5 rounded-xl text-sm
                 bg-(--theme-bg) border
                 text-(--theme-text)
                 placeholder:text-(--theme-text)/30
@@ -328,13 +328,13 @@ export default function RegisterUserModal({
                 disabled:opacity-50 disabled:cursor-not-allowed
                 ${
 									errors.ci
-										? "border-red-400 focus:border-red-400"
+										? "border-(--theme-error-border) focus:border-(--theme-error-border)"
 										: "border-(--theme-border) focus:border-primary"
 								}
               `}
 						/>
 						{errors.ci && (
-							<p className="mt-1 text-[11px] text-red-500">{errors.ci}</p>
+							<p className="mt-1 text-xs text-(--theme-error)">{errors.ci}</p>
 						)}
 					</div>
 
@@ -342,7 +342,7 @@ export default function RegisterUserModal({
 					<div>
 						<label
 							htmlFor="register-email"
-							className="block text-[13px] font-medium text-(--theme-text) mb-1.5"
+							className="block text-sm font-medium text-(--theme-text) mb-1.5"
 						>
 							Correo electrónico
 						</label>
@@ -354,7 +354,7 @@ export default function RegisterUserModal({
 							disabled={isLoading}
 							onChange={(e) => handleEmailChange(e.target.value)}
 							className={`
-                w-full px-4 py-2.5 rounded-xl text-[13px]
+                w-full px-4 py-2.5 rounded-xl text-sm
                 bg-(--theme-bg) border
                 text-(--theme-text)
                 placeholder:text-(--theme-text)/30
@@ -362,18 +362,18 @@ export default function RegisterUserModal({
                 disabled:opacity-50 disabled:cursor-not-allowed
                 ${
 									errors.email
-										? "border-red-400 focus:border-red-400"
+										? "border-(--theme-error-border) focus:border-(--theme-error-border)"
 										: "border-(--theme-border) focus:border-primary"
 								}
               `}
 						/>
-						<p className="mt-1 text-[11px] text-(--theme-text)/40">
+						<p className="mt-1 text-xs text-(--theme-text)/40">
 							Dominios permitidos: @umss.edu, @umss.edu.bo, @est.umss.edu,
 							@est.umss.edu.bo, @mi.umss.edu, @ms.umss.edu, @fcyt.umss.edu.bo,
 							@dicyt.umss.edu.bo, @posgrado.umss.edu.bo
 						</p>
 						{errors.email && (
-							<p className="mt-0.5 text-[11px] text-red-500">{errors.email}</p>
+							<p className="mt-0.5 text-xs text-(--theme-error)">{errors.email}</p>
 						)}
 					</div>
 
@@ -381,12 +381,12 @@ export default function RegisterUserModal({
 					<div>
 						<label
 							htmlFor="register-phone-number"
-							className="block text-[13px] font-medium text-(--theme-text) mb-1.5"
+							className="block text-sm font-medium text-(--theme-text) mb-1.5"
 						>
 							Teléfono
 						</label>
 						<div className="flex items-center gap-2">
-							<span className="px-3 py-2.5 rounded-xl text-[13px] bg-(--theme-bg) border border-(--theme-border) text-(--theme-text)/50 select-none">
+							<span className="px-3 py-2.5 rounded-xl text-sm bg-(--theme-bg) border border-(--theme-border) text-(--theme-text)/50 select-none">
 								+591
 							</span>
 							<input
@@ -399,7 +399,7 @@ export default function RegisterUserModal({
 								inputMode="numeric"
 								maxLength={8}
 								className={`
-                  flex-1 px-4 py-2.5 rounded-xl text-[13px]
+                  flex-1 px-4 py-2.5 rounded-xl text-sm
                   bg-(--theme-bg) border
                   text-(--theme-text)
                   placeholder:text-(--theme-text)/30
@@ -407,17 +407,17 @@ export default function RegisterUserModal({
                   disabled:opacity-50 disabled:cursor-not-allowed
                   ${
 										errors.phoneNumber
-											? "border-red-400 focus:border-red-400"
+											? "border-(--theme-error-border) focus:border-(--theme-error-border)"
 											: "border-(--theme-border) focus:border-primary"
 									}
                 `}
 							/>
 						</div>
-						<p className="mt-1 text-[11px] text-(--theme-text)/40">
+						<p className="mt-1 text-xs text-(--theme-text)/40">
 							8 dígitos. Debe iniciar con 6 o 7.
 						</p>
 						{errors.phoneNumber && (
-							<p className="mt-0.5 text-[11px] text-red-500">
+							<p className="mt-0.5 text-xs text-(--theme-error)">
 								{errors.phoneNumber}
 							</p>
 						)}
@@ -427,7 +427,7 @@ export default function RegisterUserModal({
 					<div>
 						<label
 							htmlFor="register-internal-phone"
-							className="block text-[13px] font-medium text-(--theme-text) mb-1.5"
+							className="block text-sm font-medium text-(--theme-text) mb-1.5"
 						>
 							Teléfono interno
 						</label>
@@ -440,7 +440,7 @@ export default function RegisterUserModal({
 							onChange={(e) => handleInternalPhoneChange(e.target.value)}
 							inputMode="numeric"
 							className={`
-                w-full px-4 py-2.5 rounded-xl text-[13px]
+                w-full px-4 py-2.5 rounded-xl text-sm
                 bg-(--theme-bg) border
                 text-(--theme-text)
                 placeholder:text-(--theme-text)/30
@@ -448,13 +448,13 @@ export default function RegisterUserModal({
                 disabled:opacity-50 disabled:cursor-not-allowed
                 ${
 									errors.internalPhone
-										? "border-red-400 focus:border-red-400"
+										? "border-(--theme-error-border) focus:border-(--theme-error-border)"
 										: "border-(--theme-border) focus:border-primary"
 								}
               `}
 						/>
 						{errors.internalPhone && (
-							<p className="mt-1 text-[11px] text-red-500">
+							<p className="mt-1 text-xs text-(--theme-error)">
 								{errors.internalPhone}
 							</p>
 						)}
@@ -463,10 +463,10 @@ export default function RegisterUserModal({
 					{/* Rol selector - checkbox grid */}
 					<div>
 						<div className="flex items-center justify-between mb-2">
-							<p className="text-[13px] font-medium text-(--theme-text) uppercase tracking-wide">
-								Roles asignados <span className="text-red-400">*</span>
+							<p className="text-sm font-medium text-(--theme-text) uppercase tracking-wide">
+								Roles asignados <span className="text-(--theme-error)">*</span>
 							</p>
-							<span className="text-[11px] text-(--theme-text)/40">
+							<span className="text-xs text-(--theme-text)/40">
 								(mínimo 1 requerido)
 							</span>
 						</div>
@@ -483,7 +483,7 @@ export default function RegisterUserModal({
 										onClick={() => !isDisabled && handleRoleToggle(role)}
 										disabled={isDisabled}
 										className={`
-                      flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[13px] font-medium
+                      flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium
                       border transition-all duration-150 text-left
                       ${isDisabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}
                     `}
@@ -519,7 +519,7 @@ export default function RegisterUserModal({
 							})}
 						</div>
 						{errors.role && (
-							<p className="mt-1.5 text-[11px] text-red-500">{errors.role}</p>
+							<p className="mt-1.5 text-xs text-(--theme-error)">{errors.role}</p>
 						)}
 					</div>
 				</div>
@@ -531,7 +531,7 @@ export default function RegisterUserModal({
 						onClick={handleClose}
 						disabled={isLoading}
 						className="
-              px-5 py-2.5 rounded-full text-[13px] font-medium
+              px-5 py-2.5 rounded-full text-sm font-medium
               border border-(--theme-border)
               text-(--theme-text)/70
               hover:bg-(--theme-text)/5
@@ -547,10 +547,10 @@ export default function RegisterUserModal({
 						disabled={isLoading}
 						className="
               flex items-center justify-center gap-2
-              px-5 py-2.5 rounded-full text-[13px] font-medium
+              px-5 py-2.5 rounded-full text-sm font-medium
               bg-primary text-white
-              hover:bg-[#7aa043]
-              active:bg-[#6d9039]
+              hover:bg-primary/90
+              active:bg-primary/100
               transition-colors duration-150
               shadow-sm
               disabled:opacity-60 disabled:cursor-not-allowed

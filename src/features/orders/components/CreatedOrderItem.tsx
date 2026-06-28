@@ -41,7 +41,7 @@ export default function CreatedOrderItem({ order, selectOrder }: Props) {
 				<div className="hidden min-[850px]:flex col-start-18 items-center justify-end">
 					<button
 						type="button"
-						className="rounded-full border border-(--theme-border) px-3 py-1 text-[10px] uppercase font-semibold text-(--theme-text) opacity-60 hover:opacity-100 transition-colors"
+						className="rounded-full border border-(--theme-border) px-3 py-1 text-xs uppercase font-semibold text-(--theme-text) opacity-60 hover:opacity-100 transition-colors"
 					>
 						Ver
 					</button>

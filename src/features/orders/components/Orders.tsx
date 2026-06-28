@@ -85,7 +85,7 @@ export default function Orders() {
 					onNotification={showNotification}
 				/>
 			) : null}
-			<div className="max-w-6xl mx-auto px-4 sm:px-6 pb-10">
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 pb-10">
 				<section className="rounded-2xl border border-(--theme-border) bg-(--theme-card-bg) p-5 shadow-sm">
 					<SectionHeader title="Mis pedidos" count={filteredOrders.length} />
 
@@ -136,7 +136,7 @@ export default function Orders() {
 					</div>
 
 					<ul className="grid grid-cols-18 mx-auto w-full">
-						<li className="hidden min-[765px]:grid grid-cols-subgrid col-span-full uppercase border-b border-dotted border-(--theme-border) pb-3 mb-1 text-[10px] tracking-widest font-normal opacity-60">
+						<li className="hidden min-[765px]:grid grid-cols-subgrid col-span-full uppercase border-b border-dotted border-(--theme-border) pb-3 mb-1 text-xs tracking-widest font-normal opacity-60">
 							<div className="flex gap-x-2">
 								<span>/</span>
 								Orden

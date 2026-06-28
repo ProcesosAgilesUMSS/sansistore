@@ -107,7 +107,7 @@ export default function IncidentsPanel({ embedded = false }: { embedded?: boolea
     <div
       className={
         embedded
-          ? 'mx-auto w-full max-w-6xl px-4 py-10'
+          ? 'mx-auto w-full max-w-7xl px-4 py-10'
           : 'min-h-screen bg-(--theme-bg) px-4 pb-10 pt-10 md:px-8 xl:px-10'
       }
     >

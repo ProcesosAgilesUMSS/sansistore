@@ -98,9 +98,9 @@ function CopyableOrderId({ order }: { order: MessengerOrder }) {
       type="button"
     >
       {showTechnicalId && (
-        <p className="font-mono text-[10px] font-bold opacity-40">{uuid}</p>
+        <p className="font-mono text-xs font-bold opacity-40">{uuid}</p>
       )}
-      <h1 className="text-3xl font-black tracking-normal">{displayId}</h1>
+      <h1 className="text-2xl font-black tracking-normal">{displayId}</h1>
     </button>
   );
 }
@@ -384,7 +384,7 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
 
   if (loading) {
     return (
-      <section className="mx-auto flex min-h-[55vh] max-w-6xl items-center justify-center px-4">
+      <section className="mx-auto flex min-h-[55vh] max-w-7xl items-center justify-center px-4">
         <div className="messenger-order-card flex items-center gap-3 rounded-[28px] border p-8 text-sm font-bold">
           <LoaderCircle className="animate-spin" size={20} />
           Cargando detalle del pedido...
@@ -395,7 +395,7 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
 
   if (!order) {
     return (
-      <section className="mx-auto max-w-6xl px-4 py-10">
+      <section className="mx-auto max-w-7xl px-4 py-10">
         <a
           className="messenger-map-button mb-6 inline-flex h-11 items-center justify-center gap-2 rounded-2xl border-2 px-5 text-sm font-bold transition"
           href="/courier"
@@ -411,7 +411,7 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
   }
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-10">
+    <section className="mx-auto max-w-7xl px-4 py-10">
       <a
         className="messenger-map-button mb-6 inline-flex h-11 items-center justify-center gap-2 rounded-2xl border-2 px-5 text-sm font-bold transition"
         href="/courier"
@@ -439,7 +439,7 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
 
           <div className="messenger-cash-box rounded-2xl border-2 p-5 lg:min-w-72">
             <p className="text-xs font-medium uppercase">Monto a cobrar</p>
-            <p className="mt-2 text-3xl font-black">
+            <p className="mt-2 text-2xl font-black">
               {formatBolivianos(order.cashToCollect)}
             </p>
             <p className="messenger-copy mt-1 text-xs">en efectivo</p>
@@ -465,7 +465,7 @@ export default function DeliveryOrderDetailPage({ orderId }: { orderId: string }
                 Cliente
               </p>
               <div className="messenger-copy space-y-4 text-sm">
-                <p className="text-xl font-black">{order.customerName}</p>
+                <p className="text-lg font-black">{order.customerName}</p>
                 <p className="flex items-center gap-2">
                   <Phone size={16} />
                   <a className="hover:text-green-600" href={`tel:${order.phone}`}>

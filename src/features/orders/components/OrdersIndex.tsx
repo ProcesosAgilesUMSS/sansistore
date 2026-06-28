@@ -100,9 +100,9 @@ export default function OrdersIndex() {
 
   return (
     <RouteGuard allowedRoles={['vendedor']}>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-32 min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-32 min-h-screen">
         <div className="mb-8">
-          <h1 className="text-[clamp(1.75rem,4vw,3rem)] font-black tracking-[-0.04em] leading-none text-text-light">
+          <h1 className="text-2xl font-black tracking-[-0.04em] leading-none text-text-light">
             Pedidos
           </h1>
           {!loading && (
@@ -121,7 +121,7 @@ export default function OrdersIndex() {
               Rendición del día
             </p>
             <div className="flex flex-wrap items-end gap-x-6 gap-y-1">
-              <p className="text-[clamp(1.25rem,3vw,2rem)] font-black leading-none text-text-light">
+              <p className="text-2xl font-black leading-none text-text-light">
                 {currencyFormatter.format(deliveredTotal)}
               </p>
               <p className="text-sm text-text-light/50 pb-0.5">
@@ -230,7 +230,7 @@ export default function OrdersIndex() {
 function StatusBadge({ status }: { status: OrderStatus }) {
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded border border-dotted border-[#1e1e1e44] dark:border-[#f5f3ef44] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-text-light"
+      className="inline-flex items-center gap-1.5 rounded border border-dotted border-[#1e1e1e44] dark:border-[#f5f3ef44] px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-text-light"
     >
       <span className={`size-1.5 rounded-full ${STATUS_DOT_COLOR[status] || "bg-current"}`} />
       {STATUS_LABELS[status]}
@@ -255,7 +255,7 @@ function OrderCard({
     >
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
         <div className="flex-1 min-w-0">
-          <span className="font-mono text-[10px] font-bold text-text-light/40 truncate block">
+          <span className="font-mono text-xs font-bold text-text-light/40 truncate block">
             {uuid}
           </span>
           <span className="font-bold text-text-light group-hover:text-primary transition-colors">

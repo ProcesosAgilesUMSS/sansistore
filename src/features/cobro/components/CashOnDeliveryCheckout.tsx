@@ -121,7 +121,7 @@ export default function CashOnDeliveryCheckout() {
             <p className="mb-2 text-sm font-semibold text-primary">
               Entrega y cobro
             </p>
-            <h2 className="text-3xl font-black text-text-light">
+            <h2 className="text-2xl font-black text-text-light">
               Pago contra entrega
             </h2>
             <p className="mt-2 max-w-2xl text-sm font-semibold text-text-light opacity-65">

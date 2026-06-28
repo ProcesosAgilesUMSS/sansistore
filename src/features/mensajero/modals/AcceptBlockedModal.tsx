@@ -30,7 +30,7 @@ export default function AcceptBlockedModal({
 						</span>
 						<div className="min-w-0">
 							<h2
-								className="text-lg font-black leading-tight tracking-normal sm:text-xl"
+								className="text-lg font-black leading-tight tracking-normal sm:text-lg"
 								id="accept-blocked-title"
 							>
 								No puedes aceptar este pedido
