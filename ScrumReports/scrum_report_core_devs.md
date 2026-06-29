@@ -452,9 +452,9 @@
 # Daily Report #
 # 06/23/2026   #
   ## Gonza Rojas Willian D.
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Se reviso el flujo de estados, detectando duplicidad en stockReserved
+  - **Today:**        Se corrigieron algunos bugs, datos comentados en Seccion de Mis Empaques
+  - **Blockers:**     Ninguno
 
   ## Llanos Villarroel Vania F.
   - **Yesterday:**  
@@ -481,9 +481,9 @@
 # Daily Report #
 # 06/25/2026   #
   ## Gonza Rojas Willian D.
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Se coordino con los demas grupos para revisar el flujo de estados y Walkthrough
+  - **Today:**        Se encontro un problema de duplicidad por parte de Ventas o Delivery, stockReserved en estado DEVUELTO
+  - **Blockers:**     Ninguno
 
   ## Llanos Villarroel Vania F.
   - **Yesterday:**  
@@ -511,7 +511,7 @@
 # Daily Report #
 # 06/29/2026   #
   ## Gonza Rojas Willian D.
-  - **Yesterday:**    
+  - **Yesterday:**    Se revisó el walkthroug, alguien corrigió el problema de duplicidad de stockReserved
   - **Today:**        
   - **Blockers:**     
 
