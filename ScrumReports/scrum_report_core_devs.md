@@ -393,8 +393,8 @@
 # 06/16/2026   #
   ## Gonza Rojas Willian D.
   - **Yesterday:**    Se corrigio el bug del orden de PEDIDOS DEVUELTOS, primero la ENTRADA y luego la SALIDA.
-  - **Today:**        
-  - **Blockers:**     
+  - **Today:**        Se revisó el flujo de estados de una orden
+  - **Blockers:**     Ninguno
 
   ## Llanos Villarroel Vania F.
   - **Yesterday:**  
@@ -416,4 +416,122 @@
   - **Today:**        No se encontro ningun bug en la US 56.
   - **Blockers:**     
 
+
+
+
+# ##############
+# Daily Report #
+# 06/18/2026   #
+  ## Gonza Rojas Willian D.
+  - **Yesterday:**    Se revisó el flujo de estados de una orden y se refactorizo los colores y letras, diseño de modales
+  - **Today:**        Se refactorizó diseño de letras y colores.
+  - **Blockers:**     Ninguno
+
+  ## Llanos Villarroel Vania F.
+  - **Yesterday:**  
+  - **Today:**      
+  - **Blockers:**   
+
+  ## Rios Quiruchi Edney Jhojan
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Sejas Arze Eddy
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Soliz Moya Alejandra
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+
+# ##############
+# Daily Report #
+# 06/23/2026   #
+  ## Gonza Rojas Willian D.
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Llanos Villarroel Vania F.
+  - **Yesterday:**  
+  - **Today:**      
+  - **Blockers:**   
+
+  ## Rios Quiruchi Edney Jhojan
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Sejas Arze Eddy
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Soliz Moya Alejandra
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+
+# ##############
+# Daily Report #
+# 06/25/2026   #
+  ## Gonza Rojas Willian D.
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Llanos Villarroel Vania F.
+  - **Yesterday:**  
+  - **Today:**      
+  - **Blockers:**   
+
+  ## Rios Quiruchi Edney Jhojan
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Sejas Arze Eddy
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Soliz Moya Alejandra
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+
+
+# ##############
+# Daily Report #
+# 06/29/2026   #
+  ## Gonza Rojas Willian D.
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Llanos Villarroel Vania F.
+  - **Yesterday:**  
+  - **Today:**      
+  - **Blockers:**   
+
+  ## Rios Quiruchi Edney Jhojan
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Sejas Arze Eddy
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Soliz Moya Alejandra
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
 
