@@ -393,8 +393,8 @@
 # 06/16/2026   #
   ## Gonza Rojas Willian D.
   - **Yesterday:**    Se corrigio el bug del orden de PEDIDOS DEVUELTOS, primero la ENTRADA y luego la SALIDA.
-  - **Today:**        
-  - **Blockers:**     
+  - **Today:**        Se revisó el flujo de estados de una orden
+  - **Blockers:**     Ninguno
 
   ## Llanos Villarroel Vania F.
   - **Yesterday:**  
@@ -416,4 +416,122 @@
   - **Today:**        No se encontro ningun bug en la US 56.
   - **Blockers:**     
 
+
+
+
+# ##############
+# Daily Report #
+# 06/18/2026   #
+  ## Gonza Rojas Willian D.
+  - **Yesterday:**    Se revisó el flujo de estados de una orden y se refactorizo los colores y letras, diseño de modales
+  - **Today:**        Se refactorizó diseño de letras y colores.
+  - **Blockers:**     Ninguno
+
+  ## Llanos Villarroel Vania F.
+  - **Yesterday:**  
+  - **Today:**      
+  - **Blockers:**   
+
+  ## Rios Quiruchi Edney Jhojan
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Sejas Arze Eddy
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Soliz Moya Alejandra
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+
+# ##############
+# Daily Report #
+# 06/23/2026   #
+  ## Gonza Rojas Willian D.
+  - **Yesterday:**    Se reviso el flujo de estados, detectando duplicidad en stockReserved
+  - **Today:**        Se corrigieron algunos bugs, datos comentados en Seccion de Mis Empaques
+  - **Blockers:**     Ninguno
+
+  ## Llanos Villarroel Vania F.
+  - **Yesterday:**  
+  - **Today:**      
+  - **Blockers:**   
+
+  ## Rios Quiruchi Edney Jhojan
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Sejas Arze Eddy
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Soliz Moya Alejandra
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+
+# ##############
+# Daily Report #
+# 06/25/2026   #
+  ## Gonza Rojas Willian D.
+  - **Yesterday:**    Se coordino con los demas grupos para revisar el flujo de estados y Walkthrough
+  - **Today:**        Se encontro un problema de duplicidad por parte de Ventas o Delivery, stockReserved en estado DEVUELTO
+  - **Blockers:**     Ninguno
+
+  ## Llanos Villarroel Vania F.
+  - **Yesterday:**  
+  - **Today:**      
+  - **Blockers:**   
+
+  ## Rios Quiruchi Edney Jhojan
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Sejas Arze Eddy
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Soliz Moya Alejandra
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+
+
+# ##############
+# Daily Report #
+# 06/29/2026   #
+  ## Gonza Rojas Willian D.
+  - **Yesterday:**    Se revisó el walkthroug, alguien corrigió el problema de duplicidad de stockReserved
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Llanos Villarroel Vania F.
+  - **Yesterday:**  
+  - **Today:**      
+  - **Blockers:**   
+
+  ## Rios Quiruchi Edney Jhojan
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Sejas Arze Eddy
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
+
+  ## Soliz Moya Alejandra
+  - **Yesterday:**    
+  - **Today:**        
+  - **Blockers:**     
 
