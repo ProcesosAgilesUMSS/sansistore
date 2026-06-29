@@ -2,6 +2,9 @@ import {
   LayoutDashboard,
   PackagePlus,
   ArrowLeftRight,
+  PackageSearch,
+  ArrowDownUp,
+  History,
   PackageX,
 } from 'lucide-react';
 import { NavItem } from './NavItem';
@@ -33,19 +36,19 @@ const NAV_SECTIONS: NavSection[] = [
         sprint: true,
       },
       {
-        icon: ArrowLeftRight,
+        icon: PackageSearch,
         label: 'Mis Empaques',
         href: '/inventory/packaging',
         sprint: true,
       },
       {
-        icon: ArrowLeftRight,
+        icon: ArrowDownUp,
         label: 'Entrada y Salida Stock',
         href: '/inventory/entrysExits',
         sprint: true,
       },
       {
-        icon: ArrowLeftRight,
+        icon: History,
         label: 'Historial de Movimientos',
         href: '/inventory/movements',
         sprint: true,

@@ -256,11 +256,7 @@ export const OrderDispatch: React.FC = () => {
       <div className="h-full flex flex-col">
 
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-primary/10 rounded-xl text-primary">
-            <PackageSearch className="w-6 h-6" />
-          </div>
           <div>
-            <h2 className="font-display font-bold text-lg text-(--theme-text)">Pedidos a Empacar/desempacar</h2>
             <p className="text-xs opacity-60 text-(--theme-text)">Busca, empaca y prepara los pedidos</p>
           </div>
         </div>
