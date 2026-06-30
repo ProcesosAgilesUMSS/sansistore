@@ -87,7 +87,7 @@ export function FavoriteButton({
               fill="currentColor"
               className="favorite-heart-half favorite-heart-half-right absolute inset-0"
             />
-            <span className="favorite-heart-crack absolute inset-y-[1px] left-1/2 w-px -translate-x-1/2" />
+            <span className="favorite-heart-crack absolute left-1/2 top-[3px] h-[13px] w-[5px] -translate-x-1/2" />
           </span>
         )}
       </span>
