@@ -537,3 +537,20 @@ por las dudas que se tienen.
 * **Yesterday:** Revisé las tareas concluidas durante el sprint para asegurar que cumplan con los criterios establecidos y no presenten observaciones pendientes.
 * **Today:** Participaré en la Sprint Retrospective y en la discusión de las actividades
 * **Blockers:** None
+
+
+# Daily Reports - Team 3 Webspire 25/06/26
+
+## Dayana Saleth Ortuño Guzmán
+
+* **Yesterday:**  Revise los cambios que se realizaron el la base de datos.
+* **Today:** Hacer test de las funcionalidades de la parte de mensajero.
+* **Blockers:** none
+
+# Daily Reports - Team 3 Webspire 30/06/26
+
+## Dayana Saleth Ortuño Guzmán
+
+* **Yesterday:** Hacer test de las funcionalidades de la parte de vendedor.
+* **Today:** Hacer test de las funcionalidades de la parte del comprador.
+* **Blockers:** No tener tareas en el tablero de gitHub, pero ayude y avance en lo que pude.
