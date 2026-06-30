@@ -8,9 +8,6 @@ import {
   LogOut,
   Moon,
   Sun,
-  MapPin,
-  Settings,
-  Package,
   User as UserIcon,
 } from 'lucide-react';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
@@ -47,17 +44,15 @@ const applyTheme = (theme: ThemeMode) => {
 function CartButton() {
   const totalUnits = useStore(cartTotalUnits);
   const isAnimating = useStore(cartAnimating);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     initCartStore();
-    setMounted(true);
   }, []);
 
   return (
     <a
       href="/carrito"
-      aria-label={`Carrito, ${mounted ? totalUnits : 0} unidades`}
+      aria-label={`Carrito, ${totalUnits} unidades`}
       className="relative inline-flex items-center justify-center transition-all text-text-light opacity-[0.60] hover:text-primary hover:opacity-100"
     >
       <ShoppingCart
@@ -65,7 +60,7 @@ function CartButton() {
         className={`transition-all duration-300 ease-out ${isAnimating ? 'text-primary opacity-100 scale-105' : ''
           }`}
       />
-      {mounted && totalUnits > 0 && (
+      {totalUnits > 0 && (
         <span
           key={totalUnits}
           className={`absolute -top-1.5 -right-2 min-w-4 h-4 px-1 rounded-full flex items-center justify-center text-[10px] leading-none font-bold bg-primary text-white ring-2 ring-(--theme-bg) transition-transform duration-300 ease-out ${isAnimating ? 'scale-110' : 'scale-100'
@@ -84,8 +79,16 @@ export default function Navbar() {
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [authError, setAuthError] = useState<string | null>(null);
   const [authReady, setAuthReady] = useState(false);
-  const [theme, setTheme] = useState<ThemeMode>('light');
-  const [themeReady, setThemeReady] = useState(false);
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    if (typeof window === 'undefined') return 'light';
+
+    const savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode | null;
+    return (
+      savedTheme ||
+      (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light')
+    );
+  });
+  const themeReady = true;
   const [themeAnimating, setThemeAnimating] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [roles, setRoles] = useState<string[]>([]);
@@ -148,19 +151,6 @@ export default function Navbar() {
     const timeoutId = window.setTimeout(() => setThemeAnimating(false), 560);
     return () => window.clearTimeout(timeoutId);
   }, [themeAnimating]);
-
-  useEffect(() => {
-    const savedTheme = window.localStorage.getItem(
-      THEME_STORAGE_KEY
-    ) as ThemeMode | null;
-    const currentTheme =
-      savedTheme ||
-      (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
-    if (currentTheme !== theme) {
-      setTheme(currentTheme);
-    }
-    setThemeReady(true);
-  }, [theme]);
 
   //HU #159: registrar LOGOUT antes de cerrar sesión
   //Solo se agregó el registro del acceso

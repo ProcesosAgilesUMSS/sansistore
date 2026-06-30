@@ -41,7 +41,6 @@ export default function CategoryFilter({ selectedCategory, onCategoryChange }: C
 
   useEffect(() => {
     if (open) {
-      setSearch('');
       setTimeout(() => inputRef.current?.focus(), 50);
     }
   }, [open]);
@@ -66,7 +65,13 @@ export default function CategoryFilter({ selectedCategory, onCategoryChange }: C
       <div className="relative w-full">
         <button
           type="button"
-          onClick={() => setOpen((prev) => !prev)}
+          onClick={() => {
+            setOpen((prev) => {
+              const nextOpen = !prev;
+              if (nextOpen) setSearch('');
+              return nextOpen;
+            });
+          }}
           className={`w-full inline-flex items-center justify-between gap-3 rounded-full border px-5 py-2.5 text-sm font-semibold transition-all duration-200 active:scale-[0.98] sm:justify-start ${
             open
               ? 'border-primary/45 bg-primary/8 text-primary shadow-md shadow-primary/10'
