@@ -467,28 +467,28 @@ function FeaturedProductsInner({
                 }}
               />
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                const newOffersState = !showOffersOnly;
+              <button
+                type="button"
+                onClick={() => {
+                  const newOffersState = !showOffersOnly;
                 setShowOffersOnly(newOffersState);
                 setCurrentPage(1);
                 updateUrl(appliedSearch, newOffersState, selectedCategory, 1, sortBy);
               }}
               aria-pressed={showOffersOnly}
-              aria-label={
-                showOffersOnly
-                  ? 'Quitar filtro Solo ofertas'
-                  : 'Activar filtro Solo ofertas'
-              }
-              className={`inline-flex items-center justify-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition-all duration-200 ${
-                showOffersOnly
-                  ? 'border-primary bg-primary text-text-light shadow-md shadow-primary/20 hover:brightness-105'
-                  : 'border-border-light text-text-light hover:border-primary hover:text-primary'
-              }`}
-            >
-              Ofertas
-            </button>
+                aria-label={
+                  showOffersOnly
+                    ? 'Quitar filtro Solo ofertas'
+                    : 'Activar filtro Solo ofertas'
+                }
+                className={`inline-flex items-center justify-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition-all duration-200 ${
+                  showOffersOnly
+                    ? 'border-primary bg-primary text-text-light shadow-md shadow-primary/20 hover:-translate-y-0.5 hover:brightness-105'
+                    : 'border-border-light text-text-light hover:-translate-y-0.5 hover:border-primary hover:text-primary'
+                }`}
+              >
+                Ofertas
+              </button>
           </div>
           <div className="flex w-full flex-row items-center gap-3">
             <div
@@ -615,15 +615,22 @@ function FeaturedProductsInner({
               <button
                 type="button"
                 onClick={() => setShowSortDropdown(!showSortDropdown)}
-                className="flex items-center gap-2 rounded-full border border-border-light bg-card-bg-light px-4 py-2.5 text-sm font-semibold text-text-light transition-all hover:border-primary hover:text-primary"
+                className={`flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${
+                  showSortDropdown
+                    ? 'border-primary/45 bg-primary/8 text-primary shadow-md shadow-primary/10'
+                    : 'border-border-light bg-card-bg-light text-text-light hover:-translate-y-0.5 hover:border-primary hover:text-primary'
+                }`}
                 title="Ordenar productos"
                 aria-label="Ordenar productos"
               >
-                <FaFilter size={16} />
+                <FaFilter
+                  size={16}
+                  className={`transition-transform duration-300 ${showSortDropdown ? 'rotate-12' : ''}`}
+                />
                 <span className="hidden sm:inline">{selectedSortLabel}</span>
               </button>
               {showSortDropdown && (
-                <div className="absolute right-0 top-full z-40 mt-1 min-w-56 rounded-lg border border-border-light bg-card-bg-light py-1 shadow-lg">
+                <div className="filter-popover-reveal absolute right-0 top-full z-40 mt-1 min-w-56 rounded-2xl border border-border-light bg-card-bg-light py-1 shadow-xl shadow-black/10">
                   {SORT_OPTIONS.map((option) => (
                     <button
                       key={option.value}
@@ -634,11 +641,11 @@ function FeaturedProductsInner({
                         updateUrl(appliedSearch, showOffersOnly, selectedCategory, 1, option.value);
                         setShowSortDropdown(false);
                       }}
-                      className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-colors ${
+                      className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-all duration-150 ${
                         sortBy === option.value
-                          ? 'bg-primary/15 text-primary'
-                          : 'text-text-light hover:bg-secondary-bg-light'
-                      }`}
+                          ? 'bg-primary/12 text-primary'
+                          : 'text-text-light hover:bg-secondary-bg-light hover:text-primary'
+                       }`}
                     >
                       {option.label}
                     </button>
