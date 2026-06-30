@@ -595,3 +595,13 @@
 - **Yesterday:** Probe el flujo completo.
 - **Today:** seguir probando algunos apartados del sistema.
 - **Blockers:** None.
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday:** 
+  - Finalización del prototipo de guía interactiva (walkthrough) para la sección de delivery, como propuesta de documentación no tradicional.
+  - El prototipo fue desplegado en Vercel y compartido con el equipo para recibir feedback.
+  - Se propuso la implementación de la guía a nivel general, pero en votación con todos los grupos se decidió no implementarla por falta de tiempo.
+- **Today:** 
+  - Estar atento al feedback del prototipo y posibles observaciones del equipo.
+  - Cierre de actividades del sprint y preparación para la demo.
+- **Blockers:** None.
