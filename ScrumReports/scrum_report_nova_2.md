@@ -460,3 +460,61 @@
 * **Yesterday:** Realice las últimas pruebas de mi hu #145
 * **Today:** termine la Hu #145, y realice las pruebas con mi compañero del front y el back para realizar el PR
 * **Blockers:** none.
+
+# 23/06/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+* **Yesterday:**  Verifiqué el estado final de las funcionalidades completadas durante el sprint 4
+* **Today:** Estare a la Sprint Retrospective y colaboraré en la evaluación de los objetivos alcanzados durante el sprint.
+* **Blockers:** None
+
+## Jherlan Marcelo Calero Sardan
+* **Yesterday:**  Verifiqué el estado final de la funcionalidad desarollada completada durante el sprint 4
+* **Today:** Estuve en el Sprint Retrospective y colaboraré en la evaluación de los objetivos alcanzados en el sprint.
+* **Blockers:** None
+
+## Fabricio Javier Cordova Caceres 
+* **Yesterday:**  Verifiqué las funcionalidades desarolladas y completadas del sprint   sprint 
+* **Today:** estuve presente  Sprint Retrospective y colaboraré en la evaluación de los objetivos alcanzados en el sprint.
+* **Blockers:** None
+
+## Dylan Coca Beltran
+* **Yesterday:** Revisé tareas del sprint y validé entregables.
+* **Today:** Participe en la Sprint Retrospective.
+* **Blockers:** None
+
+## Camila Wara Fernandez Sandoval 
+* **Yesterday:**  Verifiqué el estado final de mi hu y que todo el flujo del sistema este correctamente 
+* **Today:** Cololabore en el scrum restrospective 
+* **Blockers:** None
+
+# 25/06/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+- **Yesterday:** Revisé las historias de usuario implementadas por el equipo, validando su planteamiento, separación funcional y coherencia con los criterios definidos para el sprint
+- **Today:** Continuar con la revisión de algunas mejoras pendientes y apoyar en la validación funcional de lo entregado.
+- **Blockers:** n/a.
+
+## Jherlan Marcelo Calero Sardan
+- **Yesterday:** Verifique el estado actual del panel de administracion que este funcionado correctamente y todo este en orden antes de implementar el dashboard
+- **Today:** Inicie con la planificacion del apartado del dashboard que nos quedo pendiente.
+- **Blockers:** n/a.
+
+## Fabricio Javier Cordova Caceres 
+- **Yesterday:** revisión de las historias de usuario implementadas por el equipo, validando su lógica y el flujo de su funcionamiento 
+- **Today:** Continuar con la revisión de algunas mejoras del frontend y backend
+- **Blockers:** n/a.
+
+## Dylan Coca Beltran
+- **Yesterday:** Trabajé en la corrección de un bug de UI en la HU-142 y realicé pruebas para verificar que la solución fuera estable.
+- **Today:** Continuaré con tareas pendientes del sprint y apoyaré en la validación de funcionalidades del equipo.
+- **Blockers:** None
+
+## Camila Wara Fernandez Sandoval 
+* **Yesterday:**  Revise y verifique las historias de mi equipo y el flujo de funcionamiento 
+* **Today:** Continúe con la revisión de algunas historias 
+* **Blockers:** None
