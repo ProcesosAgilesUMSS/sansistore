@@ -610,3 +610,9 @@
 - **Yesterday:** Probee el happy path y añadi datos para pruebas
 - **Today:** Ver como los datos que añadi se guardan correctamente
 - **Blockers:** None.
+
+### Adrian Said Andrade Medina
+- **Yesterday:** Revise el codigo en busca de bugs
+- **Today:** Particpare en la reunion.
+- **Blockers:** None.
+-
