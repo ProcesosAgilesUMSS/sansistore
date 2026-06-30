@@ -437,6 +437,11 @@ export default function ProfileView() {
 							onCancel={() => setIsEditingPhone(false)}
 							error={errors.phone}
 							placeholder="Ej. 71234567"
+							inputMode="numeric"
+							autoComplete="tel"
+							maxLength={8}
+							pattern="[67][0-9]{7}"
+							sanitizeValue={(value) => value.replace(/\D/g, "").slice(0, 8)}
 						/>
 						<EditableField
 							icon={<Mail size={17} />}
@@ -452,6 +457,11 @@ export default function ProfileView() {
 							onCancel={() => setIsEditingMail(false)}
 							error={errors.secondaryMail}
 							placeholder="ejemplo@correo.com"
+							autoComplete="email"
+							maxLength={100}
+							spellCheck={false}
+							autoCapitalize="none"
+							sanitizeValue={(value) => value.replace(/\s+/g, "")}
 						/>
 					</div>
 				</section>
@@ -606,6 +616,13 @@ interface EditableFieldProps {
 	error?: string;
 	placeholder?: string;
 	type?: string;
+	inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+	autoComplete?: string;
+	maxLength?: number;
+	pattern?: string;
+	spellCheck?: boolean;
+	autoCapitalize?: string;
+	sanitizeValue?: (value: string) => string;
 }
 
 function EditableField({
@@ -622,6 +639,13 @@ function EditableField({
 	error,
 	placeholder,
 	type = "text",
+	inputMode,
+	autoComplete,
+	maxLength,
+	pattern,
+	spellCheck,
+	autoCapitalize,
+	sanitizeValue,
 }: EditableFieldProps) {
 	const isEmpty = value === "No registrado";
 
@@ -641,12 +665,22 @@ function EditableField({
 								id={inputId}
 								type={type}
 								value={tempValue}
-								onChange={(e) => onTempChange(e.target.value)}
+								onChange={(e) =>
+									onTempChange(
+										sanitizeValue ? sanitizeValue(e.target.value) : e.target.value,
+									)
+								}
 								onKeyDown={(e) => {
 									if (e.key === "Enter") onSave();
 									if (e.key === "Escape") onCancel();
 								}}
 								placeholder={placeholder}
+								inputMode={inputMode}
+								autoComplete={autoComplete}
+								maxLength={maxLength}
+								pattern={pattern}
+								spellCheck={spellCheck}
+								autoCapitalize={autoCapitalize}
 								className={`min-w-0 flex-1 rounded-lg border bg-(--theme-secondary-bg) px-3 py-1.5 text-sm font-semibold text-(--theme-text) focus:outline-none focus:ring-2 focus:ring-primary/20 ${
 									error
 										? "border-(--theme-error) focus:border-(--theme-error)"

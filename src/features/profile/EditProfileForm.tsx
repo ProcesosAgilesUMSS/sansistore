@@ -151,12 +151,15 @@ export default function PerfilForm() {
               Correo Electrónico de Respaldo (Opcional)
             </label>
             <input
-              type="text"
+              type="email"
               autoComplete="email"
               placeholder="ejemplo@gmail.com"
               value={secondaryMail}
               maxLength={100}
-              onChange={(e) => setsecondaryMail(e.target.value)}
+              onChange={(e) => setsecondaryMail(e.target.value.replace(/\s+/g, ''))}
+              inputMode="email"
+              spellCheck={false}
+              autoCapitalize="none"
               className="w-full px-4 py-2.5 rounded-[0.75rem] border border-border-light bg-bg-light text-text-light text-sm focus:outline-none focus:border-primary transition-all"
             />
           </div>
