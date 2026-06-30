@@ -49,7 +49,9 @@ async function mirrorDocumentToDefaultEmulator(
             signal: AbortSignal.timeout(1000),
           }
         );
-      } catch {}
+      } catch {
+        return;
+      }
     })
   );
 }

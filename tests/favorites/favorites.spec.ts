@@ -53,7 +53,6 @@ test.describe('Favorite products', () => {
     const favoriteButton = page.locator(ADD_FAVORITE_BUTTON_SELECTOR).first();
     await expect(favoriteButton).toBeVisible({ timeout: 15000 });
     await expect(favoriteButton).toHaveAttribute('aria-pressed', 'false');
-    const favoriteTestId = await favoriteButton.getAttribute('data-testid');
 
     await favoriteButton.click();
     expect(new URL(page.url()).pathname).toBe('/productos');
