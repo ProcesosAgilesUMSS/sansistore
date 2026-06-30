@@ -573,3 +573,14 @@
 - **Yesterday:** revise la parte del vendedor
 - **Today:** continuaré con la revisión de la parte del vendoe.
 - **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+- **Yesterday:** Participe en la revision general del equipo y estuve pendiente de las definiciones para el nuevo sprint.
+- **Today:** Continuare apoyando en la revision de funcionalidades y en la coordinacion de pendientes del equipo.
+- **Blockers:** None.
+
+### Adrian Said Andrade Medina
+- **Yesterday:** Revise el estado de las funcionalidades relacionadas a delivery y los posibles ajustes necesarios para la demo.
+- **Today:** Continuare validando el flujo del mensajero y apoyare en la revision de pendientes del sprint.
+- **Blockers:** None.
+
