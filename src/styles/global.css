@@ -253,6 +253,34 @@
     }
 }
 
+@keyframes locationStarPop {
+    0% { transform: scale(1) rotate(0deg); }
+    40% { transform: scale(1.28) rotate(-10deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+@keyframes locationStarBurst {
+    0% {
+        opacity: 0.28;
+        transform: scale(0.5);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.7);
+    }
+}
+
+@keyframes locationStarFall {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1) rotate(0deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(8px) scale(0.72) rotate(18deg);
+    }
+}
+
 .cart-bump {
     animation: cartBump 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
@@ -394,6 +422,23 @@
     animation: filterPopoverReveal 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.location-star-pop {
+    animation: locationStarPop 0.52s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.location-star-burst {
+    border: 1.5px solid currentColor;
+    animation: locationStarBurst 0.42s ease-out forwards;
+}
+
+.location-star-fade {
+    pointer-events: none;
+}
+
+.location-star-fall {
+    animation: locationStarFall 0.64s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .cart-bump,
     .cart-icon-pop,
@@ -404,6 +449,9 @@
     .favorite-heart-crack,
     .footer-social:hover .footer-social-sheen,
     .filter-popover-reveal,
+    .location-star-pop,
+    .location-star-burst,
+    .location-star-fall,
     .mobile-nav-reveal,
     .theme-toggle-nudge,
     .theme-toggle-pulse {

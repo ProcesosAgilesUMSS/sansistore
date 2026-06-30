@@ -1,6 +1,6 @@
 // src/features/location/components/LocationCard.tsx
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Trash2, Star, Pencil } from 'lucide-react';
 import ConfirmModal from './ConfirmModal';
 import ErrorModal from './ErrorModal';
@@ -25,12 +25,35 @@ export default function LocationCard({
     onSetDefault,
     onEdit
 }: LocationCardProps) {
-    const { id, label, type, lat, lng, isDefault } = location;
+    const { id, label, type, isDefault } = location;
     
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showErrorModal, setShowErrorModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [isDeleting, setIsDeleting] = useState(false);
+    const [defaultAnimation, setDefaultAnimation] = useState<'idle' | 'adding' | 'removing'>('idle');
+    const previousDefaultRef = useRef(isDefault);
+    const animationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    useEffect(() => {
+        if (previousDefaultRef.current === isDefault) return;
+
+        if (animationTimeoutRef.current) clearTimeout(animationTimeoutRef.current);
+
+        const nextAnimation = isDefault ? 'adding' : 'removing';
+        setDefaultAnimation(nextAnimation);
+        animationTimeoutRef.current = setTimeout(
+            () => setDefaultAnimation('idle'),
+            nextAnimation === 'adding' ? 520 : 640
+        );
+        previousDefaultRef.current = isDefault;
+    }, [isDefault]);
+
+    useEffect(() => {
+        return () => {
+            if (animationTimeoutRef.current) clearTimeout(animationTimeoutRef.current);
+        };
+    }, []);
 
     if (!id) return null;
 
@@ -63,7 +86,7 @@ export default function LocationCard({
                 return;
             }
             onEdit(location);
-        } catch (error) {
+        } catch {
             setErrorMessage('Error al verificar la ubicación');
             setShowErrorModal(true);
         }
@@ -86,7 +109,7 @@ export default function LocationCard({
                 return;
             }
             setShowConfirmModal(true);
-        } catch (error) {
+        } catch {
             setErrorMessage('Error al verificar la ubicación');
             setShowErrorModal(true);
         }
@@ -125,7 +148,7 @@ export default function LocationCard({
                 <div className="flex items-center gap-1">
                     <button
                         onClick={handleSetDefaultClick}
-                        aria-label={`Establecer ${label} como predeterminada`}
+                        aria-label={isDefault ? `Quitar ${label} como predeterminada` : `Establecer ${label} como predeterminada`}
                         className={`
                             flex h-8 w-8 items-center justify-center rounded-full transition-all
                             ${isDefault
@@ -134,7 +157,21 @@ export default function LocationCard({
                             }
                         `}
                     >
-                        <Star size={16} fill={isDefault ? 'currentColor' : 'none'} />
+                        <span className="relative flex h-4 w-4 items-center justify-center">
+                            {defaultAnimation === 'adding' && (
+                                <span aria-hidden="true" className="location-star-burst absolute inset-0 rounded-full" />
+                            )}
+                            <Star
+                                size={16}
+                                fill={isDefault ? 'currentColor' : 'none'}
+                                className={defaultAnimation === 'adding' ? 'location-star-pop' : ''}
+                            />
+                            {defaultAnimation === 'removing' && (
+                                <span aria-hidden="true" className="location-star-fade absolute inset-0">
+                                    <Star size={16} fill="currentColor" className="location-star-fall" />
+                                </span>
+                            )}
+                        </span>
                     </button>
 
                     <button
