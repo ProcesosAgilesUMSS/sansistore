@@ -574,3 +574,15 @@
 - **Yesterday:** Implementé nuevos tests automatizados para los flujos impactados por la nueva home, los carruseles destacados y la transición hacia el catálogo, fortaleciendo la cobertura e2e del módulo de tienda. Este trabajo se relaciona principalmente con la task #714.
 - **Today:** Revisar la cobertura restante y apoyar en la validación final de los flujos automatizados.
 - **Blockers:** n/a.
+
+# 06/30/2026
+
+## Castro Tejada Steven Lisandro
+- **Yesterday:** Pulí múltiples interacciones de UI a lo largo de la tienda: animaciones de favoritos y del corazón, hover del footer y redes, animación del theme toggle, menú móvil del header e interacciones de filtros del catálogo. También mejoré la edición en línea del perfil, los campos de contacto y el comportamiento de las tarjetas de ubicación (selección de tipo, ubicación por defecto y CTA oculto durante la edición móvil).
+- **Today:** Alineé los límites de los campos del perfil con las pruebas de validación y corregí incidencias de lint en detalle de producto, catálogo y header, dejando la rama estable para revisión.
+- **Blockers:** n/a.
+
+## Velasquez Vela Marcos
+- **Yesterday:** Estandaricé la UI del panel de administración: rediseñé el menú lateral para que quede integrado y fijo, unifiqué el ancho de contenido y los títulos de sección, suavicé la apertura/cierre de los grupos del sidebar y corregí el scroll y el footer. Trabajo consolidado en el PR #734 (*feature/ui-improvements*).
+- **Today:** Recorrí con Playwright cada subsección de Órdenes, Inventario, Entregas y Admin para estandarizar encabezados, eliminar dobles títulos y cards redundantes, agregar el fallback de imágenes en inventario y corregir un error de hidratación; además llevé el mismo menú lateral a Órdenes e Inventario y tomé Productos como referencia de diseño.
+- **Blockers:** n/a.
