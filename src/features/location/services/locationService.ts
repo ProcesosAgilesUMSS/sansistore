@@ -4,7 +4,14 @@ import type { Location } from "../types";
 import { updateDoc } from "firebase/firestore";
 
 export async function saveLocation(location: Location) {
-    await addDoc(collection(db, "locations"), location);
+    const existingLocations = await getDocs(
+        query(collection(db, 'locations'), where('userId', '==', location.userId))
+    );
+
+    await addDoc(collection(db, "locations"), {
+        ...location,
+        isDefault: existingLocations.empty ? true : location.isDefault,
+    });
 }
 
 
@@ -38,11 +45,17 @@ export async function setDefaultLocation(userId: string, locationId: string): Pr
 
     const q = query(collection(db, 'locations'), where('userId', '==', userId));
     const snapshot = await getDocs(q);
+    const selectedDoc = snapshot.docs.find((item) => item.id === locationId);
+    const shouldUnsetCurrentDefault = selectedDoc?.data().isDefault === true;
+
     snapshot.docs.forEach(d => {
         batch.update(d.ref, { isDefault: false });
     });
 
-    batch.update(doc(db, 'locations', locationId), { isDefault: true });
+    if (!shouldUnsetCurrentDefault) {
+        batch.update(doc(db, 'locations', locationId), { isDefault: true });
+    }
+
     await batch.commit();
 }
 
