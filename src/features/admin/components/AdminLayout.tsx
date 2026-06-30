@@ -4,6 +4,7 @@ import {
 	Bike,
 	ChevronRight,
 	ClipboardList,
+	Database,
 	FileText,
 	Menu,
 	Scale,
@@ -30,6 +31,7 @@ import UserManagement from "../users/components/UserManagement.tsx";
 import DailySales from "../ventas/components/DailySales.tsx";
 import TopSellingProducts from "../ventas/top-products/components/TopSellingProducts.tsx";
 import CourierSessionsValidation from "../messengers/sessions/components/CourierSessionsValidation.tsx";
+import OrdersManagementPanel from "../database-management/orders/components/OrdersManagementPanel";
 
 type Section =
 	| "pedidos"
@@ -48,6 +50,7 @@ type Section =
 	| "bitacora"
 	| "monitoreo"
 	| "demanda-horarios"
+	| "gestion-bd-ordenes"
 	| null;
 
 interface NavItem {
@@ -67,7 +70,7 @@ interface AdminLayoutProps {
 	initialSection?: Exclude<Section, null>;
 }
 
-type OpenGroup = "pedidos" | "ventas" | "mensajeros" | "reportes" | null;
+type OpenGroup = "pedidos" | "ventas" | "mensajeros" | "reportes" | "gestion-bd" | null;
 
 function Collapse({ open, children }: { open: boolean; children: React.ReactNode }) {
 	return (
@@ -94,6 +97,9 @@ function getInitialOpenGroup(section: Exclude<Section, null>): OpenGroup {
 	if (["reportes", "reportes-cancelados", "demanda-horarios"].includes(section)) {
 		return "reportes";
 	}
+	if (["gestion-bd-ordenes"].includes(section)) {
+  		return "gestion-bd";
+	}
 	return null;
 }
 
@@ -117,6 +123,7 @@ export default function AdminLayout({ initialSection = "pedidos" }: AdminLayoutP
 				{ label: "Parámetros", icon: <Settings size={15} />, section: "parametros" },
 				{ label: "Bitácora", icon: <ClipboardList size={15} />, section: "bitacora" },
 				{ label: "Monitoreo", icon: <Activity size={15} />, section: "monitoreo" },
+				{ label: "Gestión de BD", icon: <Database size={15} />, section: null },
 			],
 		},
 		{
@@ -255,6 +262,34 @@ export default function AdminLayout({ initialSection = "pedidos" }: AdminLayoutP
 									);
 								}
 
+								if (item.label === "Gestión de BD") {
+  const isGroupActive = ["gestion-bd-ordenes"].includes(activeSection ?? "");
+  const isOpen = openGroup === "gestion-bd";
+  return (
+    <div key={item.label} className="mb-1">
+      <button
+        type="button"
+        onClick={() => toggleGroup("gestion-bd")}
+        className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-colors ${isGroupActive ? sidebarItemActive : sidebarItemInactive}`}
+      >
+        <span>{item.icon}</span>
+        <span className="flex-1 text-left">Gestión de BD</span>
+        <ChevronRight size={12} className={`transition-transform ${isOpen ? "rotate-90" : ""}`} />
+      </button>
+      <Collapse open={isOpen}>
+        <button
+          type="button"
+          onClick={() => { setActiveSection("gestion-bd-ordenes"); setSidebarOpen(false); }}
+          className={sidebarSubItemClass(activeSection === "gestion-bd-ordenes")}
+        >
+          Órdenes
+        </button>
+        {/*  pueden agregar más subsecciones aquí */}
+      </Collapse>
+    </div>
+  );
+}
+
 								if (item.label === "Mensajeros") {
 									const isGroupActive = ["mensajeros-desempeno", "mensajeros-cierres"].includes(activeSection ?? "");
 									const isOpen = openGroup === "mensajeros";
@@ -348,6 +383,7 @@ export default function AdminLayout({ initialSection = "pedidos" }: AdminLayoutP
 						{activeSection === "demanda-horarios" && <DemandPanel />}
 						{activeSection === "auditoria-cobros" && <PaymentAuditPanel />}
 						{activeSection === "conciliacion-pagos" && <PaymentReconciliationPanel />}
+						{activeSection === "gestion-bd-ordenes" && <OrdersManagementPanel />}
 					</div>
 				</main>
 			</div>
