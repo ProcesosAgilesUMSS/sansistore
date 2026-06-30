@@ -87,7 +87,6 @@ export default function ProfileView() {
 		secondaryMail?: string;
 		ci?: string;
 	}>({});
-
 	useEffect(() => {
 		const unsubscribe = onAuthStateChanged(auth, async (user) => {
 			if (!user) {
@@ -423,6 +422,11 @@ export default function ProfileView() {
 							onCancel={() => setIsEditingCi(false)}
 							error={errors.ci}
 							placeholder="Ej. 12345678"
+							inputMode="numeric"
+							autoComplete="off"
+							maxLength={10}
+							pattern="[0-9]{5,10}"
+							sanitizeValue={(value) => value.replace(/\D/g, "").slice(0, 10)}
 						/>
 						<EditableField
 							icon={<Phone size={17} />}
@@ -650,9 +654,13 @@ function EditableField({
 	const isEmpty = value === "No registrado";
 
 	return (
-		<div className="py-3.5 first:pt-0 last:pb-0">
+		<div className={`rounded-xl px-2 py-3.5 transition-all first:pt-0 last:pb-0 ${
+			isEditing ? 'bg-primary/5 ring-1 ring-primary/10' : ''
+		}`}>
 			<div className="flex items-center gap-3">
-				<div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+				<div className={`flex size-9 shrink-0 items-center justify-center rounded-full text-primary transition-all ${
+					isEditing ? 'bg-primary/14 ring-4 ring-primary/8' : 'bg-primary/10'
+				}`}>
 					{icon}
 				</div>
 				<div className="min-w-0 flex-1">
@@ -660,33 +668,34 @@ function EditableField({
 						{label}
 					</p>
 					{isEditing ? (
-						<div className="mt-1 flex items-center gap-2">
-							<input
-								id={inputId}
-								type={type}
-								value={tempValue}
-								onChange={(e) =>
-									onTempChange(
-										sanitizeValue ? sanitizeValue(e.target.value) : e.target.value,
-									)
-								}
-								onKeyDown={(e) => {
-									if (e.key === "Enter") onSave();
-									if (e.key === "Escape") onCancel();
-								}}
-								placeholder={placeholder}
-								inputMode={inputMode}
-								autoComplete={autoComplete}
-								maxLength={maxLength}
-								pattern={pattern}
-								spellCheck={spellCheck}
-								autoCapitalize={autoCapitalize}
-								className={`min-w-0 flex-1 rounded-lg border bg-(--theme-secondary-bg) px-3 py-1.5 text-sm font-semibold text-(--theme-text) focus:outline-none focus:ring-2 focus:ring-primary/20 ${
-									error
-										? "border-(--theme-error) focus:border-(--theme-error)"
-										: "border-(--theme-border) focus:border-primary"
-								}`}
-							/>
+						<>
+							<div className="mt-1 flex items-center gap-2">
+								<input
+									id={inputId}
+									type={type}
+									value={tempValue}
+									onChange={(e) =>
+										onTempChange(
+											sanitizeValue ? sanitizeValue(e.target.value) : e.target.value,
+										)
+									}
+									onKeyDown={(e) => {
+										if (e.key === "Enter") onSave();
+										if (e.key === "Escape") onCancel();
+									}}
+									placeholder={placeholder}
+									inputMode={inputMode}
+									autoComplete={autoComplete}
+									maxLength={maxLength}
+									pattern={pattern}
+									spellCheck={spellCheck}
+									autoCapitalize={autoCapitalize}
+									className={`min-w-0 flex-1 rounded-lg border bg-(--theme-secondary-bg) px-3 py-1.5 text-sm font-semibold text-(--theme-text) shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-primary/20 ${
+										error
+											? "border-(--theme-error) focus:border-(--theme-error)"
+											: "border-(--theme-border) focus:border-primary"
+									}`}
+								/>
 							<button
 								type="button"
 								onClick={onSave}
@@ -704,6 +713,7 @@ function EditableField({
 								<X size={16} />
 							</button>
 						</div>
+						</>
 					) : (
 						<p
 							className={`truncate text-sm font-bold ${
@@ -777,10 +787,10 @@ function AccountLink({
 	return (
 		<a
 			href={href}
-			className="group flex items-center justify-between rounded-xl border border-(--theme-border) bg-(--theme-secondary-bg) p-3 transition-all hover:border-primary hover:shadow-sm"
+			className="group flex items-center justify-between rounded-xl border border-(--theme-border) bg-(--theme-secondary-bg) p-3 transition-all hover:border-primary hover:shadow-sm hover:-translate-y-0.5"
 		>
 			<div className="flex items-center gap-3">
-				<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+				<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-all group-hover:-translate-y-0.5 group-hover:scale-105 group-hover:bg-primary group-hover:text-white group-hover:shadow-md group-hover:shadow-primary/20">
 					{icon}
 				</div>
 				<div className="flex flex-col">
