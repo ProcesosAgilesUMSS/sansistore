@@ -551,3 +551,68 @@
 - **Yesterday:** Revisión final del PR #646 y verificación de que la HU #568 esté completamente integrada en `main`.
 - **Today:** Participación en el Sprint Retrospective para analizar los resultados del Sprint 4 y definir mejoras para el próximo sprint.
 - **Blockers:** None.
+
+## 25-06-2026
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Mantuve contacto con el lider del grupo de CoreDevs para ver cómo ayudar en el problema de stock dentro de la aplicación
+- **Today:** Participaré en la reunión planeatada y comunicaré las inquietudes que existen en el equipo.
+- **Blockers:** Aún no se está seguro de qué haremos en este Sprint ni que es lo que se debe presentar en la demo final.
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday (24/06):** 
+  - Participación en la reunión con el equipo para definir el plan del nuevo sprint.
+  - Propuesta de reparto de tareas para la revisión de stock y documentación interactiva.
+  - La tarea de documentación quedó en espera hasta que el ingeniero defina el alcance y formato.
+- **Today (25/06):** 
+  - Esperar definiciones del ingeniero sobre el alcance de la documentación interactiva.
+  - Participación en la reunión general de revisión de equipos.
+- **Blockers:** Pendiente de confirmación del ingeniero sobre el formato y alcance de la documentación.
+
+### Efrain Peralta Felipe 
+- **Yesterday:** revise la parte del vendedor
+- **Today:** continuaré con la revisión de la parte del vendor.
+- **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+- **Yesterday:** Participe en la revision general del equipo y estuve pendiente de las definiciones para el nuevo sprint.
+- **Today:** Continuare apoyando en la revision de funcionalidades y en la coordinacion de pendientes del equipo.
+- **Blockers:** None.
+
+### Adrian Said Andrade Medina
+- **Yesterday:** Revise el estado de las funcionalidades relacionadas a delivery y los posibles ajustes necesarios para la demo.
+- **Today:** Continuare validando el flujo del mensajero y apoyare en la revision de pendientes del sprint.
+- **Blockers:** None.
+
+## 30-06-2026
+
+### José Daniel Virreira Rufino
+- **Yesterday:** Trabajé con CoreDevs (William) para revisar el problema del stock presente en la aplicación. Revise nuestros componentes de mensajero y les dí mejoras responsive.
+- **Today:** Seguir en contacto con los equipos de inventario y administración para poder ver que toda la aplicaicoón este funcionando correctamente.
+- **Blockers:** None.
+
+### Efrain Peralta Felipe
+- **Yesterday:** Probe el flujo completo.
+- **Today:** seguir probando algunos apartados del sistema.
+- **Blockers:** None.
+
+### Jhoel Gustavo Aiza Arce
+- **Yesterday:** 
+  - Finalización del prototipo de guía interactiva (walkthrough) para la sección de delivery, como propuesta de documentación no tradicional.
+  - El prototipo fue desplegado en Vercel y compartido con el equipo para recibir feedback.
+  - Se propuso la implementación de la guía a nivel general, pero en votación con todos los grupos se decidió no implementarla por falta de tiempo.
+- **Today:** 
+  - Estar atento al feedback del prototipo y posibles observaciones del equipo.
+  - Cierre de actividades del sprint y preparación para la demo.
+- **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+- **Yesterday:** Probee el happy path y añadi datos para pruebas
+- **Today:** Ver como los datos que añadi se guardan correctamente
+- **Blockers:** None.
+
+### Adrian Said Andrade Medina
+- **Yesterday:** Revise el codigo en busca de bugs
+- **Today:** Particpare en la reunion.
+- **Blockers:** None.
+-
