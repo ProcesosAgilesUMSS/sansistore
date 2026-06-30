@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { Heart } from 'lucide-react';
 import { FaCartPlus } from 'react-icons/fa';
 import { getOfferBadgeData, hasValidOffer } from '../../../lib/productOffers';
 import { isPopularProduct } from '../../../lib/productPopularity';
 import { useCartContext } from '../../cart';
-import { useFavorites } from '../../favorites';
+import { FavoriteButton, useFavorites } from '../../favorites';
 import type { CatalogProduct } from '../types';
 import { removeAccents } from '../utils/catalogFilters';
 
@@ -169,29 +168,14 @@ export default function ProductCard({
           )}
         </div>
 
-        <button
-          type="button"
-          aria-label={
-            productIsFavorite
-              ? `Quitar ${product.name} de favoritos`
-              : `Agregar ${product.name} a favoritos`
-          }
-          aria-pressed={productIsFavorite}
-          title={productIsFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
-          data-testid={`favorite-button-${product.slug}`}
-          onClick={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            toggleFavorite(product.id);
-          }}
-          className={`absolute right-3 top-3 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-all active:scale-95 ${
-            productIsFavorite
-              ? 'border-primary bg-primary text-text-light shadow-md shadow-primary/25'
-              : 'border-border-light bg-card-bg-light/90 text-text-light hover:border-primary hover:text-primary'
-          }`}
-        >
-          <Heart size={18} fill={productIsFavorite ? 'currentColor' : 'none'} />
-        </button>
+        <FavoriteButton
+          productId={product.id}
+          productName={product.name}
+          productSlug={product.slug}
+          isFavorite={productIsFavorite}
+          onToggle={toggleFavorite}
+          className="absolute right-3 top-3 z-20"
+        />
       </div>
 
       <div className="relative z-20 flex flex-1 flex-col p-3 sm:p-4">

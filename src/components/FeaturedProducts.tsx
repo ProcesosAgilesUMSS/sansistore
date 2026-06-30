@@ -608,7 +608,10 @@ function FeaturedProductsInner({
                 </ul>
               )}
             </div>
-            <div ref={sortRef} className="relative shrink-0">
+            <div
+              ref={sortRef}
+              className={`relative shrink-0 ${showSortDropdown ? 'z-40' : 'z-20'}`}
+            >
               <button
                 type="button"
                 onClick={() => setShowSortDropdown(!showSortDropdown)}
@@ -620,7 +623,7 @@ function FeaturedProductsInner({
                 <span className="hidden sm:inline">{selectedSortLabel}</span>
               </button>
               {showSortDropdown && (
-                <div className="absolute right-0 top-full mt-1 min-w-56 rounded-lg border border-border-light bg-card-bg-light py-1 shadow-lg z-20">
+                <div className="absolute right-0 top-full z-40 mt-1 min-w-56 rounded-lg border border-border-light bg-card-bg-light py-1 shadow-lg">
                   {SORT_OPTIONS.map((option) => (
                     <button
                       key={option.value}
