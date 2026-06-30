@@ -196,6 +196,27 @@
     }
 }
 
+@keyframes themeToggleNudge {
+    0% { transform: scale(1) rotate(0deg); }
+    35% { transform: scale(1.06) rotate(-10deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+@keyframes themeTogglePulse {
+    0% {
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--theme-primary) 0%, transparent);
+        transform: scale(1);
+    }
+    45% {
+        box-shadow: 0 0 0 7px color-mix(in srgb, var(--theme-primary) 18%, transparent);
+        transform: scale(1.06);
+    }
+    100% {
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--theme-primary) 0%, transparent);
+        transform: scale(1);
+    }
+}
+
 .cart-bump {
     animation: cartBump 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
@@ -274,6 +295,14 @@
     animation: favoriteHeartCrack 0.3s ease-out forwards;
 }
 
+.theme-toggle-nudge {
+    animation: themeToggleNudge 0.56s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.theme-toggle-pulse {
+    animation: themeTogglePulse 0.56s ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .cart-bump,
     .cart-icon-pop,
@@ -281,7 +310,9 @@
     .favorite-heart-burst,
     .favorite-heart-half-left,
     .favorite-heart-half-right,
-    .favorite-heart-crack {
+    .favorite-heart-crack,
+    .theme-toggle-nudge,
+    .theme-toggle-pulse {
         animation-duration: 0.01ms;
     }
 }

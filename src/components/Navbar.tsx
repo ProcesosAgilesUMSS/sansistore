@@ -86,6 +86,7 @@ export default function Navbar() {
   const [authReady, setAuthReady] = useState(false);
   const [theme, setTheme] = useState<ThemeMode>('light');
   const [themeReady, setThemeReady] = useState(false);
+  const [themeAnimating, setThemeAnimating] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [roles, setRoles] = useState<string[]>([]);
   const [currentPath, setCurrentPath] = useState('');
@@ -143,6 +144,12 @@ export default function Navbar() {
   const canAccessCourier = userRoles.includes('mensajero');
 
   useEffect(() => {
+    if (!themeAnimating) return;
+    const timeoutId = window.setTimeout(() => setThemeAnimating(false), 560);
+    return () => window.clearTimeout(timeoutId);
+  }, [themeAnimating]);
+
+  useEffect(() => {
     const savedTheme = window.localStorage.getItem(
       THEME_STORAGE_KEY
     ) as ThemeMode | null;
@@ -194,6 +201,7 @@ export default function Navbar() {
 
   const toggleTheme = () => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    setThemeAnimating(true);
     applyTheme(nextTheme);
     setTheme(nextTheme);
   };
@@ -269,14 +277,29 @@ export default function Navbar() {
                 type="button"
                 aria-label="Cambiar tema"
                 onClick={toggleTheme}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-primary/40 text-primary transition-all hover:border-primary hover:opacity-100"
+                className={`inline-flex h-8 w-8 items-center justify-center rounded-full border border-primary/40 text-primary transition-all duration-300 hover:border-primary hover:opacity-100 ${
+                  themeAnimating ? 'theme-toggle-pulse' : ''
+                }`}
               >
-                <span className="relative flex h-[18px] w-[18px] items-center justify-center">
-                  {themeReady && theme === 'dark' ? (
-                    <Moon className="h-[18px] w-[18px]" />
-                  ) : (
-                    <Sun className="h-[18px] w-[18px]" />
-                  )}
+                <span
+                  className={`relative flex h-[18px] w-[18px] items-center justify-center ${
+                    themeAnimating ? 'theme-toggle-nudge' : ''
+                  }`}
+                >
+                  <Sun
+                    className={`absolute h-[18px] w-[18px] transition-all duration-[420ms] ease-out ${
+                      themeReady && theme === 'dark'
+                        ? 'scale-[0.65] -rotate-45 opacity-0'
+                        : 'scale-100 rotate-0 opacity-100'
+                    }`}
+                  />
+                  <Moon
+                    className={`absolute h-[18px] w-[18px] transition-all duration-[420ms] ease-out ${
+                      themeReady && theme === 'dark'
+                        ? 'scale-100 rotate-0 opacity-100'
+                        : 'scale-[0.65] rotate-45 opacity-0'
+                    }`}
+                  />
                 </span>
               </button>
 
