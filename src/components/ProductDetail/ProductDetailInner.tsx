@@ -67,10 +67,7 @@ export default function ProductDetailInner({
   const { user, authReady } = useAuthUser();
 
   useEffect(() => {
-    if (!user) {
-      setUserRoles([]);
-      return;
-    }
+    if (!user) return;
     const fetchRole = async () => {
       try {
         const snap = await getDoc(doc(db, 'users', user.uid));

@@ -8,9 +8,6 @@ import {
   LogOut,
   Moon,
   Sun,
-  MapPin,
-  Settings,
-  Package,
   User as UserIcon,
 } from 'lucide-react';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
@@ -47,17 +44,15 @@ const applyTheme = (theme: ThemeMode) => {
 function CartButton() {
   const totalUnits = useStore(cartTotalUnits);
   const isAnimating = useStore(cartAnimating);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     initCartStore();
-    setMounted(true);
   }, []);
 
   return (
     <a
       href="/carrito"
-      aria-label={`Carrito, ${mounted ? totalUnits : 0} unidades`}
+      aria-label={`Carrito, ${totalUnits} unidades`}
       className="relative inline-flex items-center justify-center transition-all text-text-light opacity-[0.60] hover:text-primary hover:opacity-100"
     >
       <ShoppingCart
@@ -65,7 +60,7 @@ function CartButton() {
         className={`transition-all duration-300 ease-out ${isAnimating ? 'text-primary opacity-100 scale-105' : ''
           }`}
       />
-      {mounted && totalUnits > 0 && (
+      {totalUnits > 0 && (
         <span
           key={totalUnits}
           className={`absolute -top-1.5 -right-2 min-w-4 h-4 px-1 rounded-full flex items-center justify-center text-[10px] leading-none font-bold bg-primary text-white ring-2 ring-(--theme-bg) transition-transform duration-300 ease-out ${isAnimating ? 'scale-110' : 'scale-100'
@@ -84,8 +79,17 @@ export default function Navbar() {
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [authError, setAuthError] = useState<string | null>(null);
   const [authReady, setAuthReady] = useState(false);
-  const [theme, setTheme] = useState<ThemeMode>('light');
-  const [themeReady, setThemeReady] = useState(false);
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    if (typeof window === 'undefined') return 'light';
+
+    const savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode | null;
+    return (
+      savedTheme ||
+      (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light')
+    );
+  });
+  const themeReady = true;
+  const [themeAnimating, setThemeAnimating] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [roles, setRoles] = useState<string[]>([]);
   const [currentPath, setCurrentPath] = useState('');
@@ -143,17 +147,10 @@ export default function Navbar() {
   const canAccessCourier = userRoles.includes('mensajero');
 
   useEffect(() => {
-    const savedTheme = window.localStorage.getItem(
-      THEME_STORAGE_KEY
-    ) as ThemeMode | null;
-    const currentTheme =
-      savedTheme ||
-      (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
-    if (currentTheme !== theme) {
-      setTheme(currentTheme);
-    }
-    setThemeReady(true);
-  }, [theme]);
+    if (!themeAnimating) return;
+    const timeoutId = window.setTimeout(() => setThemeAnimating(false), 560);
+    return () => window.clearTimeout(timeoutId);
+  }, [themeAnimating]);
 
   //HU #159: registrar LOGOUT antes de cerrar sesión
   //Solo se agregó el registro del acceso
@@ -194,6 +191,7 @@ export default function Navbar() {
 
   const toggleTheme = () => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    setThemeAnimating(true);
     applyTheme(nextTheme);
     setTheme(nextTheme);
   };
@@ -269,14 +267,29 @@ export default function Navbar() {
                 type="button"
                 aria-label="Cambiar tema"
                 onClick={toggleTheme}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-primary/40 text-primary transition-all hover:border-primary hover:opacity-100"
+                className={`inline-flex h-8 w-8 items-center justify-center rounded-full border border-primary/40 text-primary transition-all duration-300 hover:border-primary hover:opacity-100 ${
+                  themeAnimating ? 'theme-toggle-pulse' : ''
+                }`}
               >
-                <span className="relative flex h-[18px] w-[18px] items-center justify-center">
-                  {themeReady && theme === 'dark' ? (
-                    <Moon className="h-[18px] w-[18px]" />
-                  ) : (
-                    <Sun className="h-[18px] w-[18px]" />
-                  )}
+                <span
+                  className={`relative flex h-[18px] w-[18px] items-center justify-center ${
+                    themeAnimating ? 'theme-toggle-nudge' : ''
+                  }`}
+                >
+                  <Sun
+                    className={`absolute h-[18px] w-[18px] transition-all duration-[420ms] ease-out ${
+                      themeReady && theme === 'dark'
+                        ? 'scale-[0.65] -rotate-45 opacity-0'
+                        : 'scale-100 rotate-0 opacity-100'
+                    }`}
+                  />
+                  <Moon
+                    className={`absolute h-[18px] w-[18px] transition-all duration-[420ms] ease-out ${
+                      themeReady && theme === 'dark'
+                        ? 'scale-100 rotate-0 opacity-100'
+                        : 'scale-[0.65] rotate-45 opacity-0'
+                    }`}
+                  />
                 </span>
               </button>
 
@@ -357,7 +370,11 @@ export default function Navbar() {
 
               {/* MOBILE */}
               <button
-                className="md:hidden text-text-light opacity-60 hover:text-primary"
+                className={`md:hidden inline-flex h-9 w-9 items-center justify-center rounded-full border transition-all ${
+                  menuOpen
+                    ? 'border-primary/40 bg-primary/10 text-primary'
+                    : 'border-transparent text-text-light opacity-60 hover:border-border-light hover:text-primary hover:opacity-100'
+                }`}
                 onClick={() => setMenuOpen(!menuOpen)}
               >
                 {menuOpen ? <X size={18} /> : <Menu size={18} />}
@@ -367,7 +384,9 @@ export default function Navbar() {
 
           {/* MOBILE MENU */}
           {menuOpen && (
-            <div className="md:hidden py-3 flex flex-col gap-3 border-t border-border-light">
+            <div className="mobile-nav-reveal md:hidden border-t border-border-light py-3">
+              <div className="rounded-2xl border border-border-light bg-card-bg-light/80 p-3 shadow-lg shadow-black/5 backdrop-blur-sm">
+                <div className="flex flex-col gap-2">
               {[
                 { label: 'Productos', href: '/productos', reqComprador: true },
                 { label: 'Ordenes', href: '/seller/created-orders', match: '/seller', reqVendedor: true },
@@ -390,11 +409,11 @@ export default function Navbar() {
                       key={item.label}
                       href={item.href}
                       aria-current={active ? 'page' : undefined}
-                      className={`text-sm font-semibold tracking-[0.02em] transition-all hover:text-primary ${
+                      className={`rounded-xl px-3 py-2 text-sm font-semibold tracking-[0.02em] transition-all ${
                         active
-                          ? 'text-primary opacity-100'
-                          : 'text-text-light opacity-[0.55] hover:opacity-100'
-                      }`}
+                          ? 'bg-primary/10 text-primary shadow-sm shadow-primary/10'
+                          : 'text-text-light opacity-[0.65] hover:bg-secondary-bg-light hover:text-primary hover:opacity-100'
+                       }`}
                     >
                       {item.label}
                     </a>
@@ -404,9 +423,10 @@ export default function Navbar() {
               {/* CORRECCIÓN: Quitamos showCompradorFeatures de aquí */}
               {user && (
                 <>
+                  <div className="my-1 h-px bg-border-light" />
                   <a
                     href="/mi-perfil"
-                    className="text-sm font-semibold text-primary opacity-90 transition-all hover:opacity-100"
+                    className="rounded-xl px-3 py-2 text-sm font-semibold text-primary opacity-90 transition-all hover:bg-primary/10 hover:opacity-100"
                   >
                     Mi Perfil
                   </a>
@@ -414,23 +434,25 @@ export default function Navbar() {
                   {canAccessCourier && (
                     <a
                       href="/courier"
-                      className="text-sm font-semibold text-primary opacity-90 transition-all hover:opacity-100"
+                      className="rounded-xl px-3 py-2 text-sm font-semibold text-primary opacity-90 transition-all hover:bg-primary/10 hover:opacity-100"
                     >
                       Mensajero
                     </a>
                   )}
 
-                  <hr className="border-border-light my-0.5" />
+                  <hr className="my-1 border-border-light" />
 
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="text-left text-sm font-semibold text-text-light opacity-[0.55] transition-all hover:text-primary hover:opacity-100"
+                    className="rounded-xl px-3 py-2 text-left text-sm font-semibold text-text-light opacity-[0.65] transition-all hover:bg-secondary-bg-light hover:text-primary hover:opacity-100"
                   >
                     Cerrar sesión
                   </button>
                 </>
               )}
+                </div>
+              </div>
             </div>
           )}
         </div>
