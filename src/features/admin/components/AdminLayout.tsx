@@ -5,6 +5,7 @@ import {
 	ChevronRight,
 	ClipboardList,
 	FileText,
+	LayoutDashboard,
 	Menu,
 	Scale,
 	Settings,
@@ -17,6 +18,7 @@ import { useState } from "react";
 import SalesReport from "../analytics/components/SalesReport.tsx";
 import AccessLogPanel from "../audit/components/AccessLogPanel.tsx";
 import CategoryList from "../categories/components/CategoryList.tsx";
+import DashboardPanel from "../dashboard/components/DashboardPanel.tsx";
 import DemandPanel from "../demand/components/DemandPanel.tsx";
 import MessengerPerformancePage from "../messengers/performance/MessengerPerformancePage.tsx";
 import SellerActivityPanel from "../monitoring/components/SellerActivityPanel.tsx";
@@ -32,6 +34,7 @@ import TopSellingProducts from "../ventas/top-products/components/TopSellingProd
 import CourierSessionsValidation from "../messengers/sessions/components/CourierSessionsValidation.tsx";
 
 type Section =
+	| "dashboard"
 	| "pedidos"
 	| "historial"
 	| "auditoria-cobros"
@@ -65,15 +68,14 @@ interface NavSection {
 
 interface AdminLayoutProps {
 	initialSection?: Exclude<Section, null>;
+	userName?: string;
 }
 
 type OpenGroup = "pedidos" | "ventas" | "mensajeros" | "reportes" | null;
 
 function Collapse({ open, children }: { open: boolean; children: React.ReactNode }) {
 	return (
-		<div
-			className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
-		>
+		<div className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
 			<div className="overflow-hidden">
 				<div className="mt-1 space-y-1 pl-7">{children}</div>
 			</div>
@@ -82,49 +84,44 @@ function Collapse({ open, children }: { open: boolean; children: React.ReactNode
 }
 
 function getInitialOpenGroup(section: Exclude<Section, null>): OpenGroup {
-	if (["pedidos", "historial", "auditoria-cobros", "conciliacion-pagos"].includes(section)) {
-		return "pedidos";
-	}
-	if (["ventas-diarias", "mas-vendidos"].includes(section)) {
-		return "ventas";
-	}
-	if (["mensajeros-desempeno", "mensajeros-cierres"].includes(section)) {
-		return "mensajeros";
-	}
-	if (["reportes", "reportes-cancelados", "demanda-horarios"].includes(section)) {
-		return "reportes";
-	}
+	if (["pedidos", "historial", "auditoria-cobros", "conciliacion-pagos"].includes(section)) return "pedidos";
+	if (["ventas-diarias", "mas-vendidos"].includes(section)) return "ventas";
+	if (["mensajeros-desempeno", "mensajeros-cierres"].includes(section)) return "mensajeros";
+	if (["reportes", "reportes-cancelados", "demanda-horarios"].includes(section)) return "reportes";
 	return null;
 }
 
-export default function AdminLayout({ initialSection = "pedidos" }: AdminLayoutProps) {
+export default function AdminLayout({ initialSection = "dashboard", userName = "Administrador" }: AdminLayoutProps) {
 	const [activeSection, setActiveSection] = useState<Section>(initialSection);
 	const [sidebarOpen, setSidebarOpen] = useState(false);
-	const [openGroup, setOpenGroup] = useState<OpenGroup>(() => getInitialOpenGroup(initialSection));
+	const [openGroup, setOpenGroup] = useState<OpenGroup>(() =>
+		initialSection === "dashboard" ? null : getInitialOpenGroup(initialSection)
+	);
 
 	const navSections: NavSection[] = [
 		{
 			title: "Principal",
 			items: [
-				{ label: "Pedidos", icon: <ShoppingBag size={15} />, section: "pedidos" },
+				{ label: "Dashboard", icon: <LayoutDashboard size={15} />, section: "dashboard" },
+				{ label: "Pedidos",   icon: <ShoppingBag size={15} />,    section: "pedidos" },
 			],
 		},
 		{
 			title: "Configuración",
 			items: [
-				{ label: "Usuarios", icon: <Users size={15} />, section: "usuarios" },
-				{ label: "Categorías", icon: <Tag size={15} />, section: "categorias" },
-				{ label: "Parámetros", icon: <Settings size={15} />, section: "parametros" },
-				{ label: "Bitácora", icon: <ClipboardList size={15} />, section: "bitacora" },
-				{ label: "Monitoreo", icon: <Activity size={15} />, section: "monitoreo" },
+				{ label: "Usuarios",   icon: <Users size={15} />,         section: "usuarios" },
+				{ label: "Categorías", icon: <Tag size={15} />,           section: "categorias" },
+				{ label: "Parámetros", icon: <Settings size={15} />,      section: "parametros" },
+				{ label: "Bitácora",   icon: <ClipboardList size={15} />, section: "bitacora" },
+				{ label: "Monitoreo",  icon: <Activity size={15} />,      section: "monitoreo" },
 			],
 		},
 		{
 			title: "Analítica",
 			items: [
-				{ label: "Ventas", icon: <BarChart2 size={15} />, section: "ventas-diarias" },
-				{ label: "Mensajeros", icon: <Bike size={15} />, section: null },
-				{ label: "Reportes", icon: <FileText size={15} />, section: "reportes" },
+				{ label: "Ventas",     icon: <BarChart2 size={15} />, section: "ventas-diarias" },
+				{ label: "Mensajeros", icon: <Bike size={15} />,      section: null },
+				{ label: "Reportes",   icon: <FileText size={15} />,  section: "reportes" },
 			],
 		},
 	];
@@ -135,6 +132,14 @@ export default function AdminLayout({ initialSection = "pedidos" }: AdminLayoutP
 		`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${active ? sidebarItemActive : sidebarItemInactive}`;
 	const toggleGroup = (group: Exclude<OpenGroup, null>) => {
 		setOpenGroup((current) => current === group ? null : group);
+	};
+
+	const navigate = (section: string) => {
+		setActiveSection(section as Section);
+		setSidebarOpen(false);
+		// Abrir grupo correspondiente si aplica
+		const group = getInitialOpenGroup(section as Exclude<Section, null>);
+		if (group) setOpenGroup(group);
 	};
 
 	return (
@@ -148,16 +153,14 @@ export default function AdminLayout({ initialSection = "pedidos" }: AdminLayoutP
 				/>
 			)}
 
-			<aside
-				className={`
+			<aside className={`
           fixed inset-y-0 left-0 z-40 h-screen w-[256px]
           bg-(--theme-card-bg) border-r border-(--theme-border)
           transition-transform duration-300
           md:static md:z-0 md:h-full md:translate-x-0
           md:bg-transparent md:border-(--theme-text)/8
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-        `}
-			>
+        `}>
 				<nav className="h-full overflow-y-auto px-4 py-5">
 					{navSections.map((section) => (
 						<div key={section.title} className="mb-5">
@@ -165,42 +168,43 @@ export default function AdminLayout({ initialSection = "pedidos" }: AdminLayoutP
 								{section.title}
 							</p>
 							{section.items.map((item) => {
+
+								// ── Dashboard ──
+								if (item.label === "Dashboard") {
+									const isActive = activeSection === "dashboard";
+									return (
+										<button type="button" key={item.label}
+											onClick={() => { setActiveSection("dashboard"); setOpenGroup(null); setSidebarOpen(false); }}
+											className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm mb-0.5 transition-colors duration-150 text-left ${isActive ? sidebarItemActive : sidebarItemInactive}`}>
+											<span className="flex-shrink-0">{item.icon}</span>
+											<span className="flex-1">Dashboard</span>
+										</button>
+									);
+								}
+
+								// ── Pedidos ──
 								if (item.label === "Pedidos") {
 									const isGroupActive = ["pedidos", "historial", "auditoria-cobros", "conciliacion-pagos"].includes(activeSection ?? "");
 									const isOpen = openGroup === "pedidos";
 									return (
 										<div key={item.label} className="mb-1">
-											<button
-												type="button"
-												onClick={() => toggleGroup("pedidos")}
-												className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-colors ${isGroupActive ? sidebarItemActive : sidebarItemInactive}`}
-											>
+											<button type="button" onClick={() => toggleGroup("pedidos")}
+												className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-colors ${isGroupActive ? sidebarItemActive : sidebarItemInactive}`}>
 												<span>{item.icon}</span>
 												<span className="flex-1 text-left">Pedidos</span>
 												<ChevronRight size={12} className={`transition-transform ${isOpen ? "rotate-90" : ""}`} />
 											</button>
 											<Collapse open={isOpen}>
-												<button type="button" onClick={() => { setActiveSection("pedidos"); setSidebarOpen(false); }}
-													className={sidebarSubItemClass(activeSection === "pedidos")}>
-													Recepción
-												</button>
-												<button type="button" onClick={() => { setActiveSection("historial"); setSidebarOpen(false); }}
-													className={`${sidebarSubItemClass(activeSection === "historial")} flex items-center gap-1.5`}>
-													<ClipboardList size={11} /> Historial
-												</button>
-												<button type="button" onClick={() => { setActiveSection("auditoria-cobros"); setSidebarOpen(false); }}
-													className={sidebarSubItemClass(activeSection === "auditoria-cobros")}>
-													Auditoría de cobros
-												</button>
-												<button type="button" onClick={() => { setActiveSection("conciliacion-pagos"); setSidebarOpen(false); }}
-													className={`${sidebarSubItemClass(activeSection === "conciliacion-pagos")} flex items-center gap-1.5`}>
-													<Scale size={11} /> Conciliacion
-												</button>
+												<button type="button" onClick={() => { setActiveSection("pedidos"); setSidebarOpen(false); }} className={sidebarSubItemClass(activeSection === "pedidos")}>Recepción</button>
+												<button type="button" onClick={() => { setActiveSection("historial"); setSidebarOpen(false); }} className={`${sidebarSubItemClass(activeSection === "historial")} flex items-center gap-1.5`}><ClipboardList size={11} /> Historial</button>
+												<button type="button" onClick={() => { setActiveSection("auditoria-cobros"); setSidebarOpen(false); }} className={sidebarSubItemClass(activeSection === "auditoria-cobros")}>Auditoría de cobros</button>
+												<button type="button" onClick={() => { setActiveSection("conciliacion-pagos"); setSidebarOpen(false); }} className={`${sidebarSubItemClass(activeSection === "conciliacion-pagos")} flex items-center gap-1.5`}><Scale size={11} /> Conciliacion</button>
 											</Collapse>
 										</div>
 									);
 								}
 
+								// ── Ventas ──
 								if (item.label === "Ventas") {
 									const isGroupActive = ["ventas-diarias", "mas-vendidos"].includes(activeSection ?? "");
 									const isOpen = openGroup === "ventas";
@@ -213,19 +217,14 @@ export default function AdminLayout({ initialSection = "pedidos" }: AdminLayoutP
 												<ChevronRight size={12} className={`transition-transform ${isOpen ? "rotate-90" : ""}`} />
 											</button>
 											<Collapse open={isOpen}>
-												<button type="button" onClick={() => { setActiveSection("ventas-diarias"); setSidebarOpen(false); }}
-													className={sidebarSubItemClass(activeSection === "ventas-diarias")}>
-													Ventas diarias
-												</button>
-												<button type="button" onClick={() => { setActiveSection("mas-vendidos"); setSidebarOpen(false); }}
-													className={sidebarSubItemClass(activeSection === "mas-vendidos")}>
-													Más vendidos
-												</button>
+												<button type="button" onClick={() => { setActiveSection("ventas-diarias"); setSidebarOpen(false); }} className={sidebarSubItemClass(activeSection === "ventas-diarias")}>Ventas diarias</button>
+												<button type="button" onClick={() => { setActiveSection("mas-vendidos"); setSidebarOpen(false); }} className={sidebarSubItemClass(activeSection === "mas-vendidos")}>Más vendidos</button>
 											</Collapse>
 										</div>
 									);
 								}
 
+								// ── Reportes ──
 								if (item.label === "Reportes") {
 									const isGroupActive = ["reportes", "reportes-cancelados", "demanda-horarios"].includes(activeSection ?? "");
 									const isOpen = openGroup === "reportes";
@@ -238,23 +237,15 @@ export default function AdminLayout({ initialSection = "pedidos" }: AdminLayoutP
 												<ChevronRight size={12} className={`transition-transform ${isOpen ? "rotate-90" : ""}`} />
 											</button>
 											<Collapse open={isOpen}>
-												<button type="button" onClick={() => { setActiveSection("reportes"); setSidebarOpen(false); }}
-													className={sidebarSubItemClass(activeSection === "reportes")}>
-													Ventas por fecha
-												</button>
-												<button type="button" onClick={() => { setActiveSection("reportes-cancelados"); setSidebarOpen(false); }}
-													className={sidebarSubItemClass(activeSection === "reportes-cancelados")}>
-													Pedidos cancelados
-												</button>
-												<button type="button" onClick={() => { setActiveSection("demanda-horarios"); setSidebarOpen(false); }}
-													className={sidebarSubItemClass(activeSection === "demanda-horarios")}>
-													Demanda por horarios
-												</button>
+												<button type="button" onClick={() => { setActiveSection("reportes"); setSidebarOpen(false); }} className={sidebarSubItemClass(activeSection === "reportes")}>Ventas por fecha</button>
+												<button type="button" onClick={() => { setActiveSection("reportes-cancelados"); setSidebarOpen(false); }} className={sidebarSubItemClass(activeSection === "reportes-cancelados")}>Pedidos cancelados</button>
+												<button type="button" onClick={() => { setActiveSection("demanda-horarios"); setSidebarOpen(false); }} className={sidebarSubItemClass(activeSection === "demanda-horarios")}>Demanda por horarios</button>
 											</Collapse>
 										</div>
 									);
 								}
 
+								// ── Mensajeros ──
 								if (item.label === "Mensajeros") {
 									const isGroupActive = ["mensajeros-desempeno", "mensajeros-cierres"].includes(activeSection ?? "");
 									const isOpen = openGroup === "mensajeros";
@@ -267,87 +258,59 @@ export default function AdminLayout({ initialSection = "pedidos" }: AdminLayoutP
 												<ChevronRight size={12} className={`transition-transform ${isOpen ? "rotate-90" : ""}`} />
 											</button>
 											<Collapse open={isOpen}>
-												<button type="button" onClick={() => { setActiveSection("mensajeros-desempeno"); setSidebarOpen(false); }}
-													className={sidebarSubItemClass(activeSection === "mensajeros-desempeno")}>
-													Desempeño
-												</button>
-												<button type="button" onClick={() => { setActiveSection("mensajeros-cierres"); setSidebarOpen(false); }}
-													className={sidebarSubItemClass(activeSection === "mensajeros-cierres")}>
-													Validar cierres
-												</button>
+												<button type="button" onClick={() => { setActiveSection("mensajeros-desempeno"); setSidebarOpen(false); }} className={sidebarSubItemClass(activeSection === "mensajeros-desempeno")}>Desempeño</button>
+												<button type="button" onClick={() => { setActiveSection("mensajeros-cierres"); setSidebarOpen(false); }} className={sidebarSubItemClass(activeSection === "mensajeros-cierres")}>Validar cierres</button>
 											</Collapse>
 										</div>
 									);
 								}
 
+								// ── Item normal ──
 								const isActive = activeSection === item.section;
 								return (
-									<button
-										type="button"
-										key={item.label}
-										onClick={() => {
-											if (!item.disabled && item.section) {
-												setActiveSection(item.section);
-												setOpenGroup(null);
-												setSidebarOpen(false);
-											}
-										}}
-										className={`
-                      w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm mb-0.5
-                      transition-colors duration-150 text-left
-                      ${isActive
-												? sidebarItemActive
-												: item.disabled
-													? "text-(--theme-text)/20 cursor-not-allowed"
-													: `${sidebarItemInactive} cursor-pointer`
-											}
-                    `}
-									>
+									<button type="button" key={item.label}
+										onClick={() => { if (!item.disabled && item.section) { setActiveSection(item.section); setOpenGroup(null); setSidebarOpen(false); } }}
+										className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm mb-0.5 transition-colors duration-150 text-left ${isActive ? sidebarItemActive : item.disabled ? "text-(--theme-text)/20 cursor-not-allowed" : `${sidebarItemInactive} cursor-pointer`}`}>
 										<span className="flex-shrink-0">{item.icon}</span>
 										<span className="flex-1">{item.label}</span>
-										{item.badge && (
-											<span className="text-xs bg-primary text-white px-1.5 py-0.5 rounded-full font-medium">
-												{item.badge}
-											</span>
-										)}
+										{item.badge && <span className="text-xs bg-primary text-white px-1.5 py-0.5 rounded-full font-medium">{item.badge}</span>}
 									</button>
 								);
 							})}
 						</div>
 					))}
 				</nav>
-
 			</aside>
 
 			<div className="flex min-w-0 flex-1 flex-col bg-(--theme-bg)">
 				<main className="admin-scrollbar flex-1 overflow-y-auto p-6 md:p-8">
-					<button
-						type="button"
+					<button type="button"
 						className="mb-4 flex items-center gap-2 rounded-lg border border-(--theme-border) px-3 py-2 text-sm text-(--theme-text)/70 md:hidden"
-						onClick={() => setSidebarOpen(!sidebarOpen)}
-					>
+						onClick={() => setSidebarOpen(!sidebarOpen)}>
 						{sidebarOpen ? <X size={18} /> : <Menu size={18} />}
 						Menú
 					</button>
 					<div className="mx-auto w-full min-w-0 max-w-7xl">
-						{activeSection === "pedidos" && (
-							<OrderReceptionPanel />
+						{/* ── Dashboard ── */}
+						{activeSection === "dashboard" && (
+							<DashboardPanel onNavigate={navigate} userName={userName} />
 						)}
-						{activeSection === "usuarios" && <UserManagement />}
-						{activeSection === "categorias" && <CategoryList />}
-						{activeSection === "ventas-diarias" && <DailySales />}
-						{activeSection === "mas-vendidos" && <TopSellingProducts />}
+						{activeSection === "pedidos"              && <OrderReceptionPanel />}
+						{activeSection === "usuarios"             && <UserManagement />}
+						{activeSection === "categorias"           && <CategoryList />}
+						{activeSection === "ventas-diarias"       && <DailySales />}
+						{activeSection === "mas-vendidos"         && <TopSellingProducts />}
 						{activeSection === "mensajeros-desempeno" && <MessengerPerformancePage />}
-						{activeSection === "mensajeros-cierres" && <CourierSessionsValidation />}
-						{activeSection === "parametros" && <ConfigPanel />}
-						{activeSection === "reportes" && <SalesReport />}
-						{activeSection === "bitacora" && <AccessLogPanel />}
-						{activeSection === "monitoreo" && <SellerActivityPanel />}
-						{activeSection === "reportes-cancelados" && <CancelledOrdersReport />}
-						{activeSection === "historial" && <OrderHistory />}
-						{activeSection === "demanda-horarios" && <DemandPanel />}
-						{activeSection === "auditoria-cobros" && <PaymentAuditPanel />}
-						{activeSection === "conciliacion-pagos" && <PaymentReconciliationPanel />}
+						{activeSection === "mensajeros-cierres"   && <CourierSessionsValidation />}
+						{activeSection === "parametros"           && <ConfigPanel />}
+						{activeSection === "reportes"             && <SalesReport />}
+						{activeSection === "bitacora"             && <AccessLogPanel />}
+						{activeSection === "monitoreo"            && <SellerActivityPanel />}
+						{activeSection === "reportes-cancelados"  && <CancelledOrdersReport />}
+						{activeSection === "historial"            && <OrderHistory />}
+						{activeSection === "demanda-horarios"     && <DemandPanel />}
+						{activeSection === "auditoria-cobros"     && <PaymentAuditPanel />}
+						{activeSection === "conciliacion-pagos"   && <PaymentReconciliationPanel />}
 					</div>
 				</main>
 			</div>
