@@ -231,6 +231,17 @@
     }
 }
 
+@keyframes mobileNavReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.98);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
 .cart-bump {
     animation: cartBump 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
@@ -363,6 +374,10 @@
     animation: footerSocialSheen 0.7s ease-out;
 }
 
+.mobile-nav-reveal {
+    animation: mobileNavReveal 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 @media (prefers-reduced-motion: reduce) {
     .cart-bump,
     .cart-icon-pop,
@@ -372,6 +387,7 @@
     .favorite-heart-half-right,
     .favorite-heart-crack,
     .footer-social:hover .footer-social-sheen,
+    .mobile-nav-reveal,
     .theme-toggle-nudge,
     .theme-toggle-pulse {
         animation-duration: 0.01ms;

@@ -380,7 +380,11 @@ export default function Navbar() {
 
               {/* MOBILE */}
               <button
-                className="md:hidden text-text-light opacity-60 hover:text-primary"
+                className={`md:hidden inline-flex h-9 w-9 items-center justify-center rounded-full border transition-all ${
+                  menuOpen
+                    ? 'border-primary/40 bg-primary/10 text-primary'
+                    : 'border-transparent text-text-light opacity-60 hover:border-border-light hover:text-primary hover:opacity-100'
+                }`}
                 onClick={() => setMenuOpen(!menuOpen)}
               >
                 {menuOpen ? <X size={18} /> : <Menu size={18} />}
@@ -390,7 +394,9 @@ export default function Navbar() {
 
           {/* MOBILE MENU */}
           {menuOpen && (
-            <div className="md:hidden py-3 flex flex-col gap-3 border-t border-border-light">
+            <div className="mobile-nav-reveal md:hidden border-t border-border-light py-3">
+              <div className="rounded-2xl border border-border-light bg-card-bg-light/80 p-3 shadow-lg shadow-black/5 backdrop-blur-sm">
+                <div className="flex flex-col gap-2">
               {[
                 { label: 'Productos', href: '/productos', reqComprador: true },
                 { label: 'Ordenes', href: '/seller/created-orders', match: '/seller', reqVendedor: true },
@@ -413,11 +419,11 @@ export default function Navbar() {
                       key={item.label}
                       href={item.href}
                       aria-current={active ? 'page' : undefined}
-                      className={`text-sm font-semibold tracking-[0.02em] transition-all hover:text-primary ${
+                      className={`rounded-xl px-3 py-2 text-sm font-semibold tracking-[0.02em] transition-all ${
                         active
-                          ? 'text-primary opacity-100'
-                          : 'text-text-light opacity-[0.55] hover:opacity-100'
-                      }`}
+                          ? 'bg-primary/10 text-primary shadow-sm shadow-primary/10'
+                          : 'text-text-light opacity-[0.65] hover:bg-secondary-bg-light hover:text-primary hover:opacity-100'
+                       }`}
                     >
                       {item.label}
                     </a>
@@ -427,9 +433,10 @@ export default function Navbar() {
               {/* CORRECCIÓN: Quitamos showCompradorFeatures de aquí */}
               {user && (
                 <>
+                  <div className="my-1 h-px bg-border-light" />
                   <a
                     href="/mi-perfil"
-                    className="text-sm font-semibold text-primary opacity-90 transition-all hover:opacity-100"
+                    className="rounded-xl px-3 py-2 text-sm font-semibold text-primary opacity-90 transition-all hover:bg-primary/10 hover:opacity-100"
                   >
                     Mi Perfil
                   </a>
@@ -437,23 +444,25 @@ export default function Navbar() {
                   {canAccessCourier && (
                     <a
                       href="/courier"
-                      className="text-sm font-semibold text-primary opacity-90 transition-all hover:opacity-100"
+                      className="rounded-xl px-3 py-2 text-sm font-semibold text-primary opacity-90 transition-all hover:bg-primary/10 hover:opacity-100"
                     >
                       Mensajero
                     </a>
                   )}
 
-                  <hr className="border-border-light my-0.5" />
+                  <hr className="my-1 border-border-light" />
 
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="text-left text-sm font-semibold text-text-light opacity-[0.55] transition-all hover:text-primary hover:opacity-100"
+                    className="rounded-xl px-3 py-2 text-left text-sm font-semibold text-text-light opacity-[0.65] transition-all hover:bg-secondary-bg-light hover:text-primary hover:opacity-100"
                   >
                     Cerrar sesión
                   </button>
                 </>
               )}
+                </div>
+              </div>
             </div>
           )}
         </div>
