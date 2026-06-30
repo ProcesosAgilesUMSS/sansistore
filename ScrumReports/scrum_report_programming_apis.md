@@ -605,3 +605,8 @@
   - Estar atento al feedback del prototipo y posibles observaciones del equipo.
   - Cierre de actividades del sprint y preparación para la demo.
 - **Blockers:** None.
+
+### Bruno Salcedo Cadiz
+- **Yesterday:** Probee el happy path y añadi datos para pruebas
+- **Today:** Ver como los datos que añadi se guardan correctamente
+- **Blockers:** None.
