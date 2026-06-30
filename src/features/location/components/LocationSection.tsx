@@ -85,7 +85,9 @@ export default function LocationSection() {
                 <button
                     type="button"
                     onClick={startCreate}
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-bold text-white shadow-lg shadow-primary/25 transition-all hover:-translate-y-0.5 hover:brightness-105 active:scale-[0.98] sm:w-auto"
+                    className={`rounded-full bg-primary px-5 py-3 text-sm font-bold text-white shadow-lg shadow-primary/25 transition-all hover:-translate-y-0.5 hover:brightness-105 active:scale-[0.98] sm:inline-flex sm:w-auto sm:items-center sm:justify-center sm:gap-2 ${
+                        mode === 'form' ? 'hidden sm:inline-flex' : 'inline-flex w-full items-center justify-center gap-2'
+                    }`}
                 >
                     <Plus size={18} strokeWidth={2.5} />
                     Agregar ubicación
