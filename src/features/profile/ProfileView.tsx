@@ -426,7 +426,6 @@ export default function ProfileView() {
 							autoComplete="off"
 							maxLength={10}
 							pattern="[0-9]{5,10}"
-							sanitizeValue={(value) => value.replace(/\D/g, "").slice(0, 10)}
 						/>
 						<EditableField
 							icon={<Phone size={17} />}
@@ -462,7 +461,6 @@ export default function ProfileView() {
 							error={errors.secondaryMail}
 							placeholder="ejemplo@correo.com"
 							autoComplete="email"
-							maxLength={100}
 							spellCheck={false}
 							autoCapitalize="none"
 							sanitizeValue={(value) => value.replace(/\s+/g, "")}
