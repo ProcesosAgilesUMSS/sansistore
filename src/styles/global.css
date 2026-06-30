@@ -217,6 +217,20 @@
     }
 }
 
+@keyframes footerSocialSheen {
+    0% {
+        opacity: 0;
+        transform: translateX(-130%) skewX(-18deg);
+    }
+    30% {
+        opacity: 0.32;
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(130%) skewX(-18deg);
+    }
+}
+
 .cart-bump {
     animation: cartBump 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
@@ -303,6 +317,52 @@
     animation: themeTogglePulse 0.56s ease-out;
 }
 
+.footer-social {
+    transform: translateY(0) scale(1);
+}
+
+.footer-social::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--theme-primary) 92%, white 8%), color-mix(in srgb, var(--theme-primary) 72%, black 8%));
+    opacity: 0;
+    transform: scale(0.78);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.footer-social:hover {
+    transform: translateY(-2px) scale(1.06);
+    box-shadow: 0 10px 22px -14px color-mix(in srgb, var(--theme-primary) 55%, transparent);
+}
+
+.footer-social:hover::before {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.footer-social-glow {
+    background: radial-gradient(circle at 30% 30%, color-mix(in srgb, white 42%, transparent), transparent 58%);
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.footer-social:hover .footer-social-glow {
+    opacity: 0.9;
+    transform: scale(1.1);
+}
+
+.footer-social-sheen {
+    background: linear-gradient(115deg, transparent 25%, color-mix(in srgb, white 60%, transparent) 50%, transparent 75%);
+    opacity: 0;
+}
+
+.footer-social:hover .footer-social-sheen {
+    animation: footerSocialSheen 0.7s ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .cart-bump,
     .cart-icon-pop,
@@ -311,9 +371,16 @@
     .favorite-heart-half-left,
     .favorite-heart-half-right,
     .favorite-heart-crack,
+    .footer-social:hover .footer-social-sheen,
     .theme-toggle-nudge,
     .theme-toggle-pulse {
         animation-duration: 0.01ms;
+    }
+
+    .footer-social,
+    .footer-social::before,
+    .footer-social-glow {
+        transition-duration: 0.01ms;
     }
 }
 
