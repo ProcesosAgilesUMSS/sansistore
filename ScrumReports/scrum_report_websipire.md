@@ -547,6 +547,12 @@ por las dudas que se tienen.
 * **Today:** Hacer test de las funcionalidades de la parte de mensajero.
 * **Blockers:** none
 
+## María Victoria Grageda Vallejos
+
+* **Yesterday:** Revisé los cambios realizados en la implementación para verificar que no existan errores pendientes.
+* **Today:** Realizar pruebas de las funcionalidades desarrolladas y apoyar en la revisión de posibles bugs.
+* **Blockers:** None.
+
 # Daily Reports - Team 3 Webspire 30/06/26
 
 ## Dayana Saleth Ortuño Guzmán
@@ -554,3 +560,8 @@ por las dudas que se tienen.
 * **Yesterday:** Hacer test de las funcionalidades de la parte de vendedor.
 * **Today:** Hacer test de las funcionalidades de la parte del comprador.
 * **Blockers:** No tener tareas en el tablero de gitHub, pero ayude y avance en lo que pude.
+## María Victoria Grageda Vallejos
+
+* **Yesterday:** Realicé pruebas de las funcionalidades correspondientes y revisé el comportamiento del sistema.
+* **Today:** Continuar con las pruebas de las funcionalidades.
+* **Blockers:** none
