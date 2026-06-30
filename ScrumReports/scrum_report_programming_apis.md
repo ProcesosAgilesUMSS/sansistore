@@ -571,7 +571,7 @@
 
 ### Efrain Peralta Felipe 
 - **Yesterday:** revise la parte del vendedor
-- **Today:** continuaré con la revisión de la parte del vendoe.
+- **Today:** continuaré con la revisión de la parte del vendor.
 - **Blockers:** None.
 
 ### Bruno Salcedo Cadiz
@@ -589,4 +589,9 @@
 ### José Daniel Virreira Rufino
 - **Yesterday:** Trabajé con CoreDevs (William) para revisar el problema del stock presente en la aplicación. Revise nuestros componentes de mensajero y les dí mejoras responsive.
 - **Today:** Seguir en contacto con los equipos de inventario y administración para poder ver que toda la aplicaicoón este funcionando correctamente.
+- **Blockers:** None.
+
+### Efrain Peralta Felipe
+- **Yesterday:** Probe el flujo completo.
+- **Today:** seguir probando algunos apartados del sistema.
 - **Blockers:** None.
