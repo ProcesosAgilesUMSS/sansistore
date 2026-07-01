@@ -553,6 +553,12 @@ por las dudas que se tienen.
 * **Today:** Realizar pruebas de las funcionalidades desarrolladas y apoyar en la revisión de posibles bugs.
 * **Blockers:** None.
 
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Revisé los cambios implementados en el backend y verifiqué que las funcionalidades respondan correctamente.
+* **Today:** Realizar pruebas en las funcionalidades relacionadas con pedidos y apoyar en la revisión de posibles errores.
+* **Blockers:** none.
+
 # Daily Reports - Team 3 Webspire 30/06/26
 
 ## Dayana Saleth Ortuño Guzmán
@@ -565,3 +571,9 @@ por las dudas que se tienen.
 * **Yesterday:** Realicé pruebas de las funcionalidades correspondientes y revisé el comportamiento del sistema.
 * **Today:** Continuar con las pruebas de las funcionalidades.
 * **Blockers:** none
+
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Realicé pruebas de las funcionalidades de mensajero y pedidos, comprobando el comportamiento general del sistema.
+* **Today:** Continuar con la revisión de errores, apoyar en las pruebas finales y validar que los cambios funcionen de manera correcta.
+* **Blockers:** No tener tareas asignadas directamente en el tablero de GitHub, pero apoyé con pruebas y revisión del sistema.
