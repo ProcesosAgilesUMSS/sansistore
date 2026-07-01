@@ -518,3 +518,32 @@
 * **Yesterday:**  Revise y verifique las historias de mi equipo y el flujo de funcionamiento 
 * **Today:** Continúe con la revisión de algunas historias 
 * **Blockers:** None
+
+# 30/06/2026
+
+# Daily Report - Team 5 - Nova 2.0
+
+## Fidel Vasquez Carata
+- **Yesterday:** Comence a realizar el issue de la nuev ahu para este sprint 5
+- **Today:** trabaje en la hu #725 en el frontend para gestionar las ordenes con la idea de evitar  de la BD
+- **Blockers:** n/a.
+
+## Jherlan Marcelo Calero Sardan
+- **Yesterday:** Estaba revisando los datos que se podrian mostrar en el Dashboard
+- **Today:** Subi al repositorio una primera version del dashboard
+- **Blockers:** n/a.
+
+## Fabricio Javier Cordova 
+- **Yesterday:** Comence a realizar el issue de la nueva hu para este sprint 5
+- **Today:** trabaje en la hu #725 en el backend para gestionar las ordenes
+- **Blockers:** n/a.
+
+## Camila Wara Fernandez Sandoval
+- **Yesterday:** Comence con la revision de la issue de las cantidades desde interfaz y ver como empiezo con el desarrollo 
+- **Today:** Comence con el desarrollo de las cantidades desde interfaz 
+- **Blockers:** none
+
+## Dylan Coca Beltran
+- **Yesterday:** Empece a trabajar en el backend de la hu 725.
+- **Today:** Trabaje en el backend de la hu 725 y ver configuraciones necesarias sobre firestore 
+- **Blockers:** none
