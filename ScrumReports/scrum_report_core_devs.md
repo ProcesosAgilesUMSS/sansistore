@@ -402,9 +402,9 @@
   - **Blockers:**   
 
   ## Rios Quiruchi Edney Jhojan
-  - **Yesterday:**    Aprobar Pull Requests del avance realizado
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Aprobar Pull Requests del avance realizado.
+  - **Today:**        Revisar el flujo nuevamente.
+  - **Blockers:**     Ninguno.
 
   ## Sejas Arze Eddy
   - **Yesterday:**    
@@ -414,7 +414,7 @@
   ## Soliz Moya Alejandra
   - **Yesterday:**    Revisar el flujo completo de la parte del operador en busca de bugs de la US 56.
   - **Today:**        No se encontro ningun bug en la US 56.
-  - **Blockers:**     
+  - **Blockers:**     Ninguno.
 
 
 
@@ -433,9 +433,9 @@
   - **Blockers:**   
 
   ## Rios Quiruchi Edney Jhojan
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Aprobando Pull Requests pendientes hacia la rama Main.
+  - **Today:**        Refactorización de código y eliminación de console logs.
+  - **Blockers:**     Ninguno.
 
   ## Sejas Arze Eddy
   - **Yesterday:**    
@@ -462,9 +462,9 @@
   - **Blockers:**   
 
   ## Rios Quiruchi Edney Jhojan
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Ayudando a rastrear el origen de la duplicidad en stockReserved en el front.
+  - **Today:**        Sesión de pair programming para limpiar componentes no utilizados.
+  - **Blockers:**     Ninguno.
 
   ## Sejas Arze Eddy
   - **Yesterday:**    
@@ -491,9 +491,9 @@
   - **Blockers:**   
 
   ## Rios Quiruchi Edney Jhojan
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Revisión de la secuencia del Walkthrough.
+  - **Today:**        Apoyando en el testing de la resolución del bug de duplicidad de stockReserved.
+  - **Blockers:**     Ninguno.
 
   ## Sejas Arze Eddy
   - **Yesterday:**    
@@ -521,7 +521,7 @@
   - **Blockers:**   
 
   ## Rios Quiruchi Edney Jhojan
-  - **Yesterday:**    
+  - **Yesterday:**    Eliminar algunos comentarios que no aportaban nada.
   - **Today:**        
   - **Blockers:**     
 
