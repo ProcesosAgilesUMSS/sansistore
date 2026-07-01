@@ -190,9 +190,9 @@
   - **Blockers:**     Se tardó mucho en preguntar y entender el flujo de estados para #73
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
-  - **Blockers:**   
+  - **Yesterday:**   rabajé en los mockups de Figma para las vistas de la US#64 y US#65 enfocándome en diseño mobile-first.
+  - **Today:** Refactorizando el componente StockTable en React para integrar la visualización de los nuevos estados.     
+  - **Blockers:** Ninguno    
 
   ## Rios Quiruchi Edney Jhojan
   - **Yesterday:**    Colaboré en la planificación de las historias de usuario para el Sprint 3.
@@ -220,9 +220,9 @@
   - **Blockers:**     Modificaciones de ultimo momento, en el flujo con el inventario
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
-  - **Blockers:**   
+  - **Yesterday:** Ajustes de interfaz y limpieza de código CSS 
+  - **Today:**   Aplicación de la paleta de colores principal (#F39C12)    
+  - **Blockers:**  Ninguno. 
 
   ## Rios Quiruchi Edney Jhojan
   - **Yesterday:**    Analicé el flujo de solicitud de productos entre ventas e inventario.
@@ -250,9 +250,9 @@
   - **Blockers:**     Se reportaron cambios de ultimo momento, se tardó mas de lo debido.
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
-  - **Blockers:**   
+  - **Yesterday:**  iseño de modales y layout para la sección de empaques.
+  - **Today:**   Maquetado del modal de correcciones de inventario para mejorar la experiencia de usuario.   
+  - **Blockers:** Ninguno   
 
   ## Rios Quiruchi Edney Jhojan
   - **Yesterday:**    Ayudar en la implementacion de la US 72
@@ -280,9 +280,9 @@
   - **Blockers:**     Se tardó mas de lo debido, todavia no se definió el flujo de pedidos cancelados o devueltos.
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
-  - **Blockers:**   
+  - **Yesterday:** Optimizando el contraste y tamaño de fuente en los componentes de la sección de empaques.
+  - **Today:**  Ajustes visuales finales en React para resolver los problemas    
+  - **Blockers:** ninguno   
 
   ## Rios Quiruchi Edney Jhojan
   - **Yesterday:**    Ayudar en la logica para correcciones de inventario y validacion de movimientos
@@ -309,9 +309,9 @@
   - **Blockers:**     Bug, No se ve la adicion de a tienda de productos devueltos
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
-  - **Blockers:**   
+  - **Yesterday:** Actualización de los diseños para reflejar la entrada de productos devueltos.
+  - **Today:** Colaborando en la maquetación de la vista para la US 52      
+  - **Blockers:** Ninguno   
 
   ## Rios Quiruchi Edney Jhojan
   - **Yesterday:**    Revisar el flujo que se tiene hasta ahora y el funcionamiento en general para encontrar bugs.
@@ -367,9 +367,9 @@
   - **Blockers:**     Ninguno
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
-  - **Blockers:**   
+  - **Yesterday:**   Diseño de los estados visuales para identificar productos en mal estado (US #68).
+  - **Today:** Creando componentes reutilizables UI para las alertas de stock mínimo (US #50).     
+  - **Blockers:** ninguno  
 
   ## Rios Quiruchi Edney Jhojan
   - **Yesterday:**    Ayudar en la implementación de la HU #50 de alertas de stock mínimo.
@@ -397,9 +397,9 @@
   - **Blockers:**     Ninguno
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
-  - **Blockers:**   
+  - **Yesterday:** Implementando el diseño final del modal y formularios 
+  - **Today:**  Ajustes de animaciones y estilos responsivos en los componentes
+  - **Blockers:** Ningumo  
 
   ## Rios Quiruchi Edney Jhojan
   - **Yesterday:**    Aprobar Pull Requests del avance realizado
@@ -428,9 +428,9 @@
   - **Blockers:**     Ninguno
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
-  - **Blockers:**   
+  - **Yesterday:**  Pruebas de usabilidad en móvil para el historial de movimientos
+  - **Today:**   Limpieza general de código CSS      
+  - **Blockers:**   Ninguno
 
   ## Rios Quiruchi Edney Jhojan
   - **Yesterday:**    
@@ -457,9 +457,9 @@
   - **Blockers:**     Ninguno
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
-  - **Blockers:**   
+  - **Yesterday:**  Apoyo en la estandarización de la paleta de colores
+  - **Today:** Ajustes de padding, márgenes y alineación en los modales refactorizados. 
+  - **Blockers:**  ninguno 
 
   ## Rios Quiruchi Edney Jhojan
   - **Yesterday:**    
@@ -486,9 +486,9 @@
   - **Blockers:**     Ninguno
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
-  - **Blockers:**   
+  - **Yesterday:** Ajustes visuales menores en la sección de Mis Empaques. 
+  - **Today:**  Mejoras en la accesibilidad web en los formularios.
+  - **Blockers:** ninguno  
 
   ## Rios Quiruchi Edney Jhojan
   - **Yesterday:**    
@@ -516,9 +516,9 @@
   - **Blockers:**     
 
   ## Llanos Villarroel Vania F.
-  - **Yesterday:**  
-  - **Today:**      
-  - **Blockers:**   
+  - **Yesterday:**  Preparando los mockups y pantallas finales en Figma 
+  - **Today:**    Detalles finales de UI en la vista integrada de Ventas/Delivery  
+  - **Blockers:**  Ninguno. 
 
   ## Rios Quiruchi Edney Jhojan
   - **Yesterday:**    
