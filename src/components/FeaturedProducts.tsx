@@ -101,6 +101,37 @@ const SORT_OPTIONS = [
   { value: 'name-desc', label: 'Z-A' },
 ] as const;
 
+function readCatalogUrlState() {
+  if (typeof window === 'undefined') {
+    return {
+      category: null as string | null,
+      offersOnly: null as boolean | null,
+      sort: null as CatalogSort | null,
+      page: null as number | null,
+    };
+  }
+
+  const url = new URL(window.location.href);
+  const pageParamStr = url.searchParams.get('page');
+  const sortParam = url.searchParams.get('sort');
+  const pageNum = pageParamStr ? parseInt(pageParamStr, 10) : 1;
+  const hasValidPage = !isNaN(pageNum) && pageNum > 0;
+
+  if (pageParamStr && !hasValidPage) {
+    url.searchParams.delete('page');
+    window.history.replaceState({}, '', url.toString());
+  }
+
+  return {
+    category: url.searchParams.get('category'),
+    offersOnly: url.searchParams.has('offers')
+      ? url.searchParams.get('offers') === 'true'
+      : null,
+    sort: isSortOption(sortParam) ? sortParam : null,
+    page: hasValidPage ? Math.max(1, pageNum) : 1,
+  };
+}
+
 function FeaturedProductsInner({
   initialSearch = '',
   initialCategory = null,
@@ -110,6 +141,7 @@ function FeaturedProductsInner({
   favoritesOnly = false,
   title = 'Productos disponibles',
 }: FeaturedProductsProps) {
+  const initialUrlState = readCatalogUrlState();
   const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -126,15 +158,17 @@ function FeaturedProductsInner({
   );
   const [inputFocused, setInputFocused] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    initialCategory
+    initialUrlState.category ?? initialCategory
   );
-  const [showOffersOnly, setShowOffersOnly] = useState(initialOffersOnly);
+  const [showOffersOnly, setShowOffersOnly] = useState(
+    initialUrlState.offersOnly ?? initialOffersOnly
+  );
   const [currentPage, setCurrentPage] = useState(
-    Number.isFinite(initialPage) && initialPage > 0 ? initialPage : 1
+    initialUrlState.page ?? (Number.isFinite(initialPage) && initialPage > 0 ? initialPage : 1)
   );
   const [invalidPage, setInvalidPage] = useState(false);
   const [sortBy, setSortBy] = useState<CatalogSort>(
-    isSortOption(initialSort) ? initialSort : 'best-sellers'
+    initialUrlState.sort ?? (isSortOption(initialSort) ? initialSort : 'best-sellers')
   );
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const ITEMS_PER_PAGE = 12;
@@ -146,23 +180,7 @@ function FeaturedProductsInner({
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href);
-      const pageParamStr = url.searchParams.get('page');
       const categoryParam = url.searchParams.get('category');
-      const offersParam = url.searchParams.get('offers') === 'true';
-      const sortParam = url.searchParams.get('sort') as
-        | 'best-sellers'
-        | 'recent'
-        | 'name-asc'
-        | 'name-desc'
-        | null;
-
-      const pageNum = pageParamStr ? parseInt(pageParamStr, 10) : 1;
-      const isValidPageNumber = !isNaN(pageNum) && pageNum > 0;
-
-      if (pageParamStr && !isValidPageNumber) {
-        url.searchParams.delete('page');
-        window.history.replaceState({}, '', url.toString());
-      }
 
       const validateAndSetCategory = async () => {
         if (!categoryParam) {
@@ -186,10 +204,6 @@ function FeaturedProductsInner({
       };
 
       validateAndSetCategory();
-
-      if (offersParam !== showOffersOnly) setShowOffersOnly(offersParam);
-      if (sortParam && sortParam !== sortBy) setSortBy(sortParam);
-      if (isValidPageNumber && pageNum !== currentPage) setCurrentPage(pageNum);
     }
   }, []);
 
@@ -247,16 +261,20 @@ function FeaturedProductsInner({
       }
 
       if (validPage !== currentPage || isOutOfRange) {
-        setCurrentPage(validPage);
-        setInvalidPage(isOutOfRange);
+        const syncPageTimer = window.setTimeout(() => {
+          setCurrentPage(validPage);
+          setInvalidPage(isOutOfRange);
+        }, 0);
 
         if (isOutOfRange) {
           url.searchParams.delete('page');
           window.history.replaceState({}, '', url.toString());
         }
+
+        return () => window.clearTimeout(syncPageTimer);
       }
     }
-  }, [products.length, selectedCategory, showOffersOnly]);
+  }, [currentPage, products, selectedCategory, showOffersOnly]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -467,28 +485,28 @@ function FeaturedProductsInner({
                 }}
               />
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                const newOffersState = !showOffersOnly;
+              <button
+                type="button"
+                onClick={() => {
+                  const newOffersState = !showOffersOnly;
                 setShowOffersOnly(newOffersState);
                 setCurrentPage(1);
                 updateUrl(appliedSearch, newOffersState, selectedCategory, 1, sortBy);
               }}
               aria-pressed={showOffersOnly}
-              aria-label={
-                showOffersOnly
-                  ? 'Quitar filtro Solo ofertas'
-                  : 'Activar filtro Solo ofertas'
-              }
-              className={`inline-flex items-center justify-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition-all duration-200 ${
-                showOffersOnly
-                  ? 'border-primary bg-primary text-text-light shadow-md shadow-primary/20 hover:brightness-105'
-                  : 'border-border-light text-text-light hover:border-primary hover:text-primary'
-              }`}
-            >
-              Ofertas
-            </button>
+                aria-label={
+                  showOffersOnly
+                    ? 'Quitar filtro Solo ofertas'
+                    : 'Activar filtro Solo ofertas'
+                }
+                className={`inline-flex items-center justify-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition-all duration-200 ${
+                  showOffersOnly
+                    ? 'border-primary bg-primary text-text-light shadow-md shadow-primary/20 hover:-translate-y-0.5 hover:brightness-105'
+                    : 'border-border-light text-text-light hover:-translate-y-0.5 hover:border-primary hover:text-primary'
+                }`}
+              >
+                Ofertas
+              </button>
           </div>
           <div className="flex w-full flex-row items-center gap-3">
             <div
@@ -608,19 +626,29 @@ function FeaturedProductsInner({
                 </ul>
               )}
             </div>
-            <div ref={sortRef} className="relative shrink-0">
+            <div
+              ref={sortRef}
+              className={`relative shrink-0 ${showSortDropdown ? 'z-40' : 'z-20'}`}
+            >
               <button
                 type="button"
                 onClick={() => setShowSortDropdown(!showSortDropdown)}
-                className="flex items-center gap-2 rounded-full border border-border-light bg-card-bg-light px-4 py-2.5 text-sm font-semibold text-text-light transition-all hover:border-primary hover:text-primary"
+                className={`flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${
+                  showSortDropdown
+                    ? 'border-primary/45 bg-primary/8 text-primary shadow-md shadow-primary/10'
+                    : 'border-border-light bg-card-bg-light text-text-light hover:-translate-y-0.5 hover:border-primary hover:text-primary'
+                }`}
                 title="Ordenar productos"
                 aria-label="Ordenar productos"
               >
-                <FaFilter size={16} />
+                <FaFilter
+                  size={16}
+                  className={`transition-transform duration-300 ${showSortDropdown ? 'rotate-12' : ''}`}
+                />
                 <span className="hidden sm:inline">{selectedSortLabel}</span>
               </button>
               {showSortDropdown && (
-                <div className="absolute right-0 top-full mt-1 min-w-56 rounded-lg border border-border-light bg-card-bg-light py-1 shadow-lg z-20">
+                <div className="filter-popover-reveal absolute right-0 top-full z-40 mt-1 min-w-56 rounded-2xl border border-border-light bg-card-bg-light py-1 shadow-xl shadow-black/10">
                   {SORT_OPTIONS.map((option) => (
                     <button
                       key={option.value}
@@ -631,11 +659,11 @@ function FeaturedProductsInner({
                         updateUrl(appliedSearch, showOffersOnly, selectedCategory, 1, option.value);
                         setShowSortDropdown(false);
                       }}
-                      className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-colors ${
+                      className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-all duration-150 ${
                         sortBy === option.value
-                          ? 'bg-primary/15 text-primary'
-                          : 'text-text-light hover:bg-secondary-bg-light'
-                      }`}
+                          ? 'bg-primary/12 text-primary'
+                          : 'text-text-light hover:bg-secondary-bg-light hover:text-primary'
+                       }`}
                     >
                       {option.label}
                     </button>

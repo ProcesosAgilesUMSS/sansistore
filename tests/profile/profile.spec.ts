@@ -19,7 +19,7 @@ test.describe('Perfil de Usuario', () => {
     await page.goto('/iniciar-sesion');
     await waitForLoginForm(page);
     
-    const { emailField, passwordField } = await fillLoginCredentials(page, email);
+    await fillLoginCredentials(page, email);
     
     const loginButton = page
       .locator('form')
@@ -29,7 +29,7 @@ test.describe('Perfil de Usuario', () => {
       if (!isLoginPath(page.url())) break;
       try {
         await loginButton.click({ noWaitAfter: true, timeout: 2000 });
-      } catch (error) {
+      } catch {
         if (!isLoginPath(page.url())) break;
       }
       await page.waitForTimeout(1000);
@@ -62,7 +62,7 @@ test.describe('Perfil de Usuario', () => {
                 )
               );
             });
-          } catch (e) {
+          } catch {
             return false;
           }
         },

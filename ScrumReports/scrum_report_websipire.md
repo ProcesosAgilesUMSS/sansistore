@@ -537,3 +537,67 @@ por las dudas que se tienen.
 * **Yesterday:** Revisé las tareas concluidas durante el sprint para asegurar que cumplan con los criterios establecidos y no presenten observaciones pendientes.
 * **Today:** Participaré en la Sprint Retrospective y en la discusión de las actividades
 * **Blockers:** None
+
+
+# Daily Reports - Team 3 Webspire 25/06/26
+
+## Dayana Saleth Ortuño Guzmán
+
+* **Yesterday:**  Revise los cambios que se realizaron el la base de datos.
+* **Today:** Hacer test de las funcionalidades de la parte de mensajero.
+* **Blockers:** none
+
+## María Victoria Grageda Vallejos
+
+* **Yesterday:** Revisé los cambios realizados en la implementación para verificar que no existan errores pendientes.
+* **Today:** Realizar pruebas de las funcionalidades desarrolladas y apoyar en la revisión de posibles bugs.
+* **Blockers:** None.
+
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Revisé los cambios implementados en el backend y verifiqué que las funcionalidades respondan correctamente.
+* **Today:** Realizar pruebas en las funcionalidades relacionadas con pedidos y apoyar en la revisión de posibles errores.
+* **Blockers:** none.
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Revisé las funcionalidades implementadas y verifiqué que los cambios realizados funcionen correctamente.
+* **Today:** Realizar pruebas en la parte correspondiente del sistema y apoyar en la detección de posibles errores.
+* **Blockers:** none.
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Verifiqué los cambios realizados en el sistema y revisé que no existan errores pendientes.
+* **Today:** Continuar con las pruebas de las funcionalidades desarrolladas y apoyar en la revisión general del proyecto.
+* **Blockers:** none.
+
+# Daily Reports - Team 3 Webspire 30/06/26
+
+## Dayana Saleth Ortuño Guzmán
+
+* **Yesterday:** Hacer test de las funcionalidades de la parte de vendedor.
+* **Today:** Hacer test de las funcionalidades de la parte del comprador.
+* **Blockers:** No tener tareas en el tablero de gitHub, pero ayude y avance en lo que pude.
+## María Victoria Grageda Vallejos
+
+* **Yesterday:** Realicé pruebas de las funcionalidades correspondientes y revisé el comportamiento del sistema.
+* **Today:** Continuar con las pruebas de las funcionalidades.
+* **Blockers:** none
+
+## Jose Brandon Pinedo Gonzales
+
+* **Yesterday:** Realicé pruebas de las funcionalidades de mensajero y pedidos, comprobando el comportamiento general del sistema.
+* **Today:** Continuar con la revisión de errores, apoyar en las pruebas finales y validar que los cambios funcionen de manera correcta.
+* **Blockers:** No tener tareas asignadas directamente en el tablero de GitHub, pero apoyé con pruebas y revisión del sistema.
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Realicé pruebas de las funcionalidades asignadas y revisé el comportamiento del sistema.
+* **Today:** Continuar con la validación de errores, apoyar en pruebas finales y verificar que los cambios estén correctos.
+* **Blockers:** No tener tareas asignadas directamente en el tablero de GitHub, pero apoyé con pruebas y revisión.
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Revisé las funcionalidades desarrolladas y apoyé en la comprobación de posibles fallos del sistema.
+* **Today:** Seguir realizando pruebas, validar correcciones y apoyar en la revisión final del proyecto.
+* **Blockers:** No tener tareas asignadas directamente en GitHub, pero colaboré revisando y probando funcionalidades.

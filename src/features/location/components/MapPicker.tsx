@@ -1,6 +1,6 @@
 // src/features/location/components/MapPicker.tsx
 
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents, Polygon } from "react-leaflet";
 import { AlertCircle, ArrowLeft, ChevronDown } from "lucide-react";
 import { useMapPicker } from "../hooks/useMapPicker";
@@ -52,6 +52,9 @@ interface MapPickerProps {
 }
 
 export default function MapPicker({ onSave, onCancel, editingLocation }: MapPickerProps) {
+    const [typeDropdownOpen, setTypeDropdownOpen] = useState(false);
+    const typeDropdownRef = useRef<HTMLDivElement | null>(null);
+
     const {
         lat,
         lng,
@@ -68,6 +71,23 @@ export default function MapPicker({ onSave, onCancel, editingLocation }: MapPick
         isSaving,
         isEditMode,
     } = useMapPicker({ editingLocation, onSuccess: onSave });
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                typeDropdownRef.current &&
+                !typeDropdownRef.current.contains(event.target as Node)
+            ) {
+                setTypeDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const selectedTypeLabel =
+        TYPE_OPTIONS.find((option) => option.value === type)?.label ?? "Selecciona un tipo";
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -146,23 +166,52 @@ export default function MapPicker({ onSave, onCancel, editingLocation }: MapPick
                 >
                     Tipo de lugar
                 </label>
-                <div className="relative">
-                    <select
+                <div ref={typeDropdownRef} className="relative">
+                    <button
                         id="loc-type"
-                        value={type}
-                        onChange={(e) => setType(e.target.value as LocationType)}
-                        className="w-full appearance-none rounded-xl border border-(--theme-border) bg-(--theme-secondary-bg) px-3 py-2.5 pr-9 text-sm text-(--theme-text) focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10"
+                        type="button"
+                        aria-haspopup="listbox"
+                        aria-expanded={typeDropdownOpen}
+                        onClick={() => setTypeDropdownOpen((current) => !current)}
+                        className={`flex w-full items-center justify-between rounded-xl border px-3 py-2.5 text-sm transition-all focus:outline-none focus:ring-4 focus:ring-primary/10 ${
+                            typeDropdownOpen
+                                ? 'border-primary bg-primary/8 text-primary'
+                                : 'border-(--theme-border) bg-(--theme-secondary-bg) text-(--theme-text) hover:border-primary'
+                        }`}
                     >
-                        {TYPE_OPTIONS.map((o) => (
-                            <option key={o.value} value={o.value}>
-                                {o.label}
-                            </option>
-                        ))}
-                    </select>
-                    <ChevronDown
-                        size={16}
-                        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-(--theme-text) opacity-50"
-                    />
+                        <span>{selectedTypeLabel}</span>
+                        <ChevronDown
+                            size={16}
+                            className={`transition-transform duration-300 ${typeDropdownOpen ? 'rotate-180 text-primary' : 'opacity-50'}`}
+                        />
+                    </button>
+
+                    {typeDropdownOpen && (
+                        <div className="filter-popover-reveal absolute left-0 right-0 z-50 mt-2 overflow-hidden rounded-2xl border border-(--theme-border) bg-(--theme-card-bg) py-1 shadow-xl shadow-black/10">
+                            <ul role="listbox" aria-labelledby="loc-type" className="max-h-72 overflow-y-auto p-1 py-2">
+                                {TYPE_OPTIONS.map((option) => (
+                                    <li key={option.value} className="px-1">
+                                        <button
+                                            type="button"
+                                            role="option"
+                                            aria-selected={type === option.value}
+                                            onClick={() => {
+                                                setType(option.value);
+                                                setTypeDropdownOpen(false);
+                                            }}
+                                            className={`w-full rounded-xl px-4 py-2.5 text-left text-sm font-medium transition-all duration-150 ${
+                                                type === option.value
+                                                    ? 'bg-primary/12 text-primary shadow-sm shadow-primary/10'
+                                                    : 'text-(--theme-text) hover:bg-primary/5 hover:text-primary'
+                                            }`}
+                                        >
+                                            {option.label}
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
                 </div>
             </div>
 

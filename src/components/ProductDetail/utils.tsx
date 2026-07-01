@@ -2,7 +2,7 @@ import { Timestamp } from 'firebase/firestore';
 import { Star } from 'lucide-react';
 import { layout, prepare } from '@chenglou/pretext';
 import { getOfferBadgeData, hasValidOffer } from '../../lib/productOffers';
-import { getSoldCount, isPopularProduct } from '../../lib/productPopularity';
+import { isPopularProduct } from '../../lib/productPopularity';
 import type { Product, Review, ReviewSortKey } from './types';
 
 export function formatPrice(amount: number) {

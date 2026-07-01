@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Package, Heart } from 'lucide-react';
+import { Package } from 'lucide-react';
 import type { Product } from './types';
 import { isPopularProduct } from '../../lib/productPopularity';
-import { useFavorites } from '../../features/favorites';
+import { FavoriteButton, useFavorites } from '../../features/favorites';
 import { getBadgeData } from './utils';
 
 interface ProductImageSectionProps {
@@ -69,29 +69,14 @@ export default function ProductImageSection({ product }: ProductImageSectionProp
           )}
         </div>
 
-        <button
-          type="button"
-          aria-label={
-            productIsFavorite
-              ? `Quitar ${product.name} de favoritos`
-              : `Agregar ${product.name} a favoritos`
-          }
-          aria-pressed={productIsFavorite}
-          title={productIsFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
-          data-testid={`favorite-button-${product.slug}`}
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleFavorite(product.id);
-          }}
-          className={`absolute right-5 top-5 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-all active:scale-95 ${
-            productIsFavorite
-              ? 'border-primary bg-primary text-text-light shadow-md shadow-primary/25'
-              : 'border-border-light bg-card-bg-light/90 text-text-light hover:border-primary hover:text-primary'
-          }`}
-        >
-          <Heart size={18} fill={productIsFavorite ? 'currentColor' : 'none'} />
-        </button>
+        <FavoriteButton
+          productId={product.id}
+          productName={product.name}
+          productSlug={product.slug}
+          isFavorite={productIsFavorite}
+          onToggle={toggleFavorite}
+          className="absolute right-5 top-5 z-20"
+        />
       </div>
     </div>
   );

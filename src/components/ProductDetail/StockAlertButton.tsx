@@ -50,7 +50,8 @@ export default function StockAlertButton({ productId }: Props) {
         await subscribeToStockAlert(productId, userId);
         setStatus('subscribed');
       }
-    } catch {
+    } catch (error) {
+      console.error('Error toggling stock alert:', error);
     } finally {
       setWorking(false);
     }

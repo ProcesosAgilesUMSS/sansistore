@@ -34,9 +34,13 @@ export default function Footer({ className = '' }: { className?: string }) {
               key={label}
               href={href}
               aria-label={label}
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-(--theme-border) text-(--theme-text) opacity-70 transition-all hover:border-primary hover:bg-primary hover:text-white hover:opacity-100 hover:scale-105"
+              className="footer-social group relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-(--theme-border) bg-transparent text-(--theme-text) opacity-70 transition-all duration-300 hover:border-primary hover:bg-primary hover:text-white hover:opacity-100"
             >
-              <Icon size={15} />
+              <span aria-hidden="true" className="footer-social-glow absolute inset-0 rounded-full" />
+              <span aria-hidden="true" className="footer-social-sheen absolute inset-0 rounded-full" />
+              <span className="relative z-10 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
+                <Icon size={15} />
+              </span>
             </a>
           ))}
         </div>
