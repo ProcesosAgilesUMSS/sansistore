@@ -443,8 +443,8 @@
   - **Blockers:**     
 
   ## Soliz Moya Alejandra
-  - **Yesterday:**    
-  - **Today:**        
+  - **Yesterday:**    Revisión de los nuevos diseños de modales propuestos.
+  - **Today:**        Testing exploratorio de interfaz en las vistas recién refactorizadas.
   - **Blockers:**     
 
 
@@ -472,9 +472,9 @@
   - **Blockers:**     
 
   ## Soliz Moya Alejandra
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Revisando casos de prueba sobre la vista de Mis Empaques.
+  - **Today:**        Arreglar bug de visualizacion de boton 
+  - **Blockers:**     Ninguno
 
 
 # ##############
@@ -501,9 +501,9 @@
   - **Blockers:**     
 
   ## Soliz Moya Alejandra
-  - **Yesterday:**    
-  - **Today:**        
-  - **Blockers:**     
+  - **Yesterday:**    Preparación del guion y flujo ideal para la presentación del Walkthrough.
+  - **Today:**        Testing final del escenario crítico de Ventas con el estado DEVUELTO antes de la entrega.
+  - **Blockers:**     Ninguno.
 
 
 
@@ -531,7 +531,7 @@
   - **Blockers:**     
 
   ## Soliz Moya Alejandra
-  - **Yesterday:**    
+  - **Yesterday:**    Buscar posibles bugs en la pagina
   - **Today:**        
   - **Blockers:**     
 
