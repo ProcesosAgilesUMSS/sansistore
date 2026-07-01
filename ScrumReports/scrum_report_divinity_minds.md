@@ -576,10 +576,24 @@
 - **Blockers:** n/a.
 
 # 06/30/2026
-
 ## Castro Tejada Steven Lisandro
 - **Yesterday:** Pulí múltiples interacciones de UI a lo largo de la tienda: animaciones de favoritos y del corazón, hover del footer y redes, animación del theme toggle, menú móvil del header e interacciones de filtros del catálogo. También mejoré la edición en línea del perfil, los campos de contacto y el comportamiento de las tarjetas de ubicación (selección de tipo, ubicación por defecto y CTA oculto durante la edición móvil).
 - **Today:** Alineé los límites de los campos del perfil con las pruebas de validación y corregí incidencias de lint en detalle de producto, catálogo y header, dejando la rama estable para revisión.
+- **Blockers:** n/a.
+
+## Gutierrez Hinojosa Jhon Deymar
+- **Yesterday:** Actualicé los selectores rotos de Playwright y ajusté tiempos de espera en transiciones para estabilizar la suite de pruebas.
+- **Today:** Ejecutar regresión completa en los flujos críticos del admin (productos, inventario, pedidos) y verificar que la pipeline pase verde antes del merge.
+- **Blockers:** n/a.
+
+### Merudia Calderon Dayeza
+- **Yesterday:** Revisé funcionalmente el PR #734 (admin UI) y validé los criterios de aceptación de las mejoras de perfil y catálogo, verificando coherencia en la navegación del nuevo sidebar.
+- **Today:** Realizar pruebas de los cambios de UI (edición de perfil, filtros y animaciones) y dejar el approval funcional para los PRs del sprint.
+- **Blockers:** n/a.
+
+## Merino Vidal Mateo Alejandro
+- **Yesterday:** Participé en la daily sync y comuniqué los avances del equipo; coordiné la revisión de los PRs #715 y #734 .
+- **Today:** Dar seguimiento a la integración de los PRs y apoyar en la resolución de comentarios de código.
 - **Blockers:** n/a.
 
 ## Velasquez Vela Marcos
