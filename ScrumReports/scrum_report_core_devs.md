@@ -526,9 +526,9 @@
   - **Blockers:**     
 
   ## Sejas Arze Eddy
-  - **Yesterday:**    
+  - **Yesterday:**    Colaborar en la busqueda de bugs
   - **Today:**        
-  - **Blockers:**     
+  - **Blockers:**     Ninguno
 
   ## Soliz Moya Alejandra
   - **Yesterday:**    Buscar posibles bugs en la pagina
