@@ -559,6 +559,18 @@ por las dudas que se tienen.
 * **Today:** Realizar pruebas en las funcionalidades relacionadas con pedidos y apoyar en la revisión de posibles errores.
 * **Blockers:** none.
 
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Revisé las funcionalidades implementadas y verifiqué que los cambios realizados funcionen correctamente.
+* **Today:** Realizar pruebas en la parte correspondiente del sistema y apoyar en la detección de posibles errores.
+* **Blockers:** none.
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Verifiqué los cambios realizados en el sistema y revisé que no existan errores pendientes.
+* **Today:** Continuar con las pruebas de las funcionalidades desarrolladas y apoyar en la revisión general del proyecto.
+* **Blockers:** none.
+
 # Daily Reports - Team 3 Webspire 30/06/26
 
 ## Dayana Saleth Ortuño Guzmán
@@ -577,3 +589,15 @@ por las dudas que se tienen.
 * **Yesterday:** Realicé pruebas de las funcionalidades de mensajero y pedidos, comprobando el comportamiento general del sistema.
 * **Today:** Continuar con la revisión de errores, apoyar en las pruebas finales y validar que los cambios funcionen de manera correcta.
 * **Blockers:** No tener tareas asignadas directamente en el tablero de GitHub, pero apoyé con pruebas y revisión del sistema.
+
+## Juan Daniel Vasquez Casana
+
+* **Yesterday:** Realicé pruebas de las funcionalidades asignadas y revisé el comportamiento del sistema.
+* **Today:** Continuar con la validación de errores, apoyar en pruebas finales y verificar que los cambios estén correctos.
+* **Blockers:** No tener tareas asignadas directamente en el tablero de GitHub, pero apoyé con pruebas y revisión.
+
+## Alejandro Torrico Quispe
+
+* **Yesterday:** Revisé las funcionalidades desarrolladas y apoyé en la comprobación de posibles fallos del sistema.
+* **Today:** Seguir realizando pruebas, validar correcciones y apoyar en la revisión final del proyecto.
+* **Blockers:** No tener tareas asignadas directamente en GitHub, pero colaboré revisando y probando funcionalidades.
