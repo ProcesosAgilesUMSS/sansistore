@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, increment, getDoc } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
+import { getAuth } from 'firebase/auth';
 import { Package, XCircle } from 'lucide-react';
 import { ProductDetailModal } from './ProductDetailModal';
 import { ProductThumb } from './ProductThumb';
@@ -14,6 +15,7 @@ export const StockTable: React.FC = () => {
   const [status, setStatus] = useState<LoadingState>('loading');
   const [selectedProduct, setSelectedProduct] =
     useState<InventoryProduct | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -48,6 +50,24 @@ export const StockTable: React.FC = () => {
     };
 
     fetchProducts();
+    
+    // Check if user is admin
+    const auth = getAuth();
+    const unsub = auth.onAuthStateChanged(async (u) => {
+      if (u) {
+        try {
+          const userSnap = await getDoc(doc(db, 'users', u.uid));
+          const roles = userSnap.data()?.roles || [];
+          setIsAdmin(roles.includes('admin'));
+        } catch (error) {
+          console.error("Error checking roles:", error);
+        }
+      }
+    });
+
+    return () => {
+      unsub();
+    };
   }, []);
 
   const handleInitializeStock = async (productId: string, quantity: number) => {
@@ -89,6 +109,52 @@ export const StockTable: React.FC = () => {
     }
   };
 
+
+  const handleAdjustStock = async (productId: string, quantityChange: number) => {
+    try {
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+      const batch = writeBatch(db);
+      
+      const inventoryRef = doc(db, 'inventory', productId);
+      batch.update(inventoryRef, {
+        stockAvailable: increment(quantityChange),
+        stockTotal: increment(quantityChange),
+        updatedAt: new Date()
+      });
+
+      // Registro en inventoryMovements
+      const movementRef = doc(collection(db, 'inventoryMovements'));
+      batch.set(movementRef, {
+        productId,
+        type: quantityChange > 0 ? 'ENTRADA' : 'SALIDA',
+        quantity: Math.abs(quantityChange),
+        reason: 'Ajuste rápido',
+        operatorId: currentUser?.uid || 'unknown',
+        createdAt: new Date(),
+        sequence: 1
+      });
+
+      await batch.commit();
+
+      // Actualizar estado local
+      setProducts(prev => prev.map(p => {
+        if (p.id === productId) {
+          const newStock = (p.stockAvailable || 0) + quantityChange;
+          return { ...p, stockAvailable: newStock };
+        }
+        return p;
+      }));
+      
+      if (selectedProduct?.id === productId) {
+        setSelectedProduct({ ...selectedProduct, stockAvailable: (selectedProduct.stockAvailable || 0) + quantityChange });
+      }
+
+    } catch (err) {
+      console.error("Error", err);
+      alert('Error al ajustar stock.');
+    }
+  };
 
   const handleToggleActive = async () => {
     if (!selectedProduct) return;
@@ -166,7 +232,9 @@ export const StockTable: React.FC = () => {
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
           onToggleActive={handleToggleActive}
-          onInitializeStock={handleInitializeStock} // Nueva prop
+          onInitializeStock={handleInitializeStock}
+          onAdjustStock={handleAdjustStock}
+          canAdjustStock={isAdmin}
         />
       )}
 

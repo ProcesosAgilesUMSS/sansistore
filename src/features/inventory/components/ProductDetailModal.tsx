@@ -19,6 +19,8 @@ interface Props {
   onClose: () => void;
   onToggleActive: () => void;
   onInitializeStock: (productId: string, quantity: number) => Promise<void>;
+  onAdjustStock: (productId: string, quantityChange: number) => Promise<void>;
+  canAdjustStock?: boolean;
 }
 
 export const ProductDetailModal: React.FC<Props> = ({
@@ -26,12 +28,17 @@ export const ProductDetailModal: React.FC<Props> = ({
   onClose,
   onToggleActive,
   onInitializeStock,
+  onAdjustStock,
+  canAdjustStock = true,
 }) => {
   const [initialQty, setInitialQty] = useState<number | ''>('');
   const [isInitializing, setIsInitializing] = useState(false);
   
   const [successQty, setSuccessQty] = useState<number | null>(null);
   const [hasInitializedLocal, setHasInitializedLocal] = useState(false);
+
+  const [adjustQty, setAdjustQty] = useState<string>('');
+  const [isAdjusting, setIsAdjusting] = useState(false);
 
   const handleInitialize = async () => {
     if (initialQty === '' || initialQty <= 0) return;
@@ -54,6 +61,26 @@ export const ProductDetailModal: React.FC<Props> = ({
     }
   };
 
+  const handleAdjust = async () => {
+    const qty = Number(adjustQty);
+    if (isNaN(qty) || qty === 0) return;
+
+    setIsAdjusting(true);
+    try {
+      await onAdjustStock(product.id, qty);
+      setAdjustQty('');
+      // Mostrar feedback visual
+      setSuccessQty(qty > 0 ? qty : qty); // Se puede reusar successQty para mostrar la alerta
+      setTimeout(() => {
+        setSuccessQty(null);
+      }, 3000);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsAdjusting(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
       {successQty !== null && (
@@ -63,7 +90,7 @@ export const ProductDetailModal: React.FC<Props> = ({
           </div>
           <p className="font-display font-bold text-lg text-(--theme-text)">¡Éxito!</p>
           <p className="text-sm text-(--theme-text) opacity-70 text-center mt-1">
-            Se inicializaron <strong className="text-primary">{successQty} unidades</strong>.
+            Operación realizada con <strong className="text-primary">{Math.abs(successQty)} unidades</strong>.
           </p>
         </div>
       )}
@@ -171,6 +198,32 @@ export const ProductDetailModal: React.FC<Props> = ({
                     {isInitializing ? 'Cargando...' : 'Inicializar Stock'}
                   </button>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Ajuste de Stock */}
+          {canAdjustStock && (product.stockAvailable > 0 || hasInitializedLocal) && (
+            <div className="flex items-center gap-3 bg-(--theme-secondary-bg) p-3 rounded-2xl border border-(--theme-border)">
+              <div className="flex flex-col flex-1">
+                <span className="text-xs uppercase tracking-widest opacity-50 mb-1">Stock Actual</span>
+                <span className="font-bold text-lg text-(--theme-text)">{product.stockAvailable} u.</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  value={adjustQty}
+                  onChange={(e) => setAdjustQty(e.target.value)}
+                  placeholder="+ / -"
+                  className="w-20 bg-(--theme-card-bg) border border-(--theme-border) text-(--theme-text) rounded-xl px-2 py-2 text-sm focus:outline-none focus:border-primary text-center"
+                />
+                <button
+                  onClick={handleAdjust}
+                  disabled={isAdjusting || adjustQty === '' || Number(adjustQty) === 0}
+                  className="bg-primary text-white px-4 py-2 rounded-xl font-bold text-xs hover:brightness-110 disabled:opacity-50 transition-all shadow-md shadow-primary/10"
+                >
+                  {isAdjusting ? '...' : 'Guardar'}
+                </button>
               </div>
             </div>
           )}
