@@ -41,18 +41,15 @@ export default function EditOrderModal({
 }: EditOrderModalProps) {
   const [form, setForm] = useState<UpdateOrderPayload>({
     customerName: order.customerName,
-    customerPhone: order.customerPhone,
     status: order.status,
     deliveryStatus: order.deliveryStatus,
     incidentReason: order.incidentReason ?? "",
     total: order.total,
   });
 
-  // Si cambia la orden seleccionada, resetear el form
   useEffect(() => {
     setForm({
       customerName: order.customerName,
-      customerPhone: order.customerPhone,
       status: order.status,
       deliveryStatus: order.deliveryStatus,
       incidentReason: order.incidentReason ?? "",
@@ -68,11 +65,9 @@ export default function EditOrderModal({
   };
 
   return (
-    // Overlay
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-      {/* Modal */}
       <div className="bg-(--theme-card-bg) border border-(--theme-border) rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl">
-        
+
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-(--theme-border)">
           <div>
@@ -121,6 +116,7 @@ export default function EditOrderModal({
 
           {/* Campos editables */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
             {/* Customer name */}
             <div className="flex flex-col gap-1 sm:col-span-2">
               <label className="text-xs font-bold uppercase tracking-wide text-(--theme-text)/50">
@@ -130,19 +126,6 @@ export default function EditOrderModal({
                 type="text"
                 value={form.customerName}
                 onChange={(e) => handleChange("customerName", e.target.value)}
-                className="border border-(--theme-border) rounded-lg px-3 py-2 text-sm bg-(--theme-card-bg) text-(--theme-text) focus:outline-none focus:ring-2 focus:ring-primary/40"
-              />
-            </div>
-
-            {/* Phone */}
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold uppercase tracking-wide text-(--theme-text)/50">
-                Teléfono
-              </label>
-              <input
-                type="text"
-                value={form.customerPhone}
-                onChange={(e) => handleChange("customerPhone", e.target.value)}
                 className="border border-(--theme-border) rounded-lg px-3 py-2 text-sm bg-(--theme-card-bg) text-(--theme-text) focus:outline-none focus:ring-2 focus:ring-primary/40"
               />
             </div>

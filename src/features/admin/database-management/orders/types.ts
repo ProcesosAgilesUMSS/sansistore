@@ -34,7 +34,6 @@ export interface AdminOrder {
 
   // Campos editables
   customerName: string;
-  customerPhone: string;
   status: OrderStatus;
   deliveryStatus: DeliveryStatus;
   incidentReason?: string;
@@ -53,7 +52,6 @@ export interface OrderFilters {
 
 export interface UpdateOrderPayload {
   customerName: string;
-  customerPhone: string;
   status: OrderStatus;
   deliveryStatus: DeliveryStatus;
   incidentReason?: string;

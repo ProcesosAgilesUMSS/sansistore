@@ -19,11 +19,8 @@ function truncateId(id: string): string {
 
 function formatDate(dateStr: string | any): string {
   if (!dateStr) return "—";
-  
   const date = dateStr?.toDate ? dateStr.toDate() : new Date(dateStr);
-  
   if (isNaN(date.getTime())) return "—";
-  
   return date.toLocaleString("es-BO", {
     day: "2-digit",
     month: "2-digit",
@@ -32,8 +29,6 @@ function formatDate(dateStr: string | any): string {
     minute: "2-digit",
   });
 }
-
-
 
 const IconEdit = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -81,14 +76,9 @@ export default function OrdersTable({
           >
             {/* Fila superior: nombre + acciones */}
             <div className="flex items-start justify-between gap-2">
-              <div>
-                <p className="font-semibold text-(--theme-text) text-sm">
-                  {order.customerName}
-                </p>
-                <p className="text-xs text-(--theme-text)/40 mt-0.5">
-                  {order.customerPhone}
-                </p>
-              </div>
+              <p className="font-semibold text-(--theme-text) text-sm">
+                {order.customerName}
+              </p>
               <div className="flex gap-1.5 flex-shrink-0">
                 <button
                   type="button"
@@ -152,7 +142,6 @@ export default function OrdersTable({
             <tr className="bg-(--theme-text)/5 text-(--theme-text)/50 text-xs uppercase tracking-wide">
               <th className="text-left px-4 py-3 w-[160px]">Order ID</th>
               <th className="text-left px-4 py-3">Cliente</th>
-              <th className="text-left px-4 py-3">Teléfono</th>
               <th className="text-left px-4 py-3">Status</th>
               <th className="text-left px-4 py-3">Delivery</th>
               <th className="text-left px-4 py-3">Creado</th>
@@ -175,9 +164,6 @@ export default function OrdersTable({
                 </td>
                 <td className="px-4 py-3 font-medium text-(--theme-text) whitespace-nowrap">
                   {order.customerName}
-                </td>
-                <td className="px-4 py-3 text-(--theme-text)/60 whitespace-nowrap">
-                  {order.customerPhone}
                 </td>
                 <td className="px-4 py-3">
                   <span
